@@ -1,7 +1,7 @@
 import './App.css';
 import React,{useEffect,useState} from 'react'
-import PageLogin from './login/PageLogin'
-import Main from './components/Main' 
+import LoginPage from './containers/LoginPage/LoginPage'
+import MainPage from './containers/MainPage/MainPage' 
 import {auth} from './firebase'
 
 
@@ -21,9 +21,10 @@ function App() {
   },[]);
   return (
     <div className="App">
-      {presentUser ? <Main /> : <PageLogin />}
+      {presentUser ? <MainPage /> : <LoginPage />}
     </div>
   );
 }
 
 export default App;
+
