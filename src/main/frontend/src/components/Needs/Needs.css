@@ -1,0 +1,40 @@
+.wrapNeeds {
+    display: flex;
+    float: right;
+    height: 90%;
+    width: calc(100% - 350px);
+    background-color: #fafafa;
+}
+.needs {
+    width: 98%;
+    margin: 15px;
+    background-color: white;
+}
+.needMenu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+}
+.needMenulist {
+    padding: 0px;
+    margin: 0px 5px;
+}
+.needMenulist li {
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 110%;
+}
+.needMenulist li:hover {
+    border-bottom: solid;
+}
+.needMenu button {
+    font-size: 110%;
+    background-color: #4c6380;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    margin-right: 3%;
+    cursor: pointer;
+}

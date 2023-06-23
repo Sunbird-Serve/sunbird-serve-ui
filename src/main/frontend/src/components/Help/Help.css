@@ -1,0 +1,12 @@
+.wrapHelp {
+    display: flex;
+    float: right;
+    height: 90%;
+    width: calc(100% - 350px);
+    background-color: #fafafa;
+}
+.help {
+    width: 98%;
+    margin: 15px;
+    background-color: white;
+}

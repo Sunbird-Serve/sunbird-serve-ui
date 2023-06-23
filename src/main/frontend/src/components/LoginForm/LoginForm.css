@@ -1,0 +1,80 @@
+.loginForm {
+    display: block;
+    position: fixed;
+    margin-left: 49%;
+    width: 51%;
+    height: 100%;
+    padding: 4%;
+}
+
+.sbLogo {
+    width: 60%;
+    display: flex;
+}
+
+.boxLogin {
+    width: 60%;
+    margin-top: 13.5%;
+    display: flex;
+}
+
+.menuLogin {
+    width: 100%;
+    text-align: left;
+}
+
+.greetLogin {
+    margin-bottom: 10px;
+    color: #94a2b7;
+}
+
+.titleLogin {
+    font-size: 200%;
+    font-weight: 500;
+    margin-bottom: 11.5%;
+    color:  #4c6280;
+}
+
+.menuLogin label {
+    display: flex;
+    margin-bottom: 6px;
+    margin-top: 6px;
+    border-radius: 10px;
+    color: #94a2b7;
+}
+
+.menuLogin input {
+    display: block;
+    height: 38px;
+    font-size: 120%;
+    width: 97%;
+    margin-bottom: 16px;
+    border-radius: 10px;
+    padding-left: 10px;
+}
+
+.btnLogin {
+    height: 36px;
+    display: flex;
+    margin-top: 40px;
+    padding-top: 6px;
+    padding-bottom: 6px
+}
+
+.btnLogin button {
+    display: flexbox;
+    width: 100%;
+    height: 56px;
+    background-color: #4c6280;
+    color: white;
+    font-size: 110%;
+    border-radius: 10px;
+}
+
+.loption {
+    display: flexbox;
+    position: relative;
+    margin-top: 40px;
+    margin-bottom: -20px;
+    text-align: center;
+}

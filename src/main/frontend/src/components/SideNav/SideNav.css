@@ -1,0 +1,59 @@
+.sideNav {
+    display: block;
+    position: fixed;
+    width: 350px;
+    height: 100%;
+}
+.logoSideNav {
+    width: 350px;
+    height: 10%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: ridge;
+}
+.logoSideNav img {
+    margin-left: 11%;
+}
+.logoSideNav i {
+    color: #323232;
+}
+.sidebarList {
+    display:block;
+    text-align: left;
+}
+.navGroup {
+    display: block;
+    margin: 4% 12%;
+    font-weight: 520;
+    color: #929fa4;
+}
+.navCategory {
+    border-bottom: ridge;
+}
+.navManagement {
+    border-bottom: ridge;
+}
+.linkSideNav {
+    text-decoration: none;
+    list-style: none;
+    display: flex;
+}
+.sidebarListItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    color: #94a1b4;
+}
+.sidebarListItem p {
+    height: fit-content;
+    margin-left: 20px;
+}
+.active li {
+    background-color: #f0f1f5;
+    color: #4c6280;
+}
+.sidebarListItem:hover {
+    background-color: #f0f1f5;
+}
