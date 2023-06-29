@@ -7,6 +7,7 @@ import Needs from '../../components/Needs/Needs'
 import Settings from '../../components/Settings/Settings'
 import Accounts from '../../components/Accounts/Accounts'
 import Help from '../../components/Help/Help'
+import NeedPlans from '../../components/Need Plans/NeedPlans'
 
 const MainPage = () => {
     return(
@@ -21,6 +22,7 @@ const MainPage = () => {
                         <Route path="/settings" component={Settings} />
                         <Route path="/accounts" component={Accounts} />
                         <Route path="/help" component={Help} />
+                        <Route path="/needPlans" component={NeedPlans} />
                     </Switch>
                 </div>
             </div>

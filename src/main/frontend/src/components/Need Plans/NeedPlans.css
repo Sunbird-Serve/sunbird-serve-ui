@@ -1,0 +1,13 @@
+.wrapNeeds {
+    display: flex;
+    float: right;
+    height: 90%;
+    width: calc(100% - 350px);
+    background-color: #fafafa;
+}
+
+.needPlansGrid {
+    display: grid;
+    grid-template-columns: 70% 30%;
+    width: 100%;
+}
