@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './NeedPlans.css';
 import { Calendar, dayjsLocalizer, Views } from 'react-big-calendar';
 import dayjs from 'dayjs'
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
 function NeedPlans() {
+
+    const [currentDate, setCurrentDate] = useState(new Date());
 
     const mockEvents = [
         {
@@ -22,7 +24,6 @@ function NeedPlans() {
     ];
 
     const localizer = dayjsLocalizer(dayjs);
-    console.log(new Date(2023, 5, 1));
 
     // Custom event style getter
   const eventStyleGetter = (event) => {
@@ -38,22 +39,48 @@ function NeedPlans() {
       style,
     };
   };
+
+  function dateHandler(date, flag) {
+    const modifiedDate = new Date(date);
+    switch(flag) {
+        case '+':
+            modifiedDate.setMonth(modifiedDate.getMonth() + 1);
+            break;
+        case '-':
+            modifiedDate.setMonth(modifiedDate.getMonth() - 1);
+            break;
+        default:
+            break;
+    }
+    console.log(date, 'date here');
+    console.log(modifiedDate, 'check here');
+    setCurrentDate(modifiedDate);
+  }
     
     return (
         <div className="wrapNeeds">
             <div className="needPlansGrid">
                 <div>
+                    <span style={{float: 'left', width: '30%'}}>{currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}</span>
+                    <div style={{float: 'left'}}>
+                        <button type="button" onClick={() => dateHandler(currentDate, '-')} >{'<'}</button>
+                        <button type="button" onClick={() => dateHandler(currentDate, '+')} >{'>'}</button>
+                    </div>
+                    <br />
+                    <div>
                     <Calendar
                     localizer={localizer}
                     events={mockEvents}
+                    toolbar={false}
                     startAccessor="start"
-                    defaultDate={new Date()}
+                    date={currentDate}
                     step={50}
                     endAccessor="end"
                     style={{ height: 500 }}
                     views={{month: true}}
                     eventPropGetter={eventStyleGetter}
                      />
+                    </div>
                 </div>
                 <div>Events</div>
             </div>
