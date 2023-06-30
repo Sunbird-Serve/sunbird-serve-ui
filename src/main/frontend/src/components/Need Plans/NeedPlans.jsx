@@ -3,6 +3,8 @@ import './NeedPlans.css';
 import { Calendar, dayjsLocalizer, Views } from 'react-big-calendar';
 import dayjs from 'dayjs'
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 
 function NeedPlans() {
 
@@ -60,13 +62,17 @@ function NeedPlans() {
     return (
         <div className="wrapNeeds">
             <div className="needPlansGrid">
-                <div>
+                <div className = 'calendar'>
                     <span style={{float: 'left', width: '30%'}}>{currentDate.toLocaleString('default', { month: 'long' })} {currentDate.getFullYear()}</span>
                     <div style={{float: 'left'}}>
                         <button type="button" onClick={() => dateHandler(currentDate, '-')} >{'<'}</button>
                         <button type="button" onClick={() => dateHandler(currentDate, '+')} >{'>'}</button>
                     </div>
                     <br />
+                    <div className = 'headerdiv'>
+                      <div className = 'headerline'><div className = 'headerlabel'><VisibilityIcon style = {{fontSize: '100%', margin: '5px 10px 0px 10px'}}/>Needs</div><div className = 'headervalue'>200</div></div>
+                      <div className = 'headerline'><div className = 'headerlabel'><VisibilityIcon style = {{fontSize: '100%', margin: '5px 10px 0px 10px'}} />Volunteers</div><div className = 'headervalue'>120</div></div>
+                    </div>
                     <div>
                     <Calendar
                     localizer={localizer}
@@ -82,7 +88,11 @@ function NeedPlans() {
                      />
                     </div>
                 </div>
-                <div>Events</div>
+                <div className = 'events'>
+                  <EventBusyIcon />
+                  <div>Select a date to display the needs</div>
+
+                </div>
             </div>
         </div>
     );
