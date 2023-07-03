@@ -1,0 +1,12 @@
+.timestamp {
+    border: 1px solid orange;
+    background: #ffe2ae;
+    color: orange;
+    font-size: 1.5vh;
+    float: left;
+    margin: 1vh 0 1vh 0;
+}
+
+.eventCard {
+    background-color: rgb(209, 205, 205);
+}
