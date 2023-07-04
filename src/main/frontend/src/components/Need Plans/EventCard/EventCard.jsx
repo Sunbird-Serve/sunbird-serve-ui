@@ -24,7 +24,7 @@ const VolunteerCard = (props) => {
 
 
 function EventCard(props) {
-    const {event} = props;
+    const {startTime, endTime, title,address} = props;
 
     const RepeatComponent = ({ n }) => {
         const components = [];
@@ -38,13 +38,13 @@ function EventCard(props) {
 
     return (
         <div>
-            <span className='timestamp'>9:00am to 1:00pm</span>
+            <span className='timestamp'>{startTime} to {endTime}</span>
             <br style={{clear: 'both'}} />
             <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    Title
+                    {title}
                     <br />
-                    Address
+                    {address}
                 </AccordionSummary>
                 <div className='eventCard'>
                     <RepeatComponent n={5} />
