@@ -12,7 +12,6 @@ function NeedPlans() {
 
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
-    const [statusSelectedDate, setStatusSelectedDate] = useState(false);
     const [selSlotInfo, setSelSlotInfo] = React.useState(null);
     const mockEvents = [
         {
@@ -79,7 +78,6 @@ function NeedPlans() {
     // Handle the selection of an event
     console.log('Selected event:', JSON.stringify(event));
     setSelectedDate(event.start);
-    setStatusSelectedDate(true);
     setSelSlotInfo(event.start);
     // Perform any additional logic or dispatch actions
     // based on the selected event
@@ -90,23 +88,19 @@ function NeedPlans() {
     console.log('Drill down date:', date);
     console.log('Drill down view:', view);
     setSelectedDate(date);
-    setStatusSelectedDate(true);
     setSelSlotInfo(date);
   };
     
   const onSelectSlot = (slotInfo) => {
       setSelSlotInfo(slotInfo.start);
+      setSelectedDate(slotInfo.start);
     console.log(slotInfo, 'slotInfo')
   }; // onSelectSlot
 
   const dateCellWrapper = ({ children, value }) => {
     const styleObject = {backgroundColor: 'lightpink' }
     return (
-      <div style = {dayjs(value).isSame(dayjs(selSlotInfo),"day")?styleObject:{}} className={children.props.className} 
-      onClick={() => {setSelectedDate(value);
-        setStatusSelectedDate(true);}}
-      >
-        
+      <div style = {dayjs(value).isSame(dayjs(selSlotInfo),"day")?styleObject:{}} className={children.props.className}>
         {children}
       </div>
     )
@@ -163,7 +157,7 @@ function NeedPlans() {
                 </div>
                 <div className = 'events'>
                   {
-                statusSelectedDate
+                selectedDate
                   ? 
                     <EventsSideBar selectedDate={selectedDate}/>
                   :
