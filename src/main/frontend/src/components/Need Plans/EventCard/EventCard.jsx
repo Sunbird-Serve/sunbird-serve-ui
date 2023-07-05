@@ -7,13 +7,13 @@ import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const VolunteerCard = (props) => {
-    const {key} = props;
+    const {key, name} = props;
     return (
         <Accordion>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    Volunteer {key}
+                <AccordionSummary expandIcon={<ExpandMoreIcon />} className='volunteerCard'>
+                    Name: {name}
                     <br />
-                    Address Chennai
+                    Address: Chennai
                 </AccordionSummary>
                 <div className='eventCard'>
                     Volunteer details
@@ -24,13 +24,13 @@ const VolunteerCard = (props) => {
 
 
 function EventCard(props) {
-    const {event} = props;
+    const {ev} = props;
 
-    const RepeatComponent = ({ n }) => {
+    const RepeatComponent = ({ n, volunteers }) => {
         const components = [];
       
         for (let i = 0; i < n; i++) {
-          components.push(<VolunteerCard key={i} />);
+          components.push(<VolunteerCard key={i} name = {volunteers[i]}/>);
         }
       
         return <>{components}</>;
@@ -38,16 +38,17 @@ function EventCard(props) {
 
     return (
         <div>
-            <span className='timestamp'>9:00am to 1:00pm</span>
+            <span className='timestamp'>{ev.start.getHours()}:{ev.start.getMinutes()} to {ev.end.getHours()}:{ev.end.getMinutes()}</span>
+            
             <br style={{clear: 'both'}} />
             <Accordion>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                    Title
+                    {ev.title}
                     <br />
-                    Address
+                    {/* {ev.address} */}
                 </AccordionSummary>
                 <div className='eventCard'>
-                    <RepeatComponent n={5} />
+                    <RepeatComponent n={ev.volunteers.length} volunteers = {ev.volunteers}/>
                 </div>
             </Accordion>
         </div>

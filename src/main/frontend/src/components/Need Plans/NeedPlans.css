@@ -4,6 +4,7 @@
     height: 90%;
     width: calc(100% - 350px);
     background-color: #fafafa;
+    border: 1px solid #929fa4;
 }
 
 .needPlansGrid {
@@ -14,6 +15,14 @@
 
 .calendar{
     background-color:  white;
+    padding: 3%;
+}
+
+.changeMonthButton{
+  border-radius: 50%;
+  margin: 0px 3px;
+  border: 1px solid #c4c4c4;
+  background-color: white;
 }
 
 .box {
@@ -26,18 +35,18 @@
   .content {
     display: flex;
     flex-direction: row;
-    border: 1px solid black;
+    border: 1px solid #c4c4c4;
     margin-right: 2%;
     border-radius: 0.8vh;
   }
   
   .label {
-    font-weight: bold;
-    border-right: 1px solid black;
-    padding: 1vh;
+    /* font-weight: bold; */
+    border-right: 1px solid #c4c4c4;
+    padding: 0.5vh 2vh;
   }
   
   .value {
-    color: #888;
-    padding: 1vh;
+    color: blac;
+    padding:  0.5vh 2vh;
   }
