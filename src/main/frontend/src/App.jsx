@@ -3,7 +3,7 @@ import React,{useEffect,useState} from 'react'
 import LoginPage from './containers/LoginPage/LoginPage'
 import MainPage from './containers/MainPage/MainPage' 
 import {auth} from './firebase'
-
+import { Provider } from 'react-redux';
 
 function App() {
   const [presentUser,setPresentUser] = useState(null);
@@ -20,9 +20,11 @@ function App() {
     })
   },[]);
   return (
-    <div className="App">
-      {presentUser ? <MainPage /> : <LoginPage />}
-    </div>
+    <Provider store={store}>
+      <div className="App">
+        {presentUser ? <MainPage /> : <LoginPage />}
+      </div>
+    </Provider>
   );
 }
 
