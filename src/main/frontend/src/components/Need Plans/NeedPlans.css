@@ -1,24 +1,24 @@
 .wrapNeeds {
-    display: flex;
-    float: right;
-    height: 90%;
-    width: calc(100% - 350px);
-    background-color: #fafafa;
-    border: 1px solid #929fa4;
+  display: flex;
+  float: right;
+  height: 90%;
+  width: calc(100% - 350px);
+  background-color: #fafafa;
+  border: 1px solid #929fa4;
 }
 
 .needPlansGrid {
-    display: grid;
-    grid-template-columns: 70% 30%;
-    width: 100%;
+  display: grid;
+  grid-template-columns: 70% 30%;
+  width: 100%;
 }
 
-.calendar{
-    background-color:  white;
-    padding: 3%;
+.calendar {
+  background-color: white;
+  padding: 3%;
 }
 
-.changeMonthButton{
+.changeMonthButton {
   border-radius: 50%;
   margin: 0px 3px;
   border: 1px solid #c4c4c4;
@@ -26,27 +26,27 @@
 }
 
 .box {
-    padding: 1%;
-    margin-bottom: 2px;
-    display: flex;
-    flex-direction: row;
-  }
-  
-  .content {
-    display: flex;
-    flex-direction: row;
-    border: 1px solid #c4c4c4;
-    margin-right: 2%;
-    border-radius: 0.8vh;
-  }
-  
-  .label {
-    /* font-weight: bold; */
-    border-right: 1px solid #c4c4c4;
-    padding: 0.5vh 2vh;
-  }
-  
-  .value {
-    color: blac;
-    padding:  0.5vh 2vh;
-  }
+  padding: 1%;
+  margin-bottom: 2px;
+  display: flex;
+  flex-direction: row;
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid #c4c4c4;
+  margin-right: 2%;
+  border-radius: 0.8vh;
+}
+
+.label {
+  /* font-weight: bold; */
+  border-right: 1px solid #c4c4c4;
+  padding: 0.5vh 2vh;
+}
+
+.value {
+  color: blac;
+  padding: 0.5vh 2vh;
+}
