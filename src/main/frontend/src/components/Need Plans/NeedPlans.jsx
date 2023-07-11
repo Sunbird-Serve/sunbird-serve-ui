@@ -18,15 +18,18 @@ function NeedPlans() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selSlotInfo, setSelSlotInfo] = React.useState(null);
 
+  // using selectors to get data from redux, here state is the redux global state 
   const { needs } = useSelector(
     (state) => ({
-      needs: selector.getData(state),
+      needs: selector.getData(state), 
     }),
-    shallowEqual,
+    shallowEqual, // makes sure that the component rerenders only when the above redux state data changes (avoids unnecessary rerenders)
   );
 
+  // this function helps us to dispatch actions which will trigger reducers/sagas
   const dispatch = useDispatch();
 
+  // binds the actions creators with dispatch. Action creators return action object
   const bindedActions = bindActionCreators({ ...needPlansActions }, dispatch);
   const mockEvents = [
     {
