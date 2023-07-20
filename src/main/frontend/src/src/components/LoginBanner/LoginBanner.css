@@ -1,0 +1,18 @@
+.loginBanner {
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    align-content: center;
+}
+.headBanner {
+    color:white;
+    font-size: 300%;
+    font-weight: 600;
+    text-align: center;
+}
+.textBanner {
+    font-size: 110%;
+    text-align: justify;
+    border: solid;
+    visibility: hidden;
+}

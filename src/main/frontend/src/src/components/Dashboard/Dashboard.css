@@ -1,0 +1,9 @@
+.wrapDashboard {
+    height: 100%;
+    padding: 10px;
+}
+.dashboard {
+    background-color: #fafafa;
+    display: none;
+    height: 100%;
+}

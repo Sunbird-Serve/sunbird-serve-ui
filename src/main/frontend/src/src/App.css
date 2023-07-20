@@ -1,0 +1,15 @@
+.App {
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+/*
+//Hide scrollbar for Chrome, Safari and Opera 
+.App::-webkit-scrollbar {
+  display: none;
+}
+// Hide scrollbar for IE, Edge and Firefox //
+.App {
+-ms-overflow-style: none;  // IE and Edge //
+scrollbar-width: none;  //Firefox //
+}
+*/

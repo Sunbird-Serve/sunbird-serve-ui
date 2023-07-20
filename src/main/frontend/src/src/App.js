@@ -20,11 +20,14 @@ function App() {
     })
   },[]);
   return (
-    <div className="App">
-      {presentUser ? <MainPage /> : <LoginPage />}
+      <div className="App">
+        {presentUser ? <MainPage /> : <LoginPage />}
     </div>
-  );
+
+);
 }
 
 export default App;
 
+
+//

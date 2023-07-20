@@ -1,0 +1,105 @@
+.loginForm {
+    height: 100%;
+    padding-left: 3%;
+    display: flex;
+    flex-direction: column;
+    align-items: top;
+}
+.sbLogo {
+    border-bottom: ridge;
+    border-width: 1px;
+    padding: 12px;
+    margin-bottom: 7%;
+}
+.greetLogin {
+    font-size: 120%;
+    color: #94a2b7;
+    height: fit-content;
+}
+.titleLogin {
+    height: fit-content;
+    font-size: 200%;
+    font-weight: 500;
+    color:  #4c6280;
+    margin-bottom: 8%;
+}
+.unameLogin, .pwdLogin {
+    padding-right: 3%;
+}
+.unameLogin label,.pwdLogin label {
+    width: 100%;
+    color: #94a2b7;
+}
+.unameLogin input,.pwdLogin input {
+    width: 100%;
+    padding: 9px;
+    margin: 1% 0 2% 0px;
+    border-radius: 6px;
+    border-width: 1px;
+}
+.btnLogin {
+    margin-top: 7%;
+    padding-right: 3%;
+    display: flex;
+    align-items: center;
+}
+.btnLogin button {
+    padding: 10px 10%;
+    background-color: #4c6280;
+    color: white;
+    font-size: 120%;
+    border-radius: 6px;
+    border: none;
+    width: 40%;
+}
+.loption {
+    width: 20%;
+    text-align: center;
+}
+.hline { 
+    margin-top: 4%;   
+    padding-right: 3%;
+}
+.btnSLogin {
+    margin-top: 3%;
+    padding-right: 3%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.btnSLogin button {
+    padding: 10px;
+    font-size: 120%;
+    background-color: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    border-width: 1px;
+}
+.btnSLogin i {
+    vertical-align: middle;
+    margin-right: 10px ;
+}
+/*
+
+
+
+.btnSLogin {
+    display: inline-block;
+    align-items: center;
+}
+.btnSLogin button {
+    display: flexbox;
+    width: 100%;
+    background-color: white;
+    color: black;
+    font-size: 110%;
+    border-radius: 10px;
+}
+
+.loginError {
+    position:absolute;
+    top: 32%;
+    color: red;
+}
+*/
