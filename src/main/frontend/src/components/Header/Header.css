@@ -1,79 +1,46 @@
-.header {
-    float:right;
-    width: calc(100% - 350px);
-    height: 10%;
-}
 .wrapHead {
+    height: 76px;
+    border-bottom: solid;
+    border-color: #F2F2F2;
+}
+.header {
+    align-items: center;
+}
+.leftHead {
+    border-right: solid;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 100%
+    padding: 10px;
 }
-.leftHead {
-    display: block;
-}
-.rightHead {
-    display: flex;
-    align-items: center;
-    width: 350px;
-    height: 100%;
-}
+
 .btnProf {
-    width: 80%;
-    background-color: white;
+    width: 100%;
     border: none;
-}
-.profile {
     display: flex;
     align-items: center;
-    padding-left: 25px;
-    width: 90%;
-    position: fixed;
-    top: 25px;
+    background-color: white;
+    justify-content: space-evenly;
+    text-align: left;
 }
 .dropDownProfile {
-    position: relative;
-    margin-top: 140px;
     text-align: left;
-    margin-left: 30px;
+    display: flex;
+    position: absolute;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
     background-color: white;
-}
-.dropDownProfile li {
-    list-style-type: none;
-    margin: 10px;
-    font-size: 140%;
-    width: fit-content;
-}
-.dropDownProfile li:hover {
-    font-weight: 800;
-}
-.btnLogout:hover {
-    font-weight: 800;
-}
-.notification {
-    margin-right: 30px;
-}
-.profIcon {
-    margin-right: 15px;
-}
-.user {
-    margin-right: 15px;
-}
-.userName {
-    font-size: 150%;
-    text-align: left;
-}
-.userTag {
-    text-align: left;
-    margin-top: 3px;
-}
-.profile i {
-    margin-left:10%;   
+    z-index: 5;
 }
 .btnLogout {
     border: none;
     background-color: inherit;
-    font-size: 104%;
-    margin: 0px -5px 10px -5px ;
-    z-index: 1;
+    z-index: 5;
+    margin-left: 5px;
+}
+.dropDownProfile li {
+    list-style-type: none;
+    margin-left: 15px;
+    padding: 5px;
 }

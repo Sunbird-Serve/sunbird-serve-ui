@@ -2,143 +2,21 @@
     background-color: rgba(0,0,0,0.4);
     width: 100%;
     height: 100%;
-    position: fixed;
-    display: flex;
-    justify-content: space-around;
+    position: relative;
+    top: -100%;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    padding: 5% 10%;
 }
 .raiseNeed {
     background-color: white;
-    position: relative;
-    height: 60%;
-    width: 60%;
-    margin-left: -20% ;
-    margin-top: 8%;
-    overflow: auto;
-}
-.raiseNeedBar {
-    width: 90%;
-    margin-left: 4%;
-    margin-top: 4%;
-    margin-bottom: 1%;
-    height: 12%;
-}
-.needName {
-    font-size: 150%;
-    padding: 5px;
-    margin-left: 5px;
-    text-align: left ;
-}
-.tagNeedName {
-    margin-left: 10px;
-}
-.btnRaiseNeed {
-    margin-right: 20px;
-    background-color: #4c6380;
-    padding: 10px;
-    color: white;
-    border-radius: 5px;
-    font-size: 102%;
-}
-.wrapNeedBar {
-    display: flex;
-    align-items: center;
-    justify-content:space-between;
-}
-
-.raiseNeedForm {
-    width: 92%;
-    margin-left: 4%;
-    height: 72%;
-}
-.needForm {
-    display: flex;
-    height: 100%;
-}
-.formLeftSide {
-    width: 50%;
-}
-.formRightSide {
-    width: 50%;
-}
-.itemForm {
-    display: block;
-    padding: 5px;
-}
-.itemForm label {
-    width: 100%;
-    display: flex;
-    float: left;
-    margin: 5px;
-}
-.itemForm input {
-    width: 90%;
-    display: flex;
-    padding: 8px;
-    margin: 5px;
-    border: 2px ridge single;
-}
-.itemForm select {
-    width: 94%;
-    display: flex;
-    padding: 8px;
-    margin: 5px;
-    border-radius: 3px;
-    border: 2px ridge single;
-}
-.itemDescrip {
-    display: flex;
-    align-items: center;
-    width: 92%;
-    padding: 5px;
-    flex-direction: column;
-    margin-left: 5px;
-}
-.itemDescrip label {
-    display: block;
-    width: 100%;
-    text-align: left;
-    margin: 5px;
-}
-.itemDescripText {
-    display: block;
-    width: 100%;
-    border-radius: 5px;
-    text-align: left;
-}
-.quillEdit {
-    border: 1px single;
-}
-.wrapDateItem {
-    width: 96.5%;
-    margin-left: 5px;
-    display: flex;
-}
-.itemDate {
-    width: 50%;
-    display: block ;
-}
-.itemDate label {
-    display: flex;
-    margin: 5px;
-}
-.itemDate input {
-    display: flex;
-    padding: 5px;
-    margin-left: 5px;
-    width: 85%;
-}
-.wrapTimeItem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 96.5%;
-    margin-left: 5px;
+    height: 90%;
+    overflow: scroll;
 }
 .btnClose {
-    position: absolute;
-    margin-left: 41%;
-    margin-top: 6%; 
+    margin-left: 99%;
+    z-index: 20;
 }
 .btnClose button {
     cursor: pointer;
@@ -149,3 +27,171 @@
     font-size: 120%;
     border:none;
 }
+.raiseNeedBar {
+    border-bottom-style: ridge;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px
+}
+.wrapNameNeed {
+    margin: 5px 5px;
+}
+.needName {
+    font-size: 150%;
+    font-weight: 500;
+}
+.btnRaiseNeed {
+    border: none;
+    margin-right: 20px;
+    padding: 10px 20px;
+    background-color: #4c6380;
+    color: white;
+    border-radius: 5px;
+}
+.raiseNeedForm {
+    width: 100%;
+    overflow: scroll;
+    padding: 1%;
+}
+.itemForm {
+    margin: 5px 0px;
+}
+
+.itemForm label {
+    width: 100%;
+    margin-bottom: 2px;
+}
+.itemForm input {
+    padding: 2px;
+    width: 100%;
+    border-radius: 3px;
+}
+.itemForm select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+}
+.itemForm button {
+    width: 100%;
+    text-align: left;
+    border: none;
+    padding: 5px;
+    margin-top: 10px;
+}
+.ql-container {
+    height: 110px;
+}
+.formBottom {
+    display: flex;
+}
+.headerSkills {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/*
+.itemForm {
+    border: solid;
+    padding:0px;
+}
+.itemForm label {
+    width: 98%;
+    border: solid;
+}
+
+
+.itemForm button {
+    width: 96%;
+    padding: 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+.formRight {
+    border: solid;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+.itemDescripText {
+    padding-right: 4%;
+    border-radius: 5px;
+    text-align: left;
+} */
+/*
+
+
+
+
+
+.wrapNeedBar {
+    display: flex;
+    align-items: center;
+    justify-content:space-between;
+}
+
+
+.needForm {
+    display: flex;
+    height: 100%;
+}
+.formLeftSide {
+    width: 50%;
+}
+.formRightSide {
+    width: 50%;
+}
+
+
+.itemDescrip {
+    display: flex;
+    align-items: center;
+    width: 92%;
+    padding: 5px;
+    flex-direction: column;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+.itemDescrip label {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 5px;
+}
+
+.quillEdit {
+    border: 1px single;
+}
+.ql-container {
+    height: 152px;
+}
+.wrapTimeItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 96.5%;
+    margin-left: 5px;
+}
+
+.btnSkills {
+    border:soild;
+    font-size: 100%;
+    margin-left: 3px;
+    width: 95%;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    display: block;
+}
+
+.dropDownSkills {
+    border: solid;
+    display: block;
+    border-width: 1px;
+    width: 94%;
+    margin-left: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+*/
