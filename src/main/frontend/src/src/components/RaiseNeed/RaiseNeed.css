@@ -1,0 +1,197 @@
+.wrapRaiseNeed {
+    background-color: rgba(0,0,0,0.4);
+    width: 100%;
+    height: 100%;
+    position: relative;
+    top: -100%;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    padding: 5% 10%;
+}
+.raiseNeed {
+    background-color: white;
+    height: 90%;
+    overflow: scroll;
+}
+.btnClose {
+    margin-left: 99%;
+    z-index: 20;
+}
+.btnClose button {
+    cursor: pointer;
+    border-radius: 50%;
+    background-color: black;
+    color: white;
+    padding: 5px 8px 8px 8px;
+    font-size: 120%;
+    border:none;
+}
+.raiseNeedBar {
+    border-bottom-style: ridge;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px
+}
+.wrapNameNeed {
+    margin: 5px 5px;
+}
+.needName {
+    font-size: 150%;
+    font-weight: 500;
+}
+.btnRaiseNeed {
+    border: none;
+    margin-right: 20px;
+    padding: 10px 20px;
+    background-color: #4c6380;
+    color: white;
+    border-radius: 5px;
+}
+.raiseNeedForm {
+    width: 100%;
+    overflow: scroll;
+    padding: 1%;
+}
+.itemForm {
+    margin: 5px 0px;
+}
+
+.itemForm label {
+    width: 100%;
+    margin-bottom: 2px;
+}
+.itemForm input {
+    padding: 2px;
+    width: 100%;
+    border-radius: 3px;
+}
+.itemForm select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+}
+.itemForm button {
+    width: 100%;
+    text-align: left;
+    border: none;
+    padding: 5px;
+    margin-top: 10px;
+}
+.ql-container {
+    height: 110px;
+}
+.formBottom {
+    display: flex;
+}
+.headerSkills {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/*
+.itemForm {
+    border: solid;
+    padding:0px;
+}
+.itemForm label {
+    width: 98%;
+    border: solid;
+}
+
+
+.itemForm button {
+    width: 96%;
+    padding: 5px;
+    border-radius: 3px;
+    margin-left: 5px;
+}
+.formRight {
+    border: solid;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+.itemDescripText {
+    padding-right: 4%;
+    border-radius: 5px;
+    text-align: left;
+} */
+/*
+
+
+
+
+
+.wrapNeedBar {
+    display: flex;
+    align-items: center;
+    justify-content:space-between;
+}
+
+
+.needForm {
+    display: flex;
+    height: 100%;
+}
+.formLeftSide {
+    width: 50%;
+}
+.formRightSide {
+    width: 50%;
+}
+
+
+.itemDescrip {
+    display: flex;
+    align-items: center;
+    width: 92%;
+    padding: 5px;
+    flex-direction: column;
+    margin-left: 5px;
+    margin-bottom: 5px;
+}
+.itemDescrip label {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin: 5px;
+}
+
+.quillEdit {
+    border: 1px single;
+}
+.ql-container {
+    height: 152px;
+}
+.wrapTimeItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 96.5%;
+    margin-left: 5px;
+}
+
+.btnSkills {
+    border:soild;
+    font-size: 100%;
+    margin-left: 3px;
+    width: 95%;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    display: block;
+}
+
+.dropDownSkills {
+    border: solid;
+    display: block;
+    border-width: 1px;
+    width: 94%;
+    margin-left: 5px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+*/

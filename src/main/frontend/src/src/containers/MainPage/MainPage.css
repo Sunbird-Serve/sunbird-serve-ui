@@ -1,0 +1,14 @@
+.mainPage {
+    height: 100vh;
+}
+.wrapDisplay {
+    height: 100%;
+}
+.wrapSideNav {
+    border-right: solid;
+    border-color: rgba(242, 242, 242, 1);
+}
+.wrapContent {
+    height: calc( 100% - 76px);
+    background-color: #FBFBFB;
+}
