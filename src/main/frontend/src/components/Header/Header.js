@@ -4,46 +4,42 @@ import Avatar from '@mui/material/Avatar';
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function Header() {
   const [open,setOpen] = useState(false);
 
+  const currentUser = auth.currentUser;
+  console.log(currentUser)
   return (
-    <div className="header">
-      <div className="wrapHead">
-
-        <div className="leftHead">
+    <div className="wrapHead">
+      <div className="header row">
+        <div className="leftHead col-12 col-sm-8">
           <div className="headname">  </div> 
-        </div>
-
-        <div className="rightHead">
           <div className="notification">
             <Badge variant="dot" color="secondary">
               <NotificationsIcon color="action" />
             </Badge>
           </div>
-
-          <button className='btnProf' onClick={() => setOpen(!open)}>
-            <div className="profile">
+        </div>
+        <div className="rightHead col-12 col-sm-4">
+          <button className="btnProf" onClick={() => setOpen(!open)}>
               <div className="profIcon"> <Avatar>M</Avatar></div>
               <div className="user">
-                <div className='userName'> Meg Griffin</div>
-                <div className='userTag'> UX Designer</div>
+                <div className='userName'>{currentUser.displayName}</div>
+                <div className='userTag'>{currentUser.email}</div>
               </div>
               <div><i> <ExpandMoreIcon /></i></div>
-            </div>
-            {open && 
-            (<div className="dropDownProfile">
-              <ul>
-                <li>Profile</li>
-                <li>
-                  <button className="btnLogout" onClick={() => auth.signOut()}>Logout</button>
-                </li>
-              </ul>
-            </div>)
-            }
+
           </button>
+          {open && 
+          (<div className="dropDownProfile col-11 col-sm-2">
+          <li>Profile</li>
+          <li>
+            <button className="btnLogout" onClick={() => auth.signOut()}>Logout</button>  
+          </li>
+      </div>)
+      }
         </div>
       </div>
     </div>

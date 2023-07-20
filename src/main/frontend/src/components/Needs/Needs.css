@@ -1,40 +1,65 @@
 .wrapNeeds {
-    display: flex;
-    float: right;
-    height: 90%;
-    width: calc(100% - 350px);
+    height: 100%;
+    padding: 10px;
     background-color: #fafafa;
 }
 .needs {
-    width: 98%;
-    margin: 15px;
+    height: 100%;
     background-color: white;
 }
-.needMenu {
+.needBar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px;
 }
-.needMenulist {
-    padding: 0px;
-    margin: 0px 5px;
+.needMenu {
+    display: flex;
 }
-.needMenulist li {
-    display: inline-block;
-    padding: 10px 20px;
-    font-size: 110%;
+.needMenu li {
+    list-style-type: none;
+    padding: 15px 20px;
+    border: none;
 }
-.needMenulist li:hover {
+.needMenu li:hover {
     border-bottom: solid;
 }
-.needMenu button {
+.needMenu li:active {
+    border-bottom: solid;
+}
+.needBar button {
+    font-size: 100%;
+    background-color: #4c6380;
+    border: none;
+    color: white;
+    padding: 3px 15px;
+    border-radius: 6px;
+    margin-right: 2%;
+    cursor: pointer;
+}
+.zeroNeed {
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.zeroNeed button {
     font-size: 110%;
     background-color: #4c6380;
     border: none;
     color: white;
     padding: 8px 15px;
     border-radius: 6px;
-    margin-right: 3%;
     cursor: pointer;
+}
+.headZeroNeed {
+    color: #1f1f1f;
+    font-weight: 400;
+    font-size: 120%;
+    padding: 10px;
+}
+.textZeroNeed {
+    color: #99999F;
+    font-size: 100%;
+    padding-bottom: 20px;
+
 }

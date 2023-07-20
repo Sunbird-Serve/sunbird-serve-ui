@@ -13,102 +13,92 @@ import HelpIcon from '@mui/icons-material/Help';
 function SideNav() {
   return ( 
     <div className="sideNav">
-      <div className="logoSideNav">
-          <img src={SBLogo} alt="SunBirdLogo" width="150px" />
+      <div className="wrapSideLogo">
+        <div className="logoSideNav">
+          <img src={SBLogo} alt="SunBirdLogo" height="35px" />
           <i><MenuOpenIcon /></i>
+        </div>
       </div>
-      <div className="sidebarList"> 
-        <div className="navGroup">CATEGORY</div>
-        <ul className="navCategory">
+      <div className="navGroup row">
+          <div className="groupName">CATEGORY</div>
           <div className="wrapSideListItem">
             <NavLink to="/" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <AssessmentIcon /> 
-                <p>Dashboard</p>
+                <i><AssessmentIcon /> </i>  Dashboard
               </li>
             </NavLink>
           </div>
           <div className="wrapSideListItem">
             <NavLink to="/needs" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <ShoppingCartIcon /> 
-                <p>Needs</p>
+              <i><ShoppingCartIcon /> </i>Needs
               </li>
             </NavLink>
           </div>
           <div className="wrapSideListItem">
             <NavLink to="/needplans" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <DescriptionIcon /> 
-                <p>Need Plans</p>
+              <i><DescriptionIcon /> </i>Need Plans
               </li>
             </NavLink>
           </div>
           <div className="wrapSideListItem">
-            <NavLink to="/menuca" exact className="linkSideNav">
+            <NavLink to="/volunteer" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <DescriptionIcon /> 
-                <p>Menu1</p>
+              <i><DescriptionIcon /></i> Volunteer
               </li>
             </NavLink>
           </div>
           <div className="wrapSideListItem">
             <NavLink to="/menucb" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <DescriptionIcon /> 
-                <p>Menu2</p>
+              <i><DescriptionIcon /></i> Menu2
               </li>
             </NavLink>
           </div>   
-        </ul>
-        <div className="navGroup">MANAGEMENT</div>
-        <ul className="navCategory">
+      </div>
+      <div className="navGroup row">
+        <div className="groupName">MANAGEMENT</div>
         <div className="wrapSideListItem">
             <NavLink to="/menuma" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <SmsIcon /> 
-                <p>Menu1</p>
+              <i><SmsIcon /> </i>Menu 1
               </li>
             </NavLink>
-          </div>
-          <div className="wrapSideListItem">
+        </div>
+        <div className="wrapSideListItem">
             <NavLink to="/menumb" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <SmsIcon /> 
-                <p>Menu2</p>
+              <i><SmsIcon /></i> Menu 2
               </li>
             </NavLink>
-          </div>   
-        </ul>
-        <div className="navGroup">CATEGORY</div>
-        <ul className="navCategory">
+        </div>   
+      </div>
+      <div className="navGroup row">
+        <div className="groupName">OTHERS</div>
           <div className="wrapSideListItem">
             <NavLink to="/settings" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <SettingsIcon /> 
-                <p>Settings</p>
+              <i><SettingsIcon /> </i>Settings
               </li>
             </NavLink>
           </div>
           <div className="wrapSideListItem">
             <NavLink to="/accounts" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <PersonIcon /> 
-                <p>Accounts</p>
+              <i><PersonIcon /> </i>Accounts
               </li>
             </NavLink>
           </div>
           <div className="wrapSideListItem">
             <NavLink to="/help" exact className="linkSideNav">
               <li className="sidebarListItem"> 
-                <HelpIcon /> 
-                <p>Help</p>
+              <i><HelpIcon /></i> Help
               </li>
             </NavLink>
           </div>
-        </ul>
+        </div>
       </div>
-    </div>
   )
 }
 

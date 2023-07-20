@@ -3,10 +3,8 @@ import './Dashboard.css'
 
 function Dashboard() {
   return (
-    <div className="wrapDashboard"> 
-      <div className="dashboard">
-        Dashboard
-      </div>
+    <div className="wrapDashboard "> 
+      <div className="dashboard row"> Dashboard</div> 
     </div>
   )
 }
