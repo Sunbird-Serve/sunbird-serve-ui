@@ -1,79 +1,90 @@
-.header {
-    float:right;
-    width: calc(100% - 350px);
-    height: 10%;
-}
 .wrapHead {
-    display: flex;
+    height: 100%;
     align-items: center;
-    justify-content: space-between;
-    height: 100%
+    background-color: white;
+}
+.head {
+    height:51px;
+    width: 100%;
+    align-items: center;
+    padding-left: 10px;
+    padding-top: 10px;
 }
 .leftHead {
-    display: block;
+    height: 51px;
+    background-color: white;
 }
 .rightHead {
-    display: flex;
+    height: 51px;
+    display:flex;
     align-items: center;
-    width: 350px;
-    height: 100%;
+    background-color: white;
+    justify-content: right;
+    z-index: 2;
+}
+.wrapProfile {
+    height: 50px;
+    display:flex;
+    align-items: center;
+    background-color: white;
+    justify-content: right;
+    z-index: 2;
+}
+.wrapSideMenu {
+    height: 50px;
+    display:flex;
+    align-items: center;
+    justify-content: right;
+}
+.notification {
+    padding: 2px;
+    padding-right: 15px;
 }
 .btnProf {
-    width: 80%;
-    background-color: white;
+    width: fit-content;
     border: none;
-}
-.profile {
     display: flex;
     align-items: center;
-    padding-left: 25px;
-    width: 90%;
-    position: fixed;
-    top: 25px;
+    background-color: white;
+    justify-content: space-between;
+    text-align: left;
+}
+.profIcon {
+    margin-right: 8px;
+}
+.verticalLine {
+    height: 32px;
+    width: 1px;
+    margin-right:10px;
+    border-right: solid;
+}
+.wrapDropDownProfile {
+    position: absolute;
+    top: 65px;
+    z-index: 5;
 }
 .dropDownProfile {
-    position: relative;
-    margin-top: 140px;
-    text-align: left;
-    margin-left: 30px;
+    float: right;
     background-color: white;
 }
 .dropDownProfile li {
     list-style-type: none;
-    margin: 10px;
-    font-size: 140%;
     width: fit-content;
+    width: 100%;
 }
-.dropDownProfile li:hover {
-    font-weight: 800;
-}
-.btnLogout:hover {
-    font-weight: 800;
-}
-.notification {
-    margin-right: 30px;
-}
-.profIcon {
-    margin-right: 15px;
-}
-.user {
-    margin-right: 15px;
-}
-.userName {
-    font-size: 150%;
-    text-align: left;
-}
-.userTag {
-    text-align: left;
-    margin-top: 3px;
-}
-.profile i {
-    margin-left:10%;   
+.profileInfo {
+    padding-left: 5px;
 }
 .btnLogout {
-    border: none;
+    text-align: left;
     background-color: inherit;
-    font-size: 104%;
-    margin: 0px -5px 10px -5px ;
-    z-index: 1;
+    z-index: 5;
+    width: 100%;
+    border: none;
+}
+.profileInfo:hover, .btnLogout:hover {
+    background-color: gainsboro;
+}
+.menuIcon {
+    padding: 0px 10px;
 }

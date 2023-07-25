@@ -5,11 +5,18 @@ import './LoginPage.css'
 
 const LoginPage = () => {
     return(
-        <div className="wrapLogin">
-            <LoginBanner />
-            <LoginForm />  
+        //login page
+        <div className="wrapLogin row">
+            <div className="col-12 col-sm-6 order-sm-2 sideLogin">
+                <LoginForm />   {/* form reading login credentials */}
+            </div>
+            <div className="col-12 col-sm-6 order-sm-1 sideBanner">
+                <LoginBanner /> {/* sunbird banner */}
+            </div>
         </div>      
     )
 }
 
 export default LoginPage
+
+//

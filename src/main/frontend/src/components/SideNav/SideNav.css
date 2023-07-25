@@ -1,59 +1,55 @@
 .sideNav {
-    display: block;
-    position: fixed;
-    width: 350px;
     height: 100%;
 }
+.wrapSideLogo {
+    height: 74px;
+    display: flex;
+}
 .logoSideNav {
-    width: 350px;
-    height: 10%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: ridge;
-}
-.logoSideNav img {
-    margin-left: 11%;
-}
-.logoSideNav i {
-    color: #323232;
-}
-.sidebarList {
-    display:block;
-    text-align: left;
-}
-.navGroup {
-    display: block;
-    margin: 4% 12%;
-    font-weight: 520;
-    color: #929fa4;
-}
-.navCategory {
-    border-bottom: ridge;
-}
-.navManagement {
-    border-bottom: ridge;
-}
-.linkSideNav {
-    text-decoration: none;
-    list-style: none;
-    display: flex;
-}
-.sidebarListItem {
+    padding: 5px 20px;
     width: 100%;
     display: flex;
     align-items: center;
-    padding-left: 10px;
-    color: #94a1b4;
+    justify-content: space-between;
 }
-.sidebarListItem p {
-    height: fit-content;
-    margin-left: 20px;
+.logoSideNav img {
+    height: 42px;
 }
-.active li {
-    background-color: #f0f1f5;
-    color: #4c6280;
+.navGroup {
+    padding: 10px;
+    border-top: solid;
+    border-color: rgba(242, 242, 242, 1);
+}
+.groupName {
+    font-family: Poppins;
+    font-weight: 400;
+    font-size: 13px;
+    padding: 2px;
+    margin-left: 25px;
+    color: rgba(8, 36, 49, 0.5);
+}
+.wrapSideListItem {
+    width: 100%;
+}
+.sidebarListItem {
+    width: 100%;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    color: #94A3B8;
+}
+.sidebarListItem i {
+    margin-right: 15px;
+    font-size: 12px;
 }
 .sidebarListItem:hover {
-    background-color: #f0f1f5;
+    background-color:  #DFE5EC;
+}
+.active li {
+    background-color: #DFE5EC;
+    color: #4D6280;
+}
+.linkSideNav {
+    text-decoration: none;
 }

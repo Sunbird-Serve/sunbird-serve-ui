@@ -1,4 +1,6 @@
 .App {
-  text-align: center;
+  height: 100vh;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  justify-content: space-around;
 }
-
