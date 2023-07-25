@@ -8,6 +8,7 @@ import store from "./redux/store";
 
 function App() {
   const [presentUser, setPresentUser] = useState(null);
+  //check if any user logged in and set uid and email if logged in
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
@@ -22,7 +23,10 @@ function App() {
   }, []);
   return (
     <Provider store={store}>
-      <div className="App">{presentUser ? <MainPage /> : <LoginPage />}</div>
+      <div className="App row">
+        {/* Load page depending on user login */}
+        {presentUser ? <MainPage /> : <LoginPage />}
+      </div>
     </Provider>
   );
 }

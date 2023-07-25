@@ -1,9 +1,13 @@
 import React,{useState} from 'react'
-import {auth} from '../../firebase'
+import { auth, gprovider, fprovider } from '../../firebase'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
 import SBLogo from '../../clogo.jpg'
 import './LoginForm.css'
+import { FcGoogle } from "react-icons/fc"
+import { GrFacebook } from "react-icons/gr";
 
 const LoginForm = () => {
+    const [error,setError]= useState(false)
     const [data,setData] = useState({
             email:"",
             password:""
@@ -14,42 +18,60 @@ const LoginForm = () => {
     }
     const signUp = e => {
         e.preventDefault();
-        auth.createUserWithEmailAndPassword(email,password).then(
-            user => window.alert(user)
-        ).catch(err => window.alert(err))
+        createUserWithEmailAndPassword(auth, email,password).then(
+            user => console.log(user)
+        ).catch(err => console.log(err))
     }
     const logIn = e => {
         e.preventDefault();
-        auth.signInWithEmailAndPassword(email,password).then(
+        signInWithEmailAndPassword(auth, email,password).then(
             user => console.log(user)
-        ).catch(err => window.alert(err))
+        ).catch(err => setError(true) )
     }
+    const signInWithGoogle = e => {
+        e.preventDefault();
+        signInWithPopup(auth, gprovider)
+        }
+    const signInWithFacebook = e => {
+        e.preventDefault();
+        signInWithPopup(auth, fprovider)
+        }
+
     return(
-        <div className='loginForm'>
-            <div className="sbLogo">
-                <img src={SBLogo} alt="BlueBirdLogo" width="150px" />
+        // adds user login form
+        <div className="loginForm row">
+            {/* Logo */}
+            <div className="sbLogo col-12 col-sm-8 offset-sm-1 mt-sm-5">
+                <img src={SBLogo} alt="BlueBirdLogo" width="120px" />
             </div>
-            <div className="boxLogin">
-                <form className="menuLogin">
-                    <div className="greetLogin" >Welcome Back!</div>
-                    <div className="titleLogin" >Login</div>
-                    <div className="unameLogin">
-                        <label className="label" >Email</label>
-                        <input className="input" type="text" name="email" value={email} onChange={changeHandler}/>
-                    </div>
-                    <div className="pwdLogin">
-                        <label className="label" >Password</label>
-                        <input className="input" type="password" name="password" value={password} onChange={changeHandler}/>
-                    </div>
-                    <div className="btnLogin">
-                        <button type="login" onClick={logIn}>Login</button>
-                    </div>  
-                    <div className="loption">OR</div>
-                    <div className="btnLogin">
-                        <button type="login" onClick={signUp}>Signup</button>
-                    </div>
-                </form>
-            </div>
+            
+            <form className="menuLogin col-12 col-sm-8 offset-sm-1 mt-sm-5">
+                <div className="greetLogin " >Welcome Back!</div>
+                <div className="titleLogin" >Login</div>   
+                {/* user credentials */}
+                <div className="unameLogin">
+                    <label className="label" >Email Id / Mobile Number</label>
+                    <input className="input" type="text" name="email" value={email} onChange={changeHandler} autoComplete='off'/>
+                </div>
+                <div className="pwdLogin">
+                    <label className="label" >Password </label>
+                    <input className="input" type="password" name="password" value={password} onChange={changeHandler} autoComplete='off'/>
+                </div> 
+                {/* Login button*/}
+                <div className="btnLogin">
+                    <button type="login" onClick={logIn}>Log in</button>
+                    <div className="loption">or</div>
+                    <button type="login" onClick={signUp}>Sign up</button>
+                </div>   
+                <div className="hline"><hr /></div>
+                {/* Social Media Login*/}
+                <div className="btnSLogin">
+                    <button type="login" onClick={signInWithGoogle}> <i><FcGoogle /></i> Sign in with Google</button>
+                    <button type="login" onClick={signInWithFacebook} > <i><GrFacebook /></i> Sign in with Facebook</button>
+                </div>    
+                {/* Error message when credentials are wrong*/}     
+                {error&&<div className="loginError">Invalid Login Credentials. Make sure you signup before first login.</div>}  
+            </form>
         </div>
     )
 }

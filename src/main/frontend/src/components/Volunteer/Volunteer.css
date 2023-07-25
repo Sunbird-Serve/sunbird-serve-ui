@@ -1,0 +1,15 @@
+.filterNeeds {
+    background-color: #FAFAFA;
+    border: none;
+    padding: 15px;
+}
+.filterNeeds select {
+    background-color: white;    
+    padding: 2px;
+    padding-left: 5px;
+}
+.filterNeeds input {
+    background-color: white;    
+    padding: 2px;
+    padding-left: 5px;
+}

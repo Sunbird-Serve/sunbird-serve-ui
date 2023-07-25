@@ -1,0 +1,124 @@
+.needTable {
+  border:none;
+}
+.needTable table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.topBarNeedTable {
+  height: 65px;
+  width: 100%;
+  background-color: #FAFAFA;
+  display: flex;
+  align-items: center;
+}
+.leftTopBarNeedTable {
+  width: 60%;
+  height: 35px;
+  display: flex;
+}
+.rightTopBarNeedTable {
+  width: 40%;
+  height: 30px;
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 20px;
+}
+.boxSearchNeeds {
+  background-color: white;
+  width: fit-content;
+  border: solid #E8E8E8;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+}
+.boxSearchNeeds input{
+  border: none;
+}
+.boxSearchNeeds i {
+  margin: 0px 5px;
+}
+.selectNeedDate {
+  border: solid #E8E8E8;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  margin-left: 12px;
+  padding: 0px 5px;
+  border-radius: 5px;
+}
+.selectNeedDate input {
+  border: none;
+  background-color: white;
+  display: flex;
+  align-items: center;
+}
+.selectNeedType {
+  border: solid #E8E8E8;
+  margin-left: 12px;
+  padding: 0px 6px;
+  background-color: white;
+  border-radius: 5px;
+}
+.vline {
+  margin-left: 12px;
+  border-left: solid;
+  border-color: #D0D5DD;
+}
+.viewNeedsList {
+  background-color: #94A3B8;
+  color: white;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0px 5px;
+  border-radius: 5px;
+}
+.viewNeedsGrid {
+  background-color: white;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  padding: 0px 5px;
+  border-radius: 5px;
+}
+.needCount, .volunteerCount {
+  background-color: white;
+  border: solid #E8E8E8;
+  color: #1C1C1C;
+  padding: 0px 10px;
+  margin-left: 15px;
+  display: flex;
+  align-items: center;
+} 
+.needCount span,.volunteerCount span {
+  border-left: solid #E8E8E8;
+  padding-left: 10px;
+  margin-left: 10px;
+} 
+table td, table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}  
+table tr:hover {
+  background-color: #ddd;
+  cursor: pointer;
+}
+  
+table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #4D4D4D;
+  background-color: #FAFCFF;
+}
+.pageNav {
+  display: flex;
+  margin: 5px;
+  justify-content: space-evenly;
+}
+.pageNav button{
+  border: none;
+}
