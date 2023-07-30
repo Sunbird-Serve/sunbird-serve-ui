@@ -7,6 +7,12 @@
   border: 1px solid #929fa4;
 }
 
+.countWrapper {
+  display: 'flex';
+  align-items: 'center';
+  flex-wrap: 'wrap';
+}
+
 .needPlansGrid {
   display: grid;
   grid-template-columns: 70% 30%;
@@ -23,6 +29,12 @@
   margin: 0px 3px;
   border: 1px solid #c4c4c4;
   background-color: white;
+  width: 1.5vw;
+}
+
+.changeMonthButton:hover {
+  cursor:pointer;
+  border: 1px solid #4a97ee;
 }
 
 .box {
@@ -35,18 +47,22 @@
 .content {
   display: flex;
   flex-direction: row;
-  border: 1px solid #c4c4c4;
   margin-right: 2%;
-  border-radius: 0.8vh;
+  color: #969696;
 }
 
-.label {
-  /* font-weight: bold; */
-  border-right: 1px solid #c4c4c4;
-  padding: 0.5vh 2vh;
+.monthWrapper {
+  float: left;
+  width: 8%;
+}
+
+.yearWrapper {
+  float: left;
+  width: 5%;
+  margin-right: 1%;
 }
 
 .value {
-  color: blac;
-  padding: 0.5vh 2vh;
+  color: black !important;
+  margin-right: 0.5vw !important;
 }
