@@ -1,11 +1,6 @@
 .wrapLogin {
     height: 100%;
-    border:solid;
 }
 .sideBanner {
     background-color: rgb(76,98,128);
-    border: solid;
-}
-.sideLogin {
-    border: solid;
 }

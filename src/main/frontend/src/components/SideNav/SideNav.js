@@ -1,110 +1,68 @@
 import './SideNav.css';
-import SBLogo from '../../clogo.jpg';
+import SBLogo from '../../assets/sunbirdicon.png';
 import { NavLink } from "react-router-dom" ;
-import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import AssessmentIcon from '@mui/icons-material/Assessment';
-import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import DescriptionIcon from '@mui/icons-material/Description';
-import SmsIcon from '@mui/icons-material/Sms';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
+import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
+import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
+import VolunteerActivismOutlinedIcon from '@mui/icons-material/VolunteerActivismOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
-import PersonIcon from '@mui/icons-material/Person';
 import HelpIcon from '@mui/icons-material/Help';
 
 function SideNav() {
   return ( 
-    <div className="sideNav">
+    <div className="sideNav row">
+      {/* Logo in Side navigation*/}
       <div className="wrapSideLogo">
-        {/* Logo in Side navigation*/}
         <div className="logoSideNav">
           <img src={SBLogo} alt="SunBirdLogo" height="35px" />
-          <i><MenuOpenIcon /></i>
+        </div>
+        <div className="logotext">
+          <div className="logotitle">SUNBIRD SERVE</div>
+          <div className="usertag">NCoordinator Management</div>
         </div>
       </div>
-      <div className="navGroup row">
-          <div className="groupName">CATEGORY</div>
-          {/* switch to dashboard page*/}
-          <div className="wrapSideListItem">
-            <NavLink to="/" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-                <i><AssessmentIcon /> </i>  Dashboard
-              </li>
-            </NavLink>
-          </div>
-          {/* switch to needs page */}
-          <div className="wrapSideListItem">
-            <NavLink to="/needs" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><ShoppingCartIcon /> </i>Needs
-              </li>
-            </NavLink>
-          </div>
-          {/* switch to needs plan page */}
-          <div className="wrapSideListItem">
-            <NavLink to="/needplans" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><DescriptionIcon /> </i>Need Plans
-              </li>
-            </NavLink>
-          </div>
-          {/* switch to volunteers page */}
-          <div className="wrapSideListItem">
-            <NavLink to="/volunteer" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><DescriptionIcon /></i> Volunteer
-              </li>
-            </NavLink>
-          </div>
-          <div className="wrapSideListItem">
-            <NavLink to="/menucb" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><DescriptionIcon /></i> Menu2
-              </li>
-            </NavLink>
-          </div>   
+      {/* Navigation Menu options */}
+      <div className="navMenu">
+        {/* switch to dashboard page*/}
+        <NavLink to="/" exact className="sideNavItem row" activeClassName="active">
+          <i><DashboardOutlinedIcon /></i>  
+          <span>Dashboard</span>
+        </NavLink>
+
+        {/* switch to needs page */}
+        <NavLink to="/needs" exact className="sideNavItem row">
+          <i><StickyNote2OutlinedIcon /></i>
+          <span>Needs</span>
+        </NavLink>
+
+        {/* switch to needs plan page */}
+        <NavLink to="/needplans" exact className="sideNavItem row">
+          <i><CalendarTodayOutlinedIcon /></i>
+          <span>Needs Schedule</span>
+        </NavLink>
+
+        {/* switch to volunteers page */}
+        <NavLink to="/volunteer" exact className="sideNavItem row">
+              <i><VolunteerActivismOutlinedIcon /></i> 
+              <span>Volunteer</span>
+        </NavLink>  
+        <div><hr /></div>
+        <NavLink to="/settings" exact className="sideNavItem row">
+              <i><SettingsOutlinedIcon /> </i>
+              <span>Settings</span>
+        </NavLink>
+        <NavLink to="/help" exact className="sideNavItem row">
+              <i><HelpOutlineOutlinedIcon /></i> 
+              <span>Help</span>
+        </NavLink>
       </div>
-      <div className="navGroup row">
-        <div className="groupName">MANAGEMENT</div>
-        <div className="wrapSideListItem">
-            <NavLink to="/menuma" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><SmsIcon /> </i>Menu 1
-              </li>
-            </NavLink>
-        </div>
-        <div className="wrapSideListItem">
-            <NavLink to="/menumb" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><SmsIcon /></i> Menu 2
-              </li>
-            </NavLink>
-        </div>   
-      </div>
-      <div className="navGroup row">
-        <div className="groupName">OTHERS</div>
-          <div className="wrapSideListItem">
-            <NavLink to="/settings" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><SettingsIcon /> </i>Settings
-              </li>
-            </NavLink>
-          </div>
-          <div className="wrapSideListItem">
-            <NavLink to="/accounts" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><PersonIcon /> </i>Accounts
-              </li>
-            </NavLink>
-          </div>
-          <div className="wrapSideListItem">
-            <NavLink to="/help" exact className="linkSideNav">
-              <li className="sidebarListItem"> 
-              <i><HelpIcon /></i> Help
-              </li>
-            </NavLink>
-          </div>
-        </div>
-      </div>
+    </div>
   )
 }
 
 export default SideNav
+
+          /*<i><MenuOpenIcon /></i>*/

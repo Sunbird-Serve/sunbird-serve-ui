@@ -14,17 +14,17 @@ function App() {
       if (user) {
         setPresentUser({
           uid: user.uid,
-          email: user.email,
+          email: user.email
         });
       } else {
         setPresentUser(null);
       }
     });
-  }, []);
+  }, []); 
   return (
     <Provider store={store}>
       <div className="App row">
-        {/* Load page depending on user login */}
+        { /* Load page depending on user login */}
         {presentUser ? <MainPage /> : <LoginPage />}
       </div>
     </Provider>
@@ -32,3 +32,4 @@ function App() {
 }
 
 export default App;
+
