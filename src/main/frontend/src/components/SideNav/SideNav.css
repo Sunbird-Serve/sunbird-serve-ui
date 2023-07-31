@@ -1,0 +1,61 @@
+.sideNav {
+    height: 100%;
+    display: block;
+}
+.wrapSideLogo {
+    height: 59px;
+    display: flex;
+    align-items: center;
+    justify-items: center;
+    border-bottom: solid #EBEBEB;
+    padding: 12px 36px;
+}
+.logotext {
+    padding: 5px;
+}
+.logotitle {
+    width: fit-content;
+    font-size: 15px;
+    font-weight: 600;
+    color: #006FA2;
+}
+.usertag {
+    font-size: 10px;
+}
+.navMenu {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+.sideNavItem {
+    display: flex;
+    padding: 10px 30px;
+    text-decoration: none;
+}
+.sideNavItem i {
+    width: fit-content ;
+    color: #2C2E30;
+}
+.sideNavItem span {
+    font-size: 14px;
+    width: fit-content ;
+    display: flex;
+    align-items: center;
+    padding-left: 0px;
+    color: #4D4D4D;
+}
+.sideNavItem:hover {
+    background-color:  #F0FAFF;
+}
+.active {
+    background-color: #F0FAFF;
+    border-right: solid 4px #006FA2;
+}
+.active span{
+    color: #006FA2;
+    font-weight: 600;
+}
+.active i{
+    color: #006FA2;
+    font-weight: 600;
+}
