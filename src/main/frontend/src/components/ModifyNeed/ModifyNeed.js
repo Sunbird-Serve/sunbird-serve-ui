@@ -1,21 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import ReactQuill from 'react-quill';
 import axios from 'axios'
 import './ModifyNeed.css' 
 import { Redirect } from 'react-router'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-import AddRemoveInputField from '../AddRemoveInputField/AddRemoveInputField';
-import DeleteIcon from '@mui/icons-material/Delete';
 import Nominations from '../Nominations/Nominations'
+import UploadImageBG from '../../assets/bgImgUpload.png'
 
 const ModifyNeed = props => {
-   const [modify,setModify] = useState(true)
+   const [nomin,setNomin] = useState(true)
    const [data,setData] = useState(null)
    
    useEffect(()=> {
         setData(props.data);
-   },[]);
+   },[props.data]);
 
    var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], [{'list':'ordered'},{'list':'bullet'}]];
     const module = {
@@ -24,6 +21,16 @@ const ModifyNeed = props => {
     const handleQuillEdit = (value) => {
         setData({...data, description:value})
     };
+
+    const inputRef = useRef(null);
+    const handleImageClick = () => {
+        inputRef.current.click();
+    };
+    const [imageNeed, setImageNeed] = useState('')
+    const handleImageUpload = (e) => {
+        console.log(e.target.files)
+        setImageNeed(e.target.files[0])
+    }
 
     const changeHandler = e => {
         setData({...data, [e.target.name]:e.target.value})
@@ -38,60 +45,98 @@ const ModifyNeed = props => {
     <div className="wrapNeedNominations">
         {/* show list of nominations to need and need information*/}
         <div className="needNominations">
-            <div className="btnCloseNomination">
-                <button onClick={props.handleClose}>x</button>
+            <div className="wrapTabs">
+                <button onClick={()=>setNomin(true)}><div className={nomin ? "ulTab" : null}>Nominations</div></button>
+                <button onClick={()=>setNomin(false)}><div className={nomin ? null : "ulTab"}>Need Info</div></button>
             </div>
-            <div className="boxNominations">
-                <div className="wrapTabs">
-                    <div className={modify ? "underLine" : null}><button onClick={()=>setModify(true)}>Nominations</button></div>
-                    <div className={modify ? null : "underLine"}><button onClick={()=>setModify(false)}>Need Details</button></div>
-                </div>
-                { modify ? 
-                    <Nominations /> //load nominations component
-                : ( 
-                    // need informations display which can be modified as per access
-                    <div className="needinfo">
-                        <div className="modifyNeedBar">
-                            <div className="wrapModifyName"> 
-                                <div className="needName">{data.name}</div>
-                                <div className="tagNeedName">{data.description.slice(3,-4)}</div>
+            { nomin ? 
+                //load nominations component
+                <Nominations /> 
+            : ( 
+                //load need information
+                    <div className="needInfoBox">
+                        <div className="needInfoBar">
+                            <div className="wrapInfoName"> 
+                                <div className="needIName">{data.name}</div>
+                                <div className="needITag">{data.description.slice(3,-4)}</div>
                             </div>
                         </div>
-                        <div className="modifyNeedForm"  >
-                            <form className="needForm row" id="myForm" onSubmit={submitHandler}>
-                                <div className="modifyTopForm row">
-                                    <div className="modifyTopLeft col-sm-6">
-                                        <div className="itemForm">
+                        <form className="needInfoForm row" id="modifyForm" onSubmit={submitHandler}>
+                            <div className="catergoryNInfo">NEED INFO</div>
+                            <div className="needIFormTop">
+                                <div className="needInfoTopLeft col-sm-6">
+                                    <div className="infoNImage">
+                                            <label>Image</label>
+                                            <div className="uploadNImage"> 
+                                                <img src={UploadImageBG} alt=''/>
+                                            </div>
+                                    </div>
+                                    <div className="itemNInfo">
                                             <label>Need Name</label>
-                                            <input type="text" placeholder={data.name} name="name" value={data.name} onChange={changeHandler} />
-                                        </div>
-                                        <div className="itemForm">
+                                            <span>{data.name}</span>
+                                    </div>
+                                    <div className="itemNInfo">
                                             <label>Need Type</label>
-                                            <select className="selectMenu" name="needTypeId" value={data.needTypeId} onChange={changeHandler}>
-                                            </select>
-                                        </div> 
-                                        <div className="itemForm">
-                                            <label>Entity Name</label>
-                                            <select className="selectMenu" name="entityId" value={data.entityId} onChange={changeHandler}>   
-                                            </select>
+                                            <span> {data.needTypeId}
+                                            </span>
+                                    </div> 
+                                    <div className="itemNInfo">
+                                            <label>Need Location</label>
+                                            <span> </span>
+                                    </div>
+                                </div>  
+                                <div className="needInfoTopRight col-sm-6">
+                                    <div className="itemNInfoDescrip">
+                                        <label>Need Description</label>
+                                        <span>{data.description.slice(3,-4)}</span>
+                                    </div>
+                                    {/* Entity Name */}
+                                    <div className="itemNInfo">
+                                        <label>Entity Name</label>
+                                        <span>{data.entityId}</span>
+                                    </div>
+                                    {/* Date */}
+                                    <div className="itemWrapNInfoDate">
+                                        <div className="itemNInfoDate">
+                                            <label>Start Date</label>
+                                            <span></span>
                                         </div>
-                                    </div>  
-                                    <div className="modifyTopRight col-sm-6">
-                                        <div className="itemDescrip">
-                                            <label>Need Description</label>
-                                            <div className="itemDescripText">
-                                                <ReactQuill modules={module} theme="snow" placeholder={props.description} value={data.description} onChange={
-                                                handleQuillEdit} className="quillEdit" />
-                                            </div>   
+                                        <div className="itemNInfoDate">
+                                            <label>End Date</label>
+                                            <span></span>
                                         </div>
-                                    </div>                      
-                                </div>                           
-                            </form>
-                        </div>        
+                                    </div>
+                                    {/* Time */}
+                                    <div className="itemNInfo">
+                                        <label>Time</label>
+                                        <span></span>
+                                    </div> 
+                                </div>                      
+                            </div>
+                            <div className="catergoryNInfo">VOLUNTEER PREREQUISITE</div>                          
+                            <div className="needIFormBottom row">
+                                <div className="formBLeft col-sm-6">
+                                    {/* Skills Required */}
+                                    <div className="itemNInfo">
+                                        <label>Skills Required</label>
+                                        <span>{data.skillDetail}</span>
+                                    </div> 
+                                </div>
+                                <div className="formBRight col-sm-6">
+                                    {/* No. of Volunteers Required */}
+                                    <div className="itemNInfo">
+                                        <label>No. of Volunteers required</label>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 )}
-            </div>
-        </div>        
+        </div>   
+        <div className="btnCloseNomination">
+                <button onClick={props.handleClose}>x</button>
+        </div>     
     </div>
   )
 }
