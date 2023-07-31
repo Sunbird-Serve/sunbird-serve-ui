@@ -1,0 +1,9 @@
+.wrapDashboard {
+    height: 100%;
+    background-color: #FAFAFA;
+    padding: 10px 20px 10px 10px;
+}
+.dashboard {
+    height: 100%;
+    background-color: white;
+}
