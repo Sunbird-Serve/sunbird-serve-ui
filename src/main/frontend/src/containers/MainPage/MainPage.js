@@ -16,23 +16,26 @@ const MainPage = () => {
         <BrowserRouter>
             <div className="wrapMainPage">
                 <div className="mainPage row">
+                    {/* Side Navigation Component*/}
                     <div className="wrapSideNav col-8 col-sm-4 col-lg-2 d-none d-sm-block">
-                        <SideNav/>      {/* Side Navigation Component*/}
+                        <SideNav/>      
                     </div>
                     <div className="wrapDisplay col-12 col-sm-8 col-lg-10">
-                        <div className="wrapHeader">
-                            <Header/>   {/* Top Header component*/}
+                        {/* Top Header component*/}
+                        <div className="wrapHeader row">
+                            <Header/> 
                         </div>
-                        <div className="wrapContent mt-5 mt-sm-0 pl-5">
-                            <Switch>    {/* load different components by path which is selected in side navigation */}
-                                <Route exact path="/" component={Dashboard} />
-                                <Route path="/needs" component={Needs} />
-                                <Route path="/needPlans" component={NeedPlans} />
-                                <Route path="/volunteer" component={Volunteer} />
-                                <Route path="/settings" component={Settings} />
-                                <Route path="/accounts" component={Accounts} />
-                                <Route path="/help" component={Help} /> 
-                            </Switch>
+                        {/*load different components by path which is selected in side navigation */}
+                        <div className="wrapContent row mt-5 mt-sm-0 pl-5">
+                            <Switch>     
+                            <Route exact path="/" component={Dashboard} />
+                            <Route path="/needs" component={Needs} />
+                            <Route path="/needPlans" component={NeedPlans} />
+                            <Route path="/volunteer" component={Volunteer} />
+                            <Route path="/settings" component={Settings} />
+                            <Route path="/accounts" component={Accounts} />
+                            <Route path="/help" component={Help} /> 
+                        </Switch>
                         </div>
                     </div>
                 </div>  

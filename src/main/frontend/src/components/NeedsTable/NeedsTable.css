@@ -1,45 +1,63 @@
-.needTable {
-  border:none;
-}
-.needTable table {
-  border-collapse: collapse;
-  width: 100%;
-}
 .topBarNeedTable {
-  height: 65px;
+  height: 64px;
   width: 100%;
   background-color: #FAFAFA;
   display: flex;
   align-items: center;
+  padding: 16px 24px;
 }
+/* left */
 .leftTopBarNeedTable {
-  width: 60%;
-  height: 35px;
+  width: 35%;
   display: flex;
+  height: 32px;
 }
+.needCount, .volunteerCount {
+  color: #1C1C1C;
+  padding: 0px 12px;
+  display: flex;
+  align-items: center;
+}
+.needCount i, .volunteerCount i {
+  color: #006FA2;
+  margin-right: 8px;
+}
+.needCount span, .volunteerCount span {
+  font-size: 15px;
+  margin-right: 8px;
+  font-weight: 600;
+}
+.needCount label, .volunteerCount label {
+  font-size: 15px;
+  margin-right: 5px;
+  font-weight: 400;
+  color: #686C73;
+}
+/* right */
 .rightTopBarNeedTable {
-  width: 40%;
-  height: 30px;
+  width: 65%;
+  height: 32px;
   display: flex;
   justify-content: flex-end;
-  padding-right: 20px;
 }
 .boxSearchNeeds {
   background-color: white;
   width: fit-content;
   border: solid #E8E8E8;
-  margin-left: 12px;
   display: flex;
   align-items: center;
   border-radius: 5px;
 }
 .boxSearchNeeds input{
   border: none;
+  font-size: 14px;
 }
 .boxSearchNeeds i {
-  margin: 0px 5px;
+  color: #99999F;
+  padding: 4px 6px;
 }
 .selectNeedDate {
+  font-size: 14px;
   border: solid #E8E8E8;
   background-color: white;
   display: flex;
@@ -55,70 +73,75 @@
   align-items: center;
 }
 .selectNeedType {
+  font-size: 14px;
   border: solid #E8E8E8;
   margin-left: 12px;
   padding: 0px 6px;
   background-color: white;
   border-radius: 5px;
 }
-.vline {
-  margin-left: 12px;
-  border-left: solid;
-  border-color: #D0D5DD;
+/* CSS for table is below */
+.tableNeedList {
+  border-collapse: collapse;
+  width: 100%;
+  border: 1.5px solid #F0EFEF;
 }
-.viewNeedsList {
-  background-color: #94A3B8;
-  color: white;
-  margin-left: 12px;
-  display: flex;
-  align-items: center;
-  padding: 0px 5px;
-  border-radius: 5px;
-}
-.viewNeedsGrid {
-  background-color: white;
-  margin-left: 12px;
-  display: flex;
-  align-items: center;
-  padding: 0px 5px;
-  border-radius: 5px;
-}
-.needCount, .volunteerCount {
-  background-color: white;
-  border: solid #E8E8E8;
-  color: #1C1C1C;
-  padding: 0px 10px;
-  margin-left: 15px;
-  display: flex;
-  align-items: center;
-} 
-.needCount span,.volunteerCount span {
-  border-left: solid #E8E8E8;
-  padding-left: 10px;
-  margin-left: 10px;
-} 
-table td, table th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}  
-table tr:hover {
-  background-color: #ddd;
-  cursor: pointer;
-}
-  
-table th {
-  padding-top: 12px;
-  padding-bottom: 12px;
+.tableNeedList th {
+  height: 40px;
   text-align: left;
   font-weight: 600;
+  font-size: 12px;
   color: #4D4D4D;
-  background-color: #FAFCFF;
+  background-color: #F0EFEF;
+  border-left: 1px solid white;
+  border-right: 1px solid white;
+  padding: 8px;
+}
+.tableNeedList th span {
+  color: #B8B8B8;
+  float: right;
+}
+.tableNeedList td {
+  border: 1px solid #F7F8F9;
+  padding: 8px;
+  font-size: 14px;
+} 
+.tableNeedList tr:hover {
+  background-color: #F0FAFF;
+  cursor: pointer;
+}
+.activeRow {
+  background-color: #F0FAFF;
 }
 .pageNav {
+  height: 40px;
+  background-color: #F2F2F2;
   display: flex;
-  margin: 5px;
   justify-content: space-evenly;
+  font-size: 14px;
 }
-.pageNav button{
+.pageNav button {
   border: none;
+}
+.pageNav span{
+  display: flex;
+  align-items: center;
+}
+.pageNav strong {
+  margin: 5px;
+}
+.pageNav input {
+  margin: 5px;
+  padding-left: 10px;
+}
+.pageNav select {
+  font-size: 14px;
+  background-color: inherit;
+  border: none;
+}
+.needsPerPage {
+  display: flex;
+}
+.pageNumber {
+  display: flex;
 }

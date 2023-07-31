@@ -1,37 +1,46 @@
-.wrapHead {
+.head {
+    width: 100%;
     height: 100%;
     align-items: center;
-    background-color: white;
-}
-.head {
-    height:51px;
-    width: 100%;
-    align-items: center;
-    padding-left: 10px;
-    padding-top: 10px;
 }
 .leftHead {
-    height: 51px;
     background-color: white;
+    height: 100%;
 }
 .rightHead {
-    height: 51px;
-    display:flex;
+    height: 100%;
+    display: flex;
     align-items: center;
     background-color: white;
     justify-content: right;
     z-index: 2;
 }
 .wrapProfile {
-    height: 50px;
     display:flex;
     align-items: center;
     background-color: white;
     justify-content: right;
-    z-index: 2;
+}
+.searchMenu {
+    border: solid #DBDBDB;
+    padding: 1px 5px;
+    margin-right: 15px;
+    border-radius: 5px;
+}
+.searchMenu input {
+    border: none;
+    margin-left: 3px;
+}
+.searchMenu i {
+    color: #99999F;
+}
+.verticalLine {
+    height: 32px;
+    width: 1px;
+    margin-right:10px;
+    border-right: solid #EBEBEB;
 }
 .wrapSideMenu {
-    height: 50px;
     display:flex;
     align-items: center;
     justify-content: right;
@@ -49,42 +58,45 @@
     justify-content: space-between;
     text-align: left;
 }
-.profIcon {
-    margin-right: 8px;
-}
-.verticalLine {
-    height: 32px;
-    width: 1px;
-    margin-right:10px;
-    border-right: solid;
-}
 .wrapDropDownProfile {
     position: absolute;
-    top: 65px;
-    z-index: 5;
+    top: 48px;
+    z-index: 3;
+    padding: 3px 54px;
 }
 .dropDownProfile {
     float: right;
     background-color: white;
-}
-.dropDownProfile li {
-    list-style-type: none;
-    width: fit-content;
-    width: 100%;
-}
-.profileInfo {
-    padding-left: 5px;
+    border: solid #DBDBDB;
+    width: 240px;
+    border-radius: 5px;
 }
 .btnLogout {
-    text-align: left;
-    background-color: inherit;
-    z-index: 5;
     width: 100%;
     border: none;
+    background-color: inherit;
+    text-align: left;
+    padding: 4px 16px 8px 16px;
+    color: #3C4044;
+    font-size: 14px;
 }
-.profileInfo:hover, .btnLogout:hover {
+.btnLogout:hover {
     background-color: gainsboro;
+    cursor: pointer;
 }
-.menuIcon {
-    padding: 0px 10px;
+.profileInfo {
+    padding: 8px 16px 4px 16px;
+    border-bottom: solid #DBDBDB;
+    background-color: #FAFAFA;
+}
+.profileInfo:hover {
+    background-color: gainsboro;
+    cursor: pointer;
+}
+.userName {
+    font-size: 16px;
+    color: #3C4044;
+}
+.userTag {
+    font-size: 12px;
 }
