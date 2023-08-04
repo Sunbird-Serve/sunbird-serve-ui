@@ -105,8 +105,18 @@ const RaiseNeed = props => {
         e.preventDefault();
         console.log({data});
 
+        axios.post('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need', data)
+        .then(
+            ()=> {setHome(true)},
+            //function(response){console.log(response)}
+        )
+        .catch(function (error) {
+            console.log('error'); 
+        }) 
+
         // Post to internal databse //
 
+        /*
         axios.post('http://43.204.25.161:8081/api/v1/Need', data)
         .then(
             ()=> {setHome(true)},
@@ -115,6 +125,7 @@ const RaiseNeed = props => {
         .catch(function (error) {
             console.log('error'); 
         }) 
+        */
         
         // Post to firebase database //
         
