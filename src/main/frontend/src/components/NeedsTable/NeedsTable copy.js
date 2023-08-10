@@ -12,51 +12,11 @@ import { FaSort } from "react-icons/fa"
 
 export const NeedsTable = props => {
   const [dataNeed,setDataNeed] = useState(props.dataNeed);
-  
-  function NeedTypeById({ needTypeId }) {
-    const [needType, setNeedType] = useState(null);
-    useEffect(() => {
-    axios
-      .get(`http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/needtype/${needTypeId}`)
-      .then((response) => {
-        setNeedType(response.data.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Need Type failed:", error);
-      });
-    }, [needTypeId]);
-   return <span>{needType || ''}</span>;
-  }
-
-  function EntityById({ entityId }) {
-    const [entityName, setEntityName] = useState(null);
-     useEffect(() => {
-       axios
-         .get(`http://43.204.25.161:8081/api/v1/Entity/${entityId}`)
-         .then((response) => {
-           setEntityName(response.data.name);
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-         });
-     }, [entityId]);
-     return <span>{entityName || ''}</span>;
-  }
-
   const COLUMNS = [
     { Header: 'Need Name', accessor: 'name', width: 250 },
-    { Header: 'Need Type', accessor: 'needTypeId',
-      Cell: ({ value }) => {
-      return <NeedTypeById needTypeId={value} />;
-      }
-    },
+    { Header: 'Need Type', accessor: 'needTypeId', width: 177 },
     { Header: 'Location', width: 144 },
-    { Header: 'Entity', accessor: 'entityId'
-      , 
-      Cell: ({ value }) => {
-      return <EntityById entityId={value} />;
-      }
-    },
+    { Header: 'Entity', accessor: 'entityId', width: 228 },
     { Header: 'Volunteer', width: 112 },
     { Header: 'Timeline', width: 164 },
     { Header: 'Status', accessor: 'status', width: 109, filter: 'text' }
@@ -106,17 +66,17 @@ export const NeedsTable = props => {
 
   const [filterValue, setFilterValue] = useState('')
 
+  if (props.tab === 'approved') {
+    setFilterValue('approved')
+  } else if (props.tab === 'requested') {
+    setFilterValue('requested')
+  } else {
+    setFilterValue('')
+  }
+
   useEffect(() => {
-    if (props.tab === 'approved') {
-      setFilter('status', 'Approved')
-    }
-    else if (props.tab == 'requested') {
-      setFilter('status', 'New')
-    }
-    else {
-      setFilter('status','')
-    }
-  }, [props.tab])
+    setFilter('status', '')
+  }, [])
 
 
   return (
@@ -131,7 +91,7 @@ export const NeedsTable = props => {
           </div>
           <div className="volunteerCount">
             <i><PeopleAltIcon /></i>
-            <span> </span>
+            <span>200</span>
             <label>Volunteers</label>
           </div>
         </div>

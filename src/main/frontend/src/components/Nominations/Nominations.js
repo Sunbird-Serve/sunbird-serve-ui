@@ -11,17 +11,62 @@ const Nominations = props => {
   const [rejectPopup,setRejectPopup] = useState(false)
   const [rowData,setRowData] = useState({})
   const [reason,setReason] = useState('')
-  const [dataNoms,setDataNeed] = useState([
-    {name:'raviteja',location:'warangal',dob:'20-08-1993',mobnum:'9000123456'},
-    {name:'rajesh',location:'hyderabad',dob:'01-01-1996',mobnum:'9849456789'},
-    {name:'manvitha',location:'vizag',dob:'05-06-1999',mobnum:'9949124589'},
-    {name:'bhargavi',location:'chennai',dob:'11-12-2002',mobnum:'9100123789'}
-  ]);
+
+  const [dataNoms, setDataNoms] = useState([]);
+  const [tableData, setTableData] = useState([]);
+
+  const needId = props.data.osid;
+
+  useEffect(() => {
+    // Fetch dataNoms using Axios
+    const needId = '1-b2a78fa7-d2c6-41f9-8936-8c395ea39be2';
+    axios.get(`http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/${needId}/nominate`)
+      .then(response => setDataNoms(response.data))
+      .catch(error => console.error('Error fetching dataNoms:', error));
+  }, []);
+
+  useEffect(() => {
+    const fetchUserDataAndCreateTableData = async () => {
+      const updatedTableData = [];
+
+      for (const item of dataNoms) {
+        try {
+          const nominatedUserId = item.nominatedUserId;
+
+          // Fetch userData using Axios for the current nominatedUserId
+          const response = await axios.get(`http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/user/${nominatedUserId}`);
+          const userData = response.data;
+          const location = userData?.contactDetails?.address?.state || '';
+          const fullname = userData?.identityDetails?.name || '';
+          const userDOB = userData?.identityDetails?.dob || '';
+          const mobNum = userData?.contactDetails?.mobile || '';
+
+          updatedTableData.push({
+            nominatedUserId,
+            location,
+            fullname,
+            userDOB,
+            mobNum,
+            //status: item.status,
+          });
+        } catch (error) {
+          console.error('Error fetching userData:', error);
+        }
+      }
+
+      setTableData(updatedTableData);
+    };
+
+    fetchUserDataAndCreateTableData();
+  }, [dataNoms]);
+
+  
+
   const COLUMNS = [
-    {Header:'Volunteer Name',accessor:'name'}, //
+    {Header:'Volunteer Name',accessor:'fullname'}, 
     {Header:'Location',accessor:'location'},
-    {Header:'Date of Birth',accessor:'dob'},
-    {Header:'Contact Info',accessor:'mobnum'},
+    {Header:'Date of Birth',accessor:'userDOB'},
+    {Header:'Contact Info',accessor:'mobNum'},
     {Header:'Skills'},
     {Header:'Actions',
       Cell : ({ row }) => {
@@ -44,7 +89,6 @@ const Nominations = props => {
     },
   ] 
 
-  const data = useMemo(() => dataNoms,[])
   const columns = useMemo(() => COLUMNS, [])
 
   
@@ -56,7 +100,7 @@ const Nominations = props => {
     prepareRow,
   } = useTable ({
     columns,
-    data
+    data: tableData,
     },
     usePagination
   )
@@ -69,6 +113,27 @@ const Nominations = props => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   }
+
+  const userIds = [ '1-13962559-8fb8-4719-b241-61bf279d18fe',
+    '1-11012fa1-b82d-4b66-95b0-1fa13fc1636c',
+    '1-5ce2e3b7-b77f-45b1-8865-b8dfc428061b',
+    '1-f345c9ec-5b75-4893-a58a-eb61412278fb',
+    '1-34a78bce-e8ff-49e2-bad1-813b9968943f'
+  ]
+
+      /*
+      axios.post(`http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/${needId}/nominate`)
+      .then((response) => {
+        // Handle success, e.g., show a success message or update state if needed.
+        console.log(response.data);
+      })
+      .catch((error) => {
+        // Handle error, e.g., show an error message.
+        console.error("Nomination failed:", error);
+      });
+      */
+
+
 
   return (
     <div className="wrapNominations">
