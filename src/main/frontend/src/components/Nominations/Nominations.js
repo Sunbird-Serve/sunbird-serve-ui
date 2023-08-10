@@ -5,23 +5,65 @@ import { useTable, usePagination } from 'react-table'
 import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-
+import configData from './../../configData.json'
 
 const Nominations = props => {
   const [rejectPopup,setRejectPopup] = useState(false)
   const [rowData,setRowData] = useState({})
   const [reason,setReason] = useState('')
-  const [dataNoms,setDataNeed] = useState([
-    {name:'raviteja',location:'warangal',dob:'20-08-1993',mobnum:'9000123456'},
-    {name:'rajesh',location:'hyderabad',dob:'01-01-1996',mobnum:'9849456789'},
-    {name:'manvitha',location:'vizag',dob:'05-06-1999',mobnum:'9949124589'},
-    {name:'bhargavi',location:'chennai',dob:'11-12-2002',mobnum:'9100123789'}
-  ]);
+
+  const [dataNoms, setDataNoms] = useState([]);
+  const [tableData, setTableData] = useState([]);
+
+  const needId = props.data.osid;
+
+  useEffect(() => {
+    // Fetch dataNoms using Axios
+    axios.get(`${configData.NEED_FETCH}/${needId}/nominate`)
+      .then(response => setDataNoms(response.data))
+      .catch(error => console.error('Error fetching dataNoms:', error));
+  }, []);
+
+  useEffect(() => {
+    const fetchUserDataAndCreateTableData = async () => {
+      const updatedTableData = [];
+
+      for (const item of dataNoms) {
+        try {
+          const nominatedUserId = item.nominatedUserId;
+
+          // Fetch userData using Axios for the current nominatedUserId
+          const response = await axios.get(`${configData.NOMINATED_USER_FETCH}/${nominatedUserId}`);
+          const userData = response.data;
+          const location = userData?.contactDetails?.address?.state || '';
+          const fullname = userData?.identityDetails?.name || '';
+          const userDOB = userData?.identityDetails?.dob || '';
+          const mobNum = userData?.contactDetails?.mobile || '';
+
+          updatedTableData.push({
+            nominatedUserId,
+            location,
+            fullname,
+            userDOB,
+            mobNum,
+            //status: item.status,
+          });
+        } catch (error) {
+          console.error('Error fetching userData:', error);
+        }
+      }
+
+      setTableData(updatedTableData);
+    };
+
+    fetchUserDataAndCreateTableData();
+  }, [dataNoms]);
+
   const COLUMNS = [
-    {Header:'Volunteer Name',accessor:'name'}, //
+    {Header:'Volunteer Name',accessor:'fullname'}, 
     {Header:'Location',accessor:'location'},
-    {Header:'Date of Birth',accessor:'dob'},
-    {Header:'Contact Info',accessor:'mobnum'},
+    {Header:'Date of Birth',accessor:'userDOB'},
+    {Header:'Contact Info',accessor:'mobNum'},
     {Header:'Skills'},
     {Header:'Actions',
       Cell : ({ row }) => {
@@ -44,10 +86,7 @@ const Nominations = props => {
     },
   ] 
 
-  const data = useMemo(() => dataNoms,[])
   const columns = useMemo(() => COLUMNS, [])
-
-  
   const {
     getTableProps,
     getTableBodyProps,
@@ -56,7 +95,7 @@ const Nominations = props => {
     prepareRow,
   } = useTable ({
     columns,
-    data
+    data: tableData,
     },
     usePagination
   )
@@ -69,6 +108,7 @@ const Nominations = props => {
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   }
+
 
   return (
     <div className="wrapNominations">

@@ -1,6 +1,5 @@
 import React from 'react';
 import './LoginBanner.css';
-import BannerImage from '../../assets/ImageBanner.png'
 
 const BannerLogin = () => {
     return(

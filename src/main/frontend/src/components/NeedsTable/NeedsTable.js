@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useMemo} from 'react'
 import axios from 'axios'
-import { useTable, usePagination, useSortBy } from 'react-table'
+import { useTable, usePagination, useGlobalFilter, useFilters, useSortBy } from 'react-table'
 import ModifyNeed from '../ModifyNeed/ModifyNeed'
 import './NeedsTable.css'
 import SearchIcon from '@mui/icons-material/Search';
@@ -9,17 +9,58 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FaSort } from "react-icons/fa"
+import configData from './../../configData.json'
 
 export const NeedsTable = props => {
   const [dataNeed,setDataNeed] = useState(props.dataNeed);
+  
+  function NeedTypeById({ needTypeId }) {
+    const [needType, setNeedType] = useState(null);
+    useEffect(() => {
+    axios
+      .get(`${configData.NEEDTYPE_FETCH}/${needTypeId}`)
+      .then((response) => {
+        setNeedType(response.data.name);
+      })
+      .catch((error) => {
+        console.error("Fetching Need Type failed:", error);
+      });
+    }, [needTypeId]);
+   return <span>{needType || ''}</span>;
+  }
+
+  function EntityById({ entityId }) {
+    const [entityName, setEntityName] = useState(null);
+     useEffect(() => {
+       axios
+         .get(`${configData.ENTITY_FETCH}/${entityId}`)
+         .then((response) => {
+           setEntityName(response.data.name);
+         })
+         .catch((error) => {
+           console.error("Fetching Entity failed:", error);
+         });
+     }, [entityId]);
+     return <span>{entityName || ''}</span>;
+  }
+
   const COLUMNS = [
     { Header: 'Need Name', accessor: 'name', width: 250 },
-    { Header: 'Need Type', accessor: 'needTypeId', width: 177 },
+    { Header: 'Need Type', accessor: 'needTypeId',
+      Cell: ({ value }) => {
+      return <NeedTypeById needTypeId={value} />;
+      }
+    },
     { Header: 'Location', width: 144 },
-    { Header: 'Entity', accessor: 'entityId', width: 228 },
+    { Header: 'Entity', accessor: 'entityId'
+      , 
+      Cell: ({ value }) => {
+      return <EntityById entityId={value} />;
+      }
+    },
     { Header: 'Volunteer', width: 112 },
     { Header: 'Timeline', width: 164 },
-    { Header: 'Status', accessor: 'status', width: 109 }
+    { Header: 'Status', accessor: 'status', width: 109, filter: 'text' }
   ]
   const data = useMemo(() => dataNeed,[])
   const columns = useMemo(() => COLUMNS, [])
@@ -27,6 +68,8 @@ export const NeedsTable = props => {
     getTableProps,
     getTableBodyProps,
     headerGroups,
+    state,
+    setGlobalFilter,
     page,
     nextPage,
     previousPage,
@@ -36,13 +79,13 @@ export const NeedsTable = props => {
     gotoPage,
     pageCount,
     setPageSize,
-    state,
     prepareRow,
+    setFilter,
     } = useTable ({
     columns,
     data
     },
-  useSortBy, usePagination)
+    useFilters, useGlobalFilter, useSortBy, usePagination)
 
   const [showPopup, setShowPopup] = useState(false);
   const [rowData, setRowData] = useState(null);
@@ -60,7 +103,22 @@ export const NeedsTable = props => {
     setNeedTypeId(e.target.value)
   }
 
-  const { pageIndex, pageSize } = state;
+  const { globalFilter, pageIndex, pageSize } = state;
+
+  const [filterValue, setFilterValue] = useState('')
+
+  useEffect(() => {
+    if (props.tab === 'approved') {
+      setFilter('status', 'Approved')
+    }
+    else if (props.tab == 'requested') {
+      setFilter('status', 'New')
+    }
+    else {
+      setFilter('status','')
+    }
+  }, [props.tab])
+
 
   return (
     <div className="wrapTable">
@@ -74,7 +132,7 @@ export const NeedsTable = props => {
           </div>
           <div className="volunteerCount">
             <i><PeopleAltIcon /></i>
-            <span>200</span>
+            <span> </span>
             <label>Volunteers</label>
           </div>
         </div>
@@ -82,7 +140,7 @@ export const NeedsTable = props => {
           {/* Following are filters on need table */}
           <div className="boxSearchNeeds">
             <i><SearchIcon style={{height:'18px',width:'18px'}}/></i>
-            <input type="search" name="nsearch" placeholder="Search" ></input>
+            <input type="search" name="globalfilter" placeholder="Search" value={globalFilter || ''} onChange={(e) => setGlobalFilter(e.target.value)}></input>
           </div>
           <div className="selectNeedDate">
             <input type="date" name="date" value={date} onChange={handleDate} />
@@ -96,7 +154,7 @@ export const NeedsTable = props => {
           </select>
         </div>
       </div>
-      {/* Following is table that loads list of needs and its details */}
+      {/* Following is TABLE that loads list of needs and its details */}
       <table className="tableNeedList">
         <thead>
             {headerGroups.map((headerGroup)=>(

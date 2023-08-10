@@ -28,14 +28,14 @@ const MainPage = () => {
                         {/*load different components by path which is selected in side navigation */}
                         <div className="wrapContent row mt-5 mt-sm-0 pl-5">
                             <Switch>     
-                            <Route exact path="/" component={Dashboard} />
-                            <Route path="/needs" component={Needs} />
-                            <Route path="/needPlans" component={NeedPlans} />
-                            <Route path="/volunteer" component={Volunteer} />
-                            <Route path="/settings" component={Settings} />
-                            <Route path="/accounts" component={Accounts} />
-                            <Route path="/help" component={Help} /> 
-                        </Switch>
+                                <Route exact path="/" component={Dashboard} />
+                                <Route path="/needs" component={Needs} />
+                                <Route path="/needPlans" component={NeedPlans} />
+                                <Route path="/volunteer" component={Volunteer} />
+                                <Route path="/settings" component={Settings} />
+                                <Route path="/accounts" component={Accounts} />
+                                <Route path="/help" component={Help} /> 
+                            </Switch>
                         </div>
                     </div>
                 </div>  

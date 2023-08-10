@@ -5,8 +5,34 @@ import './ModifyNeed.css'
 import { Redirect } from 'react-router'
 import Nominations from '../Nominations/Nominations'
 import UploadImageBG from '../../assets/bgImgUpload.png'
+import configData from './../../configData.json'
 
 const ModifyNeed = props => {
+    const [entityName, setEntityName] = useState(null);
+    function EntityById( entityId ) {
+           axios
+             .get(`${configData.ENTITY_FETCH}/${entityId}`)
+             .then((response) => {
+               setEntityName(response.data.name);
+             })
+             .catch((error) => {
+               console.error("Fetching Entity failed:", error);
+             });
+         return entityName || '';
+    }
+    const [needType, setNeedType] = useState(null);
+    function NeedTypeById( needTypeId ) {
+        axios
+          .get(`${configData.NEEDTYPE_FETCH}/${needTypeId}`)
+          .then((response) => {
+            setNeedType(response.data.name);
+          })
+          .catch((error) => {
+            console.error("Fetching Need Type failed:", error);
+          });
+       return needType || '';
+    }
+
    const [nomin,setNomin] = useState(true)
    const [data,setData] = useState(null)
    
@@ -39,7 +65,7 @@ const ModifyNeed = props => {
    const submitHandler = e => {
     e.preventDefault();
     console.log(data)
-}
+    }
 
   return (
     <div className="wrapNeedNominations">
@@ -51,7 +77,7 @@ const ModifyNeed = props => {
             </div>
             { nomin ? 
                 //load nominations component
-                <Nominations /> 
+                <Nominations data={props.data}/> 
             : ( 
                 //load need information
                     <div className="needInfoBox">
@@ -76,14 +102,13 @@ const ModifyNeed = props => {
                                             <span>{data.name}</span>
                                     </div>
                                     <div className="itemNInfo">
-                                            <label>Need Type</label>
-                                            <span> {data.needTypeId}
-                                            </span>
-                                    </div> 
-                                    <div className="itemNInfo">
-                                            <label>Need Location</label>
+                                            <label>Need Purpose</label>
                                             <span> </span>
                                     </div>
+                                    <div className="itemNInfo">
+                                            <label>Need Type</label>
+                                            <span>{NeedTypeById(data.needTypeId)}</span>
+                                    </div> 
                                 </div>  
                                 <div className="needInfoTopRight col-sm-6">
                                     <div className="itemNInfoDescrip">
@@ -93,7 +118,7 @@ const ModifyNeed = props => {
                                     {/* Entity Name */}
                                     <div className="itemNInfo">
                                         <label>Entity Name</label>
-                                        <span>{data.entityId}</span>
+                                        <span>{EntityById(data.entityId)}</span>
                                     </div>
                                     {/* Date */}
                                     <div className="itemWrapNInfoDate">
@@ -112,15 +137,16 @@ const ModifyNeed = props => {
                                         <span></span>
                                     </div> 
                                 </div>                      
-                            </div>
+                            </div>           
                             <div className="catergoryNInfo">VOLUNTEER PREREQUISITE</div>                          
                             <div className="needIFormBottom row">
                                 <div className="formBLeft col-sm-6">
-                                    {/* Skills Required */}
-                                    <div className="itemNInfo">
+                                    { /* Skills Required */}
+                                    { data &&
+                                     <div className="itemNInfo">
                                         <label>Skills Required</label>
-                                        <span>{data.skillDetail}</span>
-                                    </div> 
+                                        <span>{data.skillDetail.map(item => item.value)}</span>
+                                    </div> }
                                 </div>
                                 <div className="formBRight col-sm-6">
                                     {/* No. of Volunteers Required */}
@@ -130,6 +156,7 @@ const ModifyNeed = props => {
                                     </div>
                                 </div>
                             </div>
+                            
                         </form>
                     </div>
                 )}

@@ -1,15 +1,12 @@
 import './SideNav.css';
 import SBLogo from '../../assets/sunbirdicon.png';
 import { NavLink } from "react-router-dom" ;
-import DashboardIcon from '@mui/icons-material/Dashboard';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined';
 import VolunteerActivismOutlinedIcon from '@mui/icons-material/VolunteerActivismOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
-import SettingsIcon from '@mui/icons-material/Settings';
-import HelpIcon from '@mui/icons-material/Help';
 
 function SideNav() {
   return ( 
@@ -49,7 +46,7 @@ function SideNav() {
               <i><VolunteerActivismOutlinedIcon /></i> 
               <span>Volunteer</span>
         </NavLink>  
-        <div><hr /></div>
+        <div></div>
         <NavLink to="/settings" exact className="sideNavItem row">
               <i><SettingsOutlinedIcon /> </i>
               <span>Settings</span>
@@ -64,5 +61,3 @@ function SideNav() {
 }
 
 export default SideNav
-
-          /*<i><MenuOpenIcon /></i>*/
