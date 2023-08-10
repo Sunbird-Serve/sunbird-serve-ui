@@ -2,6 +2,7 @@ import "./App.css";
 import React, { useEffect, useState } from "react";
 import LoginPage from "./containers/LoginPage/LoginPage";
 import MainPage from "./containers/MainPage/MainPage";
+import ExplorePage from "./containers/ExplorePage/ExplorePage"
 import { auth } from "./firebase";
 import { Provider } from "react-redux";
 import store from "./redux/store";
@@ -12,6 +13,7 @@ function App() {
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
+        console.log(user)
         setPresentUser({
           uid: user.uid,
           email: user.email
@@ -25,7 +27,8 @@ function App() {
     <Provider store={store}>
       <div className="App row">
         { /* Load page depending on user login */}
-        {presentUser ? <MainPage /> : <LoginPage />}
+        {  presentUser ? <MainPage /> : <LoginPage /> }
+        { /* <ExplorePage /> */  }
       </div>
     </Provider>
   );

@@ -6,6 +6,7 @@ import axios from 'axios'
 import './RaiseNeed.css' 
 import { Redirect } from 'react-router'
 import UploadImageBG from '../../assets/bgImgUpload.png'
+import MultiSelect from './MultiSelect';
 
 const RaiseNeed = props => {
     const [ selectedOptions, setSelectedOptions ] = useState([]);
@@ -13,23 +14,25 @@ const RaiseNeed = props => {
     const [data,setData] = useState({
         name: '',    //registry.Need (Need Name) 
         needTypeId: '',       //registry.Need (Need Type)
-        status: 'Approved',     //registry.Need
+        status: 'New',     //registry.Need
         description: '',      //registry.Need (Need Description)
-        userId:'',      //registry.Need ? Not from RN form
+        needPurpose:'',
+        userId:'1-13962559-8fb8-4719-b241-61bf279d18fe',      //registry.Need ? Not from RN form
         entityId: '',       //registry.Need (Entity Name)
-        skillDetail: [],        //serve.NeedRequirement
-        prerequisiteDetail: '',      //serve.NeedRequirement
+        //requirementId: '',        //serve.NeedRequirement'
     });
     const [dataOther,setDataOther] = useState({
-        needId:'',
-        needLocation:'',    // ?? Need Location
-        needBDate:'',    // ?? Start Date
-        needEDate:'',    // ?? End Date
-        needTime:'',   // ?? Time
-        numVolunteerRequired:'' //?? No. Volunteer Required
+        skillDetails: [],
+        frequency:'',    // ?? Need Location
+        volunteersRequired:'',    // ?? Start Date
+        startDate:'',    // ?? End Date
+        endDate:'',   // ?? Time
+        timeSlot:'',
+        days:[],
+        priority:'', //?? No. Volunteer Required
     })
-    const {name, needTypeId, status, description, userId, entityId, skillDetail, prerequisiteDetail} = data;
-    const {needId, needLocation, needBDate, needEDate, needTime, numVolunteerRequired} = dataOther;
+    const {name, needTypeId, status, description, needPurpose, userId, entityId} = data;
+    const {skillDetails, frequency, startDate, endDate, volunteersRequired, timeSlot, days, priority} = dataOther;
 
     // configure and handle image upload
     const inputRef = useRef(null);
@@ -65,9 +68,9 @@ const RaiseNeed = props => {
     ]
     const handleChange = (selectedOptions) => {
         setSelectedOptions(selectedOptions)
-        setData(data => ({
-            ...data,
-            skillDetail:selectedOptions,
+        setDataOther(dataOther => ({
+            ...dataOther,
+            skillDetails:selectedOptions,
         }))
     }
     const styleTokenInput = {
@@ -99,28 +102,132 @@ const RaiseNeed = props => {
         })
     }
 
+    const [dataNeedType,setDataNeedType] = useState([]);
+    const [dataNeedTypeB,setDataNeedTypeB] = useState([]);
+    const [dataEntity,setDataEntity] = useState([]);
 
-    const [home,setHome] = useState(false);
-    const submitHandler = e => {
-        e.preventDefault();
-        console.log({data});
-
-        axios.post('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need', data)
+    useEffect(()=> {
+        //Need type
+        
+        // APIs from gateway
+        axios.get('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/needtype/?offset=0&limit=10&status=New')
         .then(
-            ()=> {setHome(true)},
             //function(response){console.log(response)}
+          response => setDataNeedType(Object.values(response.data))
         )
         .catch(function (error) {
             console.log('error'); 
         }) 
 
-        // Post to internal databse //
+ 
+        axios.get('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/entity/?offset=0&limit=10&status=Active')
+        .then(
+            //function(response){console.log(response)}
+          response => setDataEntity(Object.values(response.data))
+        )
+        .catch(function (error) {
+            console.log('error'); 
+        }) 
 
+        //APIs from RC
         /*
-        axios.post('http://43.204.25.161:8081/api/v1/Need', data)
+        axios.post('http://43.204.25.161:8081/api/v1/NeedType/search',
+            {
+                "offset": 0,
+                "limit": 10,
+                "filters": {
+                  "status": {
+                    "eq": "New"
+                  }
+                }
+              }
+              ).then(
+          response => setDataNeedType(Object.values(response.data))
+        )
+
+        axios.post('http://43.204.25.161:8081/api/v1/NeedType/search',
+              {
+                "offset": 0,
+                "limit": 10,
+                "filters": {
+                  "status": {
+                    "eq": "Approved"
+                  }
+                }
+              }
+              ).then(
+          response => setDataNeedTypeB(Object.values(response.data))
+        )
+        axios.post('http://43.204.25.161:8081/api/v1/Entity/search',{
+            "offset": 0,
+            "limit": 10,
+            "filters": {
+              "status": {
+                "eq": "Active"
+              }
+            }
+          }).then(
+            response => setDataEntity(Object.values(response.data))
+        )
+            */
+
+      },[])
+
+    console.log(dataNeedType)
+    console.log(dataEntity)
+
+    const [home,setHome] = useState(false);
+
+    const [dataToPost,setDataToPost] = useState({
+        needRequest:{},
+        needRequirementRequest: {}
+    })
+
+    const optionsDay = [
+        { id: 1, label: 'Sunday' },
+        { id: 2, label: 'Monday' },
+        { id: 3, label: 'Tuesday' },
+        { id: 4, label: 'Wednesday' },
+        { id: 5, label: 'Thursday' },
+        { id: 6, label: 'Friday' },
+        { id: 7, label: 'Saturday' }
+    ];
+
+    const [selectedDays, setSelectedDays] = useState([]);
+
+    const handleSelectedDaysChange = (updatedDays) => {
+        setSelectedDays(updatedDays);
+    }
+
+    useEffect(() => {
+        const dayLabels = selectedDays.map(day => day.label)
+        console.log(dayLabels)
+        setDataOther(dataOther => ({
+            ...dataOther,
+            days:dayLabels,
+        }))
+    },[selectedDays])
+
+    const submitHandler = e => {
+        e.preventDefault();
+        setDataToPost({needRequest:data, needRequirementRequest:dataOther})
+        console.log(dataToPost)
+
+        axios.post('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/', dataToPost)
         .then(
             ()=> {setHome(true)},
-            //function(response){console.log(response)}
+            function(response){console.log(response)}
+        )
+        .catch(function (error) {
+            console.log('error'); 
+        }) 
+        
+        // Post to internal databse //
+        /*
+        axios.post('http://43.204.25.161:8081/api/v1/Need', dataToPost)
+        .then(
+            //()=> {setHome(true)},
+            function(response){console.log(response)}
         )
         .catch(function (error) {
             console.log('error'); 
@@ -138,12 +245,12 @@ const RaiseNeed = props => {
             .then(()=> {setHome(true)})
         })
         */
-        //window.location.reload()
     }
     if(home){
         window.location.reload()
         //return <Redirect to="/needs"/>
     }
+
 
   return (
     <div className="wrapRaiseNeed row">
@@ -176,11 +283,27 @@ const RaiseNeed = props => {
                             <label>Need Name</label>
                             <input type="text" placeholder='Ex: Avila Beach Cleaning' name="name" value={name} onChange={changeHandler} />
                         </div>
+                        {/* Need Purpose */}
+                        <div className="itemForm">
+                            <label>Need Purpose</label>
+                            <input type="text" placeholder='Enter your purpose for this need' name="needPurpose" value={needPurpose} onChange={changeHandler} />
+                        </div>
                         {/* Need Type */}
                         <div className="itemForm">
                             <label>Need Type</label>
                             <select className="selectMenu" name="needTypeId" value={needTypeId} onChange={changeHandler}>
-                                <option value="" defaultValue>Select Need Type</option>
+                            <option value="" defaultValue>Select Need type</option>
+                                {
+                                    dataNeedType.map(
+                                        (ntype) => <option key={ntype.osid} value={ntype.osid}>{ntype.name}</option>
+                                    )
+                                }
+                                {
+                                    dataNeedTypeB.map(
+                                        (ntype) => <option key={ntype.osid} value={ntype.osid}>{ntype.name}</option>
+                                    )
+                                }
+                                {/* <option value="" defaultValue>Select Need Type</option>
                                 <option value="Beach Cleaning">Beach Cleaning</option>
                                 <option vlaue="Blood Donation">Blood Donation</option>
                                 <option value="Lake Cleaning">Lake Cleaning</option>
@@ -188,19 +311,27 @@ const RaiseNeed = props => {
                                 <option value="Offline Teaching">Offline Teaching</option>
                                 <option value="Online Teaching">Online Teaching</option>
                                 <option value="Painting">Painting</option>
-                                <option value="Tuition">Tuition</option>
-                                { /*
-                                    dataNeedType.map(
-                                        (ntype) => <option value={ntype.id}>{ntype.name}</option>
-                                    )
-                                    */}
+                                <option value="Tuition">Tuition</option> */}
                             </select>
                         </div> 
-                        {/* Need Location */}
+                        {/* Entity Name */}
+                        <div className="itemForm">
+                            <label>Entity Name</label>
+                            <select className="selectMenu" name="entityId" value={entityId} onChange={changeHandler}>
+                            <option value="" defaultValue>Select Entity</option>
+                                {
+                                    dataEntity.map(
+                                        (entype) => <option key={entype.osid} value={entype.osid}>{entype.name}</option>
+                                    )
+                                }
+                            </select>
+                        </div>
+                        {/* Need Location 
                         <div className="itemForm">
                             <label>Need Location</label>
                             <input type="text" placeholder='Ex: Bangalore' name="needLocation" value={needLocation} onChange={changeHandlerOther} />
-                        </div>                               
+                        </div> 
+                        */}                              
                     </div>  
                     {/* right half of upper side */}
                     <div className="formRight col-sm-6">
@@ -211,26 +342,26 @@ const RaiseNeed = props => {
                                 placeholder='Write a small brief about the Need' onChange={handleQuillEdit}    
                             />
                         </div>
-                        {/* Entity Name */}
-                        <div className="itemForm">
-                            <label>Entity Name</label>
-                            <input type="text" placeholder='Ex: Lions club' name="entityId" value={entityId} onChange={changeHandler} />
-                        </div>
                         {/* Date */}
                         <div className="itemWrapDate">
                             <div className="itemDate">
                                 <label>Start Date</label>
-                                <input type="date" name="needBDate" value={needBDate} onChange={changeHandlerOther} />
+                                <input type="date" name="startDate" value={startDate} onChange={changeHandlerOther} />
                             </div>
                             <div className="itemDate">
                                 <label>End Date</label>
-                                <input type="date" name="needEDate" value={needEDate} onChange={changeHandlerOther} />
+                                <input type="date" name="endDate" value={endDate} onChange={changeHandlerOther} />
                             </div>
+                        </div>
+                        <div className="itemForm">
+                            <label>Event Days</label>
+                            <MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />
+                            {/*<input type="text" placeholder='Sunday, Monday, Tuesday' name="days" value={days} onChange={changeHandlerOther} /> */}
                         </div>
                         {/* Time */}
                         <div className="itemForm">
                             <label>Time</label>
-                            <input type="time" name="needTime" value={needTime} onChange={changeHandlerOther} />
+                            <input type="time" name="timeSlot" value={timeSlot} onChange={changeHandlerOther} />
                         </div> 
                     </div>
                 </div>
@@ -251,8 +382,8 @@ const RaiseNeed = props => {
                         {/* No. of Volunteers Required */}
                         <div className="itemForm">
                             <label>No. of Volunteers required</label>
-                            <input className="inpVolunteerNum" type="text" placeholder='Mention Number of Volunteers' name="numVolunteerRequired" 
-                                value={numVolunteerRequired} onChange={changeHandlerOther} />
+                            <input className="inpVolunteerNum" type="text" placeholder='Mention Number of Volunteers' name="volunteersRequired" 
+                                value={volunteersRequired} onChange={changeHandlerOther} />
                         </div>
                     </div>
                 </div>

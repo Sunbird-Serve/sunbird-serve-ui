@@ -49,7 +49,7 @@ function SideNav() {
               <i><VolunteerActivismOutlinedIcon /></i> 
               <span>Volunteer</span>
         </NavLink>  
-        <div><hr /></div>
+        <div></div>
         <NavLink to="/settings" exact className="sideNavItem row">
               <i><SettingsOutlinedIcon /> </i>
               <span>Settings</span>
