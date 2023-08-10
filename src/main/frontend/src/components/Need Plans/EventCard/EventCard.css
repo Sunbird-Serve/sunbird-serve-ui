@@ -1,0 +1,19 @@
+.timestamp {
+  border: 1px solid #e9841d;
+  background: #fff5eb;
+  color: #e9841d;
+  font-size: 1.5vh;
+  float: left;
+  margin: 1vh 0 1vh 0;
+  padding: 1px 5px;
+}
+
+.eventCard {
+  background-color: rgb(209, 205, 205);
+  padding: 5px 15px;
+}
+
+.volunteerCard {
+  text-align: left;
+  margin: 0px 5px;
+}

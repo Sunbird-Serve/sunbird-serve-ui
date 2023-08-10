@@ -1,0 +1,75 @@
+.wrapNeedsContent {
+    height: 100%;
+    padding: 10px 20px 10px 10px;
+    overflow: scroll;
+}
+.needsList {
+    height: 100%;
+    background-color: white; 
+    border: solid;
+    border-color: rgba(242, 242, 242, 1);
+    border-radius: 8px;
+}
+.needBar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+}
+.needMenu {
+    display: flex;
+}
+.tabNeed {
+    list-style-type: none;
+    padding: 16px 20px 8px 20px;
+    border: none;
+    font-size: 14px;
+    color: #686C73;
+    font-weight: 400;
+}
+.tabNeed:hover {
+    border-bottom: solid #006FA2;
+    cursor: pointer;
+}
+.activeNTab {
+    border-bottom: solid 2px #006FA2;
+    color: #006FA2;
+    font-weight: 600;
+}
+.needBar button {
+    font-size: 14px;
+    background-color: #0080BC;
+    border: none;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 6px;
+    margin-right: 2%;
+    cursor: pointer;
+}
+/* CSS for no needs page is below*/
+.zeroNeed {
+    padding: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.headZeroNeed {
+    color: #5F6367;
+    font-weight: 400;
+    font-size: 24px;
+    padding: 10px;
+}
+.textZeroNeed {
+    color: #A2A5A9;
+    font-size: 14px;
+    padding-bottom: 20px;
+}
+.zeroNeed button {
+    font-size: 14px;
+    background-color: #0080BC;
+    border: none;
+    color: white;
+    padding: 6px 6px 6px 15px;
+    border-radius: 3px;
+    cursor: pointer;
+}
