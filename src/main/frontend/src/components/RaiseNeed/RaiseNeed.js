@@ -111,7 +111,7 @@ const RaiseNeed = props => {
         //Need type
         
         // APIs from gateway
-        axios.get('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/needtype/?offset=0&limit=10&status=New')
+        axios.get(`${configData.NEEDTYPE_FETCH}/?offset=0&limit=10&status=New`)
         .then(
             //function(response){console.log(response)}
           response => setDataNeedType(Object.values(response.data))
@@ -121,7 +121,7 @@ const RaiseNeed = props => {
         }) 
 
  
-        axios.get('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/entity/?offset=0&limit=10&status=Active')
+        axios.get(`${configData.ENTITY_GET}/?offset=0&limit=10&status=Active`)
         .then(
             //function(response){console.log(response)}
           response => setDataEntity(Object.values(response.data))
@@ -129,49 +129,6 @@ const RaiseNeed = props => {
         .catch(function (error) {
             console.log('error'); 
         }) 
-
-        //APIs from RC
-        /*
-        axios.post('http://43.204.25.161:8081/api/v1/NeedType/search',
-            {
-                "offset": 0,
-                "limit": 10,
-                "filters": {
-                  "status": {
-                    "eq": "New"
-                  }
-                }
-              }
-              ).then(
-          response => setDataNeedType(Object.values(response.data))
-        )
-
-        axios.post('http://43.204.25.161:8081/api/v1/NeedType/search',
-              {
-                "offset": 0,
-                "limit": 10,
-                "filters": {
-                  "status": {
-                    "eq": "Approved"
-                  }
-                }
-              }
-              ).then(
-          response => setDataNeedTypeB(Object.values(response.data))
-        )
-        axios.post('http://43.204.25.161:8081/api/v1/Entity/search',{
-            "offset": 0,
-            "limit": 10,
-            "filters": {
-              "status": {
-                "eq": "Active"
-              }
-            }
-          }).then(
-            response => setDataEntity(Object.values(response.data))
-        )
-            */
-
       },[])
 
     const [home,setHome] = useState(false);
@@ -275,15 +232,6 @@ const RaiseNeed = props => {
                                         (ntype) => <option key={ntype.osid} value={ntype.osid}>{ntype.name}</option>
                                     )
                                 }
-                                {/* <option value="" defaultValue>Select Need Type</option>
-                                <option value="Beach Cleaning">Beach Cleaning</option>
-                                <option vlaue="Blood Donation">Blood Donation</option>
-                                <option value="Lake Cleaning">Lake Cleaning</option>
-                                <option value="Mentoring">Mentoring</option>
-                                <option value="Offline Teaching">Offline Teaching</option>
-                                <option value="Online Teaching">Online Teaching</option>
-                                <option value="Painting">Painting</option>
-                                <option value="Tuition">Tuition</option> */}
                             </select>
                         </div> 
                         {/* Entity Name */}
@@ -297,13 +245,7 @@ const RaiseNeed = props => {
                                     )
                                 }
                             </select>
-                        </div>
-                        {/* Need Location 
-                        <div className="itemForm">
-                            <label>Need Location</label>
-                            <input type="text" placeholder='Ex: Bangalore' name="needLocation" value={needLocation} onChange={changeHandlerOther} />
-                        </div> 
-                        */}                              
+                        </div>                           
                     </div>  
                     {/* right half of upper side */}
                     <div className="formRight col-sm-6">
