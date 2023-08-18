@@ -2,15 +2,17 @@ import React, { useState, useEffect } from 'react';
 import './NeedPopup.css';
 import CloseIcon from "@mui/icons-material/Close";
 import axios from 'axios';
+import configData from './../../configData.json'
+
 function NeedPopup({ open, onClose, need }) {
   const [popUp, setPopup] = useState(false);
   const togglePopup = () => {
     setPopup(!popUp);
   };
   const nominateNeed = () => {
-    const needId = need.osid; // Assuming the need.id represents the needId
+    const needId = need.id; //  the need.id represents the needId
     console.log(needId)
-    axios.post(`http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/${needId}/nominate/1-13962559-8fb8-4719-b241-61bf279d18fe`)
+    axios.get(`${configData.NEED_SEARCH}/${needId}`)
       .then((response) => {
         // Handle success, e.g., show a success message or update state if needed.
         console.log("Nomination successful!");
@@ -24,9 +26,9 @@ function NeedPopup({ open, onClose, need }) {
   const [needType, setNeedType] = useState(null);
   function NeedTypeById( needTypeId ) {
     axios
-      .get(`http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/needtype/${needTypeId}`)
+      .get(`${configData.NEED_BY_TYPE}/${needTypeId}?page=0&size=10&status=New`)
       .then((response) => {
-        setNeedType(response.data.name);
+        setNeedType(response.data.content.name);
       })
       .catch((error) => {
         console.error("Fetching Need Type failed:", error);
@@ -36,6 +38,8 @@ function NeedPopup({ open, onClose, need }) {
 
 
   const [entityName, setEntityName] = useState(null);
+
+  /*
   function EntityById( entityId ) {
        axios
          .get(`http://43.204.25.161:8081/api/v1/Entity/${entityId}`)
@@ -47,6 +51,7 @@ function NeedPopup({ open, onClose, need }) {
          });
      return entityName || '';
   }
+  */
 
   return (
     <div className={`need-popup ${open ? "open" : ""}`}>
@@ -54,18 +59,16 @@ function NeedPopup({ open, onClose, need }) {
       <div className="close-button" onClick={onClose}>
         <CloseIcon />
       </div>
-      <div className="content">
+      <div className="contentNeedPopup">
         <div className="needPTitle">{need.name}</div>
         <br/>
         <button className="nominate-button" onClick={nominateNeed}>
           Nominate
         </button>
-
         <div className="aboutHeading">About</div>
-
         <hr />
         <p className="popupNKey">About the Need </p>
-        <p className="popupNValue">{need.description.slice(3,-4)}</p>
+        <p className="popupNValue">{need.description}</p>
         <p className="popupNKey">Need Type </p>
         <p>{NeedTypeById(need.needTypeId)}</p>
         <div className="date-container">
@@ -79,7 +82,7 @@ function NeedPopup({ open, onClose, need }) {
           </div>
         </div>
         <p className="popupNKey">Entity Name </p>
-        <p>{EntityById(need.entityId)}</p>
+        <p>{/*  EntityById(need.entityId) */}</p>
         <p className="popupNKey">Skills Required</p><br/>
         <p className="popupNKey">Volunteers Required</p>
       </div>

@@ -21,17 +21,9 @@ export const VolunteerNeeds = props => {
 
   useEffect(() => {
     axios
-      .post(configData.NEED_SEARCH, {
-        offset: 0,
-        limit: 100,
-        filters: {
-          needTypeId: {
-            eq: props.needTypeId,
-          },
-        },
-      })
+      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=10&status=New`)
       .then((response) => {
-        setData(response.data);
+        setData(response.data.content);
       })
       .catch((error) => console.log(error));
   }, []);

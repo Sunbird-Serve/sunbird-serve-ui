@@ -47,6 +47,7 @@
 }
 .vnomTabs {
     display: flex;
+    margin-top: 50px;
 }
 .vnomTabs div:hover {
     cursor: pointer;
@@ -82,3 +83,45 @@
 .selectedVNomTab {
     background-color: white;
 }
+.nomination-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns with equal width */
+    gap: 30px; /* spacing between items */
+}
+  
+.nomination-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 180px;
+    width: 210px;
+    border: none;
+  }
+
+  .nomination-item img {
+    border-radius: 10px;
+  }
+  .needItemVolunteer {
+    display: flex;
+    flex-direction: column;
+    
+  }
+  .needNameVP {
+    font-size: 14px;
+    color: #3C4044;
+    margin: 8px 0px;
+  }
+  .viewFull {
+    font-size: 14px;
+    color: #0080BC;
+    border: none;
+    background-color: inherit;
+    text-align: left;
+  }
+  .backBtnVDeliverable {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+  }

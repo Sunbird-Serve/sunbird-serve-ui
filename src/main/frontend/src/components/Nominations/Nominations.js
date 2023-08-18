@@ -15,12 +15,16 @@ const Nominations = props => {
   const [dataNoms, setDataNoms] = useState([]);
   const [tableData, setTableData] = useState([]);
 
-  const needId = props.data.osid;
+  const needId = props.data.id;
 
+  //get nominations by needId and status
   useEffect(() => {
     // Fetch dataNoms using Axios
-    axios.get(`${configData.NEED_FETCH}/${needId}/nominate`)
-      .then(response => setDataNoms(response.data))
+    axios.get(`${configData.NEED_SEARCH}/${needId}/nominate`)
+      .then(
+        response => console.log(response.data)
+        //response => setDataNoms(response.data)
+      )
       .catch(error => console.error('Error fetching dataNoms:', error));
   }, []);
 

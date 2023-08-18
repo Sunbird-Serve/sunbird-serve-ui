@@ -13,6 +13,8 @@
     backdrop-filter: blur(5px);
     display: flex;
     align-items: center;
+    flex-direction: column;
+    justify-content: space-evenly;
 } 
 .headBanner {
     color:white;
@@ -25,4 +27,13 @@
     color: white;
     text-align: justify;
     padding-bottom: 16px;
+}
+.btnExplore {
+    border: none;
+    padding: 10px 25px;
+    cursor: pointer;
+    font-size: 20px;
+    color: white;
+    background-color:#001C2A;
+    border-radius: 8px;
 }
