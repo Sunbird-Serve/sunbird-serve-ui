@@ -6,6 +6,7 @@ import configData from './../../configData.json'
 
 function NeedPopup({ open, onClose, need }) {
   const [popUp, setPopup] = useState(false);
+  const [nominationStatus, setNominationStatus] = useState(false)
   const togglePopup = () => {
     setPopup(!popUp);
   };
@@ -16,6 +17,7 @@ function NeedPopup({ open, onClose, need }) {
       .then((response) => {
         // Handle success, e.g., show a success message or update state if needed.
         console.log("Nomination successful!");
+        setNominationStatus(true)
       })
       .catch((error) => {
         // Handle error, e.g., show an error message.
@@ -85,8 +87,10 @@ function NeedPopup({ open, onClose, need }) {
         <p>{/*  EntityById(need.entityId) */}</p>
         <p className="popupNKey">Skills Required</p><br/>
         <p className="popupNKey">Volunteers Required</p>
+        {nominationStatus && <p className="nominationSuccess">Nomination Successful</p>}
       </div>
       </div>
+      
     </div>
   );
 }
