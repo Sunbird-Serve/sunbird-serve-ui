@@ -42,7 +42,7 @@ function VProfile() {
         </div>
         <div className="vpContent">
             <Switch>     
-                <Route exact path="/vpinfo" component={VolunteerProfileInfo} />
+                <Route exact path="/" component={VolunteerProfileInfo} />
                 <Route path="/vpnominations" component={VolunteerProfileNominations} />
                 <Route path="/vpneedplans" component={VolunteerProfileNeedPlans} />
                 <Route path="/vpfavourites" component={VolunteerProfileFavourites} />

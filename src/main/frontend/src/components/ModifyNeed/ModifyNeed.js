@@ -8,6 +8,7 @@ import UploadImageBG from '../../assets/bgImgUpload.png'
 import configData from './../../configData.json'
 
 const ModifyNeed = props => {
+    console.log(props.data)
     const [entityName, setEntityName] = useState(null);
     function EntityById( entityId ) {
            axios

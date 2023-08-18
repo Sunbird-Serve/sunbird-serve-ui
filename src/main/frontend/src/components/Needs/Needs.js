@@ -12,47 +12,31 @@ const Needs = props => {
   const togglePopup = () => {
     setPopup(!popUp)
   }
-
   const [dataNew,setDataNew] = useState([]);
   const [dataApproved,setDataApproved] = useState([]);
   const [staus, setStatus ] = useState('all')
-
   const [activeTab, setActiveTab] = useState('all');
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   }
 
   useEffect(()=> {
-    // Fetch Needs of status New
-    axios.post(configData.NEED_SEARCH, {
-     "offset": 0,
-     "limit": 100,
-     "filters": {
-     "status": {
-     "eq": "New"
-     }
-   }
-   }).then (
-   response => setDataNew(response.data),
-   function (response) {console.log(response.data)}
-   ).catch(function (error) {
-   console.log(error)
-   })
+    // New Needs
+    axios.get(`${configData.NEED_SEARCH}/?page=0&size=10&status=Nominated`).then(
+      response => setDataNew(response.data.content),
+      //function (response) {console.log(response.data.content)}
+    ).catch(function (error) {
+      console.log(error)
+    })
 
    //Approved Needs
-   axios.post(configData.NEED_SEARCH, {
-     "offset": 0,
-     "limit": 100,
-     "filters": {
-     "status": {
-     "eq": "Approved"
-     }
-   }
-   }).then (
-   response => setDataApproved(response.data),
-   ).catch(function (error) {
-   console.log(error)
-   })
+    axios.get(`${configData.NEED_SEARCH}/?page=0&size=10&status=Approved`).then(
+      response => setDataApproved(response.data.content),
+      //function (response) {console.log(response.data.content)}
+    ).catch(function (error) {
+      console.log(error)
+    })
+
   },[]);
 
   const data = [ ...dataNew, ...dataApproved];

@@ -22,12 +22,18 @@ function App() {
       }
     });
   }, []); 
+  const [volunteer,setVolunteer] = useState(false)
+  const handleVolunteer = (value) => {
+    setVolunteer(value);
+};
+ console.log(volunteer)
   return (
     <Provider store={store}>
       <div className="App row">
         { /* Load page depending on user login */}
-        {  presentUser ? <MainPage /> : <LoginPage />  }
-        { /* <ExplorePage />  */ }
+        { !volunteer && (<>
+        { presentUser ? <MainPage /> : <LoginPage getVolunteerStatus={handleVolunteer}/>}</>)}
+        { volunteer && <ExplorePage />  }
       </div>
     </Provider>
   );

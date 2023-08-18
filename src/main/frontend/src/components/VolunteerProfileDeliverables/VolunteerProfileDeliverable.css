@@ -1,0 +1,62 @@
+.detailsNeedVoluntProfile {
+    border: solid 1px #DBDBDB;
+    height: 300px;
+    padding: 25px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+.nameNVP {
+    font-size: 20px;
+    font-weight: 500;
+    color: #2C2E30;
+}
+.typeNVP {
+    font-size: 14px;
+    color: #99999F;
+    margin: 5px 0px;
+}
+.aboutNVP {
+    font-size: 15px;
+    color: #4D4D4D;
+}
+.rowNVP {
+    display: flex;
+    margin: 10px 0px;
+}
+.itemNVP span {
+    font-size: 15px;
+    color: #99999F;
+}
+.itemNVP {
+    font-size: 15px;
+    color: #4D4D4D;
+    width: 320px;
+}
+.deliverablesNeedVolunteerProfile {
+    margin-top: 30px;
+}
+.listDNVP {
+    display: flex;
+}
+.listDNVP div {
+    width: 260px;
+}
+.listDNVP button {
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-size: 18px;
+    padding: 2px 12px;
+}
+.upcomingDNVP {
+    background-color: #1B6C92 ;
+}
+.todoDNVP {
+    background-color: #0080BC ;
+}
+.completedDNVP {
+    background-color: #277C3B ;
+}
+.canceledDNVP {
+    background-color: #BA1E12 ;
+}

@@ -18,7 +18,7 @@ function Volunteer() {
   useEffect(()=> {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${configData.NEEDTYPE_FETCH}/?offset=0&limit=10&status=New`);
+        const response = await axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=New`);
         setNtypeData(response.data); // Assuming the API response is an array of objects
         setIsLoading(false); // Data fetch complete, set loading state to false
       } catch (error) {

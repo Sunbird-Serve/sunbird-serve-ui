@@ -1,10 +1,14 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import './VolunteerProfileNominations.css'
 import VolunteerNeedsNominated from '../../assets/needsNominated.png';
 import VolunteerNeedsApproved from '../../assets/needsApproved.png';
 import VolunteerNeedsInProgress from '../../assets/needsInProgress.png';
 import VolunteerPlansDelivered from '../../assets/plansDelivered.png';
 import VolunteerHrs from '../../assets/volunteerHrs.png';
+import axios from 'axios'
+import NeedsImage from '../../assets/tempNeedsImage.png'
+import VolunteerProfileDeliverable from '../VolunteerProfileDeliverables/VolunteerProfileDeliverable';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 function VPNominations() {
   const [activeTab, setActiveTab] = useState('tabN');
@@ -12,9 +16,26 @@ function VPNominations() {
     setActiveTab(tab);
   }
 
+  const [nominations,setNominations] = useState([])
+
+  useEffect(()=> {
+
+  axios.get('http://localhost:3031/Nomination').then(
+    response => setNominations(Object.values(response.data))
+   ).catch(function (error) {
+     console.log(error)
+  })
+},[])
+
+const [fullDetails, setFullDetails] = useState(false)
+const handleDetail = () => {
+  setFullDetails(!fullDetails)
+}
 
   return (
     <div>
+
+      {!fullDetails &&<>
       <div className="headerVPNoms">
         <div className="titleVPNoms"> Nominations</div>
         <div className="tagVPNoms">Check your nominations and metrics</div>
@@ -63,7 +84,26 @@ function VPNominations() {
         <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
       </div>
 
-
+      <div className="nomination-grid">
+      {nominations.map(nomination => (
+        <div key={nomination.id} className="nomination-item">
+          <img src={NeedsImage} alt="Nominated Needs" height="120px" />
+          <div className="needItemVolunteer">
+            <p className="needNameVP">{nomination.needName}</p>
+            <button className="viewFull" onClick={() => handleDetail()}>View full details</button>
+          </div>
+        </div>
+      ))}
+      </div>
+    </> }
+    {fullDetails && <div>
+      <button className="backBtnVDeliverable" onClick={() => handleDetail()}>
+        <ArrowBackIcon />
+        Back
+      </button>
+      <VolunteerProfileDeliverable />
+      </div>
+      }
     </div>
   )
 }
