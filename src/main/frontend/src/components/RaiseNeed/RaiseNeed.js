@@ -13,27 +13,27 @@ const RaiseNeed = props => {
     const [ selectedOptions, setSelectedOptions ] = useState([]);
     // fields to enter in the raise need form
     const [data,setData] = useState({
-        name: '',    //registry.Need (Need Name) 
         needTypeId: '',       //registry.Need (Need Type)
-        status: 'New',     //registry.Need
-        description: '',      //registry.Need (Need Description)
+        name: '',    //registry.Need (Need Name) 
         needPurpose:'',
+        description: '',      //registry.Need (Need Description)
+        status: 'New',     //registry.Need
         userId:'1-13962559-8fb8-4719-b241-61bf279d18fe',      //registry.Need ? Not from RN form
         entityId: '',       //registry.Need (Entity Name)
         //requirementId: '',        //serve.NeedRequirement'
     });
     const [dataOther,setDataOther] = useState({
-        skillDetails: [],
-        frequency:'',    // ?? Need Location
-        volunteersRequired:'',    // ?? Start Date
-        startDate:'',    // ?? End Date
-        endDate:'',   // ?? Time
-        timeSlot:'',
-        days:[],
-        priority:'', //?? No. Volunteer Required
+        skillDetails: '',
+        frequency:'',    
+        volunteersRequired:'',    
+        startDate:'',    
+        endDate:'',  
+        priority:'', 
+        //timeSlot:'T00:00:00.000Z',    //??
+        //days:'',        //??
     })
     const {name, needTypeId, status, description, needPurpose, userId, entityId} = data;
-    const {skillDetails, frequency, startDate, endDate, volunteersRequired, timeSlot, days, priority} = dataOther;
+    const {skillDetails, frequency, startDate, endDate, volunteersRequired, priority} = dataOther;
 
     // configure and handle image upload
     const inputRef = useRef(null);
@@ -45,7 +45,15 @@ const RaiseNeed = props => {
         setImageNeed(e.target.files[0])
     }
 
-    // configure rich text options //
+    //need name and purpose updated by change handler
+    //need types dropdown updated by change handler
+    const [dataNeedType,setDataNeedType] = useState([]);
+    const [dataNeedTypeB,setDataNeedTypeB] = useState([]);
+
+    // entity drop down updated by change handler
+    const [dataEntity,setDataEntity] = useState([]);
+
+    // need description - configure rich text options //
     var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], [{'list':'ordered'},{'list':'bullet'}]];
     const module = {
         toolbar: toolbarOptions,
@@ -54,7 +62,41 @@ const RaiseNeed = props => {
         setData({...data,description:value})
     };
 
-    // Handler to update all input fields of forms //
+    //get from input in YearMonthDay format then convert to datetime before updating
+    const [ startYMD, setStartYMD ] = useState('')
+    const [ endYMD, setEndYMD ] = useState('')
+    const handleEndDate = e => {
+        setDataOther({...dataOther,endDate:(e.target.value+':00.000Z')})
+        setEndYMD(e.target.value)
+    }
+    const handleStartDate = e => {
+        setDataOther({...dataOther,startDate:(e.target.value+':00.000Z')})
+        setStartYMD(e.target.value)
+    }
+
+    // event days by handleSelectedDaysChange
+    const optionsDay = [
+        { id: 1, label: 'Sunday' },
+        { id: 2, label: 'Monday' },
+        { id: 3, label: 'Tuesday' },
+        { id: 4, label: 'Wednesday' },
+        { id: 5, label: 'Thursday' },
+        { id: 6, label: 'Friday' },
+        { id: 7, label: 'Saturday' }
+    ];
+    const [selectedDays, setSelectedDays] = useState([]);
+    const handleSelectedDaysChange = (updatedDays) => {
+        setSelectedDays(updatedDays);
+    }
+    useEffect(() => {
+        const dayLabels = selectedDays.map(day => day.label)
+        setDataOther(dataOther => ({
+            ...dataOther,
+            frequency:dayLabels.join(', '),
+        }))
+    },[selectedDays])
+
+    // Handler to update input fields other than specified //
     const changeHandler = e => {
         setData({...data,[e.target.name]:e.target.value})
     }
@@ -62,6 +104,7 @@ const RaiseNeed = props => {
         setDataOther({...dataOther,[e.target.name]:e.target.value})
     }
 
+    // handle skills required  
     const options = [
         { label: 'Fluency in English', value: 'Fluency in English'},
         { label: 'Python Programming', value: 'Python Programming'},
@@ -71,7 +114,7 @@ const RaiseNeed = props => {
         setSelectedOptions(selectedOptions)
         setDataOther(dataOther => ({
             ...dataOther,
-            skillDetails:selectedOptions,
+            skillDetails:selectedOptions.map(obj => obj.value).join(', '),
         }))
     }
     const styleTokenInput = {
@@ -102,126 +145,57 @@ const RaiseNeed = props => {
             }
         })
     }
+    
+    //for state update
+    const [home,setHome] = useState(false);
+    if(home){
+        window.location.reload()
+    } 
 
-    const [dataNeedType,setDataNeedType] = useState([]);
-    const [dataNeedTypeB,setDataNeedTypeB] = useState([]);
-    const [dataEntity,setDataEntity] = useState([]);
-
+    // API calls below
     useEffect(()=> {
-        //Need type
-        
-        // APIs from gateway
-        axios.get('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/needtype/?offset=0&limit=10&status=New')
+        //Need type New
+        axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=New`)
         .then(
-            //function(response){console.log(response)}
-          response => setDataNeedType(Object.values(response.data))
+          //function(response){console.log(response.data.content)},
+          response => setDataNeedType(Object.values(response.data.content))
         )
         .catch(function (error) {
             console.log('error'); 
         }) 
-
  
-        axios.get('http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/entity/?offset=0&limit=10&status=Active')
+        axios.get(`${configData.ENTITY_GET}/?page=0&size=10&status=Active`)
         .then(
-            //function(response){console.log(response)}
-          response => setDataEntity(Object.values(response.data))
+           //function(response){console.log(response.data.content)},
+          response => setDataEntity(Object.values(response.data.content))
         )
         .catch(function (error) {
             console.log('error'); 
         }) 
-
-        //APIs from RC
-        /*
-        axios.post('http://43.204.25.161:8081/api/v1/NeedType/search',
-            {
-                "offset": 0,
-                "limit": 10,
-                "filters": {
-                  "status": {
-                    "eq": "New"
-                  }
-                }
-              }
-              ).then(
-          response => setDataNeedType(Object.values(response.data))
-        )
-
-        axios.post('http://43.204.25.161:8081/api/v1/NeedType/search',
-              {
-                "offset": 0,
-                "limit": 10,
-                "filters": {
-                  "status": {
-                    "eq": "Approved"
-                  }
-                }
-              }
-              ).then(
-          response => setDataNeedTypeB(Object.values(response.data))
-        )
-        axios.post('http://43.204.25.161:8081/api/v1/Entity/search',{
-            "offset": 0,
-            "limit": 10,
-            "filters": {
-              "status": {
-                "eq": "Active"
-              }
-            }
-          }).then(
-            response => setDataEntity(Object.values(response.data))
-        )
-            */
-
       },[])
 
-    const [home,setHome] = useState(false);
-
+    // format as per API request body
     const [dataToPost,setDataToPost] = useState({
         needRequest:{},
         needRequirementRequest: {}
-    })
+    })   
 
-    const optionsDay = [
-        { id: 1, label: 'Sunday' },
-        { id: 2, label: 'Monday' },
-        { id: 3, label: 'Tuesday' },
-        { id: 4, label: 'Wednesday' },
-        { id: 5, label: 'Thursday' },
-        { id: 6, label: 'Friday' },
-        { id: 7, label: 'Saturday' }
-    ];
-
-    const [selectedDays, setSelectedDays] = useState([]);
-
-    const handleSelectedDaysChange = (updatedDays) => {
-        setSelectedDays(updatedDays);
-    }
-
-    useEffect(() => {
-        const dayLabels = selectedDays.map(day => day.label)
-        setDataOther(dataOther => ({
-            ...dataOther,
-            days:dayLabels,
-        }))
-    },[selectedDays])
-
+    // raise the need
     const submitHandler = e => {
         e.preventDefault();
         setDataToPost({needRequest:data, needRequirementRequest:dataOther})
         console.log(dataToPost)
 
-        axios.post(`${configData.NEED_FETCH}/`, dataToPost)
+        axios.post(`${configData.NEED_POST}`, dataToPost)
         .then(
             ()=> {setHome(true)},
             function(response){console.log(response)}
         )
         .catch(function (error) {
-            console.log('error'); 
+            console.log(error); 
         }) 
     }
-    if(home){
-        window.location.reload()
-    }
+
 
 
   return (
@@ -267,23 +241,14 @@ const RaiseNeed = props => {
                             <option value="" defaultValue>Select Need type</option>
                                 {
                                     dataNeedType.map(
-                                        (ntype) => <option key={ntype.osid} value={ntype.osid}>{ntype.name}</option>
+                                        (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
                                     )
                                 }
                                 {
                                     dataNeedTypeB.map(
-                                        (ntype) => <option key={ntype.osid} value={ntype.osid}>{ntype.name}</option>
+                                        (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
                                     )
                                 }
-                                {/* <option value="" defaultValue>Select Need Type</option>
-                                <option value="Beach Cleaning">Beach Cleaning</option>
-                                <option vlaue="Blood Donation">Blood Donation</option>
-                                <option value="Lake Cleaning">Lake Cleaning</option>
-                                <option value="Mentoring">Mentoring</option>
-                                <option value="Offline Teaching">Offline Teaching</option>
-                                <option value="Online Teaching">Online Teaching</option>
-                                <option value="Painting">Painting</option>
-                                <option value="Tuition">Tuition</option> */}
                             </select>
                         </div> 
                         {/* Entity Name */}
@@ -293,17 +258,11 @@ const RaiseNeed = props => {
                             <option value="" defaultValue>Select Entity</option>
                                 {
                                     dataEntity.map(
-                                        (entype) => <option key={entype.osid} value={entype.osid}>{entype.name}</option>
+                                        (entype) => <option key={entype.osid} value={entype.id}>{entype.name}</option>
                                     )
                                 }
                             </select>
-                        </div>
-                        {/* Need Location 
-                        <div className="itemForm">
-                            <label>Need Location</label>
-                            <input type="text" placeholder='Ex: Bangalore' name="needLocation" value={needLocation} onChange={changeHandlerOther} />
-                        </div> 
-                        */}                              
+                        </div>                           
                     </div>  
                     {/* right half of upper side */}
                     <div className="formRight col-sm-6">
@@ -315,15 +274,13 @@ const RaiseNeed = props => {
                             />
                         </div>
                         {/* Date */}
-                        <div className="itemWrapDate">
-                            <div className="itemDate">
-                                <label>Start Date</label>
-                                <input type="date" name="startDate" value={startDate} onChange={changeHandlerOther} />
-                            </div>
-                            <div className="itemDate">
-                                <label>End Date</label>
-                                <input type="date" name="endDate" value={endDate} onChange={changeHandlerOther} />
-                            </div>
+                        <div className="itemForm">
+                            <label>Start Date & Time </label>
+                            <input type="datetime-local" name="startYMD" value={startYMD} onChange={handleStartDate} />
+                        </div>
+                        <div className="itemForm">
+                            <label>End Date & Time </label>
+                            <input type="datetime-local" name="endYMD" value={endYMD} onChange={handleEndDate} />
                         </div>
                         <div className="itemForm">
                             <label>Event Days</label>
@@ -331,10 +288,12 @@ const RaiseNeed = props => {
                             {/*<input type="text" placeholder='Sunday, Monday, Tuesday' name="days" value={days} onChange={changeHandlerOther} /> */}
                         </div>
                         {/* Time */}
+                        {/* 
                         <div className="itemForm">
                             <label>Time</label>
                             <input type="time" name="timeSlot" value={timeSlot} onChange={changeHandlerOther} />
                         </div> 
+                        */}
                     </div>
                 </div>
                 {/* lower side of form : prerequisites */}

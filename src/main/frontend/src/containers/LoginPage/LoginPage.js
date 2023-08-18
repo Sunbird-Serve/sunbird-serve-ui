@@ -4,12 +4,16 @@ import SignUp from '../../components/SignUp/SignUp'
 import LoginBanner from '../../components/LoginBanner/LoginBanner'
 import './LoginPage.css'
 
-const LoginPage = () => {
+const LoginPage = ({getVolunteerStatus}) => {
     const [signupUser, setSignupUser ] = useState(false);
 
     const handleSignup = (valueFromChild) => {
         setSignupUser(valueFromChild);
     };
+ 
+    const handleVolunteer = (value) => {
+        getVolunteerStatus(value)
+    }
 
     return(
         //login page
@@ -20,7 +24,7 @@ const LoginPage = () => {
             </div>
             <div className="col-12 col-sm-6 order-sm-1 sideBanner">
                 {/* sunbird banner */}
-                <LoginBanner /> 
+                <LoginBanner volunteerStatus={handleVolunteer}/> 
             </div>
         </div>      
     )
