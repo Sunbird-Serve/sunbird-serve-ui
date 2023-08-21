@@ -5,6 +5,9 @@
     "NEED_POST" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/",
     "NEED_BY_TYPE" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/need-type",
     "NOMINATED_USER_FETCH" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/user",
-    "NEED_FILTER": "http://43.204.25.161:8081/api/v1/Need/search"
+    "NEED_FILTER": "http://43.204.25.161:8081/api/v1/Need/search",
+    "USER_GET" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/user",
+    "NEED_BY_USER" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/user",
+    "FETCH_ENTITY" : "http://43.204.25.161:8081/api/v1/Entity"
 }
 

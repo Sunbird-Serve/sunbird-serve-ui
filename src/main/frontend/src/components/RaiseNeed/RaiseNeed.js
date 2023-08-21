@@ -8,8 +8,11 @@ import { Redirect } from 'react-router'
 import UploadImageBG from '../../assets/bgImgUpload.png'
 import MultiSelect from './MultiSelect';
 import configData from './../../configData.json'
+import {auth} from '../../firebase.js'
 
 const RaiseNeed = props => {
+    console.log(props.uId)
+
     const [ selectedOptions, setSelectedOptions ] = useState([]);
     // fields to enter in the raise need form
     const [data,setData] = useState({
@@ -18,7 +21,7 @@ const RaiseNeed = props => {
         needPurpose:'',
         description: '',      //registry.Need (Need Description)
         status: 'New',     //registry.Need
-        userId:'1-13962559-8fb8-4719-b241-61bf279d18fe',      //registry.Need ? Not from RN form
+        userId: props.uId,      //registry.Need ? Not from RN form
         entityId: '',       //registry.Need (Entity Name)
         //requirementId: '',        //serve.NeedRequirement'
     });

@@ -16,17 +16,20 @@ const Nominations = props => {
   const [tableData, setTableData] = useState([]);
 
   const needId = props.data.id;
+  console.log(needId)
 
-  //get nominations by needId and status
+  //get nominations to needId and status
   useEffect(() => {
     // Fetch dataNoms using Axios
     axios.get(`${configData.NEED_SEARCH}/${needId}/nominate`)
       .then(
-        response => console.log(response.data)
-        //response => setDataNoms(response.data)
+        //response => console.log(response.data),
+        response => setDataNoms(response.data)
       )
       .catch(error => console.error('Error fetching dataNoms:', error));
   }, []);
+
+  console.log(dataNoms)
 
   useEffect(() => {
     const fetchUserDataAndCreateTableData = async () => {
@@ -35,9 +38,11 @@ const Nominations = props => {
       for (const item of dataNoms) {
         try {
           const nominatedUserId = item.nominatedUserId;
+          console.log(nominatedUserId)
 
           // Fetch userData using Axios for the current nominatedUserId
           const response = await axios.get(`${configData.NOMINATED_USER_FETCH}/${nominatedUserId}`);
+          console.log(response.data)
           const userData = response.data;
           const location = userData?.contactDetails?.address?.state || '';
           const fullname = userData?.identityDetails?.name || '';
@@ -73,8 +78,11 @@ const Nominations = props => {
       Cell : ({ row }) => {
         const handleAccept = () => {
           console.log('Accept Nomination')
+          console.log(needId)
+          console.log(dataNoms)
         }
         const handleReject = () => {
+          console.log(row.values)
           setRejectPopup(true)
           setRowData(row.values)
         }
@@ -169,8 +177,8 @@ const Nominations = props => {
               <button onClick={() => setRejectPopup(false)}>X</button>
             </div>
             <div className="rbNomin">
-              <div className="nameRN">{rowData.name}</div>
-              <div className="emailRN">{rowData.name}@gmail.com</div>
+              <div className="nameRN">{rowData.fullname}</div>
+              <div className="emailRN">{rowData.name}</div>
             </div>
             <div className="rejectReason">
               <label>Reason</label>
