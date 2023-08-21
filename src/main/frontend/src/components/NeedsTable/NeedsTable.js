@@ -10,15 +10,65 @@ import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FaSort } from "react-icons/fa"
 import configData from './../../configData.json'
+import {auth} from '../../firebase.js'
 
 export const NeedsTable = props => {
-  const [dataNeed,setDataNeed] = useState(props.dataNeed);
+  const [dataNew,setDataNew] = useState([]);
+  const [dataApproved,setDataApproved] = useState([]);
+  const [dataNeed, setDataNeed] = useState([]);
+
+  const currentUser = auth.currentUser;
+  const [userId, setUserId] = useState(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const email = currentUser.email.replace(/@/g, "%40");
+        console.log(email);
   
+        const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
+        
+        if (response.data.length > 0) {
+          setUserId(response.data[0].osid);
+        } else {
+          // Handle case when no data is returned
+        }
+      } catch (error) {
+        console.log(error);
+        // Handle error
+      }
+    };
+  
+    if (currentUser.email) {
+      fetchData();
+    }
+  }, [currentUser.email, userId]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const newNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=New`);
+        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Nominated`);
+        const [newNeeds, approvedNeeds] = await Promise.all([newNeedsResponse, approvedNeedsResponse]);
+        setDataNew(newNeeds.data.content);
+        setDataApproved(approvedNeeds.data.content);
+        setDataNeed([...newNeeds.data.content, ...approvedNeeds.data.content]);
+      } catch (error) {
+        console.log("Error fetching needs:", error);
+      }
+    };
+  
+    fetchData();
+  }, [userId]);
+
+  // got need data through props
+  const data = useMemo(() => dataNeed,[dataNeed])
+
   function NeedTypeById({ needTypeId }) {
     const [needType, setNeedType] = useState(null);
     useEffect(() => {
     axios
-      .get(`${configData.NEEDTYPE_FETCH}/${needTypeId}`)
+      .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
       .then((response) => {
         setNeedType(response.data.name);
       })
@@ -29,6 +79,7 @@ export const NeedsTable = props => {
    return <span>{needType || ''}</span>;
   }
 
+  /*
   function EntityById({ entityId }) {
     const [entityName, setEntityName] = useState(null);
      useEffect(() => {
@@ -43,6 +94,7 @@ export const NeedsTable = props => {
      }, [entityId]);
      return <span>{entityName || ''}</span>;
   }
+  */
 
   const COLUMNS = [
     { Header: 'Need Name', accessor: 'name', width: 250 },
@@ -52,17 +104,11 @@ export const NeedsTable = props => {
       }
     },
     { Header: 'Location', width: 144 },
-    { Header: 'Entity', accessor: 'entityId'
-      , 
-      Cell: ({ value }) => {
-      return <EntityById entityId={value} />;
-      }
-    },
+    { Header: 'Entity', accessor: 'entityId', width: 244 }, 
     { Header: 'Volunteer', width: 112 },
     { Header: 'Timeline', width: 164 },
     { Header: 'Status', accessor: 'status', width: 109, filter: 'text' }
   ]
-  const data = useMemo(() => dataNeed,[])
   const columns = useMemo(() => COLUMNS, [])
   const {
     getTableProps,
@@ -127,7 +173,7 @@ export const NeedsTable = props => {
         <div className="leftTopBarNeedTable">
           <div className="needCount">
             <i><StickyNote2Icon /></i>
-            <span>{Object.keys(data).length}</span>
+            <span>{Object.keys(dataNeed).length}</span>
             <label>Needs</label>
           </div>
           <div className="volunteerCount">

@@ -94,8 +94,8 @@ function VolunteerExplore() {
         {/* Header */}
         <div className="vHeader">
           <div className="vleftHeader">
-            <div className="vGreetNT">Welcome Back, </div> {/* auth.currentUser.displayName */}
-            <div className="vTitleNT">Volunteer Need Type </div>
+            <div className="vGreetNT"> </div> {/* auth.currentUser.displayName */}
+            <div className="vTitleNT">Explore Opportunities </div>
             <div className="vCaptionNT">Select a need type to view needs </div>
           </div>
           <div className="vrightHeader">
