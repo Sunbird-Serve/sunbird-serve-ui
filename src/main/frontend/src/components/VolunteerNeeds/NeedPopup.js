@@ -98,7 +98,7 @@ function NeedPopup({ open, onClose, need }) {
         <div className="aboutHeading">About</div>
         <hr />
         <p className="popupNKey">About the Need </p>
-        <p className="popupNValue">{need.description}</p>
+        <p className="popupNValue">{need.description.slice(3,-4)}</p>
         <p className="popupNKey">Need Type </p>
         <p>{NeedTypeById(need.needTypeId)}</p>
         <div className="date-container">
