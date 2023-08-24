@@ -154,3 +154,24 @@
     padding: 3px 10px;
     border: solid 1px #DBDBDB;
 }
+.alertNomin {
+    position: absolute;
+    top: 90%;
+    left: 36%;
+    z-index: 10;
+    border: solid 1px #2F9346;
+    background-color: #4D4D4D;
+    padding: 5px 10px;
+    color: white;
+    width: fit-content;
+}
+.alertNomin button {
+    background-color: inherit;
+    border: none;
+    cursor: pointer;
+    color: white;
+    margin-left: 10px;
+    padding-left: 15px;
+    background-color: inherit;
+    border-left: solid 1px #5D5B5B;
+}

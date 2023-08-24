@@ -10,6 +10,7 @@ import {auth} from '../../firebase.js'
 
 
 const Needs = props => {
+  console.log('sunbird repo updated on 21Aug 2023 13:01 PM')
   const [popUp, setPopup] = useState(false);
   const togglePopup = () => {
     setPopup(!popUp)
@@ -58,7 +59,7 @@ const Needs = props => {
     const fetchData = async () => {
       try {
         const newNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=New`);
-        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Nominated`);
+        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Approved`);
   
         const [newNeeds, approvedNeeds] = await Promise.all([newNeedsResponse, approvedNeedsResponse]);
   

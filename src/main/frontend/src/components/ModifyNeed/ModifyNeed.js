@@ -6,9 +6,11 @@ import { Redirect } from 'react-router'
 import Nominations from '../Nominations/Nominations'
 import UploadImageBG from '../../assets/bgImgUpload.png'
 import configData from './../../configData.json'
+import CheckIcon from '@mui/icons-material/Check';
+import ClearIcon from '@mui/icons-material/Clear';
 
 const ModifyNeed = props => {
-    console.log(props.data)
+    console.log(props.data)     //details of single need
     const [entityName, setEntityName] = useState(null);
     function EntityById( entityId ) {
            axios
@@ -24,7 +26,7 @@ const ModifyNeed = props => {
     const [needType, setNeedType] = useState(null);
     function NeedTypeById( needTypeId ) {
         axios
-          .get(`${configData.NEEDTYPE_FETCH}/${needTypeId}`)
+          .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
           .then((response) => {
             setNeedType(response.data.name);
           })
@@ -68,7 +70,18 @@ const ModifyNeed = props => {
     console.log(data)
     }
 
+    const [popupType, setPopupType] = useState(null)
+
+    const openPopup = (type) => {
+        setPopupType(type)
+    }
+    const closePopup = () => {
+        setPopupType(null);
+      };
+    console.log(popupType)
+    
   return (
+    <div>
     <div className="wrapNeedNominations">
         {/* show list of nominations to need and need information*/}
         <div className="needNominations">
@@ -78,7 +91,7 @@ const ModifyNeed = props => {
             </div>
             { nomin ? 
                 //load nominations component
-                <Nominations data={props.data}/> 
+                <Nominations data={props.data} openPopup={openPopup} /> 
             : ( 
                 //load need information
                     <div className="needInfoBox">
@@ -104,7 +117,7 @@ const ModifyNeed = props => {
                                     </div>
                                     <div className="itemNInfo">
                                             <label>Need Purpose</label>
-                                            <span> </span>
+                                            <span>{data.needPurpose}</span>
                                     </div>
                                     <div className="itemNInfo">
                                             <label>Need Type</label>
@@ -119,7 +132,7 @@ const ModifyNeed = props => {
                                     {/* Entity Name */}
                                     <div className="itemNInfo">
                                         <label>Entity Name</label>
-                                        <span>{EntityById(data.entityId)}</span>
+                                        <span>{EntityById(data.entityId)} {data.entityId}</span>
                                     </div>
                                     {/* Date */}
                                     <div className="itemWrapNInfoDate">
@@ -146,7 +159,7 @@ const ModifyNeed = props => {
                                     { data &&
                                      <div className="itemNInfo">
                                         <label>Skills Required</label>
-                                        <span>{data.skillDetail.map(item => item.value)}</span>
+                                        {/*<span>{data.skillDetail.map(item => item.value)}</span> */}
                                     </div> }
                                 </div>
                                 <div className="formBRight col-sm-6">
@@ -164,7 +177,25 @@ const ModifyNeed = props => {
         </div>   
         <div className="btnCloseNomination">
                 <button onClick={props.handleClose}>x</button>
-        </div>     
+        </div>   
+         
+    </div>
+    { popupType == 'accept' && (
+    <div className="alertNomin"> 
+        <span>
+            <CheckIcon style={{height:"20px",width:"20px",borderRadius:"50%",backgroundColor:"#2F9346",padding:"2px",color:"#4D4D4D",margin:"2px 5px"}}/> 
+            Nomination has been accepted successfully</span>
+        <button onClick={closePopup}>x</button>
+    </div>
+    )}
+    { popupType == 'reject' && (
+    <div className="alertNomin"> 
+        <span>
+            <ClearIcon style={{height:"20px",width:"20px",borderRadius:"50%",backgroundColor:"red",padding:"2px",color:"#4D4D4D",margin:"2px 5px"}}/> 
+            Nomination has been accepted rejected</span>
+        <button onClick={closePopup}>x</button>
+    </div>
+    )}
     </div>
   )
 }

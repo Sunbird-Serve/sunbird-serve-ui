@@ -158,7 +158,7 @@ const RaiseNeed = props => {
     // API calls below
     useEffect(()=> {
         //Need type New
-        axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=New`)
+        axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=Approved`)
         .then(
           //function(response){console.log(response.data.content)},
           response => setDataNeedType(Object.values(response.data.content))

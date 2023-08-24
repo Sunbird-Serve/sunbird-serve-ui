@@ -1,206 +1,148 @@
-import React, { useState } from "react";
-import { Calendar, dayjsLocalizer } from "react-big-calendar";
-import dayjs from "dayjs";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import EventIcon from "@mui/icons-material/Event";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import * as needPlansActions from "../../redux/features/needplans/actions";
-import { bindActionCreators } from "redux";
-import * as selector from "../../redux/features/needplans/selectors";
+import React, { useState } from 'react';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import './VolunteerProfileNeedPlans.css'
+import moment from 'moment';
+import IconButton from '@mui/material/IconButton'; // Import IconButton from Material-UI
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import TodayIcon from '@mui/icons-material/Today';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import noRecords from '../../assets/noRecords.png'
 
-function NeedPlans() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selSlotInfo, setSelSlotInfo] = React.useState(null);
+const localizer = momentLocalizer(moment);
 
-  // using selectors to get data from redux, here state is the redux global state 
-  const { needs } = useSelector(
-    (state) => ({
-      needs: selector.getData(state), 
-    }),
-    shallowEqual, // makes sure that the component rerenders only when the above redux state data changes (avoids unnecessary rerenders)
-  );
-
-  // this function helps us to dispatch actions which will trigger reducers/sagas
-  const dispatch = useDispatch();
-
-  // binds the actions creators with dispatch. Action creators return action object
-  const bindedActions = bindActionCreators({ ...needPlansActions }, dispatch);
-  const mockEvents = [
+const NeedPlans = () => {
+  const events = [
     {
-      title: "Kaveri River Cleaning",
-      start: new Date(2023, 6, 10, 9, 0, 0),
-      end: new Date(2023, 6, 10, 10, 0, 0),
-      color: "blue", // Custom property to define the color
+      start: new Date('2023-08-25T10:00:00'),
+      end: new Date('2023-08-25T12:00:00'),
+      title: 'Kaveri River Cleaning',
+      timeSlot: '10:00 AM'
     },
     {
-      title: "Teaching Science",
-      start: new Date(2023, 6, 10, 15, 0, 0),
-      end: new Date(2023, 6, 10, 16, 0, 0),
-      color: "blue", // Custom property to define the color
+      start: new Date('2023-08-21T10:00:00'),
+      end: new Date('2023-08-21T12:00:00'),
+      title: 'Teaching Science Class 8',
+      timeSlot: '10:00 AM'
     },
     {
-      title: "Blood Donation",
-      start: new Date(2023, 6, 12, 9, 0, 0),
-      end: new Date(2023, 6, 12, 10, 0, 0),
-      color: "blue", // Custom property to define the color
+      start: new Date('2023-08-12T10:00:00'),
+      end: new Date('2023-08-12T12:00:00'),
+      title: 'Python programming for Data Analysis',
+      timeSlot: '10:00 AM'
     },
     {
-      title: "Music Classes",
-      start: new Date(2023, 6, 15, 9, 0, 0),
-      end: new Date(2023, 6, 15, 10, 0, 0),
-      color: "red", // Custom property to define the color
+      start: new Date('2023-08-12T14:00:00'),
+      end: new Date('2023-08-12T16:00:00'),
+      title: 'Web development',
+      timeSlot: '10:00 AM'
     },
   ];
 
-  const localizer = dayjsLocalizer(dayjs);
-
-  function dateHandler(date, flag) {
-    const modifiedDate = new Date(date);
-    switch (flag) {
-      case "+":
-        modifiedDate.setMonth(modifiedDate.getMonth() + 1);
-        break;
-      case "-":
-        modifiedDate.setMonth(modifiedDate.getMonth() - 1);
-        break;
-      default:
-        break;
-    }
-    console.log(date, "date here");
-    console.log(modifiedDate, "check here");
-    setCurrentDate(modifiedDate);
+  const views = {
+    month: true,
+    week: false,
+    day: false,
+    agenda: false,
   }
-
-  const handleSelectEvent = (event, e) => {
-    // Handle the selection of an event
-    console.log("Selected event:", JSON.stringify(event));
-    setSelectedDate(event.start);
-    setSelSlotInfo(event.start);
-    // Perform any additional logic or dispatch actions
-    // based on the selected event
-  };
-
-  const handleDrillDown = (date, view) => {
-    // Handle the click on the "More" link
-    console.log("Drill down date:", date);
-    console.log("Drill down view:", view);
-    setSelectedDate(date);
-    setSelSlotInfo(date);
-  };
-
-  const onSelectSlot = (slotInfo) => {
-    setSelSlotInfo(slotInfo.start);
-    setSelectedDate(slotInfo.start);
-    console.log(slotInfo, "slotInfo");
-  }; // onSelectSlot
-
-    // Custom event style getter
-    const eventStyleGetter = (event) => {
-      const style = {
-        backgroundColor: "yellow", // Set the background color dynamically
-        borderRadius: "5px",
-        border: "solid",
-        opacity: 0.8,
-        color: "#2C2E30",
-        border: "0px",
-        display: "block",
-      };
-      return {
-        style,
-      };
+  const customEventPropGetter = (event, start, end, isSelected) => {
+    const eventStyle = {
+      backgroundColor: 'white', // Customize background color based on event property
+      borderRadius: '5px',
+      color: 'black',
+      boxShadow: "2px 0px #0080BC inset",
+      border: 'solid 1px #DBDBDB'
     };
 
-  const dateCellWrapper = ({ children, value }) => {
-    const styleObject = { backgroundColor: "green" };
-    return (
-      <div
-        style={
-          dayjs(value).isSame(dayjs(selSlotInfo), "day") ? styleObject : {}
-        }
-        className={children.props.className}
-      >
-        {children}
-      </div>
-    );
+    return {
+      style: eventStyle,
+    };
   };
 
+  const CustomToolbar = ({ onNavigate, label }) => (
+    <div className="custom-toolbar">
+      <IconButton onClick={() => onNavigate('PREV')}>
+        <KeyboardArrowLeftIcon />
+      </IconButton>
+      <IconButton onClick={() => onNavigate('TODAY')}>
+        <TodayIcon />
+      </IconButton>
+      <IconButton onClick={() => onNavigate('NEXT')}>
+        <KeyboardArrowRightIcon />
+      </IconButton>
+      <div className="calendar-month-year">
+        {moment(label).format('MMMM YYYY')} {/* Display month and year */}
+      </div>
+    </div>
+  );
+  const [selectedDate, setSelectedDate] = useState(new Date()); // State to store selected date
+
+  const handleSelectSlot = (slotInfo) => {
+    const selectedDateString = moment(slotInfo.start).format('YYYY-MM-DD');
+    setSelectedDate(selectedDateString); // Capture selected date
+  };
+
+  const customDayPropGetter = (date) => {
+    const isSelectedDate = moment(date).format('YYYY-MM-DD') === selectedDate;
+    const classNames = isSelectedDate ? 'selected-date-cell' : '';
+    return { className: classNames };
+  };
+
+
   return (
-    <div className="wrapNeeds">
-        <div className="calendar">
-          <div className="topNavCalenderVPNP">
-            <div className="arrowsVPNP">
-              <button className="changeMonthButton" type="button" onClick={() => dateHandler(currentDate, "-")}>
-                <ArrowBackIosNewIcon style={{ fontSize: "smaller" }}/>
-              </button>
-              <button className="changeMonthButton" type="button" onClick={() => dateHandler(currentDate, "+")}>
-                <ArrowForwardIosIcon style={{ fontSize: "smaller" }}/>
-              </button>
-            </div>
-            <div className="navDateVPNP">
-              <span>
-                {currentDate.toLocaleString("default", { month: "long" })}
-              </span>
-              <span>
-                {currentDate.getFullYear()}
-              </span>
-            </div>
+      <div>
+        <div className="wrapCalender">
+        <Calendar className="vCalender"
+        localizer={localizer}
+        events={events}
+        startAccessor="start"
+        endAccessor="end"
+        views={views}   //which views to enable or disable
+        style={{ width: 840 }} // Set the overall calendar width
+        eventPropGetter={customEventPropGetter}
+        components={{
+          toolbar: CustomToolbar,
+        }}
+        selectable={true} // Enable date selection
+        onSelectSlot={handleSelectSlot} // Handle date slot selection
+        dayPropGetter={customDayPropGetter} // Apply custom day cell styling
+        />
+        {selectedDate && (
+        <div className="event-list">
+          <div className="headEventList">{moment(selectedDate).format('MMMM D, YYYY')}</div>
+          {events.some((event) => moment(event.start).format('YYYY-MM-DD') === selectedDate) && (
+          <div className="statsEventList">
+            <span>To Do</span>
+            <span>Completed</span>
+            <span>Canceled</span>
           </div>
-
-          <div style={{ height: "900" }}>
-            <Calendar
-              localizer={localizer}
-              events={mockEvents}
-              toolbar={false}
-              startAccessor="start"
-              date={currentDate}
-              step={50}
-              endAccessor="end"
-              style={{ height: 600 }}
-              views={{ month: true }}
-              eventPropGetter={eventStyleGetter}
-              onSelectEvent={handleSelectEvent}
-              onDrillDown={handleDrillDown}
-              components={{
-                dateCellWrapper: dateCellWrapper,
-              }}
-              selectable
-              onSelectSlot={onSelectSlot}
-            />
-          </div>
-
-          <div className="events">
-          {selectedDate ? (
-            <div></div>
-            //{selectedDate}
-          ) : (
-            <div
-              style={{
-                height: "80vh",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <EventIcon
-                style={{
-                  fontSize: "150px",
-                  margin: "auto auto 0 auto",
-                  color: "#c4c4c4",
-                }}
-              />
-              <span style={{ margin: "0 auto auto auto" }}>
-                Select a date to display the needs
-              </span>
-            </div>
           )}
-          </div>
+            {events
+              .filter((event) => moment(event.start).format('YYYY-MM-DD') === selectedDate)
+              .map((event) => (
+                <li className="dayEventList" key={event.title}>
+                  <div className="dayEventTitle">
+                    <span className="nameDayEvent">{event.title}</span>
+                    <span className="timeDayEvent">{event.timeSlot}</span>
+                  </div>
+                  <div className="dayEventDate"> Aug 15 - Aug 18</div>
+                  <div className="dayEventDetails">View Full Details</div>
+                </li>
+              ))}
+
+            {!events.some((event) => moment(event.start).format('YYYY-MM-DD') === selectedDate) && (
+              <div className="noEventsOnDay">
+                <img src={noRecords} alt="No Events" />
+                <p>No needs scheduled on this date</p>
+              </div>
+            )}
+        </div>
+      )}
         </div>
 
+
       </div>
+
   );
 }
 

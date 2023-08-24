@@ -14,11 +14,25 @@ import {auth} from '../../firebase.js'
 
 export const NeedsTable = props => {
   const [dataNew,setDataNew] = useState([]);
+  const [dataNominated,setDataNominated] = useState([]);
   const [dataApproved,setDataApproved] = useState([]);
+  const [dataRejected,setDataRejected] = useState([]);
   const [dataNeed, setDataNeed] = useState([]);
+  const [dataNeedType,setDataNeedType] = useState([]);
 
   const currentUser = auth.currentUser;
   const [userId, setUserId] = useState(null)
+
+  useEffect(()=> {
+    axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=Approved`)
+    .then(
+      //function(response){console.log(response.data.content)},
+      response => setDataNeedType(Object.values(response.data.content))
+    )
+    .catch(function (error) {
+        console.log('error'); 
+    }) 
+  },[])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,11 +62,17 @@ export const NeedsTable = props => {
     const fetchData = async () => {
       try {
         const newNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=New`);
-        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Nominated`);
-        const [newNeeds, approvedNeeds] = await Promise.all([newNeedsResponse, approvedNeedsResponse]);
+        const nominatedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Nominated`);
+        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Approved`);
+        const rejectedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Rejected`);
+
+        const [newNeeds, approvedNeeds, nominatedNeeds, rejectedNeeds] = await Promise.all(
+          [newNeedsResponse, approvedNeedsResponse, nominatedNeedsResponse, rejectedNeedsResponse]);
         setDataNew(newNeeds.data.content);
         setDataApproved(approvedNeeds.data.content);
-        setDataNeed([...newNeeds.data.content, ...approvedNeeds.data.content]);
+        setDataRejected(rejectedNeeds.data.content);
+        setDataNominated(nominatedNeeds.data.content);
+        setDataNeed([...newNeeds.data.content, ...approvedNeeds.data.content, ...rejectedNeeds.data.content, ...nominatedNeeds.data.content]);
       } catch (error) {
         console.log("Error fetching needs:", error);
       }
@@ -158,7 +178,7 @@ export const NeedsTable = props => {
       setFilter('status', 'Approved')
     }
     else if (props.tab == 'requested') {
-      setFilter('status', 'New')
+      setFilter('status', 'Nominated')
     }
     else {
       setFilter('status','')
@@ -193,10 +213,11 @@ export const NeedsTable = props => {
           </div>
           <select className="selectNeedType" name="needTypeId" value={needTypeId} onChange={handleNeedType} >
             <option value="" defaultValue>Need Type</option>
-            <option value="Beach Cleaning">Beach Cleaning</option>
-            <option vlaue="Blood Donation">Blood Donation</option>
-            <option value="Lake Cleaning">Lake Cleaning</option>
-            <option value="Mentoring">Mentoring</option>
+            {
+              dataNeedType.map(
+                  (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
+                )
+              }
           </select>
         </div>
       </div>
