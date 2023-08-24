@@ -40,7 +40,7 @@ function VolunteerExplore() {
     const fetchNeedsCountForItem = async (item) => {    
       try {
         const needTypeId='3af122b5-2907-40e1-a3ed-c432e336c1b9'
-        const response = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=10&status=New`)
+        const response = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=New`)
         const numberOfNeeds = response.data.content.length;
         console.log(numberOfNeeds)
         setNeedsCount(prevNeedsCount => ({
