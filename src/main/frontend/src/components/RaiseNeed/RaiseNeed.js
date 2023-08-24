@@ -111,7 +111,8 @@ const RaiseNeed = props => {
     const options = [
         { label: 'Fluency in English', value: 'Fluency in English'},
         { label: 'Python Programming', value: 'Python Programming'},
-        { label: 'Public Speaking', value: 'Public Speaking'}
+        { label: 'Public Speaking', value: 'Public Speaking'},
+        { label: 'MS Office', value: 'MS Office'}
     ]
     const handleChange = (selectedOptions) => {
         setSelectedOptions(selectedOptions)
@@ -182,13 +183,14 @@ const RaiseNeed = props => {
         needRequest:{},
         needRequirementRequest: {}
     })   
+    useEffect(() => {
+        setDataToPost({needRequest:data, needRequirementRequest:dataOther})
+    },[data,dataOther])
 
     // raise the need
     const submitHandler = e => {
         e.preventDefault();
-        setDataToPost({needRequest:data, needRequirementRequest:dataOther})
         console.log(dataToPost)
-
         axios.post(`${configData.NEED_POST}`, dataToPost)
         .then(
             ()=> {setHome(true)},
@@ -198,7 +200,6 @@ const RaiseNeed = props => {
             console.log(error); 
         }) 
     }
-
 
 
   return (
