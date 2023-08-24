@@ -3,6 +3,7 @@ import './NeedPopup.css';
 import CloseIcon from "@mui/icons-material/Close";
 import axios from 'axios';
 import configData from './../../configData.json'
+import {auth} from '../../firebase.js'
 
 function NeedPopup({ open, onClose, need }) {
   const [popUp, setPopup] = useState(false);
@@ -10,17 +11,44 @@ function NeedPopup({ open, onClose, need }) {
   const togglePopup = () => {
     setPopup(!popUp);
   };
+
+  const currentUser = auth.currentUser;
+  const [userId, setUserId] = useState('')
+
+  if(currentUser){
+    const fetchData = async () => {
+      try {
+        const email = currentUser.email.replace(/@/g, "%40");
+        console.log(email);
+  
+        const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
+        
+        if (response.data.length > 0) {
+          setUserId(response.data[0].osid);
+        } else {
+          // Handle case when no data is returned
+        }
+      } catch (error) {
+        console.log(error);
+        // Handle error
+      }
+    };
+  
+    if (currentUser.email) {
+      fetchData();
+    }
+  }
+  console.log(userId)
+
   const nominateNeed = () => {
     const needId = need.id; //  the need.id represents the needId
     console.log(needId)
-    axios.get(`${configData.NEED_SEARCH}/${needId}`)
+    axios.post(`${configData.NEED_SEARCH}/${needId}/nominate/${userId}`)
       .then((response) => {
-        // Handle success, e.g., show a success message or update state if needed.
         console.log("Nomination successful!");
         setNominationStatus(true)
       })
       .catch((error) => {
-        // Handle error, e.g., show an error message.
         console.error("Nomination failed:", error);
       });
   };
@@ -70,7 +98,7 @@ function NeedPopup({ open, onClose, need }) {
         <div className="aboutHeading">About</div>
         <hr />
         <p className="popupNKey">About the Need </p>
-        <p className="popupNValue">{need.description}</p>
+        <p className="popupNValue">{need.description.slice(3,-4)}</p>
         <p className="popupNKey">Need Type </p>
         <p>{NeedTypeById(need.needTypeId)}</p>
         <div className="date-container">

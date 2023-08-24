@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Avatar from '@mui/material/Avatar';
 import randomColor from 'randomcolor'
 import './VolunteerProfile.css'
@@ -8,9 +8,47 @@ import VolunteerProfileInfo from '../VolunteerProfileInfo/VolunteerProfileInfo'
 import VolunteerProfileNominations from '../VolunteerProfileNominations/VolunteerProfileNominations'
 import VolunteerProfileNeedPlans from '../VolunteerProfileNeedPlans/VolunteerProfileNeedPlans'
 import VolunteerProfileFavourites from '../VolunteerProfileFavourites/VolunteerProfileFavourites'
+import {auth} from '../../firebase.js'
+import configData from './../../configData.json'
+import axios from 'axios'
+
 
 function VProfile() {
     const [avatarColor, setAvatarColor] = useState(randomColor())
+    const currentUser = auth.currentUser;
+
+    const [userData, setUserData] = useState('')
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const email = currentUser.email.replace(/@/g, "%40");
+        console.log(email);
+  
+        const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
+        
+        if (response.data.length > 0) {
+          setUserData(response.data[0]);
+        } else {
+          // Handle case when no data is returned
+        }
+      } catch (error) {
+        console.log(error);
+        // Handle error
+      }
+    };
+  
+    if (currentUser.email) {
+      fetchData();
+    }
+  }, [currentUser]);
+
+  console.log(userData)
+
+  const handleLogout = () => {
+    auth.signOut()
+    window.location.reload()
+  }
 
   return (
     <BrowserRouter>
@@ -22,16 +60,16 @@ function VProfile() {
                   </Avatar>
                 </div>
                 <div className="userInfo">
-                    <div className="vName">Dwayne Johnshon</div>
+                    <div className="vName"> {(userData)? userData.identityDetails.fullname : '' }</div>
                     <div className="vContact">
-                        <div className="vEmail">Dwaynejohn@gmail.com</div>
+                        <div className="vEmail">{(userData)? userData.contactDetails.email : '' }</div>
                         <span>.</span>
-                        <div className="vMobile">9876543210</div>
+                        <div className="vMobile">{(userData)? userData.contactDetails.mobile : '' }</div>
                     </div>
                 </div>
             </div>
             <div className="logoutButton">
-                <button className="btnVLogout">Logout</button>
+                <button className="btnVLogout" onClick={handleLogout}>Logout</button>
             </div>
         </div>
         <div className="vProfNav">
@@ -42,7 +80,7 @@ function VProfile() {
         </div>
         <div className="vpContent">
             <Switch>     
-                <Route exact path="/" component={VolunteerProfileInfo} />
+                <Route exact path="/vpinfo" component={VolunteerProfileInfo} />
                 <Route path="/vpnominations" component={VolunteerProfileNominations} />
                 <Route path="/vpneedplans" component={VolunteerProfileNeedPlans} />
                 <Route path="/vpfavourites" component={VolunteerProfileFavourites} />

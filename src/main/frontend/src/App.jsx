@@ -26,7 +26,6 @@ function App() {
   const handleVolunteer = (value) => {
     setVolunteer(value);
 };
- console.log(volunteer)
   return (
     <Provider store={store}>
       <div className="App row">
