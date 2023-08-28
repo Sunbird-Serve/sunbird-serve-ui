@@ -7,7 +7,9 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EventsSideBar from "./EventsSideBar/EventsSideBar";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import PeopleIcon from '@mui/icons-material/People';
 import EventIcon from "@mui/icons-material/Event";
+import LabelIcon from '@mui/icons-material/Label';
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import * as needPlansActions from "../../redux/features/needplans/actions";
 import { bindActionCreators } from "redux";
@@ -133,15 +135,13 @@ function NeedPlans() {
     <div className="wrapNeeds">
       <div className="needPlansGrid">
         <div className="calendar">
-          <div>
-            <div>
-              <span style={{ float: "left", width: "8%", marginRight: "1%" }}>
-                {currentDate.toLocaleString("default", { month: "long" })}
-              </span>
-              <span style={{ float: "left", width: "5%", marginRight: "1%" }}>
-                {currentDate.getFullYear()}
-              </span>
-            </div>
+          <div className="countWrapper">
+            <span className='monthWrapper'>
+              {currentDate.toLocaleString("default", { month: "long" })}
+            </span>
+            <span className='yearWrapper'>
+              {currentDate.getFullYear()}
+            </span>            
             <div style={{ float: "left" }}>
               <button
                 className="changeMonthButton"
@@ -166,43 +166,30 @@ function NeedPlans() {
           <br style={{ clear: "both" }} />
           <div className="box">
             <div className="content">
-              <div className="label">
-                <VisibilityIcon
+                <LabelIcon
                   style={{
-                    fontSize: "small",
+                    fontSize: "2vh",
                     paddingRight: "0.5vw",
                     color: "#888",
                   }}
                 />
+                <span className="value">565 </span>
                 Needs
-              </div>
-              <div className="value">565</div>
             </div>
             <div className="content">
-              <div className="label">
-                <VisibilityIcon
+                <PeopleIcon
                   style={{
-                    fontSize: "small",
+                    fontSize: "2vh",
                     paddingRight: "0.5vw",
                     color: "#888",
                   }}
                 />
+                <span className="value">565 </span>
                 Volunteers
-              </div>
-              <div className="value">565</div>
             </div>
-            <button
-              onClick={() =>
-                bindedActions.setNeeds([{ action1: "" }, { action2: "" }])
-              }
-            >
-              dispatch
-            </button>
-            <button onClick={() => bindedActions.getNeeds()}>get needs</button>
           </div>
           <br style={{ clear: "both" }} />
           <div style={{ height: "95vh" }}>
-            <p>look here {JSON.stringify(needs)}</p>
             <Calendar
               localizer={localizer}
               events={mockEvents}
