@@ -1,12 +1,9 @@
 .wrapDashboard {
-    display: flex;
-    float: right;
-    height: 90%;
-    width: calc(100% - 350px);
-    background-color: #fafafa;
+    height: 100%;
+    background-color: #FAFAFA;
+    padding: 10px 20px 10px 10px;
 }
 .dashboard {
-    width: 98%;
-    margin: 15px;
+    height: 100%;
     background-color: white;
 }

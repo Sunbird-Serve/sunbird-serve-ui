@@ -1,0 +1,95 @@
+.need-popup {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    transition: width 0.3s ease-out;
+    z-index: 9999;
+    overflow: hidden;
+  }
+  .need-popup.open {
+    margin-left: calc(100% + 15px);
+    z-index: 20;
+  }
+  .wrapNeedPopup {
+    width: 25%;
+    height: 100%;
+    margin-left: 75%;
+  }
+  .close-button {
+    position: absolute;
+    top: 0px;
+    cursor: pointer;
+    font-size: 20px;
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    justify-content: center;
+  }
+  .contentNeedPopup {
+    height: 100%;
+    width: 100%;
+    padding: 20px;
+    background-color: #fff;
+    margin-left: 30px;  
+    display: flex;
+    flex-direction: column;
+    font-size: 15px;
+  }
+
+  .needPTitle {
+    font-size: 20px;
+    font-weight: 600;
+    height: fit-content;
+    display: block;
+  }
+.nominate-button {
+    background-color: #005C87;
+    color: white;
+    border: none;
+    margin-right: 70%;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 50px;
+  }
+  .nominate-button:hover {
+    background-color: #005C87;
+  }
+  /* ... (previous CSS rules) */
+.date-container {
+    display: flex;
+    align-items: center;
+  }
+  .date-item {
+    margin-right: 100px;
+    margin-bottom: 10px;
+  }
+  /* ... (remaining CSS rules) */
+  hr {
+    border: 0.8px solid lightgray; /* Replace 'lightgray' with the color code you prefer */
+    margin: 20px 0; /* Adjust the margin to control the spacing around the line */
+    width: 400px;
+  }
+
+.popupNKey {
+  font-size: 14px;
+  color: #99999F;
+  margin-bottom: 0px;
+}
+.aboutHeading {
+  font-size: 20px;
+}
+
+.nominationSuccess {
+  margin-top: 200px;;
+  color: green;
+}
+
+

@@ -1,0 +1,127 @@
+.headerVPNoms {
+    height: 96px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.titleVPNoms {
+    font-size: 20px;
+    font-weight: 500;
+    color: #3C4044;
+}
+.tagVPNoms {
+    color: #99999F;
+    font-size: 14px;
+}
+.statsVPNoms {
+    display: flex;
+    margin: 10px 0px;
+}
+.statsVPNomsItem {
+    width: 200px;
+    height: 100px;
+    border: solid 1px #DBDBDB;
+    border-radius: 5px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.statsVPNomsCount {
+    font-size: 32px;
+    color: #0F181F;
+    font-weight: 500;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+.statsVPNomsCount img {
+    margin: 0px 5px;
+    padding: 5px;
+    background-color: #F0FAFF;
+}
+.statsVPNomsName {
+    font-size: 14px;
+    color: #5F6367;
+    padding-left: 45px;
+}
+.vnomTabs {
+    display: flex;
+    margin-top: 50px;
+}
+.vnomTabs div:hover {
+    cursor: pointer;
+    background-color: white;
+}
+.VNomTabP, .VNomTabR {
+    display: flex;
+    padding: 3px 12px;
+    font-size: 14px;
+    background-color: #F7F8F9;
+    border: solid #D3D4D5;
+    border-left: none;
+  }
+.VNomTabN {
+    display: flex;
+    padding: 3px 12px;
+    font-size: 14px;
+    background-color: #F7F8F9;
+    border: solid #D3D4D5;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.VNomTabA {
+    display: flex;
+    padding: 3px 12px;
+    font-size: 14px;
+    background-color: #F7F8F9;
+    border: solid #D3D4D5;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-left: none;
+}
+.selectedVNomTab {
+    background-color: white;
+}
+.nomination-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns with equal width */
+    gap: 30px; /* spacing between items */
+}
+  
+.nomination-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 180px;
+    width: 210px;
+    border: none;
+  }
+
+  .nomination-item img {
+    border-radius: 10px;
+  }
+  .needItemVolunteer {
+    display: flex;
+    flex-direction: column;
+    
+  }
+  .needNameVP {
+    font-size: 14px;
+    color: #3C4044;
+    margin: 8px 0px;
+  }
+  .viewFull {
+    font-size: 14px;
+    color: #0080BC;
+    border: none;
+    background-color: inherit;
+    text-align: left;
+  }
+  .backBtnVDeliverable {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+  }

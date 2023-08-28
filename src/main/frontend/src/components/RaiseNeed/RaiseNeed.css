@@ -1,151 +1,167 @@
 .wrapRaiseNeed {
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    position: fixed;
+    z-index: 5;
+    margin: 0px;
     display: flex;
-    justify-content: space-around;
-    z-index: 10;
+    align-items: center;
+}
+.btnClose {
+    width: fit-content;
+    height: 80%;
+    padding: 0px;
+    margin-top: -6px;
+}
+.btnClose button {
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 20%;
+    background-color: white;
+    color: black;
+    border:none;
+    padding: 2px 6px;
+    margin: 0px 4px;
 }
 .raiseNeed {
     background-color: white;
-    position: relative;
-    height: 60%;
-    width: 60%;
-    margin-left: -20% ;
-    margin-top: 8%;
-    overflow: auto;
+    height: 80%;
+    overflow: scroll;
+    padding: 15px;
 }
+/* Header of Raise Need Page */
 .raiseNeedBar {
-    width: 90%;
-    margin-left: 4%;
-    margin-top: 4%;
-    margin-bottom: 1%;
-    height: 12%;
-}
-.needName {
-    font-size: 150%;
-    padding: 5px;
-    margin-left: 5px;
-    text-align: left ;
-}
-.tagNeedName {
-    margin-left: 10px;
-}
-.btnRaiseNeed {
-    margin-right: 20px;
-    background-color: #4c6380;
-    padding: 10px;
-    color: white;
-    border-radius: 5px;
-    font-size: 102%;
-}
-.wrapNeedBar {
-    display: flex;
-    align-items: center;
-    justify-content:space-between;
-}
-
-.raiseNeedForm {
-    width: 92%;
-    margin-left: 4%;
-    height: 72%;
-}
-.needForm {
-    display: flex;
-    height: 100%;
-}
-.formLeftSide {
-    width: 50%;
-}
-.formRightSide {
-    width: 50%;
-}
-.itemForm {
-    display: block;
-    padding: 5px;
-}
-.itemForm label {
-    width: 100%;
-    display: flex;
-    float: left;
-    margin: 5px;
-}
-.itemForm input {
-    width: 90%;
-    display: flex;
-    padding: 8px;
-    margin: 5px;
-    border: 2px ridge single;
-}
-.itemForm select {
-    width: 94%;
-    display: flex;
-    padding: 8px;
-    margin: 5px;
-    border-radius: 3px;
-    border: 2px ridge single;
-}
-.itemDescrip {
-    display: flex;
-    align-items: center;
-    width: 92%;
-    padding: 5px;
-    flex-direction: column;
-    margin-left: 5px;
-}
-.itemDescrip label {
-    display: block;
-    width: 100%;
-    text-align: left;
-    margin: 5px;
-}
-.itemDescripText {
-    display: block;
-    width: 100%;
-    border-radius: 5px;
-    text-align: left;
-}
-.quillEdit {
-    border: 1px single;
-}
-.wrapDateItem {
-    width: 96.5%;
-    margin-left: 5px;
-    display: flex;
-}
-.itemDate {
-    width: 50%;
-    display: block ;
-}
-.itemDate label {
-    display: flex;
-    margin: 5px;
-}
-.itemDate input {
-    display: flex;
-    padding: 5px;
-    margin-left: 5px;
-    width: 85%;
-}
-.wrapTimeItem {
+    height: 88px;
+    border-bottom-style: ridge;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 96.5%;
-    margin-left: 5px;
+    padding: 5px;
 }
-.btnClose {
-    position: absolute;
-    margin-left: 41%;
-    margin-top: 6%; 
+.wrapNameNeed {
+    margin: 5px 10px;
 }
-.btnClose button {
-    cursor: pointer;
-    border-radius: 50%;
-    background-color: black;
+.needName {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0080BC;
+}
+.tagNeedName {
+    font-size: 12px;
+    color: #5F6367;
+}
+.btnRaiseNeed {
+    border: none;
+    margin-right: 20px;
+    padding: 6px 12px;
+    background-color: #0080BC;
     color: white;
-    padding: 5px 8px 8px 8px;
-    font-size: 120%;
-    border:none;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+/* Raise Need Form */
+.raiseNeedForm {
+    width: 100%;
+    padding: 8px;
+}
+.formRNcatergory {
+    font-size: 14px;
+    font-weight: 600;
+    color: #A2A5A9;
+    margin: 5px;
+}
+.formTop {
+    margin-bottom: 15px;
+}
+.itemForm {
+    padding: 5px;
+    font-size: 14px;
+}
+.itemForm label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.itemForm input {
+    width: 100%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+    border: solid 1px #DBDBDB;
+}
+.itemForm select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 14px;
+    border: solid 1px #DBDBDB;
+}
+.itemImage {
+    height: 135px;
+    padding: 5px;
+}
+.itemImage label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.uploadNImage {
+    height: 100px;
+    width: 100px;
+}
+.uploadNImage img{
+    height: 100px;
+    width: 100px;
+}
+.itemWrapDate {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+}
+.itemDate {
+    width: 48%;
+}
+.itemDate label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+    border-width: 1px;
+}
+.itemDate input {
+    width: 98%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+    border: solid 1px #DBDBDB;
+}
+.itemDescription {
+    height: 135px;
+    margin: 0px 5px;
+}
+.itemDescription label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.quillEdit {
+    font-size: 14px;
+    border: none;
+}
+.ql-container {
+    height: 65px;
+}
+.inpVolunteerNum {
+    height: 38px;
 }
