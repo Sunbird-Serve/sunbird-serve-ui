@@ -60,11 +60,11 @@ function VProfile() {
                   </Avatar>
                 </div>
                 <div className="userInfo">
-                    <div className="vName"> {(userData)? userData.identityDetails.fullname : '' }</div>
+                    <div className="vName"> {/* (userData)? userData.identityDetails.fullname : '' */}</div>
                     <div className="vContact">
-                        <div className="vEmail">{(userData)? userData.contactDetails.email : '' }</div>
+                        <div className="vEmail">{/* (userData)? userData.contactDetails.email : '' */}</div>
                         <span>.</span>
-                        <div className="vMobile">{(userData)? userData.contactDetails.mobile : '' }</div>
+                        <div className="vMobile">{/* (userData)? userData.contactDetails.mobile : '' */}</div>
                     </div>
                 </div>
             </div>

@@ -24,7 +24,7 @@ export const NeedsTable = props => {
   const [userId, setUserId] = useState(null)
 
   useEffect(()=> {
-    axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=Approved`)
+    axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=100&status=Approved`)
     .then(
       //function(response){console.log(response.data.content)},
       response => setDataNeedType(Object.values(response.data.content))
@@ -43,7 +43,7 @@ export const NeedsTable = props => {
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
         
         if (response.data.length > 0) {
-          setUserId(response.data[0].osid);
+          setUserId(response.data[2].osid);
         } else {
           // Handle case when no data is returned
         }
@@ -61,10 +61,10 @@ export const NeedsTable = props => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const newNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=New`);
-        const nominatedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Nominated`);
-        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Approved`);
-        const rejectedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Rejected`);
+        const newNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=100&status=New`);
+        const nominatedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=100&status=Nominated`);
+        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=100&status=Approved`);
+        const rejectedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=100&status=Rejected`);
 
         const [newNeeds, approvedNeeds, nominatedNeeds, rejectedNeeds] = await Promise.all(
           [newNeedsResponse, approvedNeedsResponse, nominatedNeedsResponse, rejectedNeedsResponse]);

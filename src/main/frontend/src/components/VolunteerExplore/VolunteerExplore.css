@@ -8,25 +8,33 @@
     background-color: white;
     overflow: scroll;
 }
-.vHeader {
+.vNtypesHeader {
     padding: 10px 10px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    background-color: #FAFAFA;
+    margin-bottom: 10px;
 }
-.vrightHeader {
-    display: flex;
-    align-items: flex-end;
-}
+
 .vGreetNT {
     font-size: 16px;
 }
 .vTitleNT {
-    font-size: 30px;
-    color: #0F181F;
+    font-size: 32px;
+    color: #00405E;
+    font-weight: 600;
 }
 .vCaptionNT {
     font-size: 15px;
     color: #99999F;
+}
+.vfilterHeader {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
 }
 .vSearchNT {
     border: solid #DBDBDB;
@@ -37,10 +45,12 @@
 }
 .vSearchNT i {
     color: #99999F;
+    margin: 0px 8px;
 }
 .vSearchNT input {
     border: none;
     background-color: inherit;
+    width: 400px;
 }
 .vSortNT {
     display: flex;
@@ -48,7 +58,6 @@
     border: solid #DBDBDB;
     padding: 4px;
     border-radius: 5px;
-    margin-left: 15px;
     background-color: white;
 }
 .vSortNT select {
@@ -62,32 +71,46 @@
 .toggleView {
     padding: 2px;
     margin: 0px 5px;
+    display: flex;
+    border: solid  1px #DBDBDB;
+    border-radius: 3px;
+    background-color: #F7F8F9;
 }
-.toggleView i {
-    padding: 5px 5px;
+.toggleView button {
+    padding: 2px;
+    margin-right: 5px;
+    border: none;
 }
-.vGrid {
-    background-color: #FBFBFB;
+.activeView {
+    background-color: white;
+    color: #0080BC;
 }
+.viewNT {
+    background-color: inherit;
+}
+
 .wrapAllNT {
     width: 100%;
+    display: flex;
 }
 .wrapGrid {
     padding: 10px ;
     display: flex;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 20px;
+    width: fit-content;
 }
 .gridItem {
     padding: 15px;
     border-radius: 5px;
-    border: solid #F6F6F9;
     color: #3C4044;
     font-weight: 600;
     font-size: 15px;
     z-index: 10;
-    width: 160px;
+    width: 260px;
     background-color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(219, 219, 219, 1);
 }
 .gridItem:hover {
     cursor: pointer;
@@ -95,11 +118,15 @@
 .numNeedsNT {
     font-size: 12px;
     color: #99999F;
+    margin-top: 10px;
 }
 .imgGridNT {
-    border: solid;
     height: 120px;
+    width: 240px;
     margin-bottom: 15px;
+    display: flex;
+    justify-content: center;
+    border: none;
 }
 .alphabetNT {
     font-size: 18px;
