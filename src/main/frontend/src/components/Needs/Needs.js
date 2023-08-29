@@ -38,7 +38,8 @@ const Needs = props => {
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
         
         if (response.data.length > 0) {
-          setUserId(response.data[0].osid);
+          console.log(response.data)
+          setUserId(response.data[2].osid);
         } else {
           // Handle case when no data is returned
         }
@@ -53,7 +54,7 @@ const Needs = props => {
     }
   }, [currentUser.email, userId]);
 
-
+  console.log(userId)
   useEffect(() => {
   
     const fetchData = async () => {

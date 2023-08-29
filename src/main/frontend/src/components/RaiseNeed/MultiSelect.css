@@ -47,3 +47,10 @@
     width: 100px;
     font-size: 14px;
   }
+  
+  .time-input {
+    display: flex;
+}
+.time-input input {
+  margin-left: 2px;
+}

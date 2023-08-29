@@ -83,7 +83,7 @@ const Nominations = ({ data, openPopup }) => {
     };
 
     fetchUserDataAndCreateTableData();
-  }, [dataNoms]);
+  }, [dataNoms, activeTab]);
 
   const COLUMNS = [
     {Header:'Volunteer Name',accessor:'fullname'}, 

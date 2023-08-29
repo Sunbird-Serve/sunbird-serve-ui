@@ -79,18 +79,32 @@ const RaiseNeed = props => {
 
     // event days by handleSelectedDaysChange
     const optionsDay = [
-        { id: 1, label: 'Sunday' },
-        { id: 2, label: 'Monday' },
-        { id: 3, label: 'Tuesday' },
-        { id: 4, label: 'Wednesday' },
-        { id: 5, label: 'Thursday' },
-        { id: 6, label: 'Friday' },
-        { id: 7, label: 'Saturday' }
-    ];
-    const [selectedDays, setSelectedDays] = useState([]);
-    const handleSelectedDaysChange = (updatedDays) => {
+        { id: 1, label: 'Sunday', startTime: '', endTime: '' },
+        { id: 2, label: 'Monday', startTime: '', endTime: '' },
+        { id: 3, label: 'Tuesday', startTime: '', endTime: '' },
+        { id: 4, label: 'Wednesday', startTime: '', endTime: '' },
+        { id: 5, label: 'Thursday', startTime: '', endTime: '' },
+        { id: 6, label: 'Friday', startTime: '', endTime: '' },
+        { id: 7, label: 'Saturday', startTime: '', endTime: '' },
+      ];
+    
+      // Handler to update selected event days
+      const [selectedDays, setSelectedDays] = useState([]);
+      const handleSelectedDaysChange = (selected) => {
+        setSelectedDays(selected);
+      };
+
+    const handleTimeChange = (dayId, field, value) => {
+        const updatedDays = selectedDays.map(day => {
+            if (day.id === dayId) {
+                return { ...day, [field]: value };
+            }
+            return day;
+        });
         setSelectedDays(updatedDays);
-    }
+    };
+
+
     useEffect(() => {
         const dayLabels = selectedDays.map(day => day.label)
         setDataOther(dataOther => ({
@@ -112,7 +126,9 @@ const RaiseNeed = props => {
         { label: 'Fluency in English', value: 'Fluency in English'},
         { label: 'Python Programming', value: 'Python Programming'},
         { label: 'Public Speaking', value: 'Public Speaking'},
-        { label: 'MS Office', value: 'MS Office'}
+        { label: 'MS Office', value: 'MS Office'},
+        { label: 'Cooking', value: 'Cooking'},
+        { label: 'Classical Dance', value: 'Classical Dance'}
     ]
     const handleChange = (selectedOptions) => {
         setSelectedOptions(selectedOptions)
@@ -288,8 +304,9 @@ const RaiseNeed = props => {
                         </div>
                         <div className="itemForm">
                             <label>Event Days</label>
-                            <MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />
+                            {<MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />}
                             {/*<input type="text" placeholder='Sunday, Monday, Tuesday' name="days" value={days} onChange={changeHandlerOther} /> */}
+                                         
                         </div>
                         {/* Time */}
                         {/* 

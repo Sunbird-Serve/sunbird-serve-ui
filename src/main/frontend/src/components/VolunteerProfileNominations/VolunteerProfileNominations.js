@@ -9,12 +9,49 @@ import axios from 'axios'
 import NeedsImage from '../../assets/tempNeedsImage.png'
 import VolunteerProfileDeliverable from '../VolunteerProfileDeliverables/VolunteerProfileDeliverable';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 
 function VPNominations() {
+  
   const [activeTab, setActiveTab] = useState('tabN');
+  const [selectedDateOption, setSelectedDateOption] = useState('');
+  const [isDateSelectOpen, setIsDateSelectOpen] = useState(false);
+  const [selectedNeedOption, setSelectedNeedOption] = useState('');
+  const [isNeedSelectOpen, setIsNeedSelectOpen] = useState(false);
+  
+
+  const handleDateOptionChange = (option) => {
+    setSelectedDateOption(option);
+  };
+
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   }
+
+
+  const toggleDateSelect = () => {
+    setIsDateSelectOpen(!isDateSelectOpen);
+    setIsNeedSelectOpen(false); // Close the need select when opening date select
+  };
+  
+  const toggleNeedSelect = () => {
+    setIsNeedSelectOpen(!isNeedSelectOpen);
+    setIsDateSelectOpen(false); // Close the date select when opening need select
+  };
+  
+  const closeSelect = () => {
+    setIsDateSelectOpen(false);
+    setIsNeedSelectOpen(false);
+  };
+  
+
+  
+  const handleNeedOptionChange = (option) => {
+    setSelectedNeedOption(option);
+  };
+
+
 
   const [nominations,setNominations] = useState([])
 
@@ -83,6 +120,48 @@ const handleDetail = () => {
         <div className={`${activeTab === 'tabR' ? 'VNomTabR selectedVNomTab' : 'VNomTabR'}`} onClick={() => handleTabClick('tabR')}>Requested</div>
         <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
       </div>
+      
+     
+      <div className="selectDateAndNeed">
+
+      <div className="selectDate">
+          <div className="custom-select date-select" onClick={toggleDateSelect} onBlur={closeSelect}>
+            <CalendarTodayIcon className="calendar-icon" />
+            <span className="selected-option">{selectedDateOption ? selectedDateOption : 'Date'}</span>
+            <span className="dropdown-indicator">{isDateSelectOpen ? '^' : '^'}</span>
+            {isDateSelectOpen && (
+              <div className="options">
+                <div onClick={() => handleDateOptionChange('Recent')}>Recent</div>
+                <div onClick={() => handleDateOptionChange('Oldest')}>Oldest</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+
+
+
+
+        <div className="selectNeed">
+          <div className="custom-select  need-select" onClick={toggleNeedSelect} onBlur={closeSelect}>
+            <StickyNote2OutlinedIcon className="note-icon" />
+            <span className="selected-option">{selectedNeedOption ? selectedNeedOption : 'Need Type'}</span>
+            <span className="dropdown-indicator">{isNeedSelectOpen ? '^' : '^'}</span>
+            {isNeedSelectOpen && (
+              <div className="optionss">
+             
+                <div onClick={() => handleNeedOptionChange('Offline Teaching')}>Offline Teaching</div>
+                <div onClick={() => handleNeedOptionChange('Road Cleaning')}>Road Cleaning</div>
+                <div onClick={() => handleNeedOptionChange('River Cleaning')}>River Cleaning</div>
+                <div onClick={() => handleNeedOptionChange('Online Teaching')}>Online Teaching</div>
+                <div onClick={() => handleNeedOptionChange('Lake Cleaning')}>Lake Cleaning</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+
 
       <div className="nomination-grid">
       {nominations.map(nomination => (
