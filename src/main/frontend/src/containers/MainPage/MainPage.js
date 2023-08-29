@@ -8,11 +8,12 @@ import Settings from '../../components/Settings/Settings'
 import Accounts from '../../components/Accounts/Accounts'
 import Help from '../../components/Help/Help'
 import NeedPlans from '../../components/Need Plans/NeedPlans'
+import Registration from '../../components/Registration/Registration'
 
 const MainPage = () => {
     return(
         <BrowserRouter>
-            <div className="mainPage">
+            {/* <div className="mainPage">
                 <SideNav/>
                 <div className="wrapDisplay">
                     <Header/>
@@ -25,8 +26,8 @@ const MainPage = () => {
                         <Route path="/needPlans" component={NeedPlans} />
                     </Switch>
                 </div>
-            </div>
-            
+            </div> */}
+            <Registration />
         </BrowserRouter>
     )
 }
