@@ -87,7 +87,7 @@ export const NeedsTable = props => {
   //filter userId my email
   useEffect(() => {
   const getUserByEmail = () => {
-    const foundItem = userData.find(item => item.contactDetails.email === 'raviteja@egurukulapps.com')
+    const foundItem = userData.find(item => item.contactDetails.email === currentUser.email)
     if (foundItem) {
       setUserId(foundItem.osid)
     } else {
