@@ -25,6 +25,8 @@ function VolunteerExplore() {
   useEffect(()=> {
     const fetchData = async () => {
       try {
+
+
         const response = await axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=100&status=Approved`);
         setNtypeData(response.data.content); 
       } catch (error) {

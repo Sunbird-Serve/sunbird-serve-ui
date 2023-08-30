@@ -15,6 +15,7 @@ function EventsSideBar(props) {
       end: new Date(2023, 6, 10, 10, 0, 0),
       color: "blue", // Custom property to define the color
       volunteers: ["Harry", "Hermoine", "Ron"],
+      address: 'Nungambakkam, Chennai',
     },
     {
       title: "Event 4",
@@ -22,6 +23,7 @@ function EventsSideBar(props) {
       end: new Date(2023, 6, 10, 16, 0, 0),
       color: "blue", // Custom property to define the color
       volunteers: ["Hagrid", "Ginny"],
+      address: 'Nungambakkam, Chennai',
     },
     {
       title: "Event 5",
@@ -29,6 +31,7 @@ function EventsSideBar(props) {
       end: new Date(2023, 6, 12, 10, 0, 0),
       color: "blue", // Custom property to define the color
       volunteers: ["Cedric", "Malfoy"],
+      address: 'Nungambakkam, Chennai',
     },
     {
       title: "Event 2",
@@ -36,6 +39,7 @@ function EventsSideBar(props) {
       end: new Date(2023, 6, 15, 10, 0, 0),
       color: "red", // Custom property to define the color
       volunteers: ["Tom", "Lucy"],
+      address: 'Nungambakkam, Chennai',
     },
   ];
 
@@ -66,7 +70,7 @@ function EventsSideBar(props) {
             </span>
           </div>
         ) : (
-          // todayEvents.map((ev) => <EventCard event={{startTime: ev.start, endTime:ev.end, title: ev.title, address: 'event address'}}/> )
+          // iterating events and displaying them in event cards
           todayEvents.map((ev) => <EventCard ev={ev} />)
         )}
       </div>
