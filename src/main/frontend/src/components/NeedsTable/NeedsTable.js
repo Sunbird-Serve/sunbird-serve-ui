@@ -43,7 +43,8 @@ export const NeedsTable = props => {
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
         
         if (response.data.length > 0) {
-          setUserId(response.data[2].osid);
+          console.log(response.data[0].osid)
+          //setUserId(response.data[0].osid);
         } else {
           // Handle case when no data is returned
         }
@@ -57,6 +58,46 @@ export const NeedsTable = props => {
       fetchData();
     }
   }, [currentUser.email, userId]);
+
+
+  //>> GET ACTIVE USER DATA *********************************************************************
+  const [userData, setUserData] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('http://43.204.25.161:8081/api/v1/Users/search', {
+          "offset": 0,
+          "limit": 100,
+          "filters": {
+            "status": {
+              "eq": "Active"
+            }
+          }
+        });
+        const responseData = response.data;
+        setUserData(responseData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  console.log(userData)
+  //filter userId my email
+  useEffect(() => {
+  const getUserByEmail = () => {
+    const foundItem = userData.find(item => item.contactDetails.email === 'raviteja@egurukulapps.com')
+    if (foundItem) {
+      setUserId(foundItem.osid)
+    } else {
+      setUserId(null)
+    }
+  }
+  getUserByEmail();
+  }, [userData]);
+  // ************************************************************************************
+
 
   useEffect(() => {
     const fetchData = async () => {
