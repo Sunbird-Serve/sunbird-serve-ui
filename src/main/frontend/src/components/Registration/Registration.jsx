@@ -10,6 +10,10 @@ import {
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import RegFormHeader from '../RegFormHeader/RegFormHeader.js';
+import RegFormFooter from '../RegFormFooter/RegFormFooter.js';
+import RegFormSuccess from '../RegFormSuccess/RegFormSuccess.js';
+import RegFormFailure from '../RegFormFailure/RegFormFailure.js';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -426,6 +430,8 @@ const Registration = (props) => {
 
   const [nav, setNav] = useState(0);
 
+  const [validationState, setValidationState] = useState('');
+
   const refArray = Array.from({ length: 6 }, () => React.createRef());
 
   const handleAutoCompleteChange = (name, value) => {
@@ -489,6 +495,7 @@ const Registration = (props) => {
   const onsubmit = () => {
     if (validateFields()) {
       window.alert("Form submitted");
+      setValidationState('success');
       return;
     }
     window.alert("Please enter all the details");
@@ -510,594 +517,606 @@ const Registration = (props) => {
 
   return (
     <div className="reg-main">
-      <div className="title-container">
-        <span className="title">Teaching science to 8th class</span>
-        <div className="info-card">
-          <span>Online</span>
-          <FiberManualRecordIcon
-            style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
-          />
-          <span>July 10 - July 24</span>
-          <FiberManualRecordIcon
-            style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
-          />
-          <span>Starts @10 AM</span>
+      <RegFormHeader />
+      { validationState === '' && <div>
+        <div className="title-container">
+          <span className="title">Teaching science to 8th class</span>
+          <div className="info-card">
+            <span>Online</span>
+            <FiberManualRecordIcon
+              style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
+            />
+            <span>July 10 - July 24</span>
+            <FiberManualRecordIcon
+              style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
+            />
+            <span>Starts @10 AM</span>
+          </div>
         </div>
-      </div>
-      <hr className="seperator" />
-      <div className="button-container">
-        <span style={{ float: "left" }}>
-          Fill all the details below and be a Volunteer
-        </span>
-        <div style={{ textAlign: "right" }}>
-          <button
-            type="button"
-            className="clear-btn"
-            onClick={() => setFormData(initFormData)}
-          >
-            Clear All
-          </button>
-          <button
-            type="button"
-            className="clear-btn register-btn"
-            onClick={() => onsubmit()}
-          >
-            Register
-          </button>
+        <hr className="seperator" />
+        <div className="button-container">
+          <span style={{ float: "left" }}>
+            Fill all the details below and be a Volunteer
+          </span>
+          <div style={{ textAlign: "right" }}>
+            <button
+              type="button"
+              className="clear-btn"
+              onClick={() => setFormData(initFormData)}
+            >
+              Clear All
+            </button>
+            <button
+              type="button"
+              className="clear-btn register-btn"
+              onClick={() => onsubmit()}
+            >
+              Register
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="regContainer">
-        <div className="nav-container ">
-          <span
-            className={nav === 0 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(0)}
-          >
-            Personal Details
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 1 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(1)}
-          >
-            Contact Details
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 2 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(2)}
-          >
-            Preferences
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 3 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(3)}
-          >
-            Additional Details
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 4 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(4)}
-          >
-            Skills
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 5 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(5)}
-          >
-            Reference & Consent
-          </span>
-        </div>
-        <div className="formContainer">
-          <div className="form-section" id={0} ref={refArray[0]}>
-            <span className="formCat">Personal Details</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>First Name</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter your first name"
-                  name="firstName"
-                  value={formData.firstName ? formData.firstName : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Last Name</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter your last name"
-                  name="lastName"
-                  value={formData.lastName ? formData.lastName : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Gender</label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.gender !== "" ? undefined : () => "Select"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="gender"
-                  value={formData.gender ? formData.gender : ""}
-                  onChange={handleChange}
-                >
-                  {genderOptions.map((gender, index) => (
-                    <MenuItem key={index + gender} value={gender}>
-                      {gender}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="formElement">
-                <label>Date of Birth</label>
-                <br />
-                <input
-                  className="form-input"
-                  label="DD/MM/YYYY"
-                  type="Date"
-                  name="dob"
-                  value={formData.dob ? formData.dob : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Nationality</label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.nationality !== "" ? undefined : () => "Select"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="nationality"
-                  value={formData.nationality ? formData.nationality : ""}
-                  onChange={handleChange}
-                >
-                  {countries.map((country, index) => (
-                    <MenuItem key={index + country} value={country}>
-                      {country}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-            </div>
+        <div className="regContainer">
+          <div className="nav-container ">
+            <span
+              className={nav === 0 ? "nav-element nav-active" : "nav-element"}
+              onClick={() => onNavClick(0)}
+            >
+              Personal Details
+            </span>
+            <hr className="nav-line" />
+            <span
+              className={nav === 1 ? "nav-element nav-active" : "nav-element"}
+              onClick={() => onNavClick(1)}
+            >
+              Contact Details
+            </span>
+            <hr className="nav-line" />
+            <span
+              className={nav === 2 ? "nav-element nav-active" : "nav-element"}
+              onClick={() => onNavClick(2)}
+            >
+              Preferences
+            </span>
+            <hr className="nav-line" />
+            <span
+              className={nav === 3 ? "nav-element nav-active" : "nav-element"}
+              onClick={() => onNavClick(3)}
+            >
+              Additional Details
+            </span>
+            <hr className="nav-line" />
+            <span
+              className={nav === 4 ? "nav-element nav-active" : "nav-element"}
+              onClick={() => onNavClick(4)}
+            >
+              Skills
+            </span>
+            <hr className="nav-line" />
+            <span
+              className={nav === 5 ? "nav-element nav-active" : "nav-element"}
+              onClick={() => onNavClick(5)}
+            >
+              Reference & Consent
+            </span>
           </div>
-          <div className="form-section" id={1} ref={refArray[1]}>
-            <span className="formCat">Contact Details</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>Mobile Number</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Add your mobile number"
-                  name="mobileNumber"
-                  value={formData.mobileNumber ? formData.mobileNumber : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>E-mail ID</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="chandlerBing@gmail.com"
-                  name="email"
-                  value={formData.email ? formData.email : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Address</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter house no, floor, street"
-                  name="address"
-                  value={formData.address ? formData.address : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>City</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Eg Koramangala"
-                  name="city"
-                  value={formData.city ? formData.city : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>District</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Eg Bangalore Urban"
-                  name="district"
-                  value={formData.district ? formData.district : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>State</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Eg Karnataka"
-                  name="state"
-                  value={formData.state ? formData.state : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Landmark</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter nearest landmark"
-                  name="landmark"
-                  value={formData.landmark ? formData.landmark : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Pincode</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter your pincode"
-                  name="pincode"
-                  value={formData.pincode ? formData.pincode : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-            </div>
-          </div>
-          <div className="form-section" id={2} ref={refArray[2]}>
-            <span className="formCat">Preferences</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>Language</label>
-                <br />
-                <Autocomplete
-                  multiple
-                  id="checkboxes-tags"
-                  options={majorLanguages}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option}
-                  ChipProps={{ style: chipStyle }}
-                  value={formData.languages ? formData.languages : []}
-                  onChange={(event, value) =>
-                    handleAutoCompleteChange("languages", value)
-                  }
-                  size={"small"}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Choose your preferred language"
-                    />
-                  )}
-                />
-              </div>
-              <div className="formElement">
-                <label>Preferred Day(s)</label>
-                <br />
-                <Autocomplete
-                  multiple
-                  id="checkboxes-tags"
-                  options={prefDays}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option}
-                  ChipProps={{ style: chipStyle }}
-                  value={formData.prefDays ? formData.prefDays : []}
-                  onChange={(event, value) =>
-                    handleAutoCompleteChange("prefDays", value)
-                  }
-                  size={"small"}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Choose your preferred days"
-                    />
-                  )}
-                />
-              </div>
-              <div className="formElement">
-                <label>Preferred Time</label>
-                <br />
-                <Autocomplete
-                  multiple
-                  id="checkboxes-tags"
-                  options={prefTime}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option}
-                  ChipProps={{ style: chipStyle }}
-                  value={formData.prefTime ? formData.prefTime : []}
-                  onChange={(event, value) =>
-                    handleAutoCompleteChange("prefTime", value)
-                  }
-                  size={"small"}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Choose your preferred time period"
-                    />
-                  )}
-                />
-              </div>
-              <div className="formElement">
-                <label>Intrested Areas</label>
-                <br />
-                <Autocomplete
-                  multiple
-                  id="checkboxes-tags"
-                  options={interests}
-                  disableCloseOnSelect
-                  getOptionLabel={(option) => option}
-                  ChipProps={{ style: chipStyle }}
-                  value={formData.interests ? formData.interests : []}
-                  onChange={(event, value) =>
-                    handleAutoCompleteChange("interests", value)
-                  }
-                  size={"small"}
-                  renderOption={(props, option, { selected }) => (
-                    <li {...props}>
-                      <Checkbox
-                        icon={icon}
-                        checkedIcon={checkedIcon}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                      />
-                      {option}
-                    </li>
-                  )}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="Choose your preferred area of interest"
-                    />
-                  )}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="form-section" id={3} ref={refArray[3]}>
-            <span className="formCat">Additional Details</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>Qualification</label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.qualification !== ""
-                      ? undefined
-                      : () => "Choose your Qualification"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="qualification"
-                  value={formData.qualification ? formData.qualification : ""}
-                  onChange={handleChange}
-                >
-                  {qualifications.map((qualification, index) => (
-                    <MenuItem key={index + qualification} value={qualification}>
-                      {qualification}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="formElement">
-                <label>Affiliation</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Eg. Xyz Company"
-                  name="affiliation"
-                  value={formData.affiliation ? formData.affiliation : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Employment Status</label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.empStatus !== ""
-                      ? undefined
-                      : () => "Choose your employment status"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="empStatus"
-                  value={formData.empStatus ? formData.empStatus : ""}
-                  onChange={handleChange}
-                >
-                  {employmentStatus.map((empStatus, index) => (
-                    <MenuItem key={index + empStatus} value={empStatus}>
-                      {empStatus}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="formElement">
-                <label>Years of Experience</label>
-                <br />
-                <input
-                  className="form-input"
-                  label="Eg. 5"
-                  type="number"
-                  name="yoe"
-                  value={formData.yoe ? formData.yoe : ""}
-                  onChange={handleChange}
-                ></input>
-              </div>
-            </div>
-          </div>
-          <div className="form-section" id={4} ref={refArray[4]}>
-            <span className="formCat">Skills</span>
-            <hr className="form-line" />
-            {formData.skills.map((skillData, index) => (
+          <div className="formContainer">
+            <div className="form-section" id={0} ref={refArray[0]}>
+              <span className="formCat">Personal Details</span>
+              <hr className="form-line" />
               <div className="formEntries">
                 <div className="formElement">
-                  <label>Skill</label>
+                  <label>First Name</label>
                   <br />
                   <input
                     className="form-input"
-                    label="Eg. Teaching"
-                    name="skillName"
-                    value={skillData.skillName}
-                    onChange={(event) => {
-                      handleChange(event, index);
-                    }}
+                    placeholder="Enter your first name"
+                    name="firstName"
+                    value={formData.firstName ? formData.firstName : ""}
+                    onChange={handleChange}
                   ></input>
                 </div>
                 <div className="formElement">
-                  <label>Skill Level</label>
+                  <label>Last Name</label>
                   <br />
-                  <div className="form-skill">
-                    <Select
-                      displayEmpty
-                      style={{
-                        height: "4vh",
-                        width: "100%",
-                        textAlign: "left",
-                      }}
-                      name="skillLevel"
-                      value={skillData.skillLevel}
-                      onChange={(event) => handleChange(event, index)}
-                      renderValue={
-                        skillData.skillLevel !== ""
-                          ? undefined
-                          : () => "Choose your skill level"
-                      }
-                    >
-                      {skillLevel.map((qualification, index) => (
-                        <MenuItem
-                          key={index + qualification}
-                          value={qualification}
-                        >
-                          {qualification}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {formData.skills.length > 1 && (
-                      <button
-                        type="button"
-                        className="remove-btn"
-                        onClick={() => removeSkill(index)}
-                      >
-                        x
-                      </button>
-                    )}
-                  </div>
+                  <input
+                    className="form-input"
+                    placeholder="Enter your last name"
+                    name="lastName"
+                    value={formData.lastName ? formData.lastName : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>Gender</label>
+                  <br />
+                  <Select
+                    displayEmpty
+                    renderValue={
+                      formData.gender !== "" ? undefined : () => "Select"
+                    }
+                    style={{ height: "4vh", width: "100%", textAlign: "left" }}
+                    name="gender"
+                    value={formData.gender ? formData.gender : ""}
+                    onChange={handleChange}
+                  >
+                    {genderOptions.map((gender, index) => (
+                      <MenuItem key={index + gender} value={gender}>
+                        {gender}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
+                <div className="formElement">
+                  <label>Date of Birth</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    label="DD/MM/YYYY"
+                    type="Date"
+                    name="dob"
+                    value={formData.dob ? formData.dob : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>Nationality</label>
+                  <br />
+                  <Select
+                    displayEmpty
+                    renderValue={
+                      formData.nationality !== "" ? undefined : () => "Select"
+                    }
+                    style={{ height: "4vh", width: "100%", textAlign: "left" }}
+                    name="nationality"
+                    value={formData.nationality ? formData.nationality : ""}
+                    onChange={handleChange}
+                  >
+                    {countries.map((country, index) => (
+                      <MenuItem key={index + country} value={country}>
+                        {country}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </div>
               </div>
-            ))}
-            <button className='addSkillButton' type="button" onClick={() => addSkill()}>
-              + Add skill
-            </button>
-          </div>
-          <div className="form-section" id={5} ref={refArray[5]}>
-            <span className="formCat">Reference & Consent</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>Reference Channel</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter your Reference Channel"
-                  name="reference"
-                  value={formData.reference ? formData.reference : ""}
-                  onChange={handleChange}
-                ></input>
+            </div>
+            <div className="form-section" id={1} ref={refArray[1]}>
+              <span className="formCat">Contact Details</span>
+              <hr className="form-line" />
+              <div className="formEntries">
+                <div className="formElement">
+                  <label>Mobile Number</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Add your mobile number"
+                    name="mobileNumber"
+                    value={formData.mobileNumber ? formData.mobileNumber : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>E-mail ID</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="chandlerBing@gmail.com"
+                    name="email"
+                    value={formData.email ? formData.email : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>Address</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Enter house no, floor, street"
+                    name="address"
+                    value={formData.address ? formData.address : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>City</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Eg Koramangala"
+                    name="city"
+                    value={formData.city ? formData.city : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>District</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Eg Bangalore Urban"
+                    name="district"
+                    value={formData.district ? formData.district : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>State</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Eg Karnataka"
+                    name="state"
+                    value={formData.state ? formData.state : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>Landmark</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Enter nearest landmark"
+                    name="landmark"
+                    value={formData.landmark ? formData.landmark : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>Pincode</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Enter your pincode"
+                    name="pincode"
+                    value={formData.pincode ? formData.pincode : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
               </div>
             </div>
-            <div className="consent-container">
-              <div>
-                <input
-                  name="consent"
-                  checked={formData.consent}
-                  onChange={() =>
-                    setFormData({ ...formData, consent: !formData.consent })
-                  }
-                  type="checkbox"
-                />
-                <span>
-                  Consent given for sharing preference to other volunteer agency
-                  through secure network
+            <div className="form-section" id={2} ref={refArray[2]}>
+              <span className="formCat">Preferences</span>
+              <hr className="form-line" />
+              <div className="formEntries">
+                <div className="formElement">
+                  <label>Language</label>
+                  <br />
+                  <Autocomplete
+                    multiple
+                    id="checkboxes-tags"
+                    options={majorLanguages}
+                    disableCloseOnSelect
+                    getOptionLabel={(option) => option}
+                    ChipProps={{ style: chipStyle }}
+                    value={formData.languages ? formData.languages : []}
+                    onChange={(event, value) =>
+                      handleAutoCompleteChange("languages", value)
+                    }
+                    size={"small"}
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props}>
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={selected}
+                        />
+                        {option}
+                      </li>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Choose your preferred language"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="formElement">
+                  <label>Preferred Day(s)</label>
+                  <br />
+                  <Autocomplete
+                    multiple
+                    id="checkboxes-tags"
+                    options={prefDays}
+                    disableCloseOnSelect
+                    getOptionLabel={(option) => option}
+                    ChipProps={{ style: chipStyle }}
+                    value={formData.prefDays ? formData.prefDays : []}
+                    onChange={(event, value) =>
+                      handleAutoCompleteChange("prefDays", value)
+                    }
+                    size={"small"}
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props}>
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={selected}
+                        />
+                        {option}
+                      </li>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Choose your preferred days"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="formElement">
+                  <label>Preferred Time</label>
+                  <br />
+                  <Autocomplete
+                    multiple
+                    id="checkboxes-tags"
+                    options={prefTime}
+                    disableCloseOnSelect
+                    getOptionLabel={(option) => option}
+                    ChipProps={{ style: chipStyle }}
+                    value={formData.prefTime ? formData.prefTime : []}
+                    onChange={(event, value) =>
+                      handleAutoCompleteChange("prefTime", value)
+                    }
+                    size={"small"}
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props}>
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={selected}
+                        />
+                        {option}
+                      </li>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Choose your preferred time period"
+                      />
+                    )}
+                  />
+                </div>
+                <div className="formElement">
+                  <label>Intrested Areas</label>
+                  <br />
+                  <Autocomplete
+                    multiple
+                    id="checkboxes-tags"
+                    options={interests}
+                    disableCloseOnSelect
+                    getOptionLabel={(option) => option}
+                    ChipProps={{ style: chipStyle }}
+                    value={formData.interests ? formData.interests : []}
+                    onChange={(event, value) =>
+                      handleAutoCompleteChange("interests", value)
+                    }
+                    size={"small"}
+                    renderOption={(props, option, { selected }) => (
+                      <li {...props}>
+                        <Checkbox
+                          icon={icon}
+                          checkedIcon={checkedIcon}
+                          style={{ marginRight: 8 }}
+                          checked={selected}
+                        />
+                        {option}
+                      </li>
+                    )}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        placeholder="Choose your preferred area of interest"
+                      />
+                    )}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="form-section" id={3} ref={refArray[3]}>
+              <span className="formCat">Additional Details</span>
+              <hr className="form-line" />
+              <div className="formEntries">
+                <div className="formElement">
+                  <label>Qualification</label>
+                  <br />
+                  <Select
+                    displayEmpty
+                    renderValue={
+                      formData.qualification !== ""
+                        ? undefined
+                        : () => "Choose your Qualification"
+                    }
+                    style={{ height: "4vh", width: "100%", textAlign: "left" }}
+                    name="qualification"
+                    value={formData.qualification ? formData.qualification : ""}
+                    onChange={handleChange}
+                  >
+                    {qualifications.map((qualification, index) => (
+                      <MenuItem key={index + qualification} value={qualification}>
+                        {qualification}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
+                <div className="formElement">
+                  <label>Affiliation</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Eg. Xyz Company"
+                    name="affiliation"
+                    value={formData.affiliation ? formData.affiliation : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+                <div className="formElement">
+                  <label>Employment Status</label>
+                  <br />
+                  <Select
+                    displayEmpty
+                    renderValue={
+                      formData.empStatus !== ""
+                        ? undefined
+                        : () => "Choose your employment status"
+                    }
+                    style={{ height: "4vh", width: "100%", textAlign: "left" }}
+                    name="empStatus"
+                    value={formData.empStatus ? formData.empStatus : ""}
+                    onChange={handleChange}
+                  >
+                    {employmentStatus.map((empStatus, index) => (
+                      <MenuItem key={index + empStatus} value={empStatus}>
+                        {empStatus}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </div>
+                <div className="formElement">
+                  <label>Years of Experience</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    label="Eg. 5"
+                    type="number"
+                    name="yoe"
+                    value={formData.yoe ? formData.yoe : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+              </div>
+            </div>
+            <div className="form-section" id={4} ref={refArray[4]}>
+              <span className="formCat">Skills</span>
+              <hr className="form-line" />
+              {formData.skills.map((skillData, index) => (
+                <div className="formEntries">
+                  <div className="formElement">
+                    <label>Skill</label>
+                    <br />
+                    <input
+                      className="form-input"
+                      label="Eg. Teaching"
+                      name="skillName"
+                      value={skillData.skillName}
+                      onChange={(event) => {
+                        handleChange(event, index);
+                      }}
+                    ></input>
+                  </div>
+                  <div className="formElement">
+                    <label>Skill Level</label>
+                    <br />
+                    <div className="form-skill">
+                      <Select
+                        displayEmpty
+                        style={{
+                          height: "4vh",
+                          width: "100%",
+                          textAlign: "left",
+                        }}
+                        name="skillLevel"
+                        value={skillData.skillLevel}
+                        onChange={(event) => handleChange(event, index)}
+                        renderValue={
+                          skillData.skillLevel !== ""
+                            ? undefined
+                            : () => "Choose your skill level"
+                        }
+                      >
+                        {skillLevel.map((qualification, index) => (
+                          <MenuItem
+                            key={index + qualification}
+                            value={qualification}
+                          >
+                            {qualification}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                      {formData.skills.length > 1 && (
+                        <button
+                          type="button"
+                          className="remove-btn"
+                          onClick={() => removeSkill(index)}
+                        >
+                          x
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              <button className='addSkillButton' type="button" onClick={() => addSkill()}>
+                + Add skill
+              </button>
+            </div>
+            <div className="form-section" id={5} ref={refArray[5]}>
+              <span className="formCat">Reference & Consent</span>
+              <hr className="form-line" />
+              <div className="formEntries">
+                <div className="formElement">
+                  <label>Reference Channel</label>
+                  <br />
+                  <input
+                    className="form-input"
+                    placeholder="Enter your Reference Channel"
+                    name="reference"
+                    value={formData.reference ? formData.reference : ""}
+                    onChange={handleChange}
+                  ></input>
+                </div>
+              </div>
+              <div className="consent-container">
+                <div>
+                  <input
+                    name="consent"
+                    checked={formData.consent}
+                    onChange={() =>
+                      setFormData({ ...formData, consent: !formData.consent })
+                    }
+                    type="checkbox"
+                  />
+                  <span>
+                    Consent given for sharing preference to other volunteer agency
+                    through secure network
+                  </span>
+                </div>
+                <span style={{padding: '3vh 0', display: 'block'}}>
+                  By submiting this form and registering yourself as a nominee,
+                  you will be agreeing to our{" "}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://www.google.com"
+                  >
+                    Terms & Conditions
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://www.google.com"
+                  >
+                    Privacy Policy
+                  </a>
                 </span>
               </div>
-              <span style={{padding: '3vh 0', display: 'block'}}>
-                By submiting this form and registering yourself as a nominee,
-                you will be agreeing to our{" "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.google.com"
-                >
-                  Terms & Conditions
-                </a>{" "}
-                and{" "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.google.com"
-                >
-                  Privacy Policy
-                </a>
-              </span>
             </div>
           </div>
         </div>
-      </div>
+      </div>}
+      {
+        validationState === 'success' &&
+        <RegFormSuccess />
+      }
+      {
+        validationState === 'failed' &&
+        <RegFormFailure />
+      }
+      <RegFormFooter />
     </div>
   );
 };

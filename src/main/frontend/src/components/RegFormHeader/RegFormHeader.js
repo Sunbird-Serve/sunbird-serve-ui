@@ -1,6 +1,6 @@
 import React from 'react'
 import './RegFormHeader.css'
-import SBLogo from '../../clogo.jpg';
+import SBLogo from './clogo.png';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SearchIcon from '@mui/icons-material/Search';

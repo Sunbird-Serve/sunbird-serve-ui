@@ -77,12 +77,13 @@
     padding: 5%;
 }
 
-.active {
+.nav-active {
     color:#0080BC;
 }
 .nav-element:hover {
     color:#0080BC;
     cursor: pointer;
+    background-color: #F0FAFF;
 }
 
 
