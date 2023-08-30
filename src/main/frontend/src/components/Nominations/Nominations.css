@@ -1,0 +1,197 @@
+.wrapNominations {
+    border: none;
+    width: 100%;
+}
+.wrapTopbarNominations {
+    height: 72px;
+    border-top: solid 2px #F0EFEF;
+    align-items: center;
+    padding: 20px 26px;
+}
+.topbarNominations {
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+}
+.leftBarNomination {
+  display: flex;
+  align-items: center;
+  background-color: #F2F2F2;
+  width: fit-content;
+  border-radius: 6px;
+  padding: 3px;
+}
+.leftBarNomination div {
+  display: flex;
+  padding: 3px 12px;
+  font-size: 14px;
+}
+.leftBarNomination div:hover {
+  cursor: pointer;
+}
+.boxSearchNomins {
+  border: solid #DBDBDB;
+  display: flex;
+  font-size: 14px;
+  align-items: center;
+  padding: 2px 5px;
+  border-radius: 5px;
+  margin-right: 15px;
+}
+.boxSearchNomins i {
+  color: #DBDBDB;
+}
+.searchLocNomins input {
+  border: solid #DBDBDB;
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 3px 8px;
+}
+.rightBarNomination {
+  display: flex;
+  align-items: center;
+  justify-items: end;
+}
+.boxSearchNomins input {
+  border: none;
+}
+.selectNomin {
+  background-color: white;
+  border-radius: 5px;
+}
+.tableNominations {
+    border-collapse: collapse;
+    width: 100%;
+    border: 1.5px solid #F0EFEF;
+    width: 95%;
+    margin-left: 2.5%;
+}
+.tableNominations th {
+    height: 40px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    color: #4D4D4D;
+    background-color: #F0EFEF;
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+    padding: 8px;
+  }
+  .tableNominations th span {
+    color: #B8B8B8;
+    float: right;
+  }
+  .tableNominations td {
+    border: 1px solid #F7F8F9;
+    padding: 8px;
+    font-size: 14px;
+  } 
+  .tableNominations tr:hover {
+    background-color: #F0FAFF;
+    cursor: pointer;
+  }
+  .activeRow {
+    background-color: #F0FAFF;
+  }
+  .pageNav {
+    height: 40px;
+    background-color: #F2F2F2;
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .pageNav button {
+    border: none;
+  }
+  .actionsCell {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+  .acceptNomin, .rejectNomin {
+    border: none;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    background-color: white;
+    border: solid #DBDBDB;
+  }
+  .acceptNomin:hover {
+    background-color: #EEF9EC;
+  }
+  .rejectNomin:hover {
+    background-color: #FEF6F1;
+  }
+  .popupReject {
+    position: absolute;
+    top: 0;
+    left:0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .rejectBox {
+    width: 380px;
+    height: 300px;
+    background-color: white;
+    border: solid #DBDBDB;
+    border-radius: 6px;
+  }
+  .rbTopBar {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: solid #F0EFEF;
+  }
+  .rbTopBar button{
+    border-radius: 50%;
+    border: none;
+    font-size: 12px;
+    color: #3C4044;
+  }
+  .rbTopBar span{
+    font-size: 16px;
+  }
+  .rbNomin {
+    padding: 12px;
+  }
+  .nameRN {
+    font-size: 14px;
+  }
+  .emailRN {
+    font-size: 10px;
+  }
+  .rejectReason {
+    font-size: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+  }
+.rejectReason textarea {
+  height: 90px;
+  display: flex;
+  margin: 5px 0px;
+  border: solid 1px #DBDBDB;
+  }
+.wrapBtnsRN {
+  display: flex;
+  font-size: 12px;
+  justify-content: right;
+  padding: 0px 12px;
+}
+.cancelBtnRN {
+  color: #005C87;
+  border: solid 1px #005C87;
+  border-radius: 5px;
+  padding: 3px 12px;
+  margin: 0px 12px;
+}
+.confirmBtnRN {
+  color: white;
+  border: solid 1px #0080BC;
+  background-color: #0080BC;
+  padding: 3px 12px;
+  border-radius: 5px;
+}

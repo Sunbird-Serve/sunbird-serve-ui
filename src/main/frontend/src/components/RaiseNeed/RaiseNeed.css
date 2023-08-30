@@ -1,0 +1,167 @@
+.wrapRaiseNeed {
+    background-color: rgba(0,0,0,0.5);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    margin: 0px;
+    display: flex;
+    align-items: center;
+}
+.btnClose {
+    width: fit-content;
+    height: 80%;
+    padding: 0px;
+    margin-top: -6px;
+}
+.btnClose button {
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 20%;
+    background-color: white;
+    color: black;
+    border:none;
+    padding: 2px 6px;
+    margin: 0px 4px;
+}
+.raiseNeed {
+    background-color: white;
+    height: 80%;
+    overflow: scroll;
+    padding: 15px;
+}
+/* Header of Raise Need Page */
+.raiseNeedBar {
+    height: 88px;
+    border-bottom-style: ridge;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+}
+.wrapNameNeed {
+    margin: 5px 10px;
+}
+.needName {
+    font-size: 20px;
+    font-weight: 600;
+    color: #0080BC;
+}
+.tagNeedName {
+    font-size: 12px;
+    color: #5F6367;
+}
+.btnRaiseNeed {
+    border: none;
+    margin-right: 20px;
+    padding: 6px 12px;
+    background-color: #0080BC;
+    color: white;
+    font-size: 14px;
+    border-radius: 5px;
+}
+
+/* Raise Need Form */
+.raiseNeedForm {
+    width: 100%;
+    padding: 8px;
+}
+.formRNcatergory {
+    font-size: 14px;
+    font-weight: 600;
+    color: #A2A5A9;
+    margin: 5px;
+}
+.formTop {
+    margin-bottom: 15px;
+}
+.itemForm {
+    padding: 5px;
+    font-size: 14px;
+}
+.itemForm label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.itemForm input {
+    width: 100%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+    border: solid 1px #DBDBDB;
+}
+.itemForm select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 14px;
+    border: solid 1px #DBDBDB;
+}
+.itemImage {
+    height: 135px;
+    padding: 5px;
+}
+.itemImage label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.uploadNImage {
+    height: 100px;
+    width: 100px;
+}
+.uploadNImage img{
+    height: 100px;
+    width: 100px;
+}
+.itemWrapDate {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+}
+.itemDate {
+    width: 48%;
+}
+.itemDate label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+    border-width: 1px;
+}
+.itemDate input {
+    width: 98%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+    border: solid 1px #DBDBDB;
+}
+.itemDescription {
+    height: 135px;
+    margin: 0px 5px;
+}
+.itemDescription label {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+.quillEdit {
+    font-size: 14px;
+    border: none;
+}
+.ql-container {
+    height: 65px;
+}
+.inpVolunteerNum {
+    height: 38px;
+}

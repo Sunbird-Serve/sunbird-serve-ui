@@ -1,0 +1,51 @@
+.timestamp {
+  border: 1px solid #e9841d;
+  background: #FFF5EB;
+  color: #E67300;
+  font-size: 1.5vh;
+  float: left;
+  margin: 1vh 0 1vh 0;
+  padding: 1px 5px;
+}
+
+.eventCard {
+  background-color: rgb(255, 255, 255);
+  padding: 5px 15px;
+  border-radius: 1vh;
+}
+
+.taskDesc {
+  margin: 1vh 0;
+  padding: 0.5vh;
+  background-color: #F3F5F7;
+  color: #4D6280;
+  font-size: 1.5vh;
+  border-radius: 1vh;
+}
+
+.eventContainer {
+  padding: 1vh;
+}
+
+.eventTitle, .eventVol {
+  color: #4D6280;
+  float: left;
+  font-size: 2.5vh;
+}
+
+.eventVol {
+  font-size: 1.5vh;
+}
+
+.eventDesc {
+  color: #9A9A9A;
+  float: left;
+  font-size: 1.5vh;
+  margin-top: 1vh;
+}
+
+.volNo {
+  color: #9A9A9A;
+  float: left;
+  font-size: 1.5vh;
+}
