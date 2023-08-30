@@ -2,7 +2,7 @@
   display: flex;
   float: right;
   height: 90%;
-  width: calc(100% - 350px);
+  width: 100%;
   background-color: #fafafa;
   border: 1px solid #929fa4;
 }

@@ -1,0 +1,284 @@
+.headerVPNoms {
+    height: 96px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.titleVPNoms {
+    font-size: 20px;
+    font-weight: 500;
+    color: #3C4044;
+}
+.tagVPNoms {
+    color: #99999F;
+    font-size: 14px;
+}
+.statsVPNoms {
+    display: flex;
+    margin: 10px 0px;
+}
+.statsVPNomsItem {
+    width: 200px;
+    height: 100px;
+    border: solid 1px #DBDBDB;
+    border-radius: 5px;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.statsVPNomsCount {
+    font-size: 32px;
+    color: #0F181F;
+    font-weight: 500;
+    height: 40px;
+    display: flex;
+    align-items: center;
+}
+.statsVPNomsCount img {
+    margin: 0px 5px;
+    padding: 5px;
+    background-color: #F0FAFF;
+}
+.statsVPNomsName {
+    font-size: 14px;
+    color: #5F6367;
+    padding-left: 45px;
+}
+.vnomTabs {
+    display: flex;
+    margin-top: 50px;
+}
+.vnomTabs div:hover {
+    cursor: pointer;
+    background-color: white;
+}
+.VNomTabP, .VNomTabR {
+    display: flex;
+    padding: 3px 12px;
+    font-size: 14px;
+    background-color: #F7F8F9;
+    border: solid #D3D4D5;
+    border-left: none;
+  }
+.VNomTabN {
+    display: flex;
+    padding: 3px 12px;
+    font-size: 14px;
+    background-color: #F7F8F9;
+    border: solid #D3D4D5;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+.VNomTabA {
+    display: flex;
+    padding: 3px 12px;
+    font-size: 14px;
+    background-color: #F7F8F9;
+    border: solid #D3D4D5;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-left: none;
+}
+.selectedVNomTab {
+    background-color: white;
+}
+.nomination-grid {
+    margin-top: 40px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 columns with equal width */
+    gap: 30px; /* spacing between items */
+}
+  
+.nomination-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 180px;
+    width: 210px;
+    border: none;
+  }
+
+  .nomination-item img {
+    border-radius: 10px;
+  }
+  .needItemVolunteer {
+    display: flex;
+    flex-direction: column;
+    
+  }
+  .needNameVP {
+    font-size: 14px;
+    color: #3C4044;
+    margin: 8px 0px;
+  }
+  .viewFull {
+    font-size: 14px;
+    color: #0080BC;
+    border: none;
+    background-color: inherit;
+    text-align: left;
+  }
+  .backBtnVDeliverable {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  .selectDateAndNeed {
+    display: flex;
+    align-items: center;
+    margin-left: 725px;
+    margin-top: -25px;
+  }
+  
+
+
+
+  .selectDate {
+border-radius: 12px;
+  }
+ 
+  /* VolunteerProfileInfoView.css */
+.selectDate {
+  margin-right: 10px; 
+
+}
+
+.custom-select {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+  border: solid gray;
+  border-radius: 4px;
+  height: 30px;
+  width: 120px;
+  color: rgba(59, 69, 78, 1);
+  white-space: nowrap; /* Prevent text from wrapping */
+  text-overflow: ellipsis; /* Display ellipsis (...) when text overflows */
+  max-width: 200%; /* Allow the select to expand up to its parent's width */
+
+ 
+}
+
+.calendar-icon {
+  position: absolute;
+  left: 14px; 
+
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.selected-option {
+  margin-left: 45px; /* Space after the icon */
+}
+
+.dropdown-indicator {
+  margin-left: 8px; /* Space after the selected option */
+  position: absolute;
+  right: 8px; /* Fixed position on the right */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+
+
+/* For select Need */
+.optionss {
+  position: absolute;
+  height: 220px;
+  width: 196px; /* Increase the width as needed */
+  top: 150%;
+  left: -30px;
+  width: 186px; /* Increase the width as needed */
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid lightgrey;
+  border-top: 1px solid lightgrey;
+  z-index: 1;
+}
+
+.optionss div {
+  padding: 6px 12px; /* Add padding to create space around each option */
+}
+
+.optionss div:not(:last-child) {
+  margin-bottom: 8px; /* Add margin at the bottom of each option except the last one */
+}
+
+
+.options {
+  position: absolute;
+  top: 150%;
+  left: -30px;
+  width: 110%;
+  background-color: white;
+  border-radius: 5px;
+  border: 1px solid lightgrey; /* Set the border color to black */
+  border-top: 1px solid lightgrey;
+  z-index: 1;
+}
+
+.options div {
+  padding: 5px;
+  cursor: pointer;
+}
+
+.options div:hover {
+  background-color: #f5f5f5;
+}
+
+
+
+.need-select {
+  width: 190px; /* Adjust the width as needed for the need select */
+}
+
+.custom-select {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  user-select: none;
+}
+
+.note-icon {
+  position: absolute;
+  left: 10px; /* Adjust this value for the icon's position */
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+select {
+  padding-left: 30px; /* Space for the icon */
+}
+
+.selectNeed select {
+  width: 100%;
+  height: 40px;
+
+  border-radius: 4px;
+  appearance: none;
+  background-color: white;
+}
+
+.selectNeed select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* ... (other styles) */

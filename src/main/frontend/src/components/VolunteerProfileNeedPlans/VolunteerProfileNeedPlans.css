@@ -1,0 +1,130 @@
+.vCalender {
+  display: flex;
+  height: 600px;
+  width: 840px;
+  border: none;
+  background-color: white;
+  border: solid 1px #DBDBDB;
+}
+.wrapCalender {
+  display: flex;
+}
+
+/*
+.vCalender .rbc-current {
+  box-sizing: border-box;
+  background-color: #0080BC;
+  border-radius: 2px;
+  color: white;
+}
+*/
+
+.rbc-today {
+  box-sizing: border-box;
+  background-color: #E7DEFF;
+}
+
+.custom-toolbar {
+  display: flex;
+  align-items: center;
+  margin: 10px 0px;
+}
+
+.calendar-month-year {
+  display: inline-block;
+  font-size: 18px; /* Adjust font size */
+  font-weight: 500; /* Adjust font weight if desired */
+}
+
+.selected-date-cell {
+  background-color: #E9F6FF; /* Example background color for selected date */
+}
+
+.event-list {
+  border: solid 1px;
+  margin-left: 50px;
+  width: 500px;
+  border: solid 1px #EBEBEB;
+  background-color: white;
+}
+
+/* Style the background of day headers */
+.rbc-header-bg {
+  background-color: #FAFAFA; /* Example background color */
+}
+
+/* Style the text of day headers */
+.rbc-header {
+  font-weight: 500; /* Adjust font weight */
+  color: #686C73; /* Adjust text color */
+  background-color: #FAFAFA;
+}
+
+/* Style the individual day header cells */
+.rbc-header > span {
+  display: block;
+  padding: 10px; /* Add padding for spacing */
+  text-align: center;
+}
+
+
+/* Style the background of previous and next month date cells */
+.rbc-off-range-bg {
+  background-color: white; /* Example background color */
+}
+
+/* Style the text of previous and next month date cells */
+.rbc-off-range {
+  color: #999; /* Adjust text color */
+}
+
+/* Style the background of previous and next month day headers */
+.rbc-off-range-bg .rbc-day-bg {
+  background-color: #f0f0f0; /* Example background color */
+}
+.headEventList {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  font-size: 18px;
+}
+.statsEventList {
+  display: flex;
+  height: 45px;
+  align-items: center;
+  padding-left: 15px ;
+  background-color: #FAFAFA;
+}
+.statsEventList span {
+  padding: 0px 50px 0px 10px;
+}
+.dayEventList {
+  list-style-type: none;
+  padding: 10px 20px;
+  border-left: solid 3px #0080BC;
+  margin-top: 3px;
+}
+.dayEventTitle {
+  display: flex;
+  justify-content: space-between;
+}
+.nameDayEvent {
+  font-weight: 600;
+  font-size: 16px;
+  width: 300px;
+}
+.dayEventDate {
+  color: #99999F;
+}
+.dayEventDetails {
+  color: #0080BC;
+  text-align: center;
+}
+.noEventsOnDay {
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

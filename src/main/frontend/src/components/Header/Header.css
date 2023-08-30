@@ -1,79 +1,102 @@
-.header {
-    float:right;
-    width: calc(100% - 350px);
-    height: 10%;
-}
-.wrapHead {
-    display: flex;
+.head {
+    width: 100%;
+    height: 100%;
     align-items: center;
-    justify-content: space-between;
-    height: 100%
 }
 .leftHead {
-    display: block;
-}
-.rightHead {
-    display: flex;
-    align-items: center;
-    width: 350px;
+    background-color: white;
     height: 100%;
 }
-.btnProf {
-    width: 80%;
-    background-color: white;
-    border: none;
-}
-.profile {
+.rightHead {
+    height: 100%;
     display: flex;
     align-items: center;
-    padding-left: 25px;
-    width: 90%;
-    position: fixed;
-    top: 25px;
-}
-.dropDownProfile {
-    position: relative;
-    margin-top: 140px;
-    text-align: left;
-    margin-left: 30px;
     background-color: white;
+    justify-content: right;
+    z-index: 2;
 }
-.dropDownProfile li {
-    list-style-type: none;
-    margin: 10px;
-    font-size: 140%;
-    width: fit-content;
+.wrapProfile {
+    display:flex;
+    align-items: center;
+    background-color: white;
+    justify-content: right;
 }
-.dropDownProfile li:hover {
-    font-weight: 800;
+.searchMenu {
+    border: solid #DBDBDB;
+    padding: 1px 5px;
+    margin-right: 15px;
+    border-radius: 5px;
 }
-.btnLogout:hover {
-    font-weight: 800;
+.searchMenu input {
+    border: none;
+    margin-left: 3px;
+}
+.searchMenu i {
+    color: #99999F;
+}
+.verticalLine {
+    height: 32px;
+    width: 1px;
+    margin-right:10px;
+    border-right: solid #EBEBEB;
+}
+.wrapSideMenu {
+    display:flex;
+    align-items: center;
+    justify-content: right;
 }
 .notification {
-    margin-right: 30px;
+    padding: 2px;
+    padding-right: 15px;
 }
-.profIcon {
-    margin-right: 15px;
-}
-.user {
-    margin-right: 15px;
-}
-.userName {
-    font-size: 150%;
+.btnProf {
+    width: fit-content;
+    border: none;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    justify-content: space-between;
     text-align: left;
 }
-.userTag {
-    text-align: left;
-    margin-top: 3px;
+.wrapDropDownProfile {
+    position: absolute;
+    top: 48px;
+    z-index: 3;
+    padding: 3px 54px;
 }
-.profile i {
-    margin-left:10%;   
+.dropDownProfile {
+    float: right;
+    background-color: white;
+    border: solid #DBDBDB;
+    width: 240px;
+    border-radius: 5px;
 }
 .btnLogout {
+    width: 100%;
     border: none;
     background-color: inherit;
-    font-size: 104%;
-    margin: 0px -5px 10px -5px ;
-    z-index: 1;
+    text-align: left;
+    padding: 4px 16px 8px 16px;
+    color: #3C4044;
+    font-size: 14px;
+}
+.btnLogout:hover {
+    background-color: gainsboro;
+    cursor: pointer;
+}
+.profileInfo {
+    padding: 8px 16px 4px 16px;
+    border-bottom: solid #DBDBDB;
+    background-color: #FAFAFA;
+}
+.profileInfo:hover {
+    background-color: gainsboro;
+    cursor: pointer;
+}
+.userName {
+    font-size: 16px;
+    color: #3C4044;
+}
+.userTag {
+    font-size: 12px;
 }

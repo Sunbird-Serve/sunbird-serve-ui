@@ -1,0 +1,56 @@
+.multi-select {
+    position: relative;
+  }
+  
+  .select-box {
+    border: 1px solid #ccc;
+    padding: 3px 8px;
+  }
+  
+  .token {
+    display: inline-block;
+    background-color: #FAFAFA;
+    border: solid 1px #DBDBDB;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #99999F;
+    margin: 0px 3px;
+  }
+
+  .token button {
+    font-size: 12px;
+    border: none;
+    background-color: #FAFAFA;
+    color: #99999F;
+  }
+  
+  .daysList {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #fff;
+    border: 1px solid #ccc;
+  }
+  
+  .dayOption {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+  }
+  
+  .dayOption input[type="checkbox"] {
+    width: 30px;
+  }
+
+  .optionLabel {
+    width: 100px;
+    font-size: 14px;
+  }
+  
+  .time-input {
+    display: flex;
+}
+.time-input input {
+  margin-left: 2px;
+}
