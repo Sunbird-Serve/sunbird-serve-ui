@@ -7,8 +7,13 @@ import GridOnIcon from '@mui/icons-material/GridOn';
 import ListIcon from '@mui/icons-material/List';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import VolunteerNeeds from '../VolunteerNeeds/VolunteerNeeds';
-import NeedTypeLogo from '../../assets/phNeedType.png'
 import configData from './../../configData.json'
+import ntypeImage01 from '../../assets/content_development.png'
+import ntypeImage02 from '../../assets/field_activity.png'
+import ntypeImage03 from '../../assets/mentoring.png'
+import ntypeImage04 from '../../assets/online_teaching.png'
+
+
 
 function VolunteerExplore() {
   const [ntypeData,setNtypeData] = useState([])   //for storing need types
@@ -20,7 +25,9 @@ function VolunteerExplore() {
   useEffect(()=> {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=Approved`);
+
+
+        const response = await axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=100&status=Approved`);
         setNtypeData(response.data.content); 
       } catch (error) {
         console.error('Error fetching ntypeData:', error);
@@ -30,16 +37,27 @@ function VolunteerExplore() {
   },[]);
 
   //sort the fetched need types
+  const sortedList = [...ntypeData].sort((a,b)=>a.name.localeCompare(b.name));
+  
+
+  //filter the sorted need types
+  const [searchQueryNT, setSearchQueryNT] = useState('')
+
+  const handleSearchChange = (event) => {
+    setSearchQueryNT(event.target.value)
+  }
+  const filteredNTs =  sortedList.filter(item => {
+    return item.name.toLowerCase().includes(searchQueryNT.toLowerCase())
+  })
+
   useEffect(()=> {
-    const sortedList = [...ntypeData].sort((a,b)=>a.name.localeCompare(b.name));
-    setSortedNTs(sortedList)
-  },[ntypeData]);
+    setSortedNTs(filteredNTs)
+  },[ntypeData, searchQueryNT]);
 
   //count needs under each type
   useEffect(() => {
     const fetchNeedsCountForItem = async (item) => {    
       try {
-        const needTypeId='3af122b5-2907-40e1-a3ed-c432e336c1b9'
         const response = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=New`)
         const numberOfNeeds = response.data.content.length;
         console.log(numberOfNeeds)
@@ -80,10 +98,28 @@ function VolunteerExplore() {
      
   const [ needsList,setNeedsList ] = useState(false)
   const [ selectedNeedTypeId, setSelectedNeedTypeId ] = useState(null)
+  const [ nTypeName, setNTypeName ] = useState('')
 
-  const handleNTClick = (typeId) => {
+  const handleNTClick = (typeId, typeName) => {
     setNeedsList(true)
     setSelectedNeedTypeId(typeId)
+    setNTypeName(typeName)
+  }
+
+  const updateNeedList = (status) => {
+    setNeedsList(status)
+  }
+
+  const [activeView, setActiveView] = useState('grid');
+  const handleView = (tab) => {
+    setActiveView(tab);
+  }
+
+  const imageMap = {
+    'Content Development': ntypeImage01,
+    'Field Activity': ntypeImage02,
+    'Mentoring': ntypeImage03,
+    'Online Teaching': ntypeImage04
   }
  
   return (
@@ -92,18 +128,13 @@ function VolunteerExplore() {
       {!needsList && (
       <div className="vNeedType">
         {/* Header */}
-        <div className="vHeader">
-          <div className="vleftHeader">
+        <div className="vNtypesHeader">
             <div className="vGreetNT"> </div> {/* auth.currentUser.displayName */}
             <div className="vTitleNT">Explore Opportunities </div>
             <div className="vCaptionNT">Select a need type to view needs </div>
-          </div>
-          <div className="vrightHeader">
-            <div className="vSearchNT">
-              <i><SearchIcon /></i>
-              <input type="search" name="nsearch" placeholder="Search need type" ></input>
-              
-            </div>
+
+        </div>
+        <div className="vfilterHeader">
             <div className="vSortNT">
               <select value={sortRev} onChange={handleSort}>
                 <option value="" disabled hidden select>Sort By</option>
@@ -111,23 +142,30 @@ function VolunteerExplore() {
                 <option value="false">Sort Z to A</option>
               </select>
             </div>
-            <div className="vline"></div>
+            <div className="vSearchNT">
+              <i><SearchIcon /></i>
+              <input type="text" name="searchQueryNT" placeholder="Search need type" value={searchQueryNT} onChange={handleSearchChange} ></input>
+              
+            </div>
             <div className="toggleView">
-              <i className="vGrid"><GridOnIcon /></i>
-              <i className="vList"><ListIcon /></i>
+              <button className={`${activeView === 'grid' ? 'activeView' : 'viewNT'}`} onClick={() => handleView('grid')}>
+                <i><GridOnIcon style={{height:"20px"}}/></i> <span>Grid View</span>
+              </button>
+              <button className={`${activeView === 'list' ? 'activeView' : 'viewNT'}`} onClick={() => handleView('list')}>
+                <i className="vList"><ListIcon /></i><span>List View</span>
+              </button>
             </div>
           </div>
-        </div>
         {/* List of need types in grid view */}
         <div className="wrapAllNT">
           {Object.entries(groupedNTs).map(
             ([firstAlphabet, groupedList]) => (
               <div key={firstAlphabet} className="wrapGrid">
-                <div className="alphabetNT">{firstAlphabet}</div>
+                {/* <div className="alphabetNT">{firstAlphabet}</div> */}
                 {groupedList.map((item) => ( 
-                  <div key={item.name} className="gridItem" onClick={() => handleNTClick(item.id)}>
+                  <div key={item.name} className="gridItem" onClick={() => handleNTClick(item.id, item.name)}>
                     <div className="imgGridNT">
-                      <img src={NeedTypeLogo} alt="SunBirdLogo" height="118px" />
+                      <img src={imageMap[item.name]} alt="SunBirdLogo" height="118px" />
                     </div>
                     {item.name}
                     <div className="numNeedsNT">
@@ -144,7 +182,7 @@ function VolunteerExplore() {
         </div>
       </div>    
       )}
-    {needsList && <VolunteerNeeds needTypeId={selectedNeedTypeId}/>}
+    {needsList && <VolunteerNeeds needTypeId={selectedNeedTypeId} nTypeName={nTypeName} updateNeedList={updateNeedList} />}
     </div>
   )
 
