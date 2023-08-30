@@ -36,28 +36,123 @@ function NeedPlans() {
   const mockEvents = [
     {
       title: "Event 1",
-      start: new Date(2023, 6, 10, 9, 0, 0),
-      end: new Date(2023, 6, 10, 10, 0, 0),
-      color: "blue", // Custom property to define the color
+      start: new Date(2023, 7, 29, 9, 0, 0),
+      end: new Date(2023, 7, 29, 10, 0, 0),
+      color: "blue", 
+    },
+    {
+        title: "Event 2",
+        start: new Date(2023, 7, 30, 9, 0, 0),
+        end: new Date(2023, 7, 30, 10, 0, 0),
+        color: "red", 
+    },
+    {
+        title: "Event 3",
+        start: new Date(2023, 7, 31, 9, 0, 0),
+        end: new Date(2023, 7, 31, 10, 0, 0),
+        color: "red", 
     },
     {
       title: "Event 4",
-      start: new Date(2023, 6, 10, 15, 0, 0),
-      end: new Date(2023, 6, 10, 16, 0, 0),
-      color: "blue", // Custom property to define the color
+      start: new Date(2023, 8, 1, 15, 0, 0),
+      end: new Date(2023, 8, 1, 16, 0, 0),
+      color: "blue", 
     },
     {
       title: "Event 5",
-      start: new Date(2023, 6, 12, 9, 0, 0),
-      end: new Date(2023, 6, 12, 10, 0, 0),
-      color: "blue", // Custom property to define the color
+      start: new Date(2023, 8, 2, 9, 0, 0),
+      end: new Date(2023, 8, 2, 9, 0, 0),
+      color: "blue", 
     },
     {
-      title: "Event 2",
-      start: new Date(2023, 6, 15, 9, 0, 0),
-      end: new Date(2023, 6, 15, 10, 0, 0),
-      color: "red", // Custom property to define the color
-    },
+        title: "Event 1",
+        start: new Date(2023, 8, 3, 9, 0, 0),
+        end: new Date(2023, 8, 3, 3, 0, 0),
+        color: "blue", 
+      },
+      {
+          title: "Event 2",
+          start: new Date(2023, 8, 4, 9, 0, 0),
+          end: new Date(2023, 8, 4, 10, 0, 0),
+          color: "red", 
+      },
+      {
+          title: "Event 3",
+          start: new Date(2023, 8, 5, 9, 0, 0),
+          end: new Date(2023, 8, 5, 10, 0, 0),
+          color: "red", 
+      },
+      {
+        title: "Event 4",
+        start: new Date(2023, 8, 6, 15, 0, 0),
+        end: new Date(2023, 8, 6, 16, 0, 0),
+        color: "blue", 
+      },
+      {
+        title: "Event 5",
+        start: new Date(2023, 8, 7, 9, 0, 0),
+        end: new Date(2023, 8, 7, 10, 0, 0),
+        color: "blue", 
+      },{
+        title: "Event 1",
+        start: new Date(2023, 8, 8, 9, 0, 0),
+        end: new Date(2023, 8, 8, 10, 0, 0),
+        color: "blue", 
+      },
+      {
+          title: "Event 2",
+          start: new Date(2023, 8, 9, 9, 0, 0),
+          end: new Date(2023, 8, 9, 10, 0, 0),
+          color: "red", 
+      },
+      {
+          title: "Event 3",
+          start: new Date(2023, 8, 10, 9, 0, 0),
+          end: new Date(2023, 8, 10, 10, 0, 0),
+          color: "red", 
+      },
+      {
+        title: "Event 4",
+        start: new Date(2023, 8, 11, 15, 0, 0),
+        end: new Date(2023, 8, 11, 16, 0, 0),
+        color: "blue", 
+      },
+      {
+        title: "Event 5",
+        start: new Date(2023, 8, 12, 9, 0, 0),
+        end: new Date(2023, 8, 12, 10, 0, 0),
+        color: "blue", 
+      },
+      {
+        title: "Event 1",
+        start: new Date(2023, 8, 13, 9, 0, 0),
+        end: new Date(2023, 8, 13, 10, 0, 0),
+        color: "blue", 
+      },
+      {
+          title: "Event 2",
+          start: new Date(2023, 8, 13, 11, 0, 0),
+          end: new Date(2023, 8, 13, 12, 0, 0),
+          color: "red", 
+      },
+      {
+          title: "Event 3",
+          start: new Date(2023, 8, 14, 9, 0, 0),
+          end: new Date(2023, 8, 14, 10, 0, 0),
+          color: "red", 
+      },
+      {
+        title: "Event 4",
+        start: new Date(2023, 8, 15, 15, 0, 0),
+        end: new Date(2023, 8, 15, 16, 0, 0),
+        color: "blue", 
+      },
+      {
+        title: "Event 5",
+        start: new Date(2023, 8, 15, 9, 0, 0),
+        end: new Date(2023, 8, 15, 10, 0, 0),
+        color: "blue", 
+      },
   ];
 
   const localizer = dayjsLocalizer(dayjs);

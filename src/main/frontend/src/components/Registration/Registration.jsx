@@ -1040,7 +1040,7 @@ const Registration = (props) => {
                 </div>
               </div>
             ))}
-            <button type="button" onClick={() => addSkill()}>
+            <button className='addSkillButton' type="button" onClick={() => addSkill()}>
               + Add skill
             </button>
           </div>

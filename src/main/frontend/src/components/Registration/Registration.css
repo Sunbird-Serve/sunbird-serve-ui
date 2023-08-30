@@ -199,3 +199,14 @@ label {
     padding: 2vh 0px;
     color: rgb(104, 108, 115);
 }
+
+.addSkillButton {
+    float: left;
+    background: none;
+    border: none;
+    color: #2693c6;
+    cursor: pointer;
+    margin: 1vh 0;
+    font-size: 1.5vh;
+}
+

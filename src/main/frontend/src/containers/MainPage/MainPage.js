@@ -9,6 +9,8 @@ import Accounts from '../../components/Accounts/Accounts'
 import Help from '../../components/Help/Help'
 import NeedPlans from '../../components/Need Plans/NeedPlans'
 import Registration from '../../components/Registration/Registration'
+import RegFormHeader from '../../components/RegFormHeader/RegFormHeader'
+import RegFormFooter from '../../components/RegFormFooter/RegFormFooter'
 
 const MainPage = () => {
     return(
@@ -27,7 +29,9 @@ const MainPage = () => {
                     </Switch>
                 </div>
             </div> */}
+            <RegFormHeader />
             <Registration />
+            <RegFormFooter />
         </BrowserRouter>
     )
 }
