@@ -11,7 +11,8 @@ import NeedPlans from '../../components/Need Plans/NeedPlans'
 import Registration from '../../components/Registration/Registration'
 import RegFormHeader from '../../components/RegFormHeader/RegFormHeader'
 import RegFormFooter from '../../components/RegFormFooter/RegFormFooter'
-
+import RegFormSuccess from '../../components/RegFormSuccess/RegFormSuccess'
+import RegFormFailure from '../../components/RegFormFailure/RegFormFailure'
 const MainPage = () => {
     return(
         <BrowserRouter>
@@ -31,6 +32,8 @@ const MainPage = () => {
             </div> */}
             <RegFormHeader />
             <Registration />
+            {/* <RegFormSuccess /> */}
+            {/* <RegFormFailure /> */}
             <RegFormFooter />
         </BrowserRouter>
     )
