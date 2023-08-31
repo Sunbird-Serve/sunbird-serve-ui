@@ -9,6 +9,7 @@
     "USER_GET" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/user",
     "NEED_BY_USER" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/user",
     "FETCH_ENTITY" : "http://43.204.25.161:8081/api/v1/Entity",
-    "NOMINATION_CONFIRM" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/{needId}/nominate"
+    "NOMINATION_CONFIRM" : "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need/{needId}/nominate",
+    "NEED_REQUIREMENT_GET": "http://ecs-integrated-239528663.ap-south-1.elb.amazonaws.com/api/v1/need-requirement"
 }
 
