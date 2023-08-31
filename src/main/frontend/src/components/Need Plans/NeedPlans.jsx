@@ -33,13 +33,13 @@ function NeedPlans() {
   const bindedActions = bindActionCreators({ ...needPlansActions }, dispatch);
   const mockEvents = [
     {
-      title: "Event 1",
+      title: "Elderly Support",
       start: new Date(2023, 7, 29, 9, 0, 0),
       end: new Date(2023, 7, 29, 10, 0, 0),
       color: "blue", 
     },
     {
-        title: "Event 2",
+        title: "Premise Cleaning",
         start: new Date(2023, 7, 30, 9, 0, 0),
         end: new Date(2023, 7, 30, 10, 0, 0),
         color: "red", 
