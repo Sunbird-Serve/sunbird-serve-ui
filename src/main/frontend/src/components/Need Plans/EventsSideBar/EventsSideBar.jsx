@@ -10,12 +10,12 @@ function EventsSideBar(props) {
 
   const mockEvents = [
     {
-      title: "Event 1",
+      title: "Elderly Support",
       start: new Date(2023, 7, 29, 9, 0, 0),
       end: new Date(2023, 7, 29, 10, 0, 0),
       color: "blue", // Custom property to define the color
-      volunteers: ["Harry", "Hermoine", "Ron"],
-      address: "Nungambakkam, Chennai",
+      volunteers: ["Ava Bytefield", "Max Code", "Axel Neon"],
+      address: "UP, Ayodhya",
     },
     {
       title: "Event 2",
@@ -26,20 +26,20 @@ function EventsSideBar(props) {
       address: "Nungambakkam, Chennai",
     },
     {
-      title: "Event 3",
+      title: "Prasad Preparation",
       start: new Date(2023, 7, 31, 9, 0, 0),
       end: new Date(2023, 7, 31, 10, 0, 0),
-      color: "red",
-      volunteers: ["Harry", "Hermoine", "Ron"],
-      address: "Nungambakkam, Chennai",
+      color: "blue",
+      volunteers: ["Ava Bytefield", "Max Code", "Axel Neon"],
+      address: "UP, Ayodhya",
     },
     {
-      title: "Event 4",
+      title: "Prasad Preparation",
       start: new Date(2023, 8, 1, 15, 0, 0),
       end: new Date(2023, 8, 1, 16, 0, 0),
       color: "blue", // Custom property to define the color
-      volunteers: ["Harry", "Hermoine", "Ron"],
-      address: "Nungambakkam, Chennai",
+      volunteers: ["Ava Bytefield", "Ankit Verma", "Sachin Mehta"],
+      address: "UP, Ayodhya",
     },
     {
       title: "Event 5",
