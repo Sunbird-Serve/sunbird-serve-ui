@@ -25,8 +25,6 @@ function VolunteerExplore() {
   useEffect(()=> {
     const fetchData = async () => {
       try {
-
-
         const response = await axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=100&status=Approved`);
         setNtypeData(response.data.content); 
       } catch (error) {
@@ -58,8 +56,11 @@ function VolunteerExplore() {
   useEffect(() => {
     const fetchNeedsCountForItem = async (item) => {    
       try {
-        const response = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=New`)
-        const numberOfNeeds = response.data.content.length;
+        const responseNew = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=New`)
+        const responseNominated = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=Nominated`)
+        const responseApproved = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=Approved`)
+        const responseRejected = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=Rejected`)
+        const numberOfNeeds = responseNew.data.content.length+responseNominated.data.content.length+responseApproved.data.content.length+responseRejected.data.content.length;
         console.log(numberOfNeeds)
         setNeedsCount(prevNeedsCount => ({
           ...prevNeedsCount,

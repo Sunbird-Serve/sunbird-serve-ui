@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import Avatar from '@mui/material/Avatar';
 import randomColor from 'randomcolor'
 import './VolunteerProfile.css'
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
 import { BrowserRouter, Switch, Route} from 'react-router-dom'
 import VolunteerProfileInfo from '../VolunteerProfileInfo/VolunteerProfileInfo'
 import VolunteerProfileNominations from '../VolunteerProfileNominations/VolunteerProfileNominations'
@@ -28,7 +28,8 @@ function VProfile() {
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
         
         if (response.data.length > 0) {
-          setUserData(response.data[0]);
+          //setUserData(response.data[0]);
+          console.log(response.data[0])
         } else {
           // Handle case when no data is returned
         }
@@ -42,6 +43,44 @@ function VProfile() {
       fetchData();
     }
   }, [currentUser]);
+
+  //>> GET ACTIVE USER DATA *********************************************************************
+  const [userListData, setUserListData] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('http://43.204.25.161:8081/api/v1/Users/search', {
+          "offset": 0,
+          "limit": 100,
+          "filters": {
+            "status": {
+              "eq": "Active"
+            }
+          }
+        });
+        const responseData = response.data;
+        setUserListData(responseData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  console.log(userListData)
+  //filter userId my email
+  useEffect(() => {
+  const getUserByEmail = () => {
+    const foundItem = userListData.find(item => item.contactDetails.email === currentUser.email)
+    if (foundItem) {
+      setUserData(foundItem)
+    } else {
+      setUserData(null)
+    }
+  }
+  getUserByEmail();
+  }, [userListData, currentUser]);
+  // ************************************************************************************
 
   console.log(userData)
 
@@ -60,11 +99,11 @@ function VProfile() {
                   </Avatar>
                 </div>
                 <div className="userInfo">
-                    <div className="vName"> {/* (userData)? userData.identityDetails.fullname : '' */}</div>
+                    <div className="vName"> { (userData)? userData.identityDetails.fullname : '' }</div>
                     <div className="vContact">
-                        <div className="vEmail">{/* (userData)? userData.contactDetails.email : '' */}</div>
+                        <div className="vEmail">{ (userData)? userData.contactDetails.email : '' }</div>
                         <span>.</span>
-                        <div className="vMobile">{/* (userData)? userData.contactDetails.mobile : '' */}</div>
+                        <div className="vMobile">{ (userData)? userData.contactDetails.mobile : '' }</div>
                     </div>
                 </div>
             </div>
@@ -73,7 +112,7 @@ function VProfile() {
             </div>
         </div>
         <div className="vProfNav">
-            <NavLink to="/vpinfo" className="vpNavItem" activeClassName="selectedTab">Profile</NavLink>
+            <NavLink to="/vpinfo" default className="vpNavItem" activeClassName="selectedTab">Profile</NavLink>
             <NavLink to="/vpnominations" className="vpNavItem" activeClassName="selectedTab">Nominations</NavLink>
             <NavLink to="/vpneedplans" className="vpNavItem" activeClassName="selectedTab">Need Plans</NavLink>
             <NavLink to="/vpfavourites" className="vpNavItem" activeClassName="selectedTab">Favourites</NavLink>
@@ -84,6 +123,7 @@ function VProfile() {
                 <Route path="/vpnominations" component={VolunteerProfileNominations} />
                 <Route path="/vpneedplans" component={VolunteerProfileNeedPlans} />
                 <Route path="/vpfavourites" component={VolunteerProfileFavourites} />
+                <Redirect from="/" to="/vpinfo" />
             </Switch>
         </div>
     </div>

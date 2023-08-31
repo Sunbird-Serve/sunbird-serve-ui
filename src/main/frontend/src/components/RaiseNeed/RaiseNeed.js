@@ -11,6 +11,7 @@ import configData from './../../configData.json'
 import {auth} from '../../firebase.js'
 
 const RaiseNeed = props => {
+    //user is received from needs component
     console.log(props.uId)
 
     const [ selectedOptions, setSelectedOptions ] = useState([]);

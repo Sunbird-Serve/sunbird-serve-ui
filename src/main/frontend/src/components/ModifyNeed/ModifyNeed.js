@@ -14,7 +14,7 @@ const ModifyNeed = props => {
     const [entityName, setEntityName] = useState(null);
     function EntityById( entityId ) {
            axios
-             .get(`${configData.ENTITY_FETCH}/${entityId}`)
+             .get(`${configData.ENTITY_GET}/${entityId}`)
              .then((response) => {
                setEntityName(response.data.name);
              })
@@ -42,6 +42,22 @@ const ModifyNeed = props => {
    useEffect(()=> {
         setData(props.data);
    },[props.data]);
+
+   const [needRequirement,setNeedRequirement] = useState(null)
+   useEffect(() => {
+    if(data) {
+    axios
+      .get(`${configData.NEED_REQUIREMENT_GET}/${data.requirementId}`)
+      .then((response) => {
+         console.log(response.data)
+         setNeedRequirement(response.data)
+      })
+      .catch((error) => {
+        console.error("Fetching Entity failed:", error);
+      });
+    }
+    }, [data]);
+    console.log(needRequirement)
 
    var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], [{'list':'ordered'},{'list':'bullet'}]];
     const module = {
@@ -105,12 +121,14 @@ const ModifyNeed = props => {
                             <div className="catergoryNInfo">NEED INFO</div>
                             <div className="needIFormTop">
                                 <div className="needInfoTopLeft col-sm-6">
+                                    {/* 
                                     <div className="infoNImage">
                                             <label>Image</label>
                                             <div className="uploadNImage"> 
                                                 <img src={UploadImageBG} alt=''/>
                                             </div>
                                     </div>
+                                    */}
                                     <div className="itemNInfo">
                                             <label>Need Name</label>
                                             <span>{data.name}</span>
@@ -132,24 +150,26 @@ const ModifyNeed = props => {
                                     {/* Entity Name */}
                                     <div className="itemNInfo">
                                         <label>Entity Name</label>
-                                        <span>{EntityById(data.entityId)} {data.entityId}</span>
+                                        <span>{EntityById(data.entityId)} </span>
                                     </div>
                                     {/* Date */}
                                     <div className="itemWrapNInfoDate">
                                         <div className="itemNInfoDate">
                                             <label>Start Date</label>
-                                            <span></span>
+                                            <span>{needRequirement.startDate.substr(0,10)}</span>
                                         </div>
                                         <div className="itemNInfoDate">
                                             <label>End Date</label>
-                                            <span></span>
+                                            <span>{needRequirement.endDate.substr(0,10)}</span>
                                         </div>
                                     </div>
                                     {/* Time */}
+                                    {/*}
                                     <div className="itemNInfo">
                                         <label>Time</label>
                                         <span></span>
                                     </div> 
+                                    */}
                                 </div>                      
                             </div>           
                             <div className="catergoryNInfo">VOLUNTEER PREREQUISITE</div>                          
@@ -159,6 +179,7 @@ const ModifyNeed = props => {
                                     { data &&
                                      <div className="itemNInfo">
                                         <label>Skills Required</label>
+                                        <span>{needRequirement.skillDetails}</span>
                                         {/*<span>{data.skillDetail.map(item => item.value)}</span> */}
                                     </div> }
                                 </div>
@@ -166,7 +187,7 @@ const ModifyNeed = props => {
                                     {/* No. of Volunteers Required */}
                                     <div className="itemNInfo">
                                         <label>No. of Volunteers required</label>
-                                        <span></span>
+                                        <span>{needRequirement.volunteersRequired}</span>
                                     </div>
                                 </div>
                             </div>
@@ -192,7 +213,7 @@ const ModifyNeed = props => {
     <div className="alertNomin"> 
         <span>
             <ClearIcon style={{height:"20px",width:"20px",borderRadius:"50%",backgroundColor:"red",padding:"2px",color:"#4D4D4D",margin:"2px 5px"}}/> 
-            Nomination has been accepted rejected</span>
+            Nomination has been rejected</span>
         <button onClick={closePopup}>x</button>
     </div>
     )}
