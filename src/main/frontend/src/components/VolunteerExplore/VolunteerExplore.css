@@ -96,8 +96,8 @@
 .wrapGrid {
     padding: 10px ;
     display: flex;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 30px;
     width: fit-content;
 }
 .gridItem {
@@ -107,7 +107,7 @@
     font-weight: 600;
     font-size: 15px;
     z-index: 10;
-    width: 260px;
+    width: 300px;
     background-color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(219, 219, 219, 1);

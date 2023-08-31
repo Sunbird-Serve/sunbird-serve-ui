@@ -2,24 +2,23 @@ import React from "react";
 import "./EventCard.css";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const VolunteerCard = (props) => {
   const { key, name } = props;
   return (
-    <Accordion style = {{margin: '0.5vh', borderRadius: '0.5vh'}}>
+    <Accordion>
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
+        className="volunteerCard"
       >
-        <span className="eventVol">{name}</span>
-      </AccordionSummary>
-      <div className="eventCard">
-        <span className="volNo">9876543210</span>
+        Name: {name}
         <br />
-        <div className="taskDesc">
-          Complete the cleaning of shores and collect pebbles
-        </div>
-      </div>
+        Address: Chennai
+      </AccordionSummary>
+      <div className="eventCard">Volunteer details</div>
     </Accordion>
   );
 };
@@ -40,17 +39,16 @@ function EventCard(props) {
   return (
     <div>
       <span className="timestamp">
-        {ev.start.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })} to {ev.end.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}
+        {ev.start.getHours()}:{ev.start.getMinutes()} to {ev.end.getHours()}:
+        {ev.end.getMinutes()}
       </span>
 
       <br style={{ clear: "both" }} />
-      <Accordion style = {{ background: '#F6F7FB', borderRadius: '1vh'}}> 
+      <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <div className="eventContainer">
-           <span className="eventTitle">{ev.title}</span>
-           <br />
-           <span className="eventDesc">Description |{ev.address}</span>
-          </div>
+          {ev.title}
+          <br />
+          {/* {ev.address} */}
         </AccordionSummary>
         <div className="eventCard">
           <RepeatComponent

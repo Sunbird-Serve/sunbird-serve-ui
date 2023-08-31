@@ -67,7 +67,7 @@
   flex-wrap: wrap;
 }
 .needBox {
-  width: 480px;
+  width: 30%;
   height: 130px;
   border: 1px solid #ccc;
   padding: 16px;

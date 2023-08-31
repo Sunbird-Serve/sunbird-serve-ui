@@ -23,6 +23,7 @@ export const NeedsTable = props => {
   const currentUser = auth.currentUser;
   const [userId, setUserId] = useState(null)
 
+  //fetch list of all approved need types
   useEffect(()=> {
     axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=100&status=Approved`)
     .then(
@@ -34,6 +35,7 @@ export const NeedsTable = props => {
     }) 
   },[])
 
+  //get userId from authenticated emailId
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -87,7 +89,7 @@ export const NeedsTable = props => {
   //filter userId my email
   useEffect(() => {
   const getUserByEmail = () => {
-    const foundItem = userData.find(item => item.contactDetails.email === 'raviteja@egurukulapps.com')
+    const foundItem = userData.find(item => item.contactDetails.email === currentUser.email)
     if (foundItem) {
       setUserId(foundItem.osid)
     } else {
@@ -99,6 +101,7 @@ export const NeedsTable = props => {
   // ************************************************************************************
 
 
+  //using the userId, get different types of needs user raised
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -122,8 +125,7 @@ export const NeedsTable = props => {
     fetchData();
   }, [userId]);
 
-  // got need data through props
-  const data = useMemo(() => dataNeed,[dataNeed])
+  
 
   function NeedTypeById({ needTypeId }) {
     const [needType, setNeedType] = useState(null);
@@ -140,12 +142,11 @@ export const NeedsTable = props => {
    return <span>{needType || ''}</span>;
   }
 
-  /*
   function EntityById({ entityId }) {
     const [entityName, setEntityName] = useState(null);
      useEffect(() => {
        axios
-         .get(`${configData.ENTITY_FETCH}/${entityId}`)
+         .get(`${configData.ENTITY_GET}/${entityId}`)
          .then((response) => {
            setEntityName(response.data.name);
          })
@@ -155,8 +156,31 @@ export const NeedsTable = props => {
      }, [entityId]);
      return <span>{entityName || ''}</span>;
   }
-  */
+  
+  function TimelineByReqId({ requirementId }) {
+    const [startDate, setStartDate] = useState(null);
+    const [endDate, setEndDate] = useState(null);
+     useEffect(() => {
+       axios
+         .get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`)
+         .then((response) => {
+            setStartDate(response.data.startDate)
+            setEndDate(response.data.endDate)
+         })
+         .catch((error) => {
+           console.error("Fetching Entity failed:", error);
+         });
+         
+     }, [requirementId]);
 
+     if(startDate && endDate) {
+        return <span>{(startDate.substr(2,8).split('-').reverse().join('/')+'-'+endDate.substr(2,8).split('-').reverse().join('/'))}</span>
+     } else {
+      return <span>''</span>
+     }
+    }
+
+  
   const COLUMNS = [
     { Header: 'Need Name', accessor: 'name', width: 250 },
     { Header: 'Need Type', accessor: 'needTypeId',
@@ -164,13 +188,54 @@ export const NeedsTable = props => {
       return <NeedTypeById needTypeId={value} />;
       }
     },
-    { Header: 'Location', width: 144 },
-    { Header: 'Entity', accessor: 'entityId', width: 244 }, 
+    { Header: 'Location',  width: 144 },
+    { Header: 'Entity', accessor: 'entityId', 
+      Cell: ({ value }) => {
+      return <EntityById entityId={value} />;
+      }
+  
+    }, 
     { Header: 'Volunteer', width: 112 },
-    { Header: 'Timeline', width: 164 },
+    { Header: 'Timeline', accessor: 'requirementId', 
+      Cell: ({ value }) => {
+      return <TimelineByReqId requirementId={value} />;
+      }
+    },
     { Header: 'Status', accessor: 'status', width: 109, filter: 'text' }
   ]
-  const columns = useMemo(() => COLUMNS, [])
+  const columns = useMemo(() => COLUMNS, [userId,userData, dataNeed, dataNeedType]);
+
+  const [filteredData, setFilteredData] = useState([])
+  const [needTypeId, setNeedTypeId] = useState('')
+  const [selectedDate, setSelectedDate] = useState('');
+
+  useEffect(()=>{
+    let filtered = dataNeed
+    if(needTypeId){
+      const filtered = dataNeed.filter(item => item.needTypeId === needTypeId)
+      setFilteredData(filtered)
+    //} else if (selectedDate) {
+    //  const filtered = dataNeed.filter(item => new Date(item.startDate) >= new Date(selectedDate))
+    //  setFilteredData(filtered)
+    } else {
+      setFilteredData(filtered)
+    }
+  },[dataNeed, needTypeId, selectedDate])
+
+  console.log(selectedDate)
+  dataNeed.filter(item => console.log(item.startDate))
+
+  const handleNeedType = e => {
+    setNeedTypeId(e.target.value)
+  }
+  // get need data through props
+  //const data = useMemo(() => dataNeed,[dataNeed])
+  const data = useMemo(() => filteredData,[filteredData])
+  
+  
+  console.log(filteredData)
+  console.log(dataNeed)
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -196,19 +261,15 @@ export const NeedsTable = props => {
 
   const [showPopup, setShowPopup] = useState(false);
   const [rowData, setRowData] = useState(null);
-  const [date,setDate] = useState('')
-  const [needTypeId, setNeedTypeId] = useState('')
 
   const handleRowClick = (rowData) => {
     setRowData(rowData);
     setShowPopup(!showPopup);
   };
-  const handleDate = e => {
-    setDate(e.target.value)
+  const handleDateChange = e => {
+    setSelectedDate(e.target.value)
   }
-  const handleNeedType = e => {
-    setNeedTypeId(e.target.value)
-  }
+  
 
   const { globalFilter, pageIndex, pageSize } = state;
 
@@ -247,11 +308,13 @@ export const NeedsTable = props => {
           {/* Following are filters on need table */}
           <div className="boxSearchNeeds">
             <i><SearchIcon style={{height:'18px',width:'18px'}}/></i>
-            <input type="search" name="globalfilter" placeholder="Search" value={globalFilter || ''} onChange={(e) => setGlobalFilter(e.target.value)}></input>
+            <input type="search" name="globalfilter" placeholder="Search need" value={globalFilter || ''} onChange={(e) => setGlobalFilter(e.target.value)}></input>
           </div>
+          {/*
           <div className="selectNeedDate">
-            <input type="date" name="date" value={date} onChange={handleDate} />
+            <input type="date" name="selectedDate" value={selectedDate} onChange={handleDateChange} />
           </div>
+          */}
           <select className="selectNeedType" name="needTypeId" value={needTypeId} onChange={handleNeedType} >
             <option value="" defaultValue>Need Type</option>
             {

@@ -14,7 +14,6 @@ function NeedPopup({ open, onClose, need }) {
     setPopup(!popUp);
   };
 
-
   const currentUser = auth.currentUser;
   const [userId, setUserId] = useState('')
 
@@ -27,7 +26,8 @@ function NeedPopup({ open, onClose, need }) {
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
         
         if (response.data.length > 0) {
-          setUserId(response.data[0].osid);
+          //setUserId(response.data[0].osid);
+          console.log(response.data[0].osid);
         } else {
           // Handle case when no data is returned
         }
@@ -41,11 +41,70 @@ function NeedPopup({ open, onClose, need }) {
       fetchData();
     }
   }
+
+  //>> GET ACTIVE USER DATA *********************************************************************
+  const [userData, setUserData] = useState([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.post('http://43.204.25.161:8081/api/v1/Users/search', {
+          "offset": 0,
+          "limit": 100,
+          "filters": {
+            "status": {
+              "eq": "Active"
+            }
+          }
+        });
+        const responseData = response.data;
+        setUserData(responseData);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+  console.log(userData)
+  //filter userId my email
+  useEffect(() => {
+  const getUserByEmail = () => {
+    if (currentUser) {
+    const foundItem = userData.find(item => item.contactDetails.email === currentUser.email)
+    if (foundItem) {
+      setUserId(foundItem.osid)
+    } else {
+      setUserId(null)
+    }
+  }
+  }
+  getUserByEmail();
+  }, [userData]);
+  // ************************************************************************************
+
+  const [needRequirement,setNeedRequirement] = useState(null)
+   useEffect(() => {
+    if(need) {
+    axios
+      .get(`${configData.NEED_REQUIREMENT_GET}/${need.requirementId}`)
+      .then((response) => {
+         console.log(response.data)
+         setNeedRequirement(response.data)
+      })
+      .catch((error) => {
+        console.error("Fetching Entity failed:", error);
+      });
+    }
+    }, [need, popUp]);
+  console.log(needRequirement)
   console.log(userId)
 
+  const [alertLogin, setAlertLogin] = useState(false)
+  //NOMINATION to a need
   const nominateNeed = () => {
     const needId = need.id; //  the need.id represents the needId
     console.log(needId)
+    if(userId){
     axios.post(`${configData.NEED_SEARCH}/${needId}/nominate/${userId}`)
       .then((response) => {
         console.log("Nomination successful!");
@@ -54,37 +113,39 @@ function NeedPopup({ open, onClose, need }) {
       .catch((error) => {
         console.error("Nomination failed:", error);
       });
+    } else {
+      setAlertLogin(true)
+    }
+
   };
  
   const [needType, setNeedType] = useState(null);
-  function NeedTypeById( needTypeId ) {
-    axios
-      .get(`${configData.NEED_BY_TYPE}/${needTypeId}?page=0&size=10&status=New`)
-      .then((response) => {
-        setNeedType(response.data.content.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Need Type failed:", error);
-      });
-   return <span>{needType || ''}</span>;
-  }
+    function NeedTypeById( needTypeId ) {
+        axios
+          .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
+          .then((response) => {
+            setNeedType(response.data.name);
+          })
+          .catch((error) => {
+            console.error("Fetching Need Type failed:", error);
+          });
+       return needType || '';
+    }
 
 
   const [entityName, setEntityName] = useState(null);
-
-  /*
-  function EntityById( entityId ) {
-       axios
-         .get(`http://43.204.25.161:8081/api/v1/Entity/${entityId}`)
-         .then((response) => {
-           setEntityName(response.data.name);
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-         });
-     return entityName || '';
-  }
-  */
+    function EntityById( entityId ) {
+           axios
+             .get(`${configData.ENTITY_GET}/${entityId}`)
+             .then((response) => {
+               setEntityName(response.data.name);
+             })
+             .catch((error) => {
+               console.error("Fetching Entity failed:", error);
+             });
+         return entityName || '';
+    }
+ console.log(need)
 
   return (
     <div className={`need-popup ${open ? "open" : ""}`}>
@@ -103,21 +164,23 @@ function NeedPopup({ open, onClose, need }) {
         <p className="popupNKey">About the Need </p>
         <p className="popupNValue">{need.description.slice(3,-4)}</p>
         <p className="popupNKey">Need Type </p>
-        <p>{NeedTypeById(need.needTypeId)}</p>
+        <p>{NeedTypeById(need.needTypeId)} </p>
         <div className="date-container">
           <div className="date-item">
-            <p className="popupNKey"> Start Date </p>
-            <p>{need.startDate}</p>
+            <span className="popupNKey"> Start Date </span>
+            <p>{ (needRequirement)? needRequirement.startDate.substr(0,10) : '' }</p>
           </div>
           <div className="date-item">
             <p className="popupNKey">End Date </p>
-            <p>{need.endDate}</p>
+            <p>{ (needRequirement)? needRequirement.endDate.substr(0,10) : '' }</p>
           </div>
         </div>
         <p className="popupNKey">Entity Name </p>
-        <p>{/*  EntityById(need.entityId) */}</p>
-        <p className="popupNKey">Skills Required</p><br/>
+        <p>{EntityById(need.entityId)}</p>
+        <p className="popupNKey">Skills Required</p>
+        <p className="popupNValue">{ (needRequirement)? needRequirement.skillDetails : '' }</p>
         <p className="popupNKey">Volunteers Required</p>
+        <p className="popupNValue">{ (needRequirement)? needRequirement.volunteersRequired : '' }</p>
         <div className="inviteToEvent">
             <ShareIcon style={{ fontSize: "15px" }} />
             <p style={{ margin: "0 10px", fontSize: "15px", width: "400px" }}>Invite your friends to this event</p>
@@ -136,6 +199,10 @@ function NeedPopup({ open, onClose, need }) {
       </div>
       </div>
       
+      {alertLogin && <div className="alertLogin"> 
+        <span>Please login using registed volunteer email-id or register to Nominate</span>
+        <button onClick={()=>setAlertLogin(false)}>x</button>
+      </div>}
     </div>
   );
 }

@@ -41,13 +41,53 @@ export const VolunteerNeeds = props => {
   };
 
   useEffect(() => {
+    const fetchNeeds = async () => {    
+      try {
+        const responseNew = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=New`)
+        const responseNominated = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Nominated`)
+        const responseApproved = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Approved`)
+        const responseRejected = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Rejected`)
+        setData([...responseNew.data.content, ...responseNominated.data.content, ...responseApproved.data.content, ...responseRejected.data.content])
+      } catch (error) {
+        console.error('Error fetch needs count',Error)
+      }
+    };
+    fetchNeeds()
+  },[props.needTypeId])
+  
+{/*
+  const [needsNew, setNeedsNew] = useState([]);
+  const [needsNominated, setNeedsNominated] = useState([]);
+  const [needsApproved, setNeedsApproved] = useState([]);
+  const [needsRejected, setNeedsRejected] = useState([]);
+  useEffect(() => {
     axios
       .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=New`)
       .then((response) => {
-        setData(response.data.content);
+        setNeedsNew(response.data.content);
       })
       .catch((error) => console.log(error));
-  }, []);
+    axios
+      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Nominated`)
+      .then((response) => {
+        setNeedsNominated(response.data.content);
+      })
+      .catch((error) => console.log(error));
+    axios
+      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Approved`)
+      .then((response) => {
+        setNeedsApproved(response.data.content);
+      })
+      .catch((error) => console.log(error));
+    axios
+      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Rejected`)
+      .then((response) => {
+        setNeedsRejected(response.data.content);
+      })
+      .catch((error) => console.log(error));
+    setData([...needsNew, ...needsNominated, ...needsApproved, ...needsRejected])
+  }, [props.needTypeId, needsNew, needsNominated]);
+*/}
 
   // function EntityById( entityId ) {
   //      axios
