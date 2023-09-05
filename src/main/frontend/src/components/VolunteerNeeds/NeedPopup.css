@@ -96,11 +96,11 @@
   width: calc( 25% - 30px) ;
 }
 .nominationSuccess {
-  position: absolute;
-  bottom: 100px;
+  position: relative;
   font-weight: 600;
   font-size: 18px;
   color: green;
+  margin-top: 60px;
 }
 .notification-needpopup {
 color: rgba(213, 91, 68, 1);

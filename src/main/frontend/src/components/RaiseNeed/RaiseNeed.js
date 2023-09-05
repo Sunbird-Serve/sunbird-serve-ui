@@ -8,11 +8,10 @@ import { Redirect } from 'react-router'
 import UploadImageBG from '../../assets/bgImgUpload.png'
 import MultiSelect from './MultiSelect';
 import configData from './../../configData.json'
-import {auth} from '../../firebase.js'
 
 const RaiseNeed = props => {
     //user is received from needs component
-    console.log(props.uId)
+    {/* console.log(props.uId) */}
 
     const [ selectedOptions, setSelectedOptions ] = useState([]);
     // fields to enter in the raise need form
@@ -52,7 +51,6 @@ const RaiseNeed = props => {
     //need name and purpose updated by change handler
     //need types dropdown updated by change handler
     const [dataNeedType,setDataNeedType] = useState([]);
-    const [dataNeedTypeB,setDataNeedTypeB] = useState([]);
 
     // entity drop down updated by change handler
     const [dataEntity,setDataEntity] = useState([]);
@@ -122,15 +120,6 @@ const RaiseNeed = props => {
         setDataOther({...dataOther,[e.target.name]:e.target.value})
     }
 
-    // handle skills required  
-    const options = [
-        { label: 'Fluency in English', value: 'Fluency in English'},
-        { label: 'Python Programming', value: 'Python Programming'},
-        { label: 'Public Speaking', value: 'Public Speaking'},
-        { label: 'MS Office', value: 'MS Office'},
-        { label: 'Cooking', value: 'Cooking'},
-        { label: 'Classical Dance', value: 'Classical Dance'}
-    ]
     const handleChange = (selectedOptions) => {
         setSelectedOptions(selectedOptions)
         setDataOther(dataOther => ({
@@ -195,6 +184,45 @@ const RaiseNeed = props => {
         }) 
       },[])
 
+    // get needrequirement whenever needtypeId is changed
+      const [needReqId,setNeedReqId] = useState(null)
+      const [skillsRequired,setSkillsRequired] = useState(null)
+      const [options,setOptions] = useState([])
+      useEffect(() => {
+        //get need requirement corresponding to needtypeId selected
+        console.log(needTypeId)
+
+        
+        //do following API call when needTypeId is not null
+        if(needTypeId){
+        axios.get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
+        .then(
+          //function(response){console.log(response.data.requirementId)},
+          response => setNeedReqId(response.data.requirementId)
+        )
+        .catch(function (error) {
+            console.log('error'); 
+        }) 
+        }
+
+        
+       if(needReqId) {
+       axios
+         .get(`${configData.NEED_REQUIREMENT_GET}/${needReqId}`)
+         .then((response) => {
+            setOptions(response.data.skillDetails.split(',').map(item=>({
+                label:item,
+                value:item,
+            })))
+         })
+         .catch((error) => {
+           console.error("Fetching Entity failed:", error);
+         });
+       }
+
+       }, [needTypeId, needReqId]);
+    console.log(options)
+
     // format as per API request body
     const [dataToPost,setDataToPost] = useState({
         needRequest:{},
@@ -238,6 +266,7 @@ const RaiseNeed = props => {
                     {/* left half of upper side*/}
                     <div className="formLeft col-sm-6">
                         {/* Image */}
+                        {/*
                         <div className="itemImage">
                             <label>Image</label>
                             <div className="uploadNImage" onClick={handleImageClick}>
@@ -245,6 +274,7 @@ const RaiseNeed = props => {
                                 <input type="file" ref={inputRef} onChange={handleImageUpload} style={{display:"none"}} />
                             </div>
                         </div>
+                        */}
                         {/* Need Name */}
                         <div className="itemForm">
                             <label>Need Name</label>
@@ -262,11 +292,6 @@ const RaiseNeed = props => {
                             <option value="" defaultValue>Select Need type</option>
                                 {
                                     dataNeedType.map(
-                                        (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
-                                    )
-                                }
-                                {
-                                    dataNeedTypeB.map(
                                         (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
                                     )
                                 }
@@ -295,27 +320,30 @@ const RaiseNeed = props => {
                             />
                         </div>
                         {/* Date */}
-                        <div className="itemForm">
-                            <label>Start Date & Time </label>
-                            <input type="datetime-local" name="startYMD" value={startYMD} onChange={handleStartDate} />
+                        <div className="itemWrapDate">
+                        <div className="itemDate">
+                            <label>Start Date </label>
+                            <input type="date" name="startYMD" value={startYMD} onChange={handleStartDate} />
                         </div>
-                        <div className="itemForm">
-                            <label>End Date & Time </label>
-                            <input type="datetime-local" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                        <div className="itemDate">
+                            <label>End Date </label>
+                            <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                        </div>
                         </div>
                         <div className="itemForm">
                             <label>Event Days</label>
-                            {<MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />}
-                            {/*<input type="text" placeholder='Sunday, Monday, Tuesday' name="days" value={days} onChange={changeHandlerOther} /> */}
-                                         
+                            <MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />
                         </div>
+
                         {/* Time */}
-                        {/* 
+                         
+                         {/*}
                         <div className="itemForm">
                             <label>Time</label>
                             <input type="time" name="timeSlot" value={timeSlot} onChange={changeHandlerOther} />
                         </div> 
-                        */}
+                            */}
+        
                     </div>
                 </div>
                 {/* lower side of form : prerequisites */}
