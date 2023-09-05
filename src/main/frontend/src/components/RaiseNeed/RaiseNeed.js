@@ -8,10 +8,10 @@ import { Redirect } from 'react-router'
 import UploadImageBG from '../../assets/bgImgUpload.png'
 import MultiSelect from './MultiSelect';
 import configData from './../../configData.json'
-import {auth} from '../../firebase.js'
 
 const RaiseNeed = props => {
-    console.log(props.uId)
+    //user is received from needs component
+    {/* console.log(props.uId) */}
 
     const [ selectedOptions, setSelectedOptions ] = useState([]);
     // fields to enter in the raise need form
@@ -51,7 +51,6 @@ const RaiseNeed = props => {
     //need name and purpose updated by change handler
     //need types dropdown updated by change handler
     const [dataNeedType,setDataNeedType] = useState([]);
-    const [dataNeedTypeB,setDataNeedTypeB] = useState([]);
 
     // entity drop down updated by change handler
     const [dataEntity,setDataEntity] = useState([]);
@@ -69,28 +68,42 @@ const RaiseNeed = props => {
     const [ startYMD, setStartYMD ] = useState('')
     const [ endYMD, setEndYMD ] = useState('')
     const handleEndDate = e => {
-        setDataOther({...dataOther,endDate:(e.target.value+':00.000Z')})
+        setDataOther({...dataOther,endDate:(e.target.value+'T08:57:00.000Z')})
         setEndYMD(e.target.value)
     }
     const handleStartDate = e => {
-        setDataOther({...dataOther,startDate:(e.target.value+':00.000Z')})
+        setDataOther({...dataOther,startDate:(e.target.value+'T08:57:00.000Z')})
         setStartYMD(e.target.value)
     }
 
     // event days by handleSelectedDaysChange
     const optionsDay = [
-        { id: 1, label: 'Sunday' },
-        { id: 2, label: 'Monday' },
-        { id: 3, label: 'Tuesday' },
-        { id: 4, label: 'Wednesday' },
-        { id: 5, label: 'Thursday' },
-        { id: 6, label: 'Friday' },
-        { id: 7, label: 'Saturday' }
-    ];
-    const [selectedDays, setSelectedDays] = useState([]);
-    const handleSelectedDaysChange = (updatedDays) => {
+        { id: 1, label: 'Sunday', startTime: '', endTime: '' },
+        { id: 2, label: 'Monday', startTime: '', endTime: '' },
+        { id: 3, label: 'Tuesday', startTime: '', endTime: '' },
+        { id: 4, label: 'Wednesday', startTime: '', endTime: '' },
+        { id: 5, label: 'Thursday', startTime: '', endTime: '' },
+        { id: 6, label: 'Friday', startTime: '', endTime: '' },
+        { id: 7, label: 'Saturday', startTime: '', endTime: '' },
+      ];
+    
+      // Handler to update selected event days
+      const [selectedDays, setSelectedDays] = useState([]);
+      const handleSelectedDaysChange = (selected) => {
+        setSelectedDays(selected);
+      };
+
+    const handleTimeChange = (dayId, field, value) => {
+        const updatedDays = selectedDays.map(day => {
+            if (day.id === dayId) {
+                return { ...day, [field]: value };
+            }
+            return day;
+        });
         setSelectedDays(updatedDays);
-    }
+    };
+
+
     useEffect(() => {
         const dayLabels = selectedDays.map(day => day.label)
         setDataOther(dataOther => ({
@@ -107,12 +120,6 @@ const RaiseNeed = props => {
         setDataOther({...dataOther,[e.target.name]:e.target.value})
     }
 
-    // handle skills required  
-    const options = [
-        { label: 'Fluency in English', value: 'Fluency in English'},
-        { label: 'Python Programming', value: 'Python Programming'},
-        { label: 'Public Speaking', value: 'Public Speaking'}
-    ]
     const handleChange = (selectedOptions) => {
         setSelectedOptions(selectedOptions)
         setDataOther(dataOther => ({
@@ -151,9 +158,6 @@ const RaiseNeed = props => {
     
     //for state update
     const [home,setHome] = useState(false);
-    if(home){
-        window.location.reload()
-    } 
 
     // API calls below
     useEffect(()=> {
@@ -177,18 +181,58 @@ const RaiseNeed = props => {
         }) 
       },[])
 
+    // get needrequirement whenever needtypeId is changed
+      const [needReqId,setNeedReqId] = useState(null)
+      const [skillsRequired,setSkillsRequired] = useState(null)
+      const [options,setOptions] = useState([])
+      useEffect(() => {
+        //get need requirement corresponding to needtypeId selected
+        console.log(needTypeId)
+
+        
+        //do following API call when needTypeId is not null
+        if(needTypeId){
+        axios.get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
+        .then(
+          //function(response){console.log(response.data.requirementId)},
+          response => setNeedReqId(response.data.requirementId)
+        )
+        .catch(function (error) {
+            console.log('error'); 
+        }) 
+        }
+
+        
+       if(needReqId) {
+       axios
+         .get(`${configData.NEED_REQUIREMENT_GET}/${needReqId}`)
+         .then((response) => {
+            setOptions(response.data.skillDetails.split(',').map(item=>({
+                label:item,
+                value:item,
+            })))
+         })
+         .catch((error) => {
+           console.error("Fetching Entity failed:", error);
+         });
+       }
+
+       }, [needTypeId, needReqId]);
+    console.log(options)
+
     // format as per API request body
     const [dataToPost,setDataToPost] = useState({
         needRequest:{},
         needRequirementRequest: {}
     })   
+    useEffect(() => {
+        setDataToPost({needRequest:data, needRequirementRequest:dataOther})
+    },[data,dataOther])
 
     // raise the need
     const submitHandler = e => {
         e.preventDefault();
-        setDataToPost({needRequest:data, needRequirementRequest:dataOther})
         console.log(dataToPost)
-
         axios.post(`${configData.NEED_POST}`, dataToPost)
         .then(
             ()=> {setHome(true)},
@@ -199,6 +243,10 @@ const RaiseNeed = props => {
         }) 
     }
 
+    if(home){
+        //return <Redirect to="/needs"/>
+        window.location.reload()
+    }
 
 
   return (
@@ -220,6 +268,7 @@ const RaiseNeed = props => {
                     {/* left half of upper side*/}
                     <div className="formLeft col-sm-6">
                         {/* Image */}
+                        {/*
                         <div className="itemImage">
                             <label>Image</label>
                             <div className="uploadNImage" onClick={handleImageClick}>
@@ -227,6 +276,7 @@ const RaiseNeed = props => {
                                 <input type="file" ref={inputRef} onChange={handleImageUpload} style={{display:"none"}} />
                             </div>
                         </div>
+                        */}
                         {/* Need Name */}
                         <div className="itemForm">
                             <label>Need Name</label>
@@ -244,11 +294,6 @@ const RaiseNeed = props => {
                             <option value="" defaultValue>Select Need type</option>
                                 {
                                     dataNeedType.map(
-                                        (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
-                                    )
-                                }
-                                {
-                                    dataNeedTypeB.map(
                                         (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
                                     )
                                 }
@@ -277,26 +322,30 @@ const RaiseNeed = props => {
                             />
                         </div>
                         {/* Date */}
-                        <div className="itemForm">
-                            <label>Start Date & Time </label>
-                            <input type="datetime-local" name="startYMD" value={startYMD} onChange={handleStartDate} />
+                        <div className="itemWrapDate">
+                        <div className="itemDate">
+                            <label>Start Date </label>
+                            <input type="date" name="startYMD" value={startYMD} onChange={handleStartDate} />
                         </div>
-                        <div className="itemForm">
-                            <label>End Date & Time </label>
-                            <input type="datetime-local" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                        <div className="itemDate">
+                            <label>End Date </label>
+                            <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                        </div>
                         </div>
                         <div className="itemForm">
                             <label>Event Days</label>
                             <MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />
-                            {/*<input type="text" placeholder='Sunday, Monday, Tuesday' name="days" value={days} onChange={changeHandlerOther} /> */}
                         </div>
+
                         {/* Time */}
-                        {/* 
+                         
+                         {/*}
                         <div className="itemForm">
                             <label>Time</label>
                             <input type="time" name="timeSlot" value={timeSlot} onChange={changeHandlerOther} />
                         </div> 
-                        */}
+                            */}
+        
                     </div>
                 </div>
                 {/* lower side of form : prerequisites */}

@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import './MultiSelect.css'; 
+import './MultiSelect.css'; // Make sure to import your CSS file
 
 const MultiSelect = ({ options, selectedOptions, onSelectedOptionsChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,19 +15,9 @@ const MultiSelect = ({ options, selectedOptions, onSelectedOptionsChange }) => {
 
     const updatedOptions = isSelected
       ? selectedOptions.filter((selectedOption) => selectedOption.id !== option.id)
-      : [...selectedOptions, { ...option, startTime: '', endTime: '' }];
+      : [...selectedOptions, option];
 
-    onSelectedOptionsChange(updatedOptions);
-  };
-
-  const handleTimeChange = (optionId, field, value) => {
-    const updatedOptions = selectedOptions.map((option) => {
-      if (option.id === optionId) {
-        return { ...option, [field]: value };
-      }
-      return option;
-    });
-
+    // Call the parent component's callback with the updated selected options
     onSelectedOptionsChange(updatedOptions);
   };
 
@@ -63,22 +53,6 @@ const MultiSelect = ({ options, selectedOptions, onSelectedOptionsChange }) => {
                 onChange={() => handleOptionClick(option)}
               />
               <div className="optionLabel">{option.label}</div>
-              {selectedOptions.some((selectedOption) => selectedOption.id === option.id) && (
-                <div className="time-input">
-                  {/* <label>Start Time:</label> */}
-                  <input
-                    type="time"
-                    value={option.startTime} 
-                    onChange={(e) => handleTimeChange(option.id, 'startTime', e.target.value)}
-                  />
-                  {/* <label>End Time:</label> */}
-                  <input
-                    type="time"
-                    value={option.endTime}
-                    onChange={(e) => handleTimeChange(option.id, 'endTime', e.target.value)}
-                  />
-                </div>
-              )}
             </div>
           ))}
         </div>
