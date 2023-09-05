@@ -10,7 +10,6 @@ import {auth} from '../../firebase.js'
 
 
 const Needs = props => {
-  console.log('sunbird repo updated on 21Aug 2023 13:01 PM')
   const [popUp, setPopup] = useState(false);
   const togglePopup = () => {
     setPopup(!popUp)
@@ -33,19 +32,14 @@ const Needs = props => {
     const fetchData = async () => {
       try {
         const email = currentUser.email.replace(/@/g, "%40");
-        console.log(email);
+        //console.log(email);
   
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
-        
-        if (response.data.length > 0) {
-          console.log(response.data)
-          //setUserId(response.data[0].osid);
-        } else {
-          // Handle case when no data is returned
-        }
+        //console.log(response.data.osid)
+        setUserId(response.data.osid);
+    
       } catch (error) {
         console.log(error);
-        // Handle error
       }
     };
   
@@ -54,47 +48,7 @@ const Needs = props => {
     }
   }, [currentUser.email, userId]);
 
-
-  //>> GET ACTIVE USER DATA *********************************************************************
-  const [userData, setUserData] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post('http://43.204.25.161:8081/api/v1/Users/search', {
-          "offset": 0,
-          "limit": 100,
-          "filters": {
-            "status": {
-              "eq": "Active"
-            }
-          }
-        });
-        const responseData = response.data;
-        setUserData(responseData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-  console.log(userData)
-  //filter userId my email
-  useEffect(() => {
-  const getUserByEmail = () => {
-    const foundItem = userData.find(item => item.contactDetails.email === currentUser.email)
-    if (foundItem) {
-      setUserId(foundItem.osid)
-    } else {
-      setUserId(null)
-    }
-  }
-  getUserByEmail();
-  }, [userData]);
-  // ************************************************************************************
-
-
-  //console.log(userId)
+  console.log(userId)
   useEffect(() => {
   
     const fetchData = async () => {
@@ -112,7 +66,9 @@ const Needs = props => {
       }
     };
   
-    fetchData();
+    if (userId) {
+      fetchData();
+    }
     console.log(data)
   }, [userId]);
 

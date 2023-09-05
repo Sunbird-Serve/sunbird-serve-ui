@@ -43,13 +43,8 @@ export const NeedsTable = props => {
         console.log(email);
   
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
-        
-        if (response.data.length > 0) {
-          console.log(response.data[0].osid)
-          //setUserId(response.data[0].osid);
-        } else {
-          // Handle case when no data is returned
-        }
+        console.log(response.data.osid)
+        setUserId(response.data.osid);
       } catch (error) {
         console.log(error);
         // Handle error
@@ -60,45 +55,6 @@ export const NeedsTable = props => {
       fetchData();
     }
   }, [currentUser.email, userId]);
-
-
-  //>> GET ACTIVE USER DATA *********************************************************************
-  const [userData, setUserData] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post('http://43.204.25.161:8081/api/v1/Users/search', {
-          "offset": 0,
-          "limit": 100,
-          "filters": {
-            "status": {
-              "eq": "Active"
-            }
-          }
-        });
-        const responseData = response.data;
-        setUserData(responseData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-  console.log(userData)
-  //filter userId my email
-  useEffect(() => {
-  const getUserByEmail = () => {
-    const foundItem = userData.find(item => item.contactDetails.email === currentUser.email)
-    if (foundItem) {
-      setUserId(foundItem.osid)
-    } else {
-      setUserId(null)
-    }
-  }
-  getUserByEmail();
-  }, [userData]);
-  // ************************************************************************************
 
 
   //using the userId, get different types of needs user raised
@@ -122,10 +78,10 @@ export const NeedsTable = props => {
       }
     };
   
-    fetchData();
+    if (userId) {
+      fetchData();
+    }
   }, [userId]);
-
-  
 
   function NeedTypeById({ needTypeId }) {
     const [needType, setNeedType] = useState(null);
@@ -203,7 +159,7 @@ export const NeedsTable = props => {
     },
     { Header: 'Status', accessor: 'status', width: 109, filter: 'text' }
   ]
-  const columns = useMemo(() => COLUMNS, [userId,userData, dataNeed, dataNeedType]);
+  const columns = useMemo(() => COLUMNS, [userId, dataNeed, dataNeedType]);
 
   const [filteredData, setFilteredData] = useState([])
   const [needTypeId, setNeedTypeId] = useState('')

@@ -26,16 +26,10 @@ function VProfile() {
         console.log(email);
   
         const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
-        
-        if (response.data.length > 0) {
-          //setUserData(response.data[0]);
-          console.log(response.data[0])
-        } else {
-          // Handle case when no data is returned
-        }
+        setUserData(response.data);
+        console.log(response.data)
       } catch (error) {
         console.log(error);
-        // Handle error
       }
     };
   
@@ -43,44 +37,6 @@ function VProfile() {
       fetchData();
     }
   }, [currentUser]);
-
-  //>> GET ACTIVE USER DATA *********************************************************************
-  const [userListData, setUserListData] = useState([]);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.post('http://43.204.25.161:8081/api/v1/Users/search', {
-          "offset": 0,
-          "limit": 100,
-          "filters": {
-            "status": {
-              "eq": "Active"
-            }
-          }
-        });
-        const responseData = response.data;
-        setUserListData(responseData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-
-    fetchData();
-  }, []);
-  console.log(userListData)
-  //filter userId my email
-  useEffect(() => {
-  const getUserByEmail = () => {
-    const foundItem = userListData.find(item => item.contactDetails.email === currentUser.email)
-    if (foundItem) {
-      setUserData(foundItem)
-    } else {
-      setUserData(null)
-    }
-  }
-  getUserByEmail();
-  }, [userListData, currentUser]);
-  // ************************************************************************************
 
   console.log(userData)
 
