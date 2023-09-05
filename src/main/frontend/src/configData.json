@@ -5,10 +5,8 @@
     "NEED_POST" : "https://serve-v1.evean.net/api/v1/need/",
     "NEED_BY_TYPE" : "https://serve-v1.evean.net/api/v1/need/need-type",
     "NOMINATED_USER_FETCH" : "https://serve-v1.evean.net/api/v1/user",
-    "NEED_FILTER": "http://43.204.25.161:8081/api/v1/Need/search",
     "USER_GET" : "https://serve-v1.evean.net/api/v1/user",
     "NEED_BY_USER" : "https://serve-v1.evean.net/api/v1/need/user",
-    "FETCH_ENTITY" : "http://43.204.25.161:8081/api/v1/Entity",
     "NOMINATION_CONFIRM" : "https://serve-v1.evean.net/api/v1/need/{needId}/nominate",
     "NEED_REQUIREMENT_GET": "https://serve-v1.evean.net/api/v1/need-requirement"
 }
