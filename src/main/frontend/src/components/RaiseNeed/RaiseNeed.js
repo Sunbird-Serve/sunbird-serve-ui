@@ -68,11 +68,11 @@ const RaiseNeed = props => {
     const [ startYMD, setStartYMD ] = useState('')
     const [ endYMD, setEndYMD ] = useState('')
     const handleEndDate = e => {
-        setDataOther({...dataOther,endDate:(e.target.value+':00.000Z')})
+        setDataOther({...dataOther,endDate:(e.target.value+'T08:57:00.000Z')})
         setEndYMD(e.target.value)
     }
     const handleStartDate = e => {
-        setDataOther({...dataOther,startDate:(e.target.value+':00.000Z')})
+        setDataOther({...dataOther,startDate:(e.target.value+'T08:57:00.000Z')})
         setStartYMD(e.target.value)
     }
 
@@ -158,9 +158,6 @@ const RaiseNeed = props => {
     
     //for state update
     const [home,setHome] = useState(false);
-    if(home){
-        window.location.reload()
-    } 
 
     // API calls below
     useEffect(()=> {
@@ -244,6 +241,11 @@ const RaiseNeed = props => {
         .catch(function (error) {
             console.log(error); 
         }) 
+    }
+
+    if(home){
+        //return <Redirect to="/needs"/>
+        window.location.reload()
     }
 
 
