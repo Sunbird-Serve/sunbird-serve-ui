@@ -1,7 +1,13 @@
 import React from 'react';
 import './VolunteerProfileInfoView.css';
+import { useSelector, useDispatch } from 'react-redux'
 
-function VolunteerProfileInfoView({ onEditClick, userData }) {
+function VolunteerProfileInfoView({ onEditClick, userDatas }) {
+  const userData = useSelector((state)=> state.user.data)
+  const handleEditClick = () => {
+
+  };
+
   return (
     <div className="main-content">
       <div className="pro">

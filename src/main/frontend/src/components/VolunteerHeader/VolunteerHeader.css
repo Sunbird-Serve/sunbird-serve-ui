@@ -15,6 +15,11 @@
 .vhLogo {
     margin: 0px 30px;
 }
+.logobutton {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+}
 .btnLoginVolunteer {
     background-color: #0080BC;
     border: none;

@@ -97,117 +97,27 @@
 }
 .nominationSuccess {
   position: relative;
-  /* bottom: 100px; */
   font-weight: 600;
   font-size: 18px;
   color: green;
+  margin-top: 60px;
 }
 .notification-needpopup {
-  color: rgba(213, 91, 68, 1);
-  background-color: rgba(254, 246, 241, 1);
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 15px;
-  margin-bottom: 0px;
+color: rgba(213, 91, 68, 1);
+background-color: rgba(254, 246, 241, 1);
+padding: 10px;
+border-radius: 5px;
+font-size: 15px;
+margin-bottom: 0px;
 }
-
 .alertLogin {
   position: absolute;
   background: white;
-  top: 35%;
+  top: 50%;
   left: 25%;
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
+  padding: 30px 50px;
 }
-.closeBtnLoginVol {
-  height: 50px;
-  display: flex;
-  justify-content: end;
-  align-items: center;
-  font-size: 25px;
-  padding: 0px 10px;
-}
-.closeBtnLoginVol button {
+.alertLogin button {
   border: none;
-  background-color: inherit;
-  cursor: pointer;
-}
-.alterVolLoginHead {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0px 40px 10px 40px;
-}
-.textHeadVolLogin {
-  font-size: 20px;
-  font-weight: 600;
-  color: #3C4044;
-  padding: 5px 0px;
-}
-.createVolAccount {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 10px;
-  border: solid 1px #D0D5DD;
-  margin: 0px 90px;
-  border-radius: 6px;
-}
-.createVolAccount button {
-  border: none;
-  background-color: inherit;
-}
-.createVolAccount i {
-  margin-right: 10px;
-}
-.signInVolunteer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 10px;
-  margin-bottom: 30px;
-  margin-top: 10px;
-}
-.signInVolunteer button {
-  border: none;
-  background-color: inherit;
-  color: #0080BC;
-  font-weight: 600;
-}
-.signInVolunteer span {
-  color: #99999F;
-}
-.volunteerSignup {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-}
-.btnLoginVol{
-  padding: 10px;
-  border: none;
-  margin-left: 160px;
-}
-
-.notifyRegister {
-  position: absolute;
-  background-color: white;
-  top: 35%;
-  left: 25%;
-  display: flex;
-  flex-direction: column;
-  border-radius: 8px;
-  padding: 30px 25px;
-}
-.notifyRegister span {
-  font-weight: 600;
-}
-.notifyRegister button {
-  color: white;
-  background-color: #276EB9;
-  border: none;
-  width: 100%;
-  padding: 5px;
+  margin-left: 10px;
 }

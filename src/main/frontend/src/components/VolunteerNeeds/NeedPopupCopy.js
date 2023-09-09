@@ -4,23 +4,35 @@ import CloseIcon from "@mui/icons-material/Close";
 import axios from 'axios';
 import configData from './../../configData.json'
 import ShareIcon from "@mui/icons-material/Share";
-import { auth, gprovider, fprovider } from '../../firebase'
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
-import { FcGoogle } from "react-icons/fc"
-import FacebookRoundedIcon from '@mui/icons-material/FacebookRounded';
-import SignUp from '../SignUp/SignUp';
-import VolunteerSignup from '../VolunteerSignup/VolunteerSignup';
-import { NavLink, Redirect, useNavigate, useHistory } from 'react-router-dom';
-import VolunteerLogin from '../VolunteerLogin/VolunteerLogin';
-import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
 
 function NeedPopup({ open, onClose, need }) {
   const userId = useSelector((state)=> state.user.data.osid)
 
+  const [popUp, setPopup] = useState(false);
+  const [nominationStatus, setNominationStatus] = useState(false)
+  const togglePopup = () => {
+    setPopup(!popUp);
+  };
+
+  const [needRequirement,setNeedRequirement] = useState(null)
+   useEffect(() => {
+    if(need) {
+    axios
+      .get(`${configData.NEED_REQUIREMENT_GET}/${need.requirementId}`)
+      .then((response) => {
+         console.log(response.data)
+         setNeedRequirement(response.data)
+      })
+      .catch((error) => {
+        console.error("Fetching Entity failed:", error);
+      });
+    }
+    }, [need, popUp]);
+  console.log(userId)
+
   const [alertLogin, setAlertLogin] = useState(false)
-  const [notifyRegister, setNotifyRegister] = useState(false)
-  //NOMINATION to a need on Nominate button click
+  //NOMINATION to a need
   const nominateNeed = () => {
     const needId = need.id; //  the need.id represents the needId
     console.log(needId)
@@ -34,80 +46,40 @@ function NeedPopup({ open, onClose, need }) {
         console.error("Nomination failed:", error);
       });
     } else {
-      if(auth.currentUser){
-        setNotifyRegister(true)
-      } else {
-        setAlertLogin(true)
-      }
+      setAlertLogin(true)
     }
 
   };
  
   const [needType, setNeedType] = useState(null);
-  function NeedTypeById( needTypeId ) {
-    axios
-      .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
-      .then((response) => {
-        setNeedType(response.data.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Need Type failed:", error);
-      });
-   return needType || '';
-  } 
+    function NeedTypeById( needTypeId ) {
+        axios
+          .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
+          .then((response) => {
+            setNeedType(response.data.name);
+          })
+          .catch((error) => {
+            console.error("Fetching Need Type failed:", error);
+          });
+       return needType || '';
+    }
+
 
   const [entityName, setEntityName] = useState(null);
-  function EntityById( entityId ) {
-    axios
-      .get(`${configData.ENTITY_GET}/${entityId}`)
-      .then((response) => {
-        setEntityName(response.data.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Entity failed:", error);
-      });
-  return entityName || '';
-  }
-  const [needRequirement,setNeedRequirement] = useState(null)
-  useEffect(() => {
-    if(need) {
-    axios
-      .get(`${configData.NEED_REQUIREMENT_GET}/${need.requirementId}`)
-      .then((response) => {
-         console.log(response.data)
-         setNeedRequirement(response.data)
-      })
-      .catch((error) => {
-        console.error("Fetching Entity failed:", error);
-      });
+    function EntityById( entityId ) {
+           axios
+             .get(`${configData.ENTITY_GET}/${entityId}`)
+             .then((response) => {
+               setEntityName(response.data.name);
+             })
+             .catch((error) => {
+               console.error("Fetching Entity failed:", error);
+             });
+         return entityName || '';
     }
-  }, [need]);
-  console.log(needRequirement)
-  console.log(userId)
-
-  const [nominationStatus, setNominationStatus] = useState(false)
-
-  const [vlogin, setVlogin ] = useState(false)
-  const handleVolunteerLogin = () => {
-    setVlogin(!vlogin)
-    setAlertLogin(false)
-  };
-
-  const [vsignup, setVsignup] = useState(false);
-  const handleVolunteerSignup = () => {
-    setVsignup(!vsignup)
-    setAlertLogin(false)
-  }
-
-  const history = useHistory();
-  const handleRegisterClick = (e) => {
-    e.preventDefault();
-    history.push("/vregistration")
-  }
 
   return (
     <div className={`need-popup ${open ? "open" : ""}`}>
-      {/*Nomination Popup*/}
       <div className="wrapNeedPopup">
       <div className="close-button" onClick={onClose}>
         <CloseIcon />
@@ -158,38 +130,11 @@ function NeedPopup({ open, onClose, need }) {
       </div>
       </div>
       
-      {alertLogin && 
-      <div className="alertLogin">
-        <div className='closeBtnLoginVol'>
-          <button onClick={()=>setAlertLogin(false)}>x</button>
-        </div> 
-        <div className="alterVolLoginHead">
-          <div className="textHeadVolLogin">Hey There!</div>
-          <p>Create an account to nominate, save your favourite events, and much more</p>
-        </div>
-        <div className="createVolAccount">
-          <button type="login" onClick={handleVolunteerSignup}> 
-            <i><EmailIcon/></i>Create account with Email ID 
-          </button>
-        </div> 
-        <div className="signInVolunteer">
-          <span>Already have an account?</span>
-          <button onClick={handleVolunteerLogin}> Login </button>
-        </div>
+      {alertLogin && <div className="alertLogin"> 
+        <span>Please login using registed volunteer email-id or register to Nominate</span>
+        <button onClick={()=>setAlertLogin(false)}>x</button>
       </div>}
-
-      {notifyRegister && <div className="notifyRegister">
-            <p>You are logged in with email id <span>{auth.currentUser.email}</span>.</p> 
-            <p>Please complete registration to nominate a need.</p>
-            <button onClick={handleRegisterClick}>Click to Register</button>
-            </div>} 
-     
-      { vsignup && <VolunteerSignup onClose={handleVolunteerSignup}/>}
-      { vlogin && <VolunteerLogin onClose={handleVolunteerLogin}/> }
-
     </div>
-
-
   );
 }
 export default NeedPopup;
