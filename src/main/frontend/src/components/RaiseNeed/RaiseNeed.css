@@ -127,7 +127,7 @@
     padding: 5px;
 }
 .itemDate {
-    width: 48%;
+    width: 35%;
 }
 .itemDate label {
     width: 100%;
@@ -142,6 +142,13 @@
     border-radius: 3px;
     font-size: 14px;
     padding: 3px 10px;
+    border: solid 1px #DBDBDB;
+}
+.itemDate select {
+    width: 98%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 4px 10px;
     border: solid 1px #DBDBDB;
 }
 .itemDescription {

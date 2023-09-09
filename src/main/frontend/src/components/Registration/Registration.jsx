@@ -511,7 +511,7 @@ const Registration = (props) => {
   return (
     <div className="reg-main">
       <div className="title-container">
-        <span className="title">Teaching science to 8th class</span>
+        <span className="title">User Registration</span>
         <div className="info-card">
           <span>Online</span>
           <FiberManualRecordIcon

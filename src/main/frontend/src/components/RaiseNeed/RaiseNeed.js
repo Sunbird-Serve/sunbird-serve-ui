@@ -4,14 +4,21 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css'
 import axios from 'axios'
 import './RaiseNeed.css' 
-import { Redirect } from 'react-router'
+import { useHistory } from 'react-router'
 import UploadImageBG from '../../assets/bgImgUpload.png'
 import MultiSelect from './MultiSelect';
 import configData from './../../configData.json'
 
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchNeedsByUid } from "../../state/needByUidSlice";
+
 const RaiseNeed = props => {
-    //user is received from needs component
-    {/* console.log(props.uId) */}
+    const dispatch = useDispatch();
+    const history = useHistory()
+    const uid = useSelector((state)=> state.user.data.osid)
+    const needTypes = useSelector((state)=> state.needtype.data.content)
+    const entities = useSelector((state)=> state.entity.data.content)
+
 
     const [ selectedOptions, setSelectedOptions ] = useState([]);
     // fields to enter in the raise need form
@@ -21,7 +28,7 @@ const RaiseNeed = props => {
         needPurpose:'',
         description: '',      //registry.Need (Need Description)
         status: 'New',     //registry.Need
-        userId: props.uId,      //registry.Need ? Not from RN form
+        userId: uid,      //registry.Need ? Not from RN form
         entityId: '',       //registry.Need (Entity Name)
         //requirementId: '',        //serve.NeedRequirement'
     });
@@ -49,11 +56,13 @@ const RaiseNeed = props => {
     }
 
     //need name and purpose updated by change handler
-    //need types dropdown updated by change handler
-    const [dataNeedType,setDataNeedType] = useState([]);
-
-    // entity drop down updated by change handler
-    const [dataEntity,setDataEntity] = useState([]);
+    //default Handlers to update input fields //
+    const changeHandler = e => {
+        setData({...data,[e.target.name]:e.target.value})
+    }
+    const changeHandlerOther = e => {
+        setDataOther({...dataOther,[e.target.name]:e.target.value})
+    }
 
     // need description - configure rich text options //
     var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], [{'list':'ordered'},{'list':'bullet'}]];
@@ -86,24 +95,12 @@ const RaiseNeed = props => {
         { id: 6, label: 'Friday', startTime: '', endTime: '' },
         { id: 7, label: 'Saturday', startTime: '', endTime: '' },
       ];
-    
-      // Handler to update selected event days
-      const [selectedDays, setSelectedDays] = useState([]);
-      const handleSelectedDaysChange = (selected) => {
-        setSelectedDays(selected);
-      };
-
-    const handleTimeChange = (dayId, field, value) => {
-        const updatedDays = selectedDays.map(day => {
-            if (day.id === dayId) {
-                return { ...day, [field]: value };
-            }
-            return day;
-        });
-        setSelectedDays(updatedDays);
+    // Handler to update selected event days
+    const [selectedDays, setSelectedDays] = useState([]);
+    const handleSelectedDaysChange = (selected) => {
+      setSelectedDays(selected);
     };
-
-
+    //convert days array into string
     useEffect(() => {
         const dayLabels = selectedDays.map(day => day.label)
         setDataOther(dataOther => ({
@@ -111,15 +108,7 @@ const RaiseNeed = props => {
             frequency:dayLabels.join(', '),
         }))
     },[selectedDays])
-
-    // Handler to update input fields other than specified //
-    const changeHandler = e => {
-        setData({...data,[e.target.name]:e.target.value})
-    }
-    const changeHandlerOther = e => {
-        setDataOther({...dataOther,[e.target.name]:e.target.value})
-    }
-
+    //handle skills details change
     const handleChange = (selectedOptions) => {
         setSelectedOptions(selectedOptions)
         setDataOther(dataOther => ({
@@ -155,41 +144,13 @@ const RaiseNeed = props => {
             }
         })
     }
-    
-    //for state update
-    const [home,setHome] = useState(false);
 
-    // API calls below
-    useEffect(()=> {
-        //Need type New
-        axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=Approved`)
-        .then(
-          //function(response){console.log(response.data.content)},
-          response => setDataNeedType(Object.values(response.data.content))
-        )
-        .catch(function (error) {
-            console.log('error'); 
-        }) 
- 
-        axios.get(`${configData.ENTITY_GET}/?page=0&size=10&status=Active`)
-        .then(
-           //function(response){console.log(response.data.content)},
-          response => setDataEntity(Object.values(response.data.content))
-        )
-        .catch(function (error) {
-            console.log('error'); 
-        }) 
-      },[])
 
     // get needrequirement whenever needtypeId is changed
       const [needReqId,setNeedReqId] = useState(null)
       const [skillsRequired,setSkillsRequired] = useState(null)
       const [options,setOptions] = useState([])
       useEffect(() => {
-        //get need requirement corresponding to needtypeId selected
-        console.log(needTypeId)
-
-        
         //do following API call when needTypeId is not null
         if(needTypeId){
         axios.get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
@@ -202,7 +163,6 @@ const RaiseNeed = props => {
         }) 
         }
 
-        
        if(needReqId) {
        axios
          .get(`${configData.NEED_REQUIREMENT_GET}/${needReqId}`)
@@ -229,23 +189,29 @@ const RaiseNeed = props => {
         setDataToPost({needRequest:data, needRequirementRequest:dataOther})
     },[data,dataOther])
 
+    //for state update
+    const [home,setHome] = useState(false);
     // raise the need
     const submitHandler = e => {
         e.preventDefault();
         console.log(dataToPost)
+
         axios.post(`${configData.NEED_POST}`, dataToPost)
         .then(
-            ()=> {setHome(true)},
-            function(response){console.log(response)}
+            console.log('posted sucessfully'),
+            dispatch(fetchNeedsByUid(uid)),
+            gotoNeeds()
         )
         .catch(function (error) {
             console.log(error); 
         }) 
     }
-
     if(home){
         //return <Redirect to="/needs"/>
         window.location.reload()
+    }
+    const gotoNeeds = (selectedOptions) => {
+        history.push('/needs')
     }
 
 
@@ -293,7 +259,7 @@ const RaiseNeed = props => {
                             <select className="selectMenu" name="needTypeId" value={needTypeId} onChange={changeHandler}>
                             <option value="" defaultValue>Select Need type</option>
                                 {
-                                    dataNeedType.map(
+                                    needTypes.map(
                                         (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
                                     )
                                 }
@@ -305,7 +271,7 @@ const RaiseNeed = props => {
                             <select className="selectMenu" name="entityId" value={entityId} onChange={changeHandler}>
                             <option value="" defaultValue>Select Entity</option>
                                 {
-                                    dataEntity.map(
+                                    entities.map(
                                         (entype) => <option key={entype.osid} value={entype.id}>{entype.name}</option>
                                     )
                                 }
@@ -330,6 +296,12 @@ const RaiseNeed = props => {
                         <div className="itemDate">
                             <label>End Date </label>
                             <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                        </div>
+                        <div className="itemDate">
+                            <label>Recurrence </label>
+                            <select className="selectFrequency" name="frequency" value={entityId} onChange={changeHandler}>
+                                <option value="" defaultValue>Off</option>
+                            </select>
                         </div>
                         </div>
                         <div className="itemForm">
@@ -374,7 +346,7 @@ const RaiseNeed = props => {
         </div>
         {/* Close button */}
         <div className="btnClose">
-            <button onClick={props.handleClose}>X</button>
+            <button onClick={gotoNeeds}>X</button>
         </div> 
     </div>
   )

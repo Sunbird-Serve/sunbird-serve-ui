@@ -114,6 +114,52 @@ export const VolunteerNeeds = props => {
     props.updateNeedList(false)
   }
 
+  const [reqDetails, setReqDetails] = useState(null);
+  function NeedReqId(requirementId) {
+    axios
+         .get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`)
+         .then((response) => {
+            setReqDetails(response.data.id)
+         })
+         .catch((error) => {
+           console.error("Fetching Entity failed:", error);
+    });
+    return reqDetails || ''
+  }
+
+
+  const [volunteerReqData, setVolunteerReqData] = useState({});
+  const [startDateData, setStartDateData] = useState({});
+
+  useEffect(() => {
+    const fetchDataById = async (requirementId) => {
+      try {
+        const response = await axios.get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`);
+        return response.data;
+      } catch (error) {
+        console.error(`Failed to fetch data`);
+        throw error;
+      }
+    };
+    const updateReqData = async () => {
+      const reqVolunteer = {};
+      const startDates = {};
+      for (const item of data) {
+        try {
+          const requirement = await fetchDataById(item.requirementId);
+          reqVolunteer[item.requirementId] = requirement.volunteersRequired;
+          startDates[item.requirementId] = requirement.startDate.slice(0,10);
+        } catch (error) {
+          console.error(`Error fetching requirement`);
+        }
+      }
+      setVolunteerReqData(reqVolunteer);
+      setStartDateData(startDates);
+
+    };
+    updateReqData();
+  }, [data]); 
+
   return (
     <div className="wrapvolunteerNeeds">
       <div className="volunteerNeeds">
@@ -163,12 +209,12 @@ export const VolunteerNeeds = props => {
                   </div>
                   <div className="required-container gray-text">
                     <PeopleIcon style={{ fontSize: 15 }} />
-                    <span>Required</span>
+                    <span>{volunteerReqData[need.requirementId]}</span>
                   </div>
                 </div>
                 <div className="calendar-container gray-text">
                   <i><CalendarTodayOutlinedIcon style={{ fontSize: 15 }} /></i>
-                  <span> 10, Jul 2023 | 10AM </span>
+                  <span> {startDateData[need.requirementId]} </span>
                 </div>
               </div>
             ))}
