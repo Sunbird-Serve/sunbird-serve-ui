@@ -31,10 +31,12 @@
     "react-router-dom": "^5.3.3",
     "react-scripts": "^5.0.1",
     "react-select": "^5.7.4",
+    "react-select-country-list": "^2.2.3",
     "react-table": "^7.8.0",
     "redux": "^4.2.1",
     "redux-devtools-extension": "^2.13.9",
     "redux-saga": "^1.2.3",
+    "redux-thunk": "^2.4.2",
     "web-vitals": "^2.1.4"
   },
   "homepage": ".",
