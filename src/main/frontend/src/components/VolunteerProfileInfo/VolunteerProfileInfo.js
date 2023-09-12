@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './VolunteerProfileInfo.css';
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
@@ -6,9 +6,16 @@ import { useHistory } from 'react-router'
 function VolunteerProfileInfoView() {
   //get userData from redux store
   const userData = useSelector((state)=> state.user.data)
+  const [user, setUser] = useState(false)
+  useEffect(()=>{
+    if(userData){
+      setUser(true)
+    }
+  },[userData])
+  console.log(userData)
   const history = useHistory()
   const handleEditClick = () => {
-    history.push('/vpedit')
+    history.push('/vprofile/vpedit')
     console.log('clicked edit')
   };
 
@@ -23,7 +30,7 @@ function VolunteerProfileInfoView() {
         </div>
       </div>
 
-      {userData && (
+      { user && (
         <div>
           <div className="profile-info-box">
             <h3 className="box-header">Basic Info</h3>
@@ -79,7 +86,7 @@ function VolunteerProfileInfoView() {
             </div>
           </div>
         </div>
-      )}
+      ) }
     </div>
   );
 }

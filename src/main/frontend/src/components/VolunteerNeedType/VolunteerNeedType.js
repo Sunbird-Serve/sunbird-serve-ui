@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import './VolunteerNeedType.css'
-import {auth} from '../../firebase.js'
 import axios from 'axios'
 import SearchIcon from '@mui/icons-material/Search';
 import GridOnIcon from '@mui/icons-material/GridOn';

@@ -19,7 +19,7 @@ function VolunteerProfileEdit() {
   const dispatch = useDispatch()
 
   const handleDiscordClick = () => {
-    history.push("/vpinfo");
+    history.push("/vprofile/vpinfo");
   };
 
   const [identityDetailsData, setIdentityDetailsData] = useState({

@@ -22,14 +22,13 @@ function VHeader({ activeComponent, onToggle }) {
     const loginVolunteer = () => {
       setVlogin(!vlogin)
     };
-    {/*
-    useEffect(()=> {
-      setVlogin(false)
-    },[currentUser]);
-    */}
+    
+    const handleProfileClick = () => {
+      history.push("/vprofile")
+    }
 
     const handleLogoClick = () => {
-      //history.push("/vneedtypes");
+      history.push("/vneedtypes");
     };
 
   return (
@@ -48,7 +47,7 @@ function VHeader({ activeComponent, onToggle }) {
               <NotificationsIcon color="action" style={{height:'24px'}} />
             </Badge>
           </div>
-          <button className="btnProf" onClick={onToggle}>
+          <button className="btnProf" onClick={handleProfileClick}>
             <div className="profIcon"> 
               <Avatar style={{height:'40px',width:'40px',fontSize:'16px',backgroundColor:avatarColor}}>
               </Avatar>
