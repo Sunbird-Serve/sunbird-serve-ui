@@ -518,7 +518,7 @@ const Registration = (props) => {
       ]
     }
 
-  const [ regStatus, setRegStatus ] = useState('failure')
+  const [ regStatus, setRegStatus ] = useState('')
 
   const onsubmit = () => {
     // if (validateFields()) {
