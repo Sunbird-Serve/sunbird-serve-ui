@@ -14,7 +14,7 @@ function RegFormFailure() {
             Oops! Network Error
         </div>
       </div>
-      <div className='errorMsg'>
+      {/* <div className='errorMsg'>
         <div className='msgBody'>
           <p className='msg'>
             No Internet Connection. Please try again
@@ -26,7 +26,7 @@ function RegFormFailure() {
         <button className='homeButton'>
             Back to home
         </button>
-      </div>
+      </div> */}
     </div>
   )
 }

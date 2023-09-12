@@ -244,17 +244,17 @@ const RaiseNeed = props => {
                         </div>
                         */}
                         {/* Need Name */}
-                        <div className="itemForm">
+                        <div className="itemFormNeed">
                             <label>Need Name</label>
                             <input type="text" placeholder='Ex: Avila Beach Cleaning' name="name" value={name} onChange={changeHandler} />
                         </div>
                         {/* Need Purpose */}
-                        <div className="itemForm">
+                        <div className="itemFormNeed">
                             <label>Need Purpose</label>
                             <input type="text" placeholder='Provide the impact or purpose of this Need' name="needPurpose" value={needPurpose} onChange={changeHandler} />
                         </div>
                         {/* Need Type */}
-                        <div className="itemForm">
+                        <div className="itemFormNeed">
                             <label>Need Type</label>
                             <select className="selectMenu" name="needTypeId" value={needTypeId} onChange={changeHandler}>
                             <option value="" defaultValue>Select Need type</option>
@@ -266,7 +266,7 @@ const RaiseNeed = props => {
                             </select>
                         </div> 
                         {/* Entity Name */}
-                        <div className="itemForm">
+                        <div className="itemFormNeed">
                             <label>Entity Name</label>
                             <select className="selectMenu" name="entityId" value={entityId} onChange={changeHandler}>
                             <option value="" defaultValue>Select Entity</option>
@@ -281,12 +281,14 @@ const RaiseNeed = props => {
                     {/* right half of upper side */}
                     <div className="formRight col-sm-6">
                         {/* Need Description */}
-                        <div className="itemDescription">
-                            <label>Need Description</label>
+                        
+
+                            <label className="itemDescriptionNeedLabel">Need Description</label>
+                            <div className="itemDescriptionNeed"> 
                             <ReactQuill className="quillEdit" modules={module} theme="snow" value={description} 
                                 placeholder='Write a small brief about the Need' onChange={handleQuillEdit}    
                             />
-                        </div>
+                            </div>
                         {/* Date */}
                         <div className="itemWrapDate">
                         <div className="itemDate">
@@ -304,9 +306,11 @@ const RaiseNeed = props => {
                             </select>
                         </div>
                         </div>
-                        <div className="itemForm">
+                        <div className="itemFormNeed">
                             <label>Event Days</label>
-                            <MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />
+                            <div className="itemFormNeedDays">
+                                <MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />
+                            </div>
                         </div>
 
                         {/* Time */}
@@ -325,7 +329,7 @@ const RaiseNeed = props => {
                 <div className="formBottom row">
                     <div className="formBLeft col-sm-6">
                         {/* Skills Required */}
-                        <div className="itemForm">
+                        <div className="itemFormNeed">
                             <label>Skills Required</label>
                             {/*<input type="text" placeholder='Add Skills' name="skillDetail" value={skillDetail} onChange={changeHandler} />*/}
                             <div className="tokenInput">
@@ -335,7 +339,7 @@ const RaiseNeed = props => {
                     </div>
                     <div className="formBRight col-sm-6">
                         {/* No. of Volunteers Required */}
-                        <div className="itemForm">
+                        <div className="itemFormNeed">
                             <label>No. of Volunteers required</label>
                             <input className="inpVolunteerNum" type="text" placeholder='Mention Number of Volunteers' name="volunteersRequired" 
                                 value={volunteersRequired} onChange={changeHandlerOther} />

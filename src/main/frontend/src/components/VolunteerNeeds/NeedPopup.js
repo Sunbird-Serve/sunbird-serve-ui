@@ -102,6 +102,7 @@ function NeedPopup({ open, onClose, need }) {
   const history = useHistory();
   const handleRegisterClick = (e) => {
     e.preventDefault();
+    console.log(history)
     history.push("/vregistration")
   }
 

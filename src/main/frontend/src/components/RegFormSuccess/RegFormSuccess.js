@@ -17,16 +17,15 @@ const RegFormSuccess = () => {
       <div className='successMsg'>
         <div className='msgBody'>
           <p className='msg'>
-            Hurray! You've successfully registered for the event 
-            <b>“Kaveri River Cleaning”</b>. You’ll be notified once when the organiser accepted your nomination.
+            Hurray! You've successfully registered. 
           </p>
         </div>
-        <button className='moreButton'>
+        {/* <button className='moreButton'>
             View more details
         </button>
         <button className='homeButton'>
             Back to home
-        </button>
+        </button> */}
       </div>
     </div>
   )

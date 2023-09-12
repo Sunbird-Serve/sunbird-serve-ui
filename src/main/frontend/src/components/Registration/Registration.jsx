@@ -10,6 +10,10 @@ import {
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
+import configData from './../../configData.json'
+import axios from 'axios'
+import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
+import RegFormFailure from "../RegFormFailure/RegFormFailure";
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
@@ -433,7 +437,7 @@ const Registration = (props) => {
   };
 
   const handleChange = (event, count = 0) => {
-    console.log(event, "check this");
+    // console.log(event, "check this");
     const { name, value } = event.target;
     if (name === "skillName" || name === "skillLevel") {
       const updatedSkills = [...formData.skills];
@@ -472,7 +476,7 @@ const Registration = (props) => {
 
   const validateFields = () => {
     for (const key in formData) {
-      if (formData[key] === "" || formData[key] === []) {
+      if (formData[key] === "" || formData[key] == []) {
         return false;
       }
     }
@@ -486,12 +490,53 @@ const Registration = (props) => {
     return true;
   };
 
-  const onsubmit = () => {
-    if (validateFields()) {
-      window.alert("Form submitted");
-      return;
+  // useEffect(() => {
+  //   console.log(formData, "inside useEffect");
+  // }, [formData]);
+
+  const dataToPost = {
+      "identityDetails": {
+        "fullname": formData.firstName,
+        "name": formData.lastName,
+        "gender": formData.gender,
+        "dob": formData.dob,
+        "Nationality": formData.nationality
+      },
+      "contactDetails": {
+        "email": formData.email,
+        "mobile": formData.mobile,
+        "address": {
+          "city": formData.city,
+          "state": formData.state,
+          "country": 'India'
+        }
+      },
+      "agencyId": formData.affiliation,
+      "status": "Active",
+      "role": [
+        "Volunteer"
+      ]
     }
-    window.alert("Please enter all the details");
+
+  const [ regStatus, setRegStatus ] = useState('failure')
+
+  const onsubmit = () => {
+    // if (validateFields()) {
+    //   window.alert("Form submitted");
+    //   return;
+    // }
+    // window.alert("Please enter all the details");
+
+    console.log(dataToPost)
+    axios.post(`${configData.USER_GET}`, dataToPost)
+      .then(
+        console.log('user created sucessfully'),
+        setRegStatus('success')
+      )
+      .catch(function (error) {
+        console.log(error); 
+        setRegStatus('failure')
+    }) 
   };
 
   const onNavClick = (key) => {
@@ -504,12 +549,10 @@ const Registration = (props) => {
     setNav(key);
   };
 
-  useEffect(() => {
-    console.log(formData, "inside useEffect");
-  }, [formData]);
-
   return (
-    <div className="reg-main">
+    <div>
+    { (!regStatus) &&
+    (<div className="reg-main">
       <div className="title-container">
         <span className="title">User Registration</span>
         <div className="info-card">
@@ -1098,6 +1141,13 @@ const Registration = (props) => {
           </div>
         </div>
       </div>
+    </div>)}
+
+    {(regStatus == 'success') && <RegFormSuccess />}
+    {(regStatus == 'failure') && <RegFormFailure />}
+
+
+
     </div>
   );
 };

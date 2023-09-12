@@ -6,7 +6,7 @@ import SBLogo from '../../assets/sunbirdlogo.png'
 import { FcGoogle } from "react-icons/fc"
 import FacebookRoundedIcon from '@mui/icons-material/FacebookRounded';
 import { useSelector, useDispatch } from 'react-redux'
-import { useHistory } from "react-router-dom";
+import { Redirect, useHistory } from "react-router-dom";
 
 const VolunteerLogin = ({loginState, onClose}) => {
     const [error,setError]= useState('');
@@ -48,9 +48,9 @@ const VolunteerLogin = ({loginState, onClose}) => {
     const history = useHistory();
     const handleRegisterClick = (e) => {
         e.preventDefault();
+        onClose()
         history.push("/vregistration")
     }
-
 
     return(
         // adds user login form
