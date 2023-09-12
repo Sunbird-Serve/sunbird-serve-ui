@@ -4,7 +4,7 @@ import axios from 'axios'
 import configData from './../configData.json'
 
 const initialState = {
-    data: [],
+    data: {},
     status: 'idle',
     error: null
 }
@@ -37,6 +37,7 @@ const userSlice = createSlice({
         .addCase(fetchUserByEmail.rejected, (state,action)=>{
             state.status = 'failed'
             state.error = action.error.message
+            state.data = {}
         })
     }
 })
