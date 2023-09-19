@@ -12,8 +12,9 @@ const initialState = {
 export const fetchNeedsByUid = createAsyncThunk('needs/fetchNeedsByUid', 
     async (userId)=> {
     try {
-        const response = await axios.get(`${configData.NEED_GET}/user/${userId}?page=0&size=100&status=New`)
-        return response.data
+        const response1 = await axios.get(`${configData.NEED_GET}/user/${userId}?page=0&size=100&status=New`)
+        const response2 = await axios.get(`${configData.NEED_GET}/user/${userId}?page=0&size=100&status=Nominated`)
+        return {...response1.data, ...response2.data}
     } catch(error){
         throw error
     }
