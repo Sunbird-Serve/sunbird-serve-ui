@@ -197,11 +197,11 @@ const RaiseNeed = props => {
         console.log(dataToPost)
 
         axios.post(`${configData.NEED_POST}`, dataToPost)
-        .then(
-            console.log('posted sucessfully'),
-            dispatch(fetchNeedsByUid(uid)),
-            gotoNeeds()
-        )
+        .then( function(response) {
+            console.log('posted sucessfully',response);
+            dispatch(fetchNeedsByUid(uid));
+            gotoNeeds();
+        })
         .catch(function (error) {
             console.log(error); 
         }) 

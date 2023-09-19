@@ -529,13 +529,13 @@ const Registration = (props) => {
 
     console.log(dataToPost)
     axios.post(`${configData.USER_GET}`, dataToPost)
-      .then(
-        console.log('user created sucessfully'),
-        setRegStatus('success')
-      )
+      .then(function(response){
+        console.log('user created sucessfully',response);
+        setRegStatus('success');
+      })
       .catch(function (error) {
         console.log(error); 
-        setRegStatus('failure')
+        setRegStatus('failure');
     }) 
   };
 
@@ -1143,8 +1143,8 @@ const Registration = (props) => {
       </div>
     </div>)}
 
-    {(regStatus == 'success') && <RegFormSuccess />}
-    {(regStatus == 'failure') && <RegFormFailure />}
+    {(regStatus === 'success') && <RegFormSuccess />}
+    {(regStatus === 'failure') && <RegFormFailure />}
 
 
 

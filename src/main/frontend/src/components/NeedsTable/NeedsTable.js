@@ -25,6 +25,18 @@ export const NeedsTable = props => {
 
   //get needList from store
   const needsList = useSelector((state) => state.needbyuid.data.content);
+  const entityList = useSelector((state) => state.entity.data.content);
+  const needtypeList = useSelector((state) => state.needtype.data.content);
+  const needsData = needsList.map(need => {
+    const entity = entityList.find(entity => entity.id === need.entityId);
+    const needtype = needtypeList.find(needtype => needtype.id === need.needTypeId);
+    return {
+      ...need,
+      entityInfo: entity,
+      needTypeInfo: needtype,
+    }
+  });
+
   const uid = useSelector((state)=> state.user.data.osid)
   useEffect(() => {
     dispatch(fetchNeedsByUid(uid))
@@ -39,9 +51,9 @@ export const NeedsTable = props => {
     setNeedTypeId(e.target.value)
   }
   useEffect(()=>{
-    let filtered = needsList
+    let filtered = needsData
     if(needTypeId){
-      const filtered = needsList.filter(item => item.needTypeId === needTypeId)
+      const filtered = needsData.filter(item => item.needTypeId === needTypeId)
       setFilteredData(filtered)
       //} else if (selectedDate) {
       //  const filtered = dataNeed.filter(item => new Date(item.startDate) >= new Date(selectedDate))
@@ -104,6 +116,53 @@ export const NeedsTable = props => {
      }
   }
 
+  function VolunteerByNeedId({ needId }) {
+    const [volunteerList, setVolunteerList] = useState(null);
+    const [volunteerNames, setVolunteerNames] = useState([]);
+     useEffect(() => {
+       axios
+         .get(`${configData.NEED_GET}/${needId}/nominate`)
+         .then((response) => {
+           setVolunteerList(response.data);
+         })
+         .catch((error) => {
+           console.error("Fetching Entity failed:", error);
+         });
+     }, [needId]);
+     
+     useEffect(() => {
+      if (volunteerList) {
+        const volunteerIds = volunteerList.map((item) => item['nominatedUserId']);
+        // Function to fetch volunteer details by volunteerId
+        const fetchVolunteerDetails = async (volunteerId) => {
+          try {
+            const response = await axios.get(`${configData.USER_GET}/${volunteerId}`); 
+            return response.data.identityDetails.name; // Assuming your API returns a name field
+          } catch (error) {
+            console.error(`Error fetching volunteer details for ID ${volunteerId}:`, error);
+            return null;
+          }
+        };
+  
+        // Use Promise.all to make API calls for all volunteerIds concurrently
+        const fetchDataForAllVolunteers = async () => {
+          const promises = volunteerIds.map((volunteerId) => fetchVolunteerDetails(volunteerId));
+          const volunteerNames = await Promise.all(promises);
+          setVolunteerNames(volunteerNames);
+        };
+  
+        fetchDataForAllVolunteers();
+      }
+    }, [volunteerList]);
+    if (volunteerNames.length > 0) {
+      return <span>{volunteerNames.join(", ")}</span>;
+    } else {
+      console.log(volunteerNames)
+      return <span>No volunteers</span>;
+    }
+
+  }
+
   
   const COLUMNS = [
     { Header: 'Need Name', accessor: 'name', width: 250 },
@@ -112,14 +171,17 @@ export const NeedsTable = props => {
       return <NeedTypeById needTypeId={value} />;
       }
     },
-    { Header: 'Location',  width: 144 },
+    { Header: 'Location', accessor: 'entityInfo.district'
+    },
     { Header: 'Entity', accessor: 'entityId', 
       Cell: ({ value }) => {
       return <EntityById entityId={value} />;
       }
-  
     }, 
-    { Header: 'Volunteer', width: 112 },
+    { Header: 'Volunteer', accessor: 'id',
+      Cell: ({ value }) => {
+      return <VolunteerByNeedId needId={value} />; }
+    },
     { Header: 'Timeline', accessor: 'requirementId', 
       Cell: ({ value }) => {
       return <TimelineByReqId requirementId={value} />;
