@@ -9,9 +9,9 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
 import EventIcon from "@mui/icons-material/Event";
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import * as needPlansActions from "../../redux/features/needplans/actions";
+//import * as needPlansActions from "../../redux/features/needplans/actions";
 import { bindActionCreators } from "redux";
-import * as selector from "../../redux/features/needplans/selectors";
+//import * as selector from "../../redux/features/needplans/selectors";
 
 function NeedPlans() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -19,18 +19,19 @@ function NeedPlans() {
   const [selSlotInfo, setSelSlotInfo] = React.useState(null);
 
   // using selectors to get data from redux, here state is the redux global state 
-  const { needs } = useSelector(
-    (state) => ({
-      needs: selector.getData(state), 
-    }),
-    shallowEqual, // makes sure that the component rerenders only when the above redux state data changes (avoids unnecessary rerenders)
-  );
+  // const { needs } = useSelector(
+  //   (state) => ({
+  //     needs: selector.getData(state), 
+  //   }),
+  //   shallowEqual, // makes sure that the component rerenders only when the above redux state data changes (avoids unnecessary rerenders)
+  // );
 
   // this function helps us to dispatch actions which will trigger reducers/sagas
   const dispatch = useDispatch();
 
   // binds the actions creators with dispatch. Action creators return action object
-  const bindedActions = bindActionCreators({ ...needPlansActions }, dispatch);
+  // const bindedActions = bindActionCreators({ ...needPlansActions }, dispatch);
+  const bindedActions = {}
   const mockEvents = [
     {
       title: "Elderly Support",
@@ -297,7 +298,7 @@ function NeedPlans() {
           </div>
           <br style={{ clear: "both" }} />
           <div style={{ height: "95vh" }}>
-            <p>look here {JSON.stringify(needs)}</p>
+            {/* <p>look here {JSON.stringify(needs)}</p> */}
             <Calendar
               localizer={localizer}
               events={mockEvents}

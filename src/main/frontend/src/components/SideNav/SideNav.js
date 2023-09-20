@@ -41,6 +41,11 @@ function SideNav() {
           <span>Needs Schedule</span>
         </NavLink>
 
+        <NavLink to="/volunteers" exact className="sideNavItem row">
+              <i><VolunteerActivismOutlinedIcon /></i> 
+              <span>Volunteers</span>
+        </NavLink>
+
         {/* switch to volunteers page */}
         {/* 
         <NavLink to="/volunteer" exact className="sideNavItem row">
