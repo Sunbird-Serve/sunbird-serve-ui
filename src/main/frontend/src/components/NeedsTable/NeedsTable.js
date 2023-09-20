@@ -11,7 +11,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FaSort } from "react-icons/fa"
 import configData from './../../configData.json'
 import { useHistory } from 'react-router'
-
+import Avatar from '@mui/material/Avatar';
+import randomColor from 'randomcolor'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchNeedsByUid } from "../../state/needByUidSlice";
 
@@ -154,10 +155,41 @@ export const NeedsTable = props => {
         fetchDataForAllVolunteers();
       }
     }, [volunteerList]);
+
+    const truncateAndDots = (names, maxNamesToShow) => {
+        const firstLetters = names.map((element) => 
+        element === null ? null : (
+          <Avatar className="avatar" style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
+            {element.charAt(0)}
+          </Avatar>
+        )
+        
+        );
+        
+      if (names.length <= maxNamesToShow) {
+        return firstLetters
+          ;
+      } else {
+        return firstLetters.slice(0,maxNamesToShow);
+      }
+    
+    };
+
     if (volunteerNames.length > 0) {
-      return <span>{volunteerNames.join(", ")}</span>;
+      const maxNamesToShow = 3; // Adjust the number of names to show
+      const truncatedVolunteerNames = truncateAndDots(volunteerNames, maxNamesToShow);
+      if(volunteerNames.length > maxNamesToShow){
+        return <span>{truncatedVolunteerNames}
+          <Avatar className="avatar" style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
+          {'+'}{volunteerNames.length-maxNamesToShow}
+          </Avatar>
+        
+        </span>;
+      } else {
+        return <span>{truncatedVolunteerNames}</span>;
+      }
     } else {
-      console.log(volunteerNames)
+      console.log(volunteerNames);
       return <span>No volunteers</span>;
     }
 
@@ -180,7 +212,9 @@ export const NeedsTable = props => {
     }, 
     { Header: 'Volunteer', accessor: 'id',
       Cell: ({ value }) => {
-      return <VolunteerByNeedId needId={value} />; }
+      return <div className="vAvatars-container"><
+        VolunteerByNeedId needId={value} />
+        </div>; }
     },
     { Header: 'Timeline', accessor: 'requirementId', 
       Cell: ({ value }) => {
