@@ -63,7 +63,7 @@ const Nominations = ({ data, openPopup }) => {
           console.log(response.data)
           const userData = response.data;
           const location = userData?.contactDetails?.address?.state || '';
-          const fullname = userData?.identityDetails?.name || '';
+          const fullname = userData?.identityDetails?.fullname || '';
           const userDOB = userData?.identityDetails?.dob || '';
           const mobNum = userData?.contactDetails?.mobile || '';
 
