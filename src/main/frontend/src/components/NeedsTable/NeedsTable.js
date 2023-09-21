@@ -25,7 +25,8 @@ export const NeedsTable = props => {
   }
 
   //get needList from store
-  const needsList = useSelector((state) => state.needbyuid.data.content);
+  const needsList = useSelector((state) => state.needbyuid.data);
+  console.log(needsList)
   const entityList = useSelector((state) => state.entity.data.content);
   const needtypeList = useSelector((state) => state.needtype.data.content);
   const needsData = needsList.map(need => {
@@ -189,7 +190,6 @@ export const NeedsTable = props => {
         return <span>{truncatedVolunteerNames}</span>;
       }
     } else {
-      console.log(volunteerNames);
       return <span>No volunteers</span>;
     }
 

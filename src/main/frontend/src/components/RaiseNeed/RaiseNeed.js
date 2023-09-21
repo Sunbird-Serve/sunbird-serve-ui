@@ -27,7 +27,7 @@ const RaiseNeed = props => {
         name: '',    //registry.Need (Need Name) 
         needPurpose:'',
         description: '',      //registry.Need (Need Description)
-        status: 'New',     //registry.Need
+        status: 'Approved',     //registry.Need
         userId: uid,      //registry.Need ? Not from RN form
         entityId: '',       //registry.Need (Entity Name)
         //requirementId: '',        //serve.NeedRequirement'

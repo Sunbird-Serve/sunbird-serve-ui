@@ -13,7 +13,7 @@ const Needs = props => {
   //get userId from store
   const userId = useSelector((state)=> state.user.data.osid)
   //get needCount from store
-  const needsCount = useSelector((state)=> state.needbyuid.data.content.length)
+  const needsCount = useSelector((state)=> state.needbyuid.data.length)
   //go to raise need on click
   const gotoRaiseNeed = e => {
     history.push('/raiseneed')
