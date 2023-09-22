@@ -11,8 +11,20 @@ import VolunteerProfileDeliverable from '../VolunteerProfileDeliverables/Volunte
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
+import { useSelector, useDispatch } from 'react-redux'
+import configData from '../../configData.json'
 
 function VPNominations() {
+  
+  const needsList = useSelector((state) => state.need.data);
+ 
+  const needById = {};
+  needsList.forEach(item => {
+    if (item && item.need) {
+      const { id, name } = item.need;
+      needById[id] = name;
+    }
+  })
   
   const [activeTab, setActiveTab] = useState('tabN');
   const [selectedDateOption, setSelectedDateOption] = useState('');
@@ -20,6 +32,8 @@ function VPNominations() {
   const [selectedNeedOption, setSelectedNeedOption] = useState('');
   const [isNeedSelectOpen, setIsNeedSelectOpen] = useState(false);
   
+  const userId = useSelector((state)=> state.user.data.osid)
+  console.log(userId)
 
   const handleDateOptionChange = (option) => {
     setSelectedDateOption(option);
@@ -52,22 +66,24 @@ function VPNominations() {
   };
 
 
-
   const [nominations,setNominations] = useState([])
-
   useEffect(()=> {
-
-  axios.get('http://localhost:3031/Nomination').then(
+    axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=10`).then(
     response => setNominations(Object.values(response.data))
    ).catch(function (error) {
      console.log(error)
   })
-},[])
+  },[userId])
+  console.log(nominations)
 
-const [fullDetails, setFullDetails] = useState(false)
-const handleDetail = () => {
-  setFullDetails(!fullDetails)
-}
+  const [fullDetails, setFullDetails] = useState(false)
+
+  const [needId, setNeedId ] = useState(null)
+  const handleDetail = (needid) => {
+    setFullDetails(!fullDetails)
+    setNeedId(needid)
+  }
+  console.log(needId)
 
   return (
     <div>
@@ -168,19 +184,20 @@ const handleDetail = () => {
         <div key={nomination.id} className="nomination-item">
           <img src={NeedsImage} alt="Nominated Needs" height="120px" />
           <div className="needItemVolunteer">
-            <p className="needNameVP">{nomination.needName}</p>
-            <button className="viewFull" onClick={() => handleDetail()}>View full details</button>
+            <p className="needNameVP">{needById[nomination.needId]}</p> 
+            <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View full details</button>
           </div>
         </div>
       ))}
       </div>
+
     </> }
     {fullDetails && <div>
       <button className="backBtnVDeliverable" onClick={() => handleDetail()}>
         <ArrowBackIcon />
         Back
       </button>
-      <VolunteerProfileDeliverable />
+      <VolunteerProfileDeliverable needId={needId} />
       </div>
       }
     </div>

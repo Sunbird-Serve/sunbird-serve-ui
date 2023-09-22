@@ -1,27 +1,55 @@
 import React from 'react'
 import './VolunteerProfileDeliverable.css'
+import { useSelector, useDispatch } from 'react-redux'
 
-function VolunteerProfileDeliverable() {
+
+
+const VolunteerProfileDeliverable = props => {
+  const needsList = useSelector((state) => state.need.data);
+  const needById = {};
+  const entityById = {};
+  const requirementById = {};
+  needsList.forEach(item => {
+    if (item && item.need) {
+      const { id, name, needTypeId, description } = item.need;
+      needById[id] = { name, needTypeId, description } ;
+    }
+    if (item && item.entity ) {
+        entityById[item.need.id] = item.entity.name ;
+    }
+    if (item && item.needRequirement ) {
+        const { startDate, endDate } = item.needRequirement;
+        requirementById[item.need.id] = { startDate, endDate} ;
+    }
+  })
+  const needtypeList = useSelector((state) => state.needtype.data.content);
+  const needTypeById = {};
+  needtypeList.forEach(item => {
+    if (item) {
+      needTypeById[item.id] = item.name ;
+    }
+  })
+
   return (
     <div>
         <div className="detailsNeedVoluntProfile">
-            <div className="nameNVP">Teaching Science to 8th Class</div> 
-            <div className="typeNVP">Teaching</div>
-            <div className="aboutNVP">About the full description of the Need </div>
+            <div className="nameNVP">{needById[props.needId].name}</div> 
+            <div className="typeNVP">{needTypeById[needById[props.needId].needTypeId]}</div>
+            <div className="aboutNVP">{needById[props.needId].description.slice(3,-4)} </div>
             <div className="rowNVP">
                 <div className="itemNVP">
-                    <span>Organizer</span> : Lions Club
+                    <span>Organizer</span> : 
                 </div>
                 <div className="itemNVP">
-                    <span>Location</span> : Chennai
+                    <span>Location</span> : {entityById[props.needId]}
                 </div>
             </div>
             <div className="rowNVP">
                 <div className="itemNVP">
-                    <span>Start Date</span> : 05-01-2023
+                    <span>Start Date</span> : {requirementById[props.needId].startDate.slice(0,10)}
                 </div>
                 <div className="itemNVP">
-                    <span>End Date</span> : 20-01-2023
+                    <span>End Date</span> : {requirementById[props.needId].endDate.slice(0,10)}
                 </div>
             </div>
             <div className="rowNVP">
