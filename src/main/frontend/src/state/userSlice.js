@@ -13,7 +13,7 @@ export const fetchUserByEmail = createAsyncThunk(
     'user/fetchUserByEmail',
     async(email) => {
         try {
-            const response = await axios.get(`${configData.USER_GET}/?email=${email}`)
+            const response = await axios.get(`${configData.USER_GET}/email?email=${email}`)
             return response.data
         } catch(error) {
             throw error
