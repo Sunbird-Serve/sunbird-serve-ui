@@ -1,6 +1,7 @@
 {
     "USER_GET" : "https://serve-v1.evean.net/api/v1/user",
     "NEED_GET": "https://serve-v1.evean.net/api/v1/need",
+    "NEED_SEARCH": "https://serve-v1.evean.net/api/v1/need",
     "NEEDTYPE_GET": "https://serve-v1.evean.net/api/v1/needtype",
     "ENTITY_GET": "https://serve-v1.evean.net/api/v1/entity",
     "NEED_POST" : "https://serve-v1.evean.net/api/v1/need/",
@@ -9,5 +10,5 @@
     "NEED_BY_USER" : "https://serve-v1.evean.net/api/v1/need/user",
     "NOMINATION_CONFIRM" : "https://serve-v1.evean.net/api/v1/need/{needId}/nominate",
     "NEED_REQUIREMENT_GET": "https://serve-v1.evean.net/api/v1/need-requirement",
-    "NEED_SEARCH": "https://serve-v1.evean.net/api/v1/need"
+    "NOMINATIONS_GET":"https://serve-v1.evean.net/api/v1/need/nomination"
 }
