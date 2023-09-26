@@ -504,14 +504,14 @@ const Registration = (props) => {
       },
       "contactDetails": {
         "email": formData.email,
-        "mobile": formData.mobile,
+        "mobile": formData.mobileNumber,
         "address": {
           "city": formData.city,
           "state": formData.state,
           "country": 'India'
         }
       },
-      "agencyId": formData.affiliation,
+      "agencyId": 123,
       "status": "Active",
       "role": [
         "Volunteer"
