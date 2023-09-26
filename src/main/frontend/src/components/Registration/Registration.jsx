@@ -528,7 +528,7 @@ const Registration = (props) => {
     // window.alert("Please enter all the details");
 
     console.log(dataToPost)
-    axios.post(`${configData.USER_GET}`, dataToPost)
+    axios.post(`${configData.USER_GET}/`, dataToPost)
       .then(function(response){
         console.log('user created sucessfully',response);
         setRegStatus('success');
