@@ -13,17 +13,17 @@ import { FaSort } from "react-icons/fa"
 import VolunteerDetails from './VolunteerDetails'
 
 
+
 function Volunteers() {
   //const userDetails = useSelector((state)=> state.user.data)
-  const [ users, setUsers] = useState([
-    {status:'active',name:'abc',mobile:'9874563210',city:'Hyderabad',language:'English',interestAreas:'Singing, Flute',nominationStatus:'On Hold'},
-    {status:'active',name:'xyz',mobile:'8769877650',city:'Warangal',language:'Telugu',interestAreas:'Teaching, Coaching',nominationStatus:'Recommended'},
-    {status:'active',name:'pqr',mobile:'9969877650',city:'Chennai',language:'Tamil',interestAreas:'Management, Administration',nominationStatus:'Not Recommended'}
-  ])
+
+  const userList = useSelector((state) => state.userlist.data);
+  const volunteerList = userList.filter(item => item.role.includes('Volunteer'))
+
   const COLUMNS = [
-    { Header: 'Name', accessor:'name' },
-    { Header: 'Phone', accessor:'mobile' },
-    { Header: 'City', accessor:'city' },
+    { Header: 'Name', accessor:'identityDetails.fullname' },
+    { Header: 'Phone', accessor:'contactDetails.mobile'},
+    { Header: 'City', accessor:'contactDetails.address.city' },
     { Header: 'Language', accessor:'language' },
     { Header: 'Interested Areas', accessor:'interestAreas' },
     { Header: 'Status', accessor:'status' },
@@ -31,7 +31,8 @@ function Volunteers() {
   ]
 
    const columns = useMemo(() => COLUMNS, []);
-   const data = useMemo(() => users,[users])
+   const data = useMemo(() => volunteerList,[userList])
+   console.log(data)
 
   const {
     getTableProps,

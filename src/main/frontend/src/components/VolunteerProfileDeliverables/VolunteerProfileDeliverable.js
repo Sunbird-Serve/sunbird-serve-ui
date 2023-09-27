@@ -38,10 +38,10 @@ const VolunteerProfileDeliverable = props => {
             <div className="aboutNVP">{needById[props.needId].description.slice(3,-4)} </div>
             <div className="rowNVP">
                 <div className="itemNVP">
-                    <span>Organizer</span> : 
+                    <span>Organizer</span> : nCoordinator name
                 </div>
                 <div className="itemNVP">
-                    <span>Location</span> : {entityById[props.needId]}
+                    <span>Entity</span> : {entityById[props.needId]}
                 </div>
             </div>
             <div className="rowNVP">

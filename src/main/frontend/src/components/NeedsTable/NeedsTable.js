@@ -1,125 +1,70 @@
 import React, {useState, useEffect, useMemo} from 'react'
-import axios from 'axios'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTable, usePagination, useGlobalFilter, useFilters, useSortBy } from 'react-table'
+import { useHistory } from 'react-router'
+import randomColor from 'randomcolor'
+import axios from 'axios'
+
+import configData from './../../configData.json'
 import ModifyNeed from '../ModifyNeed/ModifyNeed'
 import './NeedsTable.css'
+
 import SearchIcon from '@mui/icons-material/Search';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FaSort } from "react-icons/fa"
-import configData from './../../configData.json'
-import { useHistory } from 'react-router'
 import Avatar from '@mui/material/Avatar';
-import randomColor from 'randomcolor'
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchNeedsByUid } from "../../state/needByUidSlice";
-import { fetchNeeds } from '../../state/needSlice'
 
 
 export const NeedsTable = props => {
   const dispatch = useDispatch()
 
-  const [popUp, setPopup] = useState(false);
-  const togglePopup = () => {
-    setPopup(!popUp)
-  }
-
-  //get needList from store
-  const needsList = useSelector((state) => state.needbyuid.data);
-  console.log(needsList)
-  
-  const entityList = useSelector((state) => state.entity.data.content);
-  const needtypeList = useSelector((state) => state.needtype.data.content);
-  const needsData = needsList.map(need => {
-    const entity = entityList.find(entity => entity.id === need.entityId);
-    const needtype = needtypeList.find(needtype => needtype.id === need.needTypeId);
-    return {
-      ...need,
-      entityInfo: entity,
-      needTypeInfo: needtype,
-    }
-  });
-
+  //get userId
   const uid = useSelector((state)=> state.user.data.osid)
-  useEffect(() => {
-    dispatch(fetchNeedsByUid(uid))
-  },[])
-
-  // Need type filter
+  //get list of needs raised by user
+  const needList = useSelector((state) => state.need.data);
+  const needsByUser = needList.filter(item => item && item.need && item.need.userId === uid)
+  console.log(needsByUser)
+  //needtype filter
   const needTypes = useSelector((state)=> state.needtype.data.content)
-  const [filteredData, setFilteredData] = useState([])
-  const [selectedDate, setSelectedDate] = useState('');
   const [needTypeId, setNeedTypeId] = useState('')
   const handleNeedTypeFilter = e => {
     setNeedTypeId(e.target.value)
   }
+  const [filteredData, setFilteredData] = useState([])
   useEffect(()=>{
-    let filtered = needsData
+    let filtered = needsByUser
     if(needTypeId){
-      const filtered = needsData.filter(item => item.needTypeId === needTypeId)
+      const filtered = needsByUser.filter(item => item.need.needTypeId === needTypeId)
       setFilteredData(filtered)
-      //} else if (selectedDate) {
-      //  const filtered = dataNeed.filter(item => new Date(item.startDate) >= new Date(selectedDate))
-      //  setFilteredData(filtered)
     } else {
       setFilteredData(filtered)
     }
-  },[needsList, needTypeId, selectedDate])
+  },[needTypeId, needList])
+  const data = useMemo(() => filteredData,[filteredData, needList])
 
-  function NeedTypeById({ needTypeId }) {
-    const [needType, setNeedType] = useState(null);
-    useEffect(() => {
-    axios
-      .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
-      .then((response) => {
-        setNeedType(response.data.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Need Type failed:", error);
-      });
-    }, [needTypeId]);
-   return <span>{needType || ''}</span>;
-  }
-
-  function EntityById({ entityId }) {
-    const [entityName, setEntityName] = useState(null);
-     useEffect(() => {
-       axios
-         .get(`${configData.ENTITY_GET}/${entityId}`)
-         .then((response) => {
-           setEntityName(response.data.name);
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-         });
-     }, [entityId]);
-     return <span>{entityName || ''}</span>;
-  }
-  
-  function TimelineByReqId({ requirementId }) {
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
-     useEffect(() => {
-       axios
-         .get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`)
-         .then((response) => {
-            setStartDate(response.data.startDate)
-            setEndDate(response.data.endDate)
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-         });
-         
-     }, [requirementId]);
-
-     if(startDate && endDate) {
-        return <span>{(startDate.substr(2,8).split('-').reverse().join('/')+'-'+endDate.substr(2,8).split('-').reverse().join('/'))}</span>
-     } else {
-      return <span>''</span>
-     }
-  }
+  const COLUMNS = [
+    { Header: 'Need Name', accessor: 'need.name', width: 250 },
+    { Header: 'Need Type', accessor: 'needType.name'  },
+    { Header: 'Location', accessor: 'entity.district'},
+    { Header: 'Entity', accessor: 'entity.name' }, 
+    { Header: 'Volunteer', accessor: 'need.id',
+      Cell: ({ value }) => {
+      return <div className="vAvatars-container"><
+        VolunteerByNeedId needId={value} />
+        </div>; }
+    },
+    { Header: 'Timeline', accessor: 
+      (row) => `${row.needRequirement.startDate.substr(2,8).split('-').reverse().join('/')} - ${row.needRequirement.endDate.substr(2,8).split('-').reverse().join('/')}`,
+      Cell: ({ value }) => (
+        <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+      ),
+    },
+    { Header: 'Status', accessor: 'need.status'}
+  ]
+  const columns = useMemo(() => COLUMNS, []);
 
   function VolunteerByNeedId({ needId }) {
     const [volunteerList, setVolunteerList] = useState(null);
@@ -198,37 +143,6 @@ export const NeedsTable = props => {
 
   }
 
-  
-  const COLUMNS = [
-    { Header: 'Need Name', accessor: 'name', width: 250 },
-    { Header: 'Need Type', accessor: 'needTypeId',
-      Cell: ({ value }) => {
-      return <NeedTypeById needTypeId={value} />;
-      }
-    },
-    { Header: 'Location', accessor: 'entityInfo.district'
-    },
-    { Header: 'Entity', accessor: 'entityId', 
-      Cell: ({ value }) => {
-      return <EntityById entityId={value} />;
-      }
-    }, 
-    { Header: 'Volunteer', accessor: 'id',
-      Cell: ({ value }) => {
-      return <div className="vAvatars-container"><
-        VolunteerByNeedId needId={value} />
-        </div>; }
-    },
-    { Header: 'Timeline', accessor: 'requirementId', 
-      Cell: ({ value }) => {
-      return <TimelineByReqId requirementId={value} />;
-      }
-    },
-    { Header: 'Status', accessor: 'status', width: 109, filter: 'text' }
-  ]
-  const columns = useMemo(() => COLUMNS, [needsList, needTypes]);
-  const data = useMemo(() => filteredData,[filteredData])
-
   const {
     getTableProps,
     getTableBodyProps,
@@ -252,23 +166,24 @@ export const NeedsTable = props => {
     },
   useFilters, useGlobalFilter, useSortBy, usePagination)
 
-  //Filters on the needs
-  const { globalFilter, pageIndex, pageSize } = state;  //works for need search
+  //Filters on the needs table
+  const { globalFilter, pageIndex, pageSize } = state;  
   const [filterValue, setFilterValue] = useState('')
-  const [status, setStatus ] = useState('all')  //filter status for tab
+  //filter tabs
+  const [status, setStatus ] = useState('all')  
   const [activeTab, setActiveTab] = useState('all');
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   }
   useEffect(() => {
     if (activeTab === 'approved') {
-      setFilter('status', 'Approved')
+      setFilter('need.status', 'Approved')
     }
     else if (activeTab == 'requested') {
-      setFilter('status', 'New')
+      setFilter('need.status', 'New')
     }
     else {
-      setFilter('status','')
+      setFilter('need.status','')
     }
   }, [activeTab])
 
@@ -280,29 +195,28 @@ export const NeedsTable = props => {
     setShowPopup(!showPopup);
   };
 
-  const handleDateChange = e => {
-    setSelectedDate(e.target.value)
-  }
+  //raise need page
   const history = useHistory()
-
   const gotoRaiseNeed = e => {
     history.push('/raiseneed')
   }
-  
-
 
   return (
     <div className="wrapTable">
       <div className="needBar">
+        {/* Tabs */}
         <div className="needMenu">
           <div className={`tabNeed ${activeTab === 'all' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('all')}>All</div>
           <div className={`tabNeed ${activeTab === 'approved' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('approved')}>Approved</div>
           <div className={`tabNeed ${activeTab === 'requested' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('requested')}>Requested</div>
         </div>
+        {/* Raise Need Button */}
         <button onClick={gotoRaiseNeed}>Raise Need</button>
       </div>
-      {/* Header on top of table containing search, data, type, need and volunteer count */}
+
+      {/* Header on top of table: stats and filters */}
       <div className="topBarNeedTable">
+        {/*Counts*/}
         <div className="leftTopBarNeedTable">
           <div className="needCount">
             <i><StickyNote2Icon /></i>
@@ -315,6 +229,7 @@ export const NeedsTable = props => {
             <label>Volunteers</label>
           </div>
         </div>
+        {/*Filters*/}
         <div className="rightTopBarNeedTable">
           {/* Following are filters on need table */}
           <div className="boxSearchNeeds">
@@ -336,6 +251,7 @@ export const NeedsTable = props => {
           </select>
         </div>
       </div>
+
       {/* Following is TABLE that loads list of needs and its details */}
       <table className="tableNeedList">
         <thead>
@@ -397,6 +313,7 @@ export const NeedsTable = props => {
         <button onClick={()=>nextPage()} disabled={!canNextPage}><ArrowForwardIosIcon style={{height:"18px"}}/></button>
         </div>
       </div>
+
       {/* Open nominations and need info page as popup */}
       { showPopup && <ModifyNeed handleClose={handleRowClick} data={rowData} /> }
     </div>

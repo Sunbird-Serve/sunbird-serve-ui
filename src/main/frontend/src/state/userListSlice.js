@@ -1,44 +1,44 @@
 //USER details for a emailId
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
-import configData from './../configData.json'
+import configData from '../configData.json'
 
 const initialState = {
-    data: {},
+    data: [],
     status: 'idle',
     error: null
 }
 
-export const fetchUserByEmail = createAsyncThunk(
-    'user/fetchUserByEmail',
-    async(email) => {
+export const fetchUserList = createAsyncThunk(
+    'user/fetchUserList',
+    async() => {
         try {
-            const response = await axios.get(`${configData.USER_GET}/email?email=${email}`)
+            const response = await axios.get(`${configData.USER_GET}/list`)
             return response.data
+            console.log(response.data)
         } catch(error) {
             throw error
         }
     }
 )
 
-const userSlice = createSlice({
-    name: 'user',
+const userListSlice = createSlice({
+    name: 'userlist',
     initialState,
     reducers:{},
     extraReducers: (builder) => {
         builder
-        .addCase(fetchUserByEmail.pending, (state)=>{
+        .addCase(fetchUserList.pending, (state)=>{
             state.status = 'loading'
         })
-        .addCase(fetchUserByEmail.fulfilled,(state,action)=>{
+        .addCase(fetchUserList.fulfilled,(state,action)=>{
             state.status = 'succeeded'
             state.data = action.payload
         })
-        .addCase(fetchUserByEmail.rejected, (state,action)=>{
+        .addCase(fetchUserList.rejected, (state,action)=>{
             state.status = 'failed'
             state.error = action.error.message
-            state.data = {}
         })
     }
 })
-export default userSlice.reducer
+export default userListSlice.reducer

@@ -66,12 +66,6 @@ const NeedPlans = () => {
     };
     const currentDate = end;
 
-  if (currentDate <= event.end) {
-    console.log(currentDate)
-    eventStyle.backgroundColor = 'green'; // Customize background color for dates within the range
-    eventStyle.color = 'white'; // Customize text color for dates within the range
-  } 
-
   return {
     style: eventStyle,
   };
@@ -161,7 +155,7 @@ const NeedPlans = () => {
                     {/* <span className="timeDayEvent">{event.timeSlot}</span> */}
                   </div>
                 <div className="dayEventDate"> {month[event.start.slice(5,7)]} {event.start.slice(8,10)} - {month[event.end.slice(5,7)]} {event.end.slice(8,10)}</div>
-                  <div className="dayEventDetails">View Full Details</div>
+                  {/* <div className="dayEventDetails">View Full Details</div> */}
                 </li>
               ))}
 
