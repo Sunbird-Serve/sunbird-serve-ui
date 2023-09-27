@@ -5,15 +5,25 @@ import ZeroDisplay from '../../assets/noRecords.png';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
+import { fetchNeeds } from "../../state/needSlice";
+
 
 const Needs = props => {
   const dispatch = useDispatch()
   const history = useHistory()
+  useEffect(()=>{
+    dispatch(fetchNeeds());
+  },[])
 
   //get userId from store
   const userId = useSelector((state)=> state.user.data.osid)
+  console.log(userId)
   //get needCount from store
-  const needsCount = useSelector((state)=> state.needbyuid.data.length)
+  // const needsCount = useSelector((state)=> state.needbyuid.data.length)
+  // console.log(needsCount)
+
+  const needList = useSelector((state) => state.need.data);
+  const needsCount = needList.filter(item => item && item.need && item.need.userId === userId).length
   //go to raise need on click
   const gotoRaiseNeed = e => {
     history.push('/raiseneed')

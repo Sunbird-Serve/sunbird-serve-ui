@@ -15,9 +15,22 @@ import { useSelector, useDispatch } from 'react-redux'
 import configData from '../../configData.json'
 
 function VPNominations() {
-  
+  //get userId
+  const userId = useSelector((state)=> state.user.data.osid)
+  console.log(userId)
+  //get nominations by nominated userId
+  const [nominations,setNominations] = useState([])
+  useEffect(()=> {
+    axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=10`).then(
+    response => setNominations(Object.values(response.data))
+   ).catch(function (error) {
+     console.log(error)
+  })
+  },[userId])
+  console.log(nominations)
+
+  //create needId-name map
   const needsList = useSelector((state) => state.need.data);
- 
   const needById = {};
   needsList.forEach(item => {
     if (item && item.need) {
@@ -25,25 +38,45 @@ function VPNominations() {
       needById[id] = name;
     }
   })
+
+  //hadle view nomination details
+  const [fullDetails, setFullDetails] = useState(false)
+  const [needId, setNeedId ] = useState(null)
+  const handleDetail = (needid) => {
+    setFullDetails(!fullDetails)
+    setNeedId(needid)
+  }
+  console.log(needId)
+
+  ///
   
   const [activeTab, setActiveTab] = useState('tabN');
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  }
+  const [nomsFiltered, setNomsFiltered] = useState(null)
+  useEffect(() => {
+    if (activeTab === 'tabN') {
+      setNomsFiltered(nominations.filter(item => item.nominationStatus === "Nominated"))
+    }
+    else if (activeTab === 'tabA') {
+      setNomsFiltered(nominations.filter(item => item.nominationStatus === "Approved"))
+    }
+    else {
+      setNomsFiltered(nominations)
+    }
+  }, [nominations,activeTab])
+  console.log(nomsFiltered)
+
+
+
   const [selectedDateOption, setSelectedDateOption] = useState('');
   const [isDateSelectOpen, setIsDateSelectOpen] = useState(false);
   const [selectedNeedOption, setSelectedNeedOption] = useState('');
   const [isNeedSelectOpen, setIsNeedSelectOpen] = useState(false);
-  
-  const userId = useSelector((state)=> state.user.data.osid)
-  console.log(userId)
-
   const handleDateOptionChange = (option) => {
     setSelectedDateOption(option);
   };
-
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  }
-
-
   const toggleDateSelect = () => {
     setIsDateSelectOpen(!isDateSelectOpen);
     setIsNeedSelectOpen(false); // Close the need select when opening date select
@@ -58,89 +91,72 @@ function VPNominations() {
     setIsDateSelectOpen(false);
     setIsNeedSelectOpen(false);
   };
-  
-
-  
   const handleNeedOptionChange = (option) => {
     setSelectedNeedOption(option);
   };
 
 
-  const [nominations,setNominations] = useState([])
-  useEffect(()=> {
-    axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=10`).then(
-    response => setNominations(Object.values(response.data))
-   ).catch(function (error) {
-     console.log(error)
-  })
-  },[userId])
-  console.log(nominations)
+  
 
-  const [fullDetails, setFullDetails] = useState(false)
-
-  const [needId, setNeedId ] = useState(null)
-  const handleDetail = (needid) => {
-    setFullDetails(!fullDetails)
-    setNeedId(needid)
-  }
-  console.log(needId)
+  
 
   return (
     <div>
-
-      {!fullDetails &&<>
-      <div className="headerVPNoms">
-        <div className="titleVPNoms"> Nominations</div>
-        <div className="tagVPNoms">Check your nominations and metrics</div>
-      </div>
-      <div className="statsVPNoms">
-        <div className="statsVPNomsItem">
-          <div className="statsVPNomsCount">
-            <img src={VolunteerNeedsNominated} alt="Nominated Needs" height="35px" />
-            <span>24</span>
-          </div>
-          <div className="statsVPNomsName">Needs Nominated</div>
+      {/* NOMINATIONS by VOLUNTEER */}
+      {!fullDetails &&<div>
+        {/* Title */}
+        <div className="headerVPNoms">
+          <div className="titleVPNoms"> Nominations</div>
+          <div className="tagVPNoms">Check your nominations and metrics</div>
         </div>
-        <div className="statsVPNomsItem">
-          <div className="statsVPNomsCount">
-            <img src={VolunteerNeedsApproved} alt="Approved Needs" height="35px" />
-            <span>6</span>
+        {/* stats */}
+        <div className="statsVPNoms">
+          <div className="statsVPNomsItem">
+            <div className="statsVPNomsCount">
+              <img src={VolunteerNeedsNominated} alt="Nominated Needs" height="35px" />
+              <span>{nominations.filter(item => item.nominationStatus === "Nominated").length}</span>
+            </div>
+            <div className="statsVPNomsName">Needs Nominated</div>
           </div>
-          <div className="statsVPNomsName">Needs Approved</div>
-        </div>
-        <div className="statsVPNomsItem">
-          <div className="statsVPNomsCount">
-            <img src={VolunteerNeedsInProgress} alt="Needs In Progress" height="35px" />
-            <span>8</span>
+          <div className="statsVPNomsItem">
+            <div className="statsVPNomsCount">
+              <img src={VolunteerNeedsApproved} alt="Approved Needs" height="35px" />
+              <span>{nominations.filter(item => item.nominationStatus === "Approved").length}</span>
+            </div>
+            <div className="statsVPNomsName">Needs Approved</div>
           </div>
-          <div className="statsVPNomsName">Needs In Progress</div>
-        </div>
-        <div className="statsVPNomsItem">
-          <div className="statsVPNomsCount">
-            <img src={VolunteerPlansDelivered} alt="Nominated Needs" height="35px" />
-            <span>120</span>
+          <div className="statsVPNomsItem">
+            <div className="statsVPNomsCount">
+              <img src={VolunteerNeedsInProgress} alt="Needs In Progress" height="35px" />
+              <span>00</span>
+            </div>
+            <div className="statsVPNomsName">Needs In Progress</div>
           </div>
-          <div className="statsVPNomsName">Total Volunteer Hrs</div>
-        </div>
-        <div className="statsVPNomsItem">
-          <div className="statsVPNomsCount">
-            <img src={VolunteerHrs} alt="Nominated Needs" height="35px" />
-            <span>120</span>
+          <div className="statsVPNomsItem">
+            <div className="statsVPNomsCount">
+              <img src={VolunteerPlansDelivered} alt="Nominated Needs" height="35px" />
+              <span>00</span>
+            </div>
+            <div className="statsVPNomsName">Total Volunteer Hrs</div>
           </div>
-          <div className="statsVPNomsName">Total Plans Delivered</div>
+          <div className="statsVPNomsItem">
+            <div className="statsVPNomsCount">
+              <img src={VolunteerHrs} alt="Nominated Needs" height="35px" />
+              <span>00</span>
+            </div>
+            <div className="statsVPNomsName">Total Plans Delivered</div>
+          </div>
         </div>
-      </div>
-      <div className="vnomTabs">
-        <div className={`${activeTab === 'tabN' ? 'VNomTabN selectedVNomTab' : 'VNomTabN'}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
-        <div className={`${activeTab === 'tabP' ? 'VNomTabP selectedVNomTab' : 'VNomTabP'}`} onClick={() => handleTabClick('tabP')}>In Progress</div>
-        <div className={`${activeTab === 'tabR' ? 'VNomTabR selectedVNomTab' : 'VNomTabR'}`} onClick={() => handleTabClick('tabR')}>Requested</div>
-        <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
-      </div>
-      
-     
-      <div className="selectDateAndNeed">
-
-      <div className="selectDate">
+        {/* Tabs */}
+        <div className="vnomTabs">
+          <div className={`${activeTab === 'tabN' ? 'VNomTabN selectedVNomTab' : 'VNomTabN'}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
+          <div className={`${activeTab === 'tabP' ? 'VNomTabP selectedVNomTab' : 'VNomTabP'}`} onClick={() => handleTabClick('tabP')}>In Progress</div>
+          <div className={`${activeTab === 'tabR' ? 'VNomTabR selectedVNomTab' : 'VNomTabR'}`} onClick={() => handleTabClick('tabR')}>Requested</div>
+          <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
+        </div>
+    
+        <div className="selectDateAndNeed">
+        <div className="selectDate">
           <div className="custom-select date-select" onClick={toggleDateSelect} onBlur={closeSelect}>
             <CalendarTodayIcon className="calendar-icon" />
             <span className="selected-option">{selectedDateOption ? selectedDateOption : 'Date'}</span>
@@ -153,10 +169,6 @@ function VPNominations() {
             )}
           </div>
         </div>
-
-
-
-
 
         <div className="selectNeed">
           <div className="custom-select  need-select" onClick={toggleNeedSelect} onBlur={closeSelect}>
@@ -175,29 +187,29 @@ function VPNominations() {
             )}
           </div>
         </div>
-      </div>
-
-
-
-      <div className="nomination-grid">
-      {nominations.map(nomination => (
-        <div key={nomination.id} className="nomination-item">
-          <img src={NeedsImage} alt="Nominated Needs" height="120px" />
-          <div className="needItemVolunteer">
-            <p className="needNameVP">{needById[nomination.needId]}</p> 
-            <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View full details</button>
-          </div>
         </div>
-      ))}
-      </div>
 
-    </> }
-    {fullDetails && <div>
-      <button className="backBtnVDeliverable" onClick={() => handleDetail()}>
-        <ArrowBackIcon />
-        Back
-      </button>
-      <VolunteerProfileDeliverable needId={needId} />
+        {/* Nominations Display */}
+        <div className="nomination-grid">
+          {nomsFiltered && nomsFiltered.map(nomination => (
+            <div key={nomination.id} className="nomination-item">
+              <img src={NeedsImage} alt="Nominated Needs" height="120px" />
+              <div className="needItemVolunteer">
+                <p className="needNameVP">{needById[nomination.needId]}</p> 
+                <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View full details</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+      </div> }
+
+      {/* DETAILS OF A NOMINATION */}
+      {fullDetails && <div>
+        <button className="backBtnVDeliverable" onClick={() => handleDetail()}>
+          <ArrowBackIcon /> Back
+        </button>
+        <VolunteerProfileDeliverable needId={needId} />
       </div>
       }
     </div>

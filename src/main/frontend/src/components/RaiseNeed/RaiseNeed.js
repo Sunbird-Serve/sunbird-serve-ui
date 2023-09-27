@@ -10,12 +10,14 @@ import MultiSelect from './MultiSelect';
 import configData from './../../configData.json'
 
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchNeedsByUid } from "../../state/needByUidSlice";
+import { fetchNeeds } from "../../state/needSlice";
+
 
 const RaiseNeed = props => {
     const dispatch = useDispatch();
     const history = useHistory()
     const uid = useSelector((state)=> state.user.data.osid)
+    console.log(uid)
     const needTypes = useSelector((state)=> state.needtype.data.content)
     const entities = useSelector((state)=> state.entity.data.content)
 
@@ -198,8 +200,8 @@ const RaiseNeed = props => {
 
         axios.post(`${configData.NEED_POST}`, dataToPost)
         .then( function(response) {
+            dispatch(fetchNeeds());
             console.log('posted sucessfully',response);
-            dispatch(fetchNeedsByUid(uid));
             gotoNeeds();
         })
         .catch(function (error) {

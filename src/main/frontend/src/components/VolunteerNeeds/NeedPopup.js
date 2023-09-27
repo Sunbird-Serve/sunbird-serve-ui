@@ -14,6 +14,7 @@ import { NavLink, Redirect, useNavigate, useHistory } from 'react-router-dom';
 import VolunteerLogin from '../VolunteerLogin/VolunteerLogin';
 import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
+import NominationSuccess from '../../assets/nominationSuccess.png';
 
 function NeedPopup({ open, onClose, need }) {
   const userId = useSelector((state)=> state.user.data.osid)
@@ -102,8 +103,13 @@ function NeedPopup({ open, onClose, need }) {
   const history = useHistory();
   const handleRegisterClick = (e) => {
     e.preventDefault();
-    console.log(history)
     history.push("/vregistration")
+  }
+
+  const gotoHome = (e) => {
+    e.preventDefault();
+    setNominationStatus(false)
+    onClose()
   }
 
   return (
@@ -155,9 +161,21 @@ function NeedPopup({ open, onClose, need }) {
               style={{ width: "24px", height: "24px", cursor: "pointer" }}
             />
           </div>
-        {nominationStatus && <p className="nominationSuccess">Nomination Successful</p>}
+        {/* { <p className="nominationSuccess">Nomination Successful</p>} */}
       </div>
       </div>
+
+      { nominationStatus && <div className="nominationSuccess">
+          <div className="buttonNSClose"><button onClick={gotoHome}>X</button></div>
+          <div className="imageNomSuccess">
+            <img src={NominationSuccess} alt="SunBirdLogo" width="400px" />
+          </div>
+          
+          <div className="textNomSuccess">
+            Hurray! You've successfully nominated for the event "<span>{need.name}</span>". You'll be notified
+            once the organiser accepts your nomination.
+          </div>
+      </div> }
       
       {alertLogin && 
       <div className="alertLogin">
