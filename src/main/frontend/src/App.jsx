@@ -11,18 +11,19 @@ import { fetchNeeds } from './state/needSlice'
 import { fetchNeedtypes } from './state/needtypeSlice'
 import { fetchNeedsByUid } from "./state/needByUidSlice";
 import { fetchEntities } from "./state/entitySlice";
+import { fetchUserList } from "./state/userListSlice";
 
 
 function App() {
   const dispatch = useDispatch()
 
-  const [presentUser, setPresentUser] = useState(null);
   //AUTHENTICATION using firebase
+  const [presentUser, setPresentUser] = useState(null);
   useEffect(() => {
     auth.onAuthStateChanged((user) => {
       if (user) {
         setPresentUser({
-          uid: user.uid,
+          uid: user.uid,    //this is firebase userId
           email: user.email
         });
       } else {
@@ -33,6 +34,7 @@ function App() {
 
   //UPDATE USER STATE based on authenticated email
   const userDetails = useSelector((state)=> state.user.data)
+  console.log(userDetails.role)
   //dispatch the user to store
   useEffect(() => {
     if(presentUser){
@@ -42,10 +44,20 @@ function App() {
     }
   }, [dispatch, presentUser]);
 
-  //UPDATE NEEDS
+   //UPDATE USERLIST
+  useEffect(()=>{
+    dispatch(fetchUserList())
+  },[dispatch])
+
+  //UPDATE NEEDSBYID
   useEffect(()=>{
     dispatch(fetchNeedsByUid(userDetails.osid))
   },[dispatch, userDetails])
+
+  //UPDATE NEEDS
+  useEffect(()=>{
+    dispatch(fetchNeeds())
+  },[dispatch])
 
   //UPDATE NEEDTYPES
   useEffect(()=>{
@@ -67,8 +79,18 @@ function App() {
   return (
       <div className="App row">
         { /* Load page depending on user login */}
+        { /* when clicks explore button, volunteer will be true*/}
+        { /* if not volunteer and logins, go to nCoordinator screen */}
         { !volunteer && (<>
-        { presentUser ? <MainPage /> : <LoginPage getVolunteerStatus={handleVolunteer}/>}</>)}
+          { presentUser ? 
+              userDetails.role && userDetails.role.includes('Volunteer') ?
+                <ExplorePage />
+              :
+              <MainPage /> 
+            : 
+            <LoginPage getVolunteerStatus={handleVolunteer}/>
+          }</>)}
+        { /* if volunteer, go to volunteer screen */ }
         { volunteer && <ExplorePage />  }
       </div>
   );
