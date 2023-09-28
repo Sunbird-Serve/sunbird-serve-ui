@@ -187,6 +187,7 @@
   border-radius: 5px;
   padding: 3px 12px;
   margin: 0px 12px;
+  cursor: pointer;
 }
 .confirmBtnRN {
   color: white;
@@ -194,4 +195,5 @@
   background-color: #0080BC;
   padding: 3px 12px;
   border-radius: 5px;
+  cursor: pointer;
 }
