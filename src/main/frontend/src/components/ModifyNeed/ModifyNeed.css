@@ -131,6 +131,7 @@
 }
 .itemNInfoDescrip span{
     font-size: 14px;
+    margin: 10px;;
 }
 .itemWrapNInfoDate {
     display: flex;

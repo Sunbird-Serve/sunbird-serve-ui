@@ -17,7 +17,6 @@ const RaiseNeed = props => {
     const dispatch = useDispatch();
     const history = useHistory()
     const uid = useSelector((state)=> state.user.data.osid)
-    console.log(uid)
     const needTypes = useSelector((state)=> state.needtype.data.content)
     const entities = useSelector((state)=> state.entity.data.content)
 
@@ -32,8 +31,8 @@ const RaiseNeed = props => {
         status: 'Approved',     //registry.Need
         userId: uid,      //registry.Need ? Not from RN form
         entityId: '',       //registry.Need (Entity Name)
-        //requirementId: '',        //serve.NeedRequirement'
     });
+    // data that goes to need requirement
     const [dataOther,setDataOther] = useState({
         skillDetails: '',
         frequency:'',    
@@ -66,7 +65,7 @@ const RaiseNeed = props => {
         setDataOther({...dataOther,[e.target.name]:e.target.value})
     }
 
-    // need description - configure rich text options //
+    // NEED DESCRIPTION - configure rich text options //
     var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], [{'list':'ordered'},{'list':'bullet'}]];
     const module = {
         toolbar: toolbarOptions,
@@ -75,6 +74,7 @@ const RaiseNeed = props => {
         setData({...data,description:value})
     };
 
+    // START AND END DATE
     //get from input in YearMonthDay format then convert to datetime before updating
     const [ startYMD, setStartYMD ] = useState('')
     const [ endYMD, setEndYMD ] = useState('')
@@ -87,6 +87,7 @@ const RaiseNeed = props => {
         setStartYMD(e.target.value)
     }
 
+    //EVENT DAYS
     // event days by handleSelectedDaysChange
     const optionsDay = [
         { id: 1, label: 'Sunday', startTime: '', endTime: '' },
@@ -148,39 +149,45 @@ const RaiseNeed = props => {
     }
 
 
-    // get needrequirement whenever needtypeId is changed
-      const [needReqId,setNeedReqId] = useState(null)
-      const [skillsRequired,setSkillsRequired] = useState(null)
-      const [options,setOptions] = useState([])
-      useEffect(() => {
-        //do following API call when needTypeId is not null
-        if(needTypeId){
-        axios.get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
-        .then(
-          //function(response){console.log(response.data.requirementId)},
-          response => setNeedReqId(response.data.requirementId)
-        )
-        .catch(function (error) {
-            console.log('error'); 
-        }) 
+    const [reqs, setReqs] = useState({});
+    const [options,setOptions] = useState([])
+    useEffect(() => {
+    // Define a function to make the API call using Axios
+        async function getRequirement(id) {
+         try {
+            // Replace with your API endpoint and configuration
+            const response = await axios.get(`${configData.NEED_REQUIREMENT_GET}/${id}`);
+            return response.data.skillDetails;
+        } catch (error) {            
+            return ''
+         }
         }
 
-       if(needReqId) {
-       axios
-         .get(`${configData.NEED_REQUIREMENT_GET}/${needReqId}`)
-         .then((response) => {
-            setOptions(response.data.skillDetails.split(',').map(item=>({
-                label:item,
-                value:item,
-            })))
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-         });
-       }
+    // Define an async function to fetch data
+        async function fetchData() {
+            const updatedReqs = {};
+            for (const item of needTypes) {
+                const data = await getRequirement(item.requirementId);
+                updatedReqs[item.id] = data;
+            }
+            setReqs(updatedReqs);
+        }
+        fetchData();
+        if(reqs[needTypeId]){
+        setOptions(reqs[needTypeId].split(',').map(item=>({
+            label:item,
+            value:item,
+        })))
+        } else {
+            setOptions([])
+        }
 
-       }, [needTypeId, needReqId]);
-    console.log(options)
+    }, [needTypeId]);
+
+
+    // get needrequirement options whenever needTypeId is changed
+      const [needReqId,setNeedReqId] = useState(null)
+      const [skillsRequired,setSkillsRequired] = useState(null)
 
     // format as per API request body
     const [dataToPost,setDataToPost] = useState({

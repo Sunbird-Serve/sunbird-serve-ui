@@ -1,93 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react'
-import ReactQuill from 'react-quill';
-import axios from 'axios'
 import './ModifyNeed.css' 
-import { Redirect } from 'react-router'
 import Nominations from '../Nominations/Nominations'
-import UploadImageBG from '../../assets/bgImgUpload.png'
-import configData from './../../configData.json'
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 
 const ModifyNeed = props => {
     console.log(props.data)     //details of single need
-    const [entityName, setEntityName] = useState(null);
-    function EntityById( entityId ) {
-           axios
-             .get(`${configData.ENTITY_GET}/${entityId}`)
-             .then((response) => {
-               setEntityName(response.data.name);
-             })
-             .catch((error) => {
-               console.error("Fetching Entity failed:", error);
-             });
-         return entityName || '';
-    }
-    const [needType, setNeedType] = useState(null);
-    function NeedTypeById( needTypeId ) {
-        axios
-          .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
-          .then((response) => {
-            setNeedType(response.data.name);
-          })
-          .catch((error) => {
-            console.error("Fetching Need Type failed:", error);
-          });
-       return needType || '';
-    }
-
-   const [nomin,setNomin] = useState(true)
-   const [data,setData] = useState(null)
+    const [data,setData] = useState(null)
    
-   useEffect(()=> {
-        setData(props.data);
-   },[props.data]);
+    useEffect(()=> {
+         setData(props.data);
+    },[props.data]);
 
-   const [needRequirement,setNeedRequirement] = useState(null)
-   useEffect(() => {
-    if(data) {
-    axios
-      .get(`${configData.NEED_REQUIREMENT_GET}/${data.requirementId}`)
-      .then((response) => {
-         console.log(response.data)
-         setNeedRequirement(response.data)
-      })
-      .catch((error) => {
-        console.error("Fetching Entity failed:", error);
-      });
-    }
-    }, [data]);
-    console.log(needRequirement)
-
-   var toolbarOptions = [['bold', 'italic', 'underline', 'strike'], [{'list':'ordered'},{'list':'bullet'}]];
-    const module = {
-        toolbar: toolbarOptions,
-    };
-    const handleQuillEdit = (value) => {
-        setData({...data, description:value})
-    };
-
-    const inputRef = useRef(null);
-    const handleImageClick = () => {
-        inputRef.current.click();
-    };
-    const [imageNeed, setImageNeed] = useState('')
-    const handleImageUpload = (e) => {
-        console.log(e.target.files)
-        setImageNeed(e.target.files[0])
-    }
-
-    const changeHandler = e => {
-        setData({...data, [e.target.name]:e.target.value})
-    }
-
-   const submitHandler = e => {
-    e.preventDefault();
-    console.log(data)
-    }
-
+    // Handle Nomination tab
+    const [nomin,setNomin] = useState(true)
     const [popupType, setPopupType] = useState(null)
-
     const openPopup = (type) => {
         setPopupType(type)
     }
@@ -113,54 +40,46 @@ const ModifyNeed = props => {
                     <div className="needInfoBox">
                         <div className="needInfoBar">
                             <div className="wrapInfoName"> 
-                                <div className="needIName">{data.name}</div>
-                                <div className="needITag">{data.description.slice(3,-4)}</div>
+                                <div className="needIName">{data.need.name}</div>
+                                <div className="needITag">{data.need.description.slice(3,-4)}</div>
                             </div>
                         </div>
-                        <form className="needInfoForm row" id="modifyForm" onSubmit={submitHandler}>
+                        <form className="needInfoForm row" id="modifyForm" >
                             <div className="catergoryNInfo">NEED INFO</div>
                             <div className="needIFormTop">
                                 <div className="needInfoTopLeft col-sm-6">
-                                    {/* 
-                                    <div className="infoNImage">
-                                            <label>Image</label>
-                                            <div className="uploadNImage"> 
-                                                <img src={UploadImageBG} alt=''/>
-                                            </div>
-                                    </div>
-                                    */}
                                     <div className="itemNInfo">
                                             <label>Need Name</label>
-                                            <span>{data.name}</span>
+                                            <span>{data.need.name}</span>
                                     </div>
                                     <div className="itemNInfo">
                                             <label>Need Purpose</label>
-                                            <span>{data.needPurpose}</span>
+                                            <span>{data.need.needPurpose}</span>
                                     </div>
                                     <div className="itemNInfo">
                                             <label>Need Type</label>
-                                            <span>{NeedTypeById(data.needTypeId)}</span>
+                                            <span>{data.needType.name}</span>
                                     </div> 
                                 </div>  
                                 <div className="needInfoTopRight col-sm-6">
                                     <div className="itemNInfoDescrip">
                                         <label>Need Description</label>
-                                        <span>{data.description.slice(3,-4)}</span>
+                                        <span>{data.need.description.slice(3,-4)}</span>
                                     </div>
                                     {/* Entity Name */}
                                     <div className="itemNInfo">
                                         <label>Entity Name</label>
-                                        <span>{EntityById(data.entityId)} </span>
+                                        <span>{data.entity.name} </span>
                                     </div>
                                     {/* Date */}
                                     <div className="itemWrapNInfoDate">
                                         <div className="itemNInfoDate">
                                             <label>Start Date</label>
-                                            <span>{needRequirement.startDate.substr(0,10)}</span>
+                                            <span>{data.needRequirement.startDate.substr(0,10)}</span>
                                         </div>
                                         <div className="itemNInfoDate">
                                             <label>End Date</label>
-                                            <span>{needRequirement.endDate.substr(0,10)}</span>
+                                            <span>{data.needRequirement.endDate.substr(0,10)}</span>
                                         </div>
                                     </div>
                                     {/* Time */}
@@ -179,7 +98,7 @@ const ModifyNeed = props => {
                                     { data &&
                                      <div className="itemNInfo">
                                         <label>Skills Required</label>
-                                        <span>{needRequirement.skillDetails}</span>
+                                        <span>{data.needRequirement.skillDetails}</span>
                                         {/*<span>{data.skillDetail.map(item => item.value)}</span> */}
                                     </div> }
                                 </div>
@@ -187,7 +106,7 @@ const ModifyNeed = props => {
                                     {/* No. of Volunteers Required */}
                                     <div className="itemNInfo">
                                         <label>No. of Volunteers required</label>
-                                        <span>{needRequirement.volunteersRequired}</span>
+                                        <span>{data.needRequirement.volunteersRequired}</span>
                                     </div>
                                 </div>
                             </div>

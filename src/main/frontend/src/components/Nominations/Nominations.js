@@ -6,101 +6,95 @@ import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import configData from './../../configData.json'
+import { useSelector } from 'react-redux'
 
 const Nominations = ({ data, openPopup }) => {
-  const [rejectPopup,setRejectPopup] = useState(false)
-  const [acceptPopup,setAcceptPopup] = useState(false)
-  const [rowData,setRowData] = useState({})
-  const [reason,setReason] = useState('')
-
-  const [dataNoms, setDataNoms] = useState([]);
-  const [tableData, setTableData] = useState([]);
+  //need to which nomination is done
+  const needId = data.need.id;
 
   const [activeTab, setActiveTab] = useState('tabN');
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   }
-
-  const needId = data.id;
-  console.log(needId)
-
-  //get nominations to needId and status
+  //fetch nominations as per active tab
+  const [dataNoms, setDataNoms] = useState([]);
   useEffect(() => {
     async function fetchData() {
       try {
-        let url = `${configData.NEED_SEARCH}/${needId}/nominate`;
-        if (activeTab === 'tabA') {
-          url += '/Approved';
-        } else if (activeTab === 'tabR') {
-          url += '/Rejected';
-        } else if (activeTab === 'tabN') {
-          url += '/Nominated';
-        }
-        console.log(url)
         // Fetch dataNoms using Axios
-        const response = await axios.get(url)
-        setDataNoms(response.data)
+        const response = await axios.get(`${configData.NEED_SEARCH}/${needId}/nominate`)
+        if (activeTab === 'tabA') {
+          setDataNoms(response.data.filter(item => item.nominationStatus === "Approved"))
+        } else if (activeTab === 'tabR') {
+          setDataNoms(response.data.filter(item => item.nominationStatus === "Rejected"))
+        } else if (activeTab === 'tabN') {
+          setDataNoms(response.data.filter(item => item.nominationStatus === "Nominated"))
+        }
       } catch (error) {
          console.error('Error fetching dataNoms:', error);
         }
       }
     fetchData();
   }, [needId, activeTab]);
-
-  console.log(dataNoms)
-
+  const userList = useSelector((state) => state.userlist.data);
+  const [tableData, setTableData] = useState([]);
   useEffect(() => {
-    const fetchUserDataAndCreateTableData = async () => {
-      const updatedTableData = [];
-
-      for (const item of dataNoms) {
-        try {
-          const nominatedUserId = item.nominatedUserId;
-          console.log(nominatedUserId)
-
-          // Fetch userData using Axios for the current nominatedUserId
-          const response = await axios.get(`${configData.NOMINATED_USER_FETCH}/${nominatedUserId}`);
-          console.log(response.data)
-          const userData = response.data;
-          const location = userData?.contactDetails?.address?.state || '';
-          const fullname = userData?.identityDetails?.fullname || '';
-          const userDOB = userData?.identityDetails?.dob || '';
-          const mobNum = userData?.contactDetails?.mobile || '';
-
-          updatedTableData.push({
-            nominatedUserId,
-            location,
-            fullname,
-            userDOB,
-            mobNum,
-            //status: item.status,
-          });
-        } catch (error) {
-          console.error('Error fetching userData:', error);
-        }
+    const nomDetails = dataNoms.map((nomination) => {
+      const user = userList.find((user) => user.osid === nomination.nominatedUserId);
+      if(user){
+        return {...nomination, userInfo: user }
       }
-      setTableData(updatedTableData);
-    };
+      return nomination
+    })
+    setTableData(nomDetails)
+  }, [dataNoms]);
 
-    fetchUserDataAndCreateTableData();
-  }, [dataNoms, activeTab]);
+  const [rejectPopup,setRejectPopup] = useState(false)    //reject nomination
+  const [acceptPopup,setAcceptPopup] = useState(false)    //accept nomination
+  const [rowData,setRowData] = useState({})
+  const [reason,setReason] = useState('')
+
+  if(acceptPopup){
+    console.log(rowData.id)   //nominationId
+    console.log(rowData.nominatedUserId)  //nominatedUserId
+    axios.post(`${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`)
+    .then(
+      //function(response){console.log(response.data)},
+      openPopup('accept')
+    )
+    .catch(function (error) {
+        console.log('error'); 
+    }) 
+    setAcceptPopup(false)
+  }
+
+  const confirmRejection = e => {
+    axios.post(`${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Rejected`)
+    .then(
+      //function(response){console.log(response.data)},
+      openPopup('reject'),
+      setRejectPopup(false),
+    )
+    .catch(function (error) {
+        console.log('error'); 
+    }) 
+  }
 
   const COLUMNS = [
-    {Header:'Volunteer Name',accessor:'fullname'}, 
-    {Header:'Location',accessor:'location'},
-    {Header:'Date of Birth',accessor:'userDOB'},
-    {Header:'Contact Info',accessor:'mobNum'},
+    {Header:'Volunteer Name',accessor:'userInfo.identityDetails.fullname'}, 
+    {Header:'Location',accessor:'userInfo.contactDetails.address.city'},
+    {Header:'Date of Birth',accessor:'userInfo.identityDetails.dob'},
+    {Header:'Contact Info',accessor:'userInfo.contactDetails.mobile'},
     {Header:'Skills'},
     {Header:'Actions',
       Cell : ({ row }) => {
         const handleAccept = () => {
-          console.log('Accept Nomination')
+          setRowData(row.original)
           setAcceptPopup(true)
         }
         const handleReject = () => {
-          console.log(row.values)
           setRejectPopup(true)
-          setRowData(row.values)
+          setRowData(row.original)
         }
         return (
           <div className="actionsCell">
@@ -131,36 +125,6 @@ const Nominations = ({ data, openPopup }) => {
 
   const handleReason = e => {
     setReason(e.target.value)
-  }
-  
-
-  const confirmRejection = e => {
-    console.log(dataNoms)
-    axios.post(`${configData.NOMINATION_CONFIRM}/${dataNoms[0].nominatedUserId}/confirm/${dataNoms[0].id}?status=Rejected`)
-    .then(
-      //function(response){console.log(response.data)},
-      openPopup('reject'),
-      setRejectPopup(false),
-    )
-    .catch(function (error) {
-        console.log('error'); 
-    }) 
-  }
-
-  
-  if(acceptPopup){
-    console.log(needId)
-    console.log(dataNoms[0].id)   //nominationId
-    console.log(dataNoms[0].nominatedUserId)
-    axios.post(`${configData.NOMINATION_CONFIRM}/${dataNoms[0].nominatedUserId}/confirm/${dataNoms[0].id}?status=Approved`)
-    .then(
-      //function(response){console.log(response.data)},
-      openPopup('accept')
-    )
-    .catch(function (error) {
-        console.log('error'); 
-    }) 
-    setAcceptPopup(false)
   }
 
   return (
@@ -218,8 +182,8 @@ const Nominations = ({ data, openPopup }) => {
               <button onClick={() => setRejectPopup(false)}>X</button>
             </div>
             <div className="rbNomin">
-              <div className="nameRN">{rowData.fullname}</div>
-              <div className="emailRN">{rowData.name}</div>
+              <div className="nameRN">{rowData.userInfo.identityDetails.fullname}</div>
+              <div className="emailRN">{rowData.userInfo.contactDetails.email}</div>
             </div>
             <div className="rejectReason">
               <label>Reason</label>
