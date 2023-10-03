@@ -207,15 +207,15 @@ const RaiseNeed = props => {
         e.preventDefault();
         console.log(dataToPost)
         console.log(selectedDays)
-        axios.post(`${configData.NEED_POST}`, dataToPost)
-            .then(function (response) {
-                console.log('posted sucessfully', response);
-                dispatch(fetchNeedsByUid(uid));
-                gotoNeeds();
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
+        // axios.post(`${configData.NEED_POST}`, dataToPost)
+        //     .then(function (response) {
+        //         console.log('posted sucessfully', response);
+        //         dispatch(fetchNeedsByUid(uid));
+        //         gotoNeeds();
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     })
     }
     const gotoNeeds = (selectedOptions) => {
         history.push('/needs')
@@ -339,6 +339,7 @@ const RaiseNeed = props => {
                                         value={manualSkill}
                                         onChange={(e) => setManualSkill(e.target.value)}
                                         onKeyDown={handleManualSkillAdd}
+                                        className = "addSkillsInput"
                                     />
                                 </div>
                             </div>

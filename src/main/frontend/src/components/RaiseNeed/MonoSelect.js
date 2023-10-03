@@ -6,9 +6,8 @@ import {
   MenuItem,
   TextField,
   Grid,
-  Button,
 } from '@mui/material';
-import './MonoSelect.css'
+import './MonoSelect.css';
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -32,17 +31,20 @@ const MonoSelect = ({ onAdd, frequency }) => {
 
   const handleDayChange = (event) => {
     setSelectedDay(event.target.value);
+    saveValues();
   };
 
   const handleStartTimeChange = (event) => {
     setStartTime(event.target.value);
+    saveValues();
   };
 
   const handleEndTimeChange = (event) => {
     setEndTime(event.target.value);
+    saveValues();
   };
 
-  const handleAdd = () => {
+  const saveValues = () => {
     let selectedDaysArray = [];
 
     if (selectedDay === 'Mon-Fri') {
@@ -74,7 +76,6 @@ const MonoSelect = ({ onAdd, frequency }) => {
       <Grid container spacing={0} className="wrapDayTime">
         <Grid item xs={3.2}>
           <FormControl fullWidth>
-            {/* <InputLabel>Day</InputLabel> */}
             <Select
               value={selectedDay}
               onChange={handleDayChange}
@@ -98,8 +99,6 @@ const MonoSelect = ({ onAdd, frequency }) => {
         </Grid>
         <Grid item xs={3.6}>
           <TextField
-            // label="Start Time"
-            className="label-startTime"
             type="time"
             value={startTime}
             onChange={handleStartTimeChange}
@@ -111,8 +110,6 @@ const MonoSelect = ({ onAdd, frequency }) => {
         </Grid>
         <Grid item xs={3.6}>
           <TextField
-            // label="End Time"
-            className="label-endTime"
             type="time"
             value={endTime}
             onChange={handleEndTimeChange}
@@ -123,14 +120,6 @@ const MonoSelect = ({ onAdd, frequency }) => {
           />
         </Grid>
       </Grid>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleAdd}
-        className="button-save"
-      >
-        Save
-      </Button>
     </div>
   );
 };
