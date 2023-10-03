@@ -10,5 +10,6 @@
     "NEED_BY_USER" : "https://serve-v1.evean.net/api/v1/need/user",
     "NOMINATION_CONFIRM" : "https://serve-v1.evean.net/api/v1/need/{needId}/nominate",
     "NEED_REQUIREMENT_GET": "https://serve-v1.evean.net/api/v1/need-requirement",
-    "NOMINATIONS_GET":"https://serve-v1.evean.net/api/v1/need/nomination"
+    "NOMINATIONS_GET": "https://serve-v1.evean.net/api/v1/need/nomination",
+    "NEEDPLAN_GET": "https://serve-v1.evean.net/api/v1/need-plan"
 }
