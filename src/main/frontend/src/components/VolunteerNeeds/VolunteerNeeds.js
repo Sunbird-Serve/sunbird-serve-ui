@@ -15,13 +15,20 @@ import configData from './../../configData.json'
 import SortIcon from "@mui/icons-material/Sort";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useSelector, useDispatch } from 'react-redux'
 
 export const VolunteerNeeds = props => {
-  const [data, setData] = useState([]);
+  console.log(props.needTypeId)
+
+  const needList = useSelector((state) => state.need.data);
+  const data = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId)
+  console.log(data)
+
+
+  // const [data, setData] = useState([]);
   const [view, setView] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedNeed, setSelectedNeed] = useState(null); // State to store the selected need
-  const [entityName, setEntityName] = useState(null);
   const [sortRev, setSortRev] = useState("");
 
   const [needBoxesPerRow, setNeedBoxesPerRow] = useState(3); // Initialize with 3 boxes per row for grid view
@@ -40,67 +47,6 @@ export const VolunteerNeeds = props => {
     setSortRev(event.target.value);
   };
 
-  useEffect(() => {
-    const fetchNeeds = async () => {    
-      try {
-        const responseNew = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=New`)
-        const responseNominated = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Nominated`)
-        const responseApproved = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Approved`)
-        const responseRejected = await axios.get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Rejected`)
-        setData([...responseNew.data.content, ...responseNominated.data.content, ...responseApproved.data.content, ...responseRejected.data.content])
-      } catch (error) {
-        console.error('Error fetch needs count',Error)
-      }
-    };
-    fetchNeeds()
-  },[props.needTypeId])
-  
-{/*
-  const [needsNew, setNeedsNew] = useState([]);
-  const [needsNominated, setNeedsNominated] = useState([]);
-  const [needsApproved, setNeedsApproved] = useState([]);
-  const [needsRejected, setNeedsRejected] = useState([]);
-  useEffect(() => {
-    axios
-      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=New`)
-      .then((response) => {
-        setNeedsNew(response.data.content);
-      })
-      .catch((error) => console.log(error));
-    axios
-      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Nominated`)
-      .then((response) => {
-        setNeedsNominated(response.data.content);
-      })
-      .catch((error) => console.log(error));
-    axios
-      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Approved`)
-      .then((response) => {
-        setNeedsApproved(response.data.content);
-      })
-      .catch((error) => console.log(error));
-    axios
-      .get(`${configData.NEED_BY_TYPE}/${props.needTypeId}?page=0&size=100&status=Rejected`)
-      .then((response) => {
-        setNeedsRejected(response.data.content);
-      })
-      .catch((error) => console.log(error));
-    setData([...needsNew, ...needsNominated, ...needsApproved, ...needsRejected])
-  }, [props.needTypeId, needsNew, needsNominated]);
-*/}
-
-  // function EntityById( entityId ) {
-  //      axios
-  //        .get(`${configData.ENTITY_FETCH}/${entityId}`)
-  //        .then((response) => {
-  //          setEntityName(response.data.name);
-  //        })
-  //        .catch((error) => {
-  //          console.error("Fetching Entity failed:", error);
-  //        });
-  //    return entityName || '';
-  // }
-
   const handlePopupOpen = (need) => {
     setSelectedNeed(need); // Store the selected need in the state
     setShowPopup(true);
@@ -114,51 +60,6 @@ export const VolunteerNeeds = props => {
     props.updateNeedList(false)
   }
 
-  const [reqDetails, setReqDetails] = useState(null);
-  function NeedReqId(requirementId) {
-    axios
-         .get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`)
-         .then((response) => {
-            setReqDetails(response.data.id)
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-    });
-    return reqDetails || ''
-  }
-
-
-  const [volunteerReqData, setVolunteerReqData] = useState({});
-  const [startDateData, setStartDateData] = useState({});
-
-  useEffect(() => {
-    const fetchDataById = async (requirementId) => {
-      try {
-        const response = await axios.get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`);
-        return response.data;
-      } catch (error) {
-        console.error(`Failed to fetch data`);
-        throw error;
-      }
-    };
-    const updateReqData = async () => {
-      const reqVolunteer = {};
-      const startDates = {};
-      for (const item of data) {
-        try {
-          const requirement = await fetchDataById(item.requirementId);
-          reqVolunteer[item.requirementId] = requirement.volunteersRequired;
-          startDates[item.requirementId] = requirement.startDate.slice(0,10);
-        } catch (error) {
-          console.error(`Error fetching requirement`);
-        }
-      }
-      setVolunteerReqData(reqVolunteer);
-      setStartDateData(startDates);
-
-    };
-    updateReqData();
-  }, [data]); 
 
   return (
     <div className="wrapvolunteerNeeds">
@@ -196,25 +97,25 @@ export const VolunteerNeeds = props => {
       { data.length && 
         <div className="needs">
           <div className="needContainer">
-            {data.map((need) => (
-              <div key={need.id} className="needBox" onClick={() => handlePopupOpen(need)} >
+            {data.map((item) => (
+              <div key={item.need.id} className="needBox" onClick={() => handlePopupOpen(item)} >
                 <div className="need-container-volunteer">
-                  <div class="h3-container">{need.name}</div>
+                  <div class="h3-container">{item.need.name}</div>
                   <i class="heart-icon"><FavoriteIcon/></i>
                 </div>
                 <div className="location-vrequired">
                   <div className="location-container gray-text">
                     <LocationOnOutlinedIcon style={{ fontSize: 15 }} />
-                    <span>Chennai</span>
+                    <span>{(item.entity && item.entity.district) ? item.entity.district : ''}</span>
                   </div>
                   <div className="required-container gray-text">
                     <PeopleIcon style={{ fontSize: 15 }} />
-                    <span>{volunteerReqData[need.requirementId]}</span>
+                    <span>{(item.needRequirement && item.needRequirement.volunteersRequired) ? item.needRequirement.volunteersRequired : ''}</span>
                   </div>
                 </div>
                 <div className="calendar-container gray-text">
                   <i><CalendarTodayOutlinedIcon style={{ fontSize: 15 }} /></i>
-                  <span> {startDateData[need.requirementId]} </span>
+                  <span> {(item.occurrence && item.occurrence.startDate) ? item.occurrence.startDate.slice(0,10) : ''} </span>
                 </div>
               </div>
             ))}

@@ -1,88 +1,116 @@
-import React, { useState, useRef, useEffect } from 'react';
-import './MultiSelect.css'; 
+import React, { useState } from 'react';
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TextField,
+  Grid,
+  Button,
+} from '@mui/material';
+import './MultiSelect.css'
 
-const MultiSelect = ({ options, selectedOptions, onSelectedOptionsChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  const toggleDropdown = (event) => {
-    event.stopPropagation();
-    setIsOpen(!isOpen);
+const MultiSelect = ({ onAdd }) => {
+  const [scheduleItems, setScheduleItems] = useState([{ day: '', startTime: '', endTime: '' }]);
+
+  const handleDayChange = (event, index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems[index].day = event.target.value ;
+    setScheduleItems(updatedScheduleItems);
   };
 
-  const handleOptionClick = (option) => {
-    const isSelected = selectedOptions.some((selectedOption) => selectedOption.id === option.id);
-
-    const updatedOptions = isSelected
-      ? selectedOptions.filter((selectedOption) => selectedOption.id !== option.id)
-      : [...selectedOptions, { ...option, startTime: '', endTime: '' }];
-
-    onSelectedOptionsChange(updatedOptions);
+  const handleStartTimeChange = (event, index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems[index].startTime = event.target.value ;
+    setScheduleItems(updatedScheduleItems);
   };
 
-  const handleTimeChange = (optionId, field, value) => {
-    const updatedOptions = selectedOptions.map((option) => {
-      if (option.id === optionId) {
-        return { ...option, [field]: value };
-      }
-      return option;
-    });
-
-    onSelectedOptionsChange(updatedOptions);
+  const handleEndTimeChange = (event, index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems[index].endTime = event.target.value ;
+    setScheduleItems(updatedScheduleItems);
   };
 
-  const handleDocumentClick = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
-    }
+  const handleAdd = () => {
+    setScheduleItems([...scheduleItems, { day: '', startTime: '', endTime: '' }]);
   };
 
-  useEffect(() => {
-    document.addEventListener('click', handleDocumentClick);
-    return () => {
-      document.removeEventListener('click', handleDocumentClick);
-    };
-  }, []);
+  const handleRemove = (index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems.splice(index, 1);
+    setScheduleItems(updatedScheduleItems);
+  };
+
+  const handleSave = () => {
+    // Pass the scheduleItems to the parent component
+    onAdd(scheduleItems);
+  };
 
   return (
-    <div className="multi-select col-sm-12">
-      <div className="select-box" onClick={toggleDropdown}>
-        {selectedOptions.length === 0 ? 'Select' : selectedOptions.map((option) => (
-          <span key={option.id} className="token">
-            {option.label} <button onClick={() => handleOptionClick(option)}>x</button>
-          </span>
-        ))}
-      </div>
-      {isOpen && (
-        <div ref={dropdownRef} className="daysList col-sm-8">
-          {options.map((option) => (
-            <div key={option.id} className="dayOption">
-              <input
-                type="checkbox"
-                checked={selectedOptions.some((selectedOption) => selectedOption.id === option.id)}
-                onChange={() => handleOptionClick(option)}
-              />
-              <div className="optionLabel">{option.label}</div>
-              {selectedOptions.some((selectedOption) => selectedOption.id === option.id) && (
-                <div className="time-input">
-                  {/* <label>Start Time:</label> */}
-                  <input
-                    type="time"
-                    value={option.startTime} 
-                    onChange={(e) => handleTimeChange(option.id, 'startTime', e.target.value)}
-                  />
-                  {/* <label>End Time:</label> */}
-                  <input
-                    type="time"
-                    value={option.endTime}
-                    onChange={(e) => handleTimeChange(option.id, 'endTime', e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+    <div>
+      {scheduleItems.map((scheduleItem, index) => (
+        <Grid container spacing={0} key={index} className="container-daysTime">
+          <Grid item xs={4} >
+            <FormControl fullWidth>
+              {/* <InputLabel>Day</InputLabel> */}
+              <Select
+                value={scheduleItem.day}
+                onChange={(e) => handleDayChange(e, index)}
+                className="days-label"
+              >
+                {daysOfWeek.map((day) => (
+                  <MenuItem key={day} value={day}>
+                    {day}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              // label="Start Time"
+              type="time"
+              value={scheduleItem.startTime}
+              onChange={(e) => handleStartTimeChange(e, index)}
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <TextField
+              // label="End Time"
+              type="time"
+              value={scheduleItem.endTime}
+              onChange={(e) => handleEndTimeChange(e, index)}
+              fullWidth
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+          </Grid>
+          <Grid item xs={1} className="button-add-remove">
+            {index === scheduleItems.length - 1 ? (
+              <button onClick={handleAdd}   
+              className="add-button"> + </button>
+            ) : (
+              <button onClick={() => handleRemove(index)}  
+              className="remove-button"> x </button>
+            )}
+          </Grid>
+        </Grid>
+      ))}
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handleSave}
+        className="button-save"
+      >
+        Save
+      </Button>
     </div>
   );
 };

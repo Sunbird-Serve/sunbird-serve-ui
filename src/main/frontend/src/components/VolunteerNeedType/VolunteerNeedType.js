@@ -11,7 +11,7 @@ import ntypeImage01 from '../../assets/content_development.png'
 import ntypeImage02 from '../../assets/field_activity.png'
 import ntypeImage03 from '../../assets/mentoring.png'
 import ntypeImage04 from '../../assets/online_teaching.png'
-
+import { useSelector, useDispatch } from 'react-redux'
 
 
 function VolunteerNeedType() {
@@ -51,29 +51,7 @@ function VolunteerNeedType() {
     setSortedNTs(filteredNTs)
   },[ntypeData, searchQueryNT]);
 
-  //count needs under each type
-  useEffect(() => {
-    const fetchNeedsCountForItem = async (item) => {    
-      try {
-        const responseNew = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=New`)
-        const responseNominated = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=Nominated`)
-        const responseApproved = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=Approved`)
-        const responseRejected = await axios.get(`${configData.NEED_BY_TYPE}/${item.id}?page=0&size=100&status=Rejected`)
-        const numberOfNeeds = responseNew.data.content.length+responseNominated.data.content.length+responseApproved.data.content.length+responseRejected.data.content.length;
-        console.log(numberOfNeeds)
-        setNeedsCount(prevNeedsCount => ({
-          ...prevNeedsCount,
-          [item.id]: numberOfNeeds,
-        })) 
-      } catch (error) {
-        console.error('Error fetch needs count',Error)
-      }
-    };
-    ntypeData.forEach(item => {
-        fetchNeedsCountForItem(item)
-    })
-    setCountFetched(true)
-  },[ntypeData])
+  const needList = useSelector((state) => state.need.data);
 
   const [sortRev, setSortRev] = useState('')
   const handleSort = (e) => {
@@ -171,7 +149,7 @@ function VolunteerNeedType() {
                     <div className="numNeedsNT">
                       <i><StickyNote2Icon style={{height:"12px"}} /></i>
                       <span>
-                        {needsCount[item.id] } Needs
+                        {needList.filter(need => need && need.need && need.need.needTypeId === item.id).length } Needs
                       </span>
                     </div>
                   </div>

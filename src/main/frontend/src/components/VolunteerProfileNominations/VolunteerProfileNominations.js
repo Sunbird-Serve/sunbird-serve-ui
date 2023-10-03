@@ -125,13 +125,13 @@ function VPNominations() {
             </div>
             <div className="statsVPNomsName">Needs Approved</div>
           </div>
-          <div className="statsVPNomsItem">
+          {/* <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerNeedsInProgress} alt="Needs In Progress" height="35px" />
               <span>00</span>
             </div>
             <div className="statsVPNomsName">Needs In Progress</div>
-          </div>
+          </div> */}
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerPlansDelivered} alt="Nominated Needs" height="35px" />
@@ -150,8 +150,6 @@ function VPNominations() {
         {/* Tabs */}
         <div className="vnomTabs">
           <div className={`${activeTab === 'tabN' ? 'VNomTabN selectedVNomTab' : 'VNomTabN'}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
-          <div className={`${activeTab === 'tabP' ? 'VNomTabP selectedVNomTab' : 'VNomTabP'}`} onClick={() => handleTabClick('tabP')}>In Progress</div>
-          <div className={`${activeTab === 'tabR' ? 'VNomTabR selectedVNomTab' : 'VNomTabR'}`} onClick={() => handleTabClick('tabR')}>Requested</div>
           <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
         </div>
     

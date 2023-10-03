@@ -40,8 +40,8 @@ const ModifyNeed = props => {
                     <div className="needInfoBox">
                         <div className="needInfoBar">
                             <div className="wrapInfoName"> 
-                                <div className="needIName">{data.need.name}</div>
-                                <div className="needITag">{data.need.description.slice(3,-4)}</div>
+                                <div className="needIName">{data.need.name ? data.need.name : ''}</div>
+                                <div className="needITag">{data.need.description ? data.need.description.slice(3,-4) : ''}</div>
                             </div>
                         </div>
                         <form className="needInfoForm row" id="modifyForm" >
@@ -50,45 +50,38 @@ const ModifyNeed = props => {
                                 <div className="needInfoTopLeft col-sm-6">
                                     <div className="itemNInfo">
                                             <label>Need Name</label>
-                                            <span>{data.need.name}</span>
+                                            <span>{data.need.name ? data.need.name : ''}</span>
                                     </div>
                                     <div className="itemNInfo">
                                             <label>Need Purpose</label>
-                                            <span>{data.need.needPurpose}</span>
+                                            <span>{data.need.needPurpose ? data.need.needPurpose : ''}</span>
                                     </div>
                                     <div className="itemNInfo">
                                             <label>Need Type</label>
-                                            <span>{data.needType.name}</span>
+                                            <span>{data.needType.name ? data.needType.name : ''}</span>
                                     </div> 
                                 </div>  
                                 <div className="needInfoTopRight col-sm-6">
                                     <div className="itemNInfoDescrip">
                                         <label>Need Description</label>
-                                        <span>{data.need.description.slice(3,-4)}</span>
+                                        <span>{data.need.description ? data.need.description.slice(3,-4) : ''}</span>
                                     </div>
                                     {/* Entity Name */}
                                     <div className="itemNInfo">
                                         <label>Entity Name</label>
-                                        <span>{data.entity.name} </span>
+                                        <span>{data.entity.name ? data.entity.name : ''} </span>
                                     </div>
                                     {/* Date */}
                                     <div className="itemWrapNInfoDate">
                                         <div className="itemNInfoDate">
                                             <label>Start Date</label>
-                                            <span>{data.needRequirement.startDate.substr(0,10)}</span>
+                                            <span>{data.occurrence ? data.occurrence.startDate.substr(0,10) : ''}</span>
                                         </div>
                                         <div className="itemNInfoDate">
                                             <label>End Date</label>
-                                            <span>{data.needRequirement.endDate.substr(0,10)}</span>
+                                            <span>{data.occurrence ? data.occurrence.endDate.substr(0,10) : ''}</span>
                                         </div>
                                     </div>
-                                    {/* Time */}
-                                    {/*}
-                                    <div className="itemNInfo">
-                                        <label>Time</label>
-                                        <span></span>
-                                    </div> 
-                                    */}
                                 </div>                      
                             </div>           
                             <div className="catergoryNInfo">VOLUNTEER PREREQUISITE</div>                          
@@ -98,7 +91,7 @@ const ModifyNeed = props => {
                                     { data &&
                                      <div className="itemNInfo">
                                         <label>Skills Required</label>
-                                        <span>{data.needRequirement.skillDetails}</span>
+                                        <span>{data.needRequirement.skillDetails ? data.needRequirement.skillDetails : ''}</span>
                                         {/*<span>{data.skillDetail.map(item => item.value)}</span> */}
                                     </div> }
                                 </div>
@@ -106,7 +99,7 @@ const ModifyNeed = props => {
                                     {/* No. of Volunteers Required */}
                                     <div className="itemNInfo">
                                         <label>No. of Volunteers required</label>
-                                        <span>{data.needRequirement.volunteersRequired}</span>
+                                        <span>{data.needRequirement.volunteersRequired ? data.needRequirement.volunteersRequired : ''}</span>
                                     </div>
                                 </div>
                             </div>

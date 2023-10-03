@@ -4,13 +4,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import axios from 'axios';
 import configData from './../../configData.json'
 import ShareIcon from "@mui/icons-material/Share";
-import { auth, gprovider, fprovider } from '../../firebase'
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth'
-import { FcGoogle } from "react-icons/fc"
-import FacebookRoundedIcon from '@mui/icons-material/FacebookRounded';
-import SignUp from '../SignUp/SignUp';
+import { auth } from '../../firebase'
 import VolunteerSignup from '../VolunteerSignup/VolunteerSignup';
-import { NavLink, Redirect, useNavigate, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import VolunteerLogin from '../VolunteerLogin/VolunteerLogin';
 import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
@@ -18,13 +14,15 @@ import NominationSuccess from '../../assets/nominationSuccess.png';
 
 function NeedPopup({ open, onClose, need }) {
   const userId = useSelector((state)=> state.user.data.osid)
+  console.log(need.need.id)
 
   const [alertLogin, setAlertLogin] = useState(false)
   const [notifyRegister, setNotifyRegister] = useState(false)
   //NOMINATION to a need on Nominate button click
   const nominateNeed = () => {
-    const needId = need.id; //  the need.id represents the needId
+    const needId = need.need.id; //  the need.id represents the needId
     console.log(needId)
+    console.log(userId)
     if(userId){
     axios.post(`${configData.NEED_SEARCH}/${needId}/nominate/${userId}`)
       .then((response) => {
@@ -41,50 +39,7 @@ function NeedPopup({ open, onClose, need }) {
         setAlertLogin(true)
       }
     }
-
   };
- 
-  const [needType, setNeedType] = useState(null);
-  function NeedTypeById( needTypeId ) {
-    axios
-      .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
-      .then((response) => {
-        setNeedType(response.data.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Need Type failed:", error);
-      });
-   return needType || '';
-  } 
-
-  const [entityName, setEntityName] = useState(null);
-  function EntityById( entityId ) {
-    axios
-      .get(`${configData.ENTITY_GET}/${entityId}`)
-      .then((response) => {
-        setEntityName(response.data.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Entity failed:", error);
-      });
-  return entityName || '';
-  }
-  const [needRequirement,setNeedRequirement] = useState(null)
-  useEffect(() => {
-    if(need) {
-    axios
-      .get(`${configData.NEED_REQUIREMENT_GET}/${need.requirementId}`)
-      .then((response) => {
-         console.log(response.data)
-         setNeedRequirement(response.data)
-      })
-      .catch((error) => {
-        console.error("Fetching Entity failed:", error);
-      });
-    }
-  }, [need]);
-  console.log(needRequirement)
-  console.log(userId)
 
   const [nominationStatus, setNominationStatus] = useState(false)
 
@@ -120,7 +75,7 @@ function NeedPopup({ open, onClose, need }) {
         <CloseIcon />
       </div>
       <div className="contentNeedPopup">
-        <div className="needPTitle">{need.name}</div>
+        <div className="needPTitle">{need.need.name}</div>
         <br/>
         <button className="nominate-button" onClick={nominateNeed}>
           Nominate
@@ -128,25 +83,25 @@ function NeedPopup({ open, onClose, need }) {
         <p className="notification-needpopup">Hurry! Nominations will be closed soon</p>
         <div className="aboutHeading">About</div>
         <p className="popupNKey">About the Need </p>
-        <p className="popupNValue">{need.description.slice(3,-4)}</p>
+        <p className="popupNValue">{ (need.need && need.need.description) ? need.need.description.slice(3,-4) : '' }</p>
         <p className="popupNKey">Need Type </p>
-        <p>{NeedTypeById(need.needTypeId)} </p>
+        <p>{need.needType.name} </p>
         <div className="date-container">
           <div className="date-item">
             <span className="popupNKey"> Start Date </span>
-            <p>{ (needRequirement)? needRequirement.startDate.substr(0,10) : '' }</p>
+            <p>{ (need.occurrence && need.occurrence.startDate)? need.occurrence.startDate.substr(0,10) : '' }</p>
           </div>
           <div className="date-item">
             <p className="popupNKey">End Date </p>
-            <p>{ (needRequirement)? needRequirement.endDate.substr(0,10) : '' }</p>
+            <p>{ (need.occurrence && need.occurrence.endDate)? need.occurrence.endDate.substr(0,10) : '' }</p>
           </div>
         </div>
         <p className="popupNKey">Entity Name </p>
-        <p>{EntityById(need.entityId)}</p>
+        <p>{ need.entity.name }</p>
         <p className="popupNKey">Skills Required</p>
-        <p className="popupNValue">{ (needRequirement)? needRequirement.skillDetails : '' }</p>
+        <p className="popupNValue">{ (need.needRequirement && need.needRequirement.skillDetails)? need.needRequirement.skillDetails : '' }</p>
         <p className="popupNKey">Volunteers Required</p>
-        <p className="popupNValue">{ (needRequirement)? needRequirement.volunteersRequired : '' }</p>
+        <p className="popupNValue">{ (need.needRequirement && need.needRequirement.volunteersRequired)? need.needRequirement.volunteersRequired : '' }</p>
         <div className="inviteToEvent">
             <ShareIcon style={{ fontSize: "15px" }} />
             <p style={{ margin: "0 10px", fontSize: "15px", width: "400px" }}>Invite your friends to this event</p>
@@ -160,7 +115,7 @@ function NeedPopup({ open, onClose, need }) {
               alt="Copy Icon"
               style={{ width: "24px", height: "24px", cursor: "pointer" }}
             />
-          </div>
+        </div>
         {/* { <p className="nominationSuccess">Nomination Successful</p>} */}
       </div>
       </div>
@@ -177,8 +132,7 @@ function NeedPopup({ open, onClose, need }) {
           </div>
       </div> }
       
-      {alertLogin && 
-      <div className="alertLogin">
+      {alertLogin && <div className="alertLogin">
         <div className='closeBtnLoginVol'>
           <button onClick={()=>setAlertLogin(false)}>x</button>
         </div> 
@@ -198,14 +152,13 @@ function NeedPopup({ open, onClose, need }) {
       </div>}
 
       {notifyRegister && <div className="notifyRegister">
-            <p>You are logged in with email id <span>{auth.currentUser.email}</span>.</p> 
+            <p>You are logged in with email id <span>{auth.currentUser ? auth.currentUser.email : ''}</span>.</p> 
             <p>Please complete registration to nominate a need.</p>
             <button onClick={handleRegisterClick}>Click to Register</button>
             </div>} 
      
       { vsignup && <VolunteerSignup onClose={handleVolunteerSignup}/>}
       { vlogin && <VolunteerLogin onClose={handleVolunteerLogin}/> }
-
     </div>
 
 
