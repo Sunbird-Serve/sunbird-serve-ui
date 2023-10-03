@@ -1,0 +1,16 @@
+.label-days {
+    height: 30px;
+    width: 120px;
+}
+.wrapDayTime {
+    display: flex;
+    gap: 25px;
+    align-items: middle;
+}
+.label-startTime {
+    height: 30px;
+    padding: 2px;
+}
+.label-endTime {
+    height: 30px;
+}

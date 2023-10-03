@@ -57,9 +57,11 @@ export const NeedsTable = props => {
         </div>; }
     },
     { Header: 'Timeline', accessor: 
-      (row) => `${row.needRequirement.startDate.substr(2,8).split('-').reverse().join('/')} - ${row.needRequirement.endDate.substr(2,8).split('-').reverse().join('/')}`,
+      (row) => `${row.needRequirement.occurrenceId}`,
       Cell: ({ value }) => (
-        <span style={{ whiteSpace: 'nowrap' }}>{value}</span>
+        <span style={{ whiteSpace: 'nowrap' }}>{(value) ? '' : value}</span>
+        //startDate.substr(2,8).split('-').reverse().join('/')
+        //endDate.substr(2,8).split('-').reverse().join('/')
       ),
     },
     { Header: 'Status', accessor: 'need.status'}
@@ -142,7 +144,6 @@ export const NeedsTable = props => {
     }
 
   }
-
   const {
     getTableProps,
     getTableBodyProps,

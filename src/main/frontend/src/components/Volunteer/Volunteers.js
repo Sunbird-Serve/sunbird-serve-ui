@@ -18,7 +18,7 @@ function Volunteers() {
   //const userDetails = useSelector((state)=> state.user.data)
 
   const userList = useSelector((state) => state.userlist.data);
-  const volunteerList = userList.filter(item => item.role.includes('Volunteer'))
+  const volunteerList = userList.filter(item => item.role.includes('nCoordinator'))
 
   const COLUMNS = [
     { Header: 'Name', accessor:'identityDetails.fullname' },

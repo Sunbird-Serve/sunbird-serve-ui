@@ -4,6 +4,7 @@ import Avatar from '@mui/material/Avatar';
 import randomColor from 'randomcolor'
 
 const VolunteerDetails = props => {
+    console.log(props.data)
   return (
     <div className="wrapVolunteerDetails">
         <div className="volunteerDetails">
@@ -13,7 +14,7 @@ const VolunteerDetails = props => {
                 </div>
                 <div className="nameEmail-vInfo">
                     <div className="volunteer-name">Raviteja</div>
-                    <div className="volunteer-email">raviteja@egurukulapps.com</div>
+                    <div className="volunteer-email">{props.data.contactDetails.email}</div>
                 </div>
                 <div className="status-vInfo"></div>
             </div>

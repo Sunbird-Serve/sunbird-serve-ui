@@ -1,6 +1,3 @@
-
-
-
 import React, { useState, useEffect, useRef } from 'react'
 import Select from 'react-select'
 import ReactQuill from 'react-quill';
@@ -10,8 +7,9 @@ import './RaiseNeed.css'
 import { useHistory } from 'react-router'
 import UploadImageBG from '../../assets/bgImgUpload.png'
 import MultiSelect from './MultiSelect';
-import configData from './../../configData.json'
+import MonoSelect from './MonoSelect';
 
+import configData from './../../configData.json'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchNeedsByUid } from "../../state/needByUidSlice";
 
@@ -19,58 +17,40 @@ const RaiseNeed = props => {
     const dispatch = useDispatch();
     const history = useHistory()
     const uid = useSelector((state) => state.user.data.osid)
-    const needTypes = useSelector((state) => state.needtype.data.content)
     const entities = useSelector((state) => state.entity.data.content)
-    const [manualSkill, setManualSkill] = useState("");
+    const needTypes = useSelector((state) => state.needtype.data.content)
+    console.log(needTypes)
 
-
-
-    const handleManualSkillAdd = (e) => {
-        if (e.key === "Enter" && manualSkill.trim() !== "") {
-            // Create a new skill object and add it to the selectedOptions array
-            const newSkill = { label: manualSkill, value: manualSkill };
-            setSelectedOptions([...selectedOptions, newSkill]);
-    
-            // Clear the manualSkill input field
-            setManualSkill("");
-        }
-    };
-    
-
-    const [selectedOptions, setSelectedOptions] = useState([]);
     // fields to enter in the raise need form
+    const [timeslotsArray, setTimeslotsArray] = useState([])
     const [data, setData] = useState({
-        needTypeId: '',       //registry.Need (Need Type)
-        name: '',    //registry.Need (Need Name) 
+        needTypeId: '',      
+        name: '',    
         needPurpose: '',
-        description: '',      //registry.Need (Need Description)
-        status: 'Approved',     //registry.Need
-        userId: uid,      //registry.Need ? Not from RN form
-        entityId: '',       //registry.Need (Entity Name)
-        //requirementId: '',        //serve.NeedRequirement'
+        description: '',     
+        status: 'Approved',     
+        userId: uid,      
+        entityId: '',     
+        //requirementId: '',       
     });
-    const [dataOther, setDataOther] = useState({
-        skillDetails: '',
-        frequency: '',
-        volunteersRequired: '',
+    const [reccurrence, setReccurrence] = useState('off')
+    const [selectedDays, setSelectedDays] = useState([]);
+    const [dataOccurrence, setDataOccurrence ] = useState({
         startDate: '',
         endDate: '',
-        priority: '',
-        //timeSlot:'T00:00:00.000Z',    //??
-        //days:'',        //??
+        days: '',
+        frequency: reccurrence,
+        timeSlots: selectedDays,
     })
-    const { name, needTypeId, status, description, needPurpose, userId, entityId } = data;
-    const { skillDetails, frequency, startDate, endDate, volunteersRequired, priority } = dataOther;
-
-    // configure and handle image upload
-    const inputRef = useRef(null);
-    const handleImageClick = () => {
-        inputRef.current.click();
-    };
-    const [imageNeed, setImageNeed] = useState('')
-    const handleImageUpload = (e) => {
-        setImageNeed(e.target.files[0])
-    }
+    const [dataOther, setDataOther] = useState({
+        skillDetails: '',
+        volunteersRequired: '',
+        occurrence: dataOccurrence,
+        priority: '',
+    })
+    const { needTypeId, name, needPurpose, description, status, userId, entityId } = data;
+    const { startDate, endDate, days, frequency, timeSlots } = dataOccurrence;
+    const { skillDetails, volunteersRequired, occurrence, priority } = dataOther;
 
     //need name and purpose updated by change handler
     //default Handlers to update input fields //
@@ -79,6 +59,10 @@ const RaiseNeed = props => {
     }
     const changeHandlerOther = e => {
         setDataOther({ ...dataOther, [e.target.name]: e.target.value })
+    }
+    const changeFrequency= e => {
+        setDataOccurrence({ ...dataOccurrence, frequency: e.target.value })
+        setReccurrence(e.target.value)
     }
 
     // need description - configure rich text options //
@@ -94,44 +78,74 @@ const RaiseNeed = props => {
     const [startYMD, setStartYMD] = useState('')
     const [endYMD, setEndYMD] = useState('')
     const handleEndDate = e => {
-        setDataOther({ ...dataOther, endDate: (e.target.value + 'T08:57:00.000Z') })
+        setDataOccurrence({ ...dataOccurrence, endDate: (e.target.value + 'T08:57:00.000Z') })
         setEndYMD(e.target.value)
     }
     const handleStartDate = e => {
-        setDataOther({ ...dataOther, startDate: (e.target.value + 'T08:57:00.000Z') })
+        setDataOccurrence({ ...dataOccurrence, startDate: (e.target.value + 'T08:57:00.000Z') })
         setStartYMD(e.target.value)
     }
-
-    // event days by handleSelectedDaysChange
-    const optionsDay = [
-        { id: 1, label: 'Sunday', startTime: '', endTime: '' },
-        { id: 2, label: 'Monday', startTime: '', endTime: '' },
-        { id: 3, label: 'Tuesday', startTime: '', endTime: '' },
-        { id: 4, label: 'Wednesday', startTime: '', endTime: '' },
-        { id: 5, label: 'Thursday', startTime: '', endTime: '' },
-        { id: 6, label: 'Friday', startTime: '', endTime: '' },
-        { id: 7, label: 'Saturday', startTime: '', endTime: '' },
-    ];
     // Handler to update selected event days
-    const [selectedDays, setSelectedDays] = useState([]);
     const handleSelectedDaysChange = (selected) => {
-        setSelectedDays(selected);
+        setSelectedDays(selected.map((obj) => ({
+            ...obj,
+            startTime: `2023-10-02T${obj.startTime}:21.937Z`,
+            endTime: `2023-10-02T${obj.endTime}:21.937Z`,
+          })));
     };
-    //convert days array into string
+    
+
+
+    // get skills for all need types
+    const [skillMap, setSkillMap] = useState([]);
     useEffect(() => {
-        const dayLabels = selectedDays.map(day => day.label)
-        setDataOther(dataOther => ({
-            ...dataOther,
-            frequency: dayLabels.join(', '),
-        }))
-    }, [selectedDays])
+        async function getReq(requirementId) {
+          try {
+            // Replace with your API endpoint and configuration
+            const response = await axios.get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`);
+            return response.data.skillDetails;
+          } catch (error) {
+            return null
+          }
+        }
+        async function fetchNeedRequirements() {
+            const responseMap = {}
+            await Promise.all(
+                needTypes.map(async (needType) => {
+                    const skillsReq = await getReq(needType.requirementId);
+                    responseMap[needType.id]= skillsReq ? skillsReq.split(',').map(item => ({
+                        label: item,
+                        value: item
+                    })) : []
+                })
+            );
+            setSkillMap(responseMap);
+        }
+        fetchNeedRequirements();
+    }, [needTypes]); 
+    //when needType is set, fetch curresponding requirements ans set to options
+    const [options, setOptions ] = useState([])
+    useEffect(() => {
+        setOptions(skillMap[needTypeId])
+    }, [needTypeId]); 
+    console.log(options)
+
+    const [manualSkill, setManualSkill] = useState("");
+    const handleManualSkillAdd = (e) => {
+        if (e.key === "Enter" && manualSkill.trim() !== "") {
+            // Create a new skill object and add it to the selectedOptions array
+            const newSkill = { label: manualSkill, value: manualSkill };
+            setSelectedOptions([...selectedOptions, newSkill]);
+    
+            // Clear the manualSkill input field
+            setManualSkill("");
+        }
+    };
+    
     //handle skills details change
+    const [selectedOptions, setSelectedOptions] = useState([]);
     const handleChange = (selectedOptions) => {
         setSelectedOptions(selectedOptions)
-        setDataOther(dataOther => ({
-            ...dataOther,
-            skillDetails: selectedOptions.map(obj => obj.value).join(', '),
-        }))
     }
     const styleTokenInput = {
         control: (provided) => ({
@@ -162,41 +176,6 @@ const RaiseNeed = props => {
         })
     }
 
-
-    // get needrequirement whenever needtypeId is changed
-    const [needReqId, setNeedReqId] = useState(null)
-    const [skillsRequired, setSkillsRequired] = useState(null)
-    const [options, setOptions] = useState([])
-    useEffect(() => {
-        //do following API call when needTypeId is not null
-        if (needTypeId) {
-            axios.get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
-                .then(
-                    //function(response){console.log(response.data.requirementId)},
-                    response => setNeedReqId(response.data.requirementId)
-                )
-                .catch(function (error) {
-                    console.log('error');
-                })
-        }
-
-        if (needReqId) {
-            axios
-                .get(`${configData.NEED_REQUIREMENT_GET}/${needReqId}`)
-                .then((response) => {
-                    setOptions(response.data.skillDetails.split(',').map(item => ({
-                        label: item,
-                        value: item,
-                    })))
-                })
-                .catch((error) => {
-                    console.error("Fetching Entity failed:", error);
-                });
-        }
-
-    }, [needTypeId, needReqId]);
-    console.log(options)
-
     // format as per API request body
     const [dataToPost, setDataToPost] = useState({
         needRequest: {},
@@ -205,14 +184,29 @@ const RaiseNeed = props => {
     useEffect(() => {
         setDataToPost({ needRequest: data, needRequirementRequest: dataOther })
     }, [data, dataOther])
+    useEffect(() => {
+        setDataOther({ ...dataOther, occurrence: dataOccurrence })
+    }, [dataOccurrence])
 
-    //for state update
-    const [home, setHome] = useState(false);
+    useEffect(() => {
+        setDataOccurrence({ ...dataOccurrence, timeSlots: selectedDays, days: selectedDays.map((obj) => obj.day).join(', ') })
+    }, [selectedDays])
+    useEffect(() => {
+        setDataOther(dataOther => ({
+            ...dataOther,
+            skillDetails: selectedOptions.map(obj => obj.value).join(', '),
+        }))
+    
+    }, [selectedOptions])
+   
+
+    
+
     // raise the need
     const submitHandler = e => {
         e.preventDefault();
         console.log(dataToPost)
-
+        console.log(selectedDays)
         axios.post(`${configData.NEED_POST}`, dataToPost)
             .then(function (response) {
                 console.log('posted sucessfully', response);
@@ -223,14 +217,9 @@ const RaiseNeed = props => {
                 console.log(error);
             })
     }
-    if (home) {
-        //return <Redirect to="/needs"/>
-        window.location.reload()
-    }
     const gotoNeeds = (selectedOptions) => {
         history.push('/needs')
     }
-
 
     return (
         <div className="wrapRaiseNeed row">
@@ -250,16 +239,6 @@ const RaiseNeed = props => {
                     <div className="formTop row">
                         {/* left half of upper side*/}
                         <div className="formLeft col-sm-6">
-                            {/* Image */}
-                            {/*
-                        <div className="itemImage">
-                            <label>Image</label>
-                            <div className="uploadNImage" onClick={handleImageClick}>
-                                {imageNeed ? (<img src={URL.createObjectURL(imageNeed)} alt='' />) : <img src={UploadImageBG} alt='' /> }
-                                <input type="file" ref={inputRef} onChange={handleImageUpload} style={{display:"none"}} />
-                            </div>
-                        </div>
-                        */}
                             {/* Need Name */}
                             <div className="itemFormNeed">
                                 <label>Need Name</label>
@@ -298,8 +277,6 @@ const RaiseNeed = props => {
                         {/* right half of upper side */}
                         <div className="formRight col-sm-6">
                             {/* Need Description */}
-
-
                             <label className="itemDescriptionNeedLabel">Need Description</label>
                             <div className="itemDescriptionNeed">
                                 <ReactQuill className="quillEdit" modules={module} theme="snow" value={description}
@@ -318,15 +295,21 @@ const RaiseNeed = props => {
                                 </div>
                                 <div className="itemDate">
                                     <label>Recurrence </label>
-                                    <select className="selectFrequency" name="frequency" value={entityId} onChange={changeHandler}>
-                                        <option value="" defaultValue>Off</option>
+                                    <select className="selectFrequency" name="frequency" value={frequency} onChange={changeFrequency}>
+                                        <option value="off" defaultValue>Off</option>
+                                        <option value="weekdays">Every Weekday</option>
+                                        <option value="weekend">Every Weekend</option>
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
                                     </select>
                                 </div>
                             </div>
                             <div className="itemFormNeed">
                                 <label>Event Days</label>
                                 <div className="itemFormNeedDays">
-                                    <MultiSelect options={optionsDay} selectedOptions={selectedDays} onSelectedOptionsChange={handleSelectedDaysChange} />
+                                    {frequency === 'off' ? 
+                                        <MultiSelect onAdd={handleSelectedDaysChange} /> 
+                                        : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} />}
                                 </div>
                             </div>
 
