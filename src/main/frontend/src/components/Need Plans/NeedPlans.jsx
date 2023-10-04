@@ -31,35 +31,56 @@ const NeedPlans = () => {
   //get needs raised by nCoordinator
   const needList = useSelector((state) => state.need.data);
   const needsByUser = needList.filter(item => item && item.need && item.need.userId === userId)
+  console.log(needsByUser)
 
   //see if needIds by user have need plans and save if they
+  const [plannedNeeds, setPlannedNeeds] = useState([]);
+  useEffect(() => {
+  async function fetchNoms() {
+    // Use Promise.all to fetch plans for all needs
+    const promises = needsByUser.map(item => axios.get(`${configData.NEED_GET}/${item.need.id}/nominate/Approved`));
+
+    try {
+      const responses = await Promise.all(promises);
+
+      const nomedNeeds = responses.map(response => response.data).filter(item => item.length).map(item => item[0].needId);
+      setPlannedNeeds(nomedNeeds);
+    } catch (error) {
+      console.error("Error fetching plans for: ",promises);
+    }
+    }
+    fetchNoms();
+  }, [userId]);
+
+  console.log(plannedNeeds);
+
   const [needPlans, setNeedPlans] = useState([]);
   useEffect(() => {
     async function getNeedPlan(needId) {
-      try {
-        const response = await axios.get(`${configData.NEEDPLAN_GET}/${needId}`);
-        return response.data || [];
-      } catch (error) {
-        return []
-      }
+    try {
+      const response = await axios.get(`${configData.NEEDPLAN_GET}/${needId}`);
+      return response.data; 
+    } catch (error) {
+      console.error(`Error for needId ${needId}:`, error);
+      throw error;
+    }
     }
 
-    // Use async/await inside the useEffect to fetch data
     async function fetchData() {
-      let flattenedNeedPlans = [];
-      for (const needByUserItem of needsByUser) {
-        const needId = needByUserItem.need.id; 
-        const response = await getNeedPlan(needId);
-        flattenedNeedPlans = [...flattenedNeedPlans, ...response]
+      try {
+        const needplan = plannedNeeds.map(needId => getNeedPlan(needId));
+        const responseArray = await Promise.all(needplan);
+        const merged = responseArray.reduce((merged, response) => {
+          return merged.concat(response);
+        }, []);
+        setNeedPlans(merged);
+      } catch (error) {
+        console.log("An error occurred:", error);
       }
-      setNeedPlans(flattenedNeedPlans)
     }
-
-    // Call the fetchData function when the component mounts
     fetchData();
-  }, []); 
+  }, [plannedNeeds]);
   console.log(needPlans)
-
 
   function VolunteerByNeedId({ needId }) {
     const [volunteerList, setVolunteerList] = useState(null);
@@ -111,28 +132,30 @@ const NeedPlans = () => {
 
   useEffect(() => {
     const planDetails = needPlans.map((plan) => {
-      const need = needList.find((need) => need && need.need.id === plan.needId);
-      async function fetchData() {
-        try {
-          const response = await axios.get(`${configData.NEED_GET}/${plan.needId}/nominate`);      
-          const volunteer = response.data.map((item) => userMap[item['nominatedUserId']]);
-          return volunteer;
-        } catch (error) {
-          console.error("Fetching Entity failed:", error);
-        }
-      }
-    let volunteerArray = [];
-    fetchData()
-    .then((volunteerArray) => {
-      console.log(volunteerArray); // Access the resolved array
-    })
-    .catch((error) => {
-      console.error("Error:", error);
-    });
+      const need = needList.filter((item) => item && item.need).find(item => item.need.id === plan.plan.needId);
+      console.log(need)
+    //   async function fetchData() {
+    //     try {
+    //       const response = await axios.get(`${configData.NEED_GET}/${plan.needId}/nominate`);      
+    //       const volunteer = response.data.map((item) => userMap[item['nominatedUserId']]);
+    //       return volunteer;
+    //     } catch (error) {
+    //       console.error("Fetching Entity failed:", error);
+    //     }
+    //   }
+      // let volunteerArray = [];
+    //   fetchData().then((volunteerArray) => {
+    //     console.log(volunteerArray); // Access the resolved array
+    //   }).catch((error) => {
+    //     console.error("Error:", error);
+    //   });
     
-      if(need && volunteerArray ){
-        return {...plan, needInfo: need, volunteerInfo: volunteerArray }
-      }
+    //   if(need && volunteerArray ){
+    //     return {...plan, needInfo: need, volunteerInfo: volunteerArray }
+    //   }
+      if(need ){
+          return {...plan, needInfo: need }
+        }
       return plan
     })
     setNeedPlanDetails(planDetails)
@@ -141,38 +164,31 @@ const NeedPlans = () => {
 
   const events = needPlanDetails.map(item => ({
     title: item.needInfo.need.name,
-    start: item.needInfo.needRequirement.startDate.slice(0,10),
-    end: item.needInfo.needRequirement.endDate.slice(0,10),
-    timeSlot: item.needInfo.needRequirement.startDate.slice(11,16),
-    needId: item.needId
+    start: item.occurrence.startDate.slice(0,10),
+    end: item.occurrence.endDate.slice(0,10),
+    timeSlot: '09:00',
   }));
-  console.log(events)
 
-
-  //list of approved nominations for a volunteer
-  //need plan is from needIds
-
+  //view of calender: to show monthwise
   const views = {
     month: true,
     week: false,
     day: false,
     agenda: false,
   }
+  //styling of ceels inside calender
   const customEventPropGetter = (event, start, end, isSelected) => {
     const eventStyle = {
-      backgroundColor: 'white', // Customize background color based on event property
+      backgroundColor: 'white', 
       borderRadius: '5px',
       color: 'black',
       boxShadow: "2px 0px #0080BC inset",
       border: 'solid 1px #DBDBDB'
     };
     const currentDate = end;
-
-  return {
-    style: eventStyle,
-  };
-    
-    
+    return {
+      style: eventStyle,
+    };
   };
 
   const month = {'01':'Jan','02':'Feb', '03':'Mar', '04':'Apr', '05':'May', '06':'Jun', '07':'Jul', '08':'Aug', '09':'Sep', '10':'Oct', '11':'Nov', '12':'Dec'}
@@ -195,7 +211,6 @@ const NeedPlans = () => {
   );
 
   const [selectedDate, setSelectedDate] = useState(new Date()); // State to store selected date
-  console.log(selectedDate)
 
   const handleSelectSlot = (slotInfo) => {
     const selectedDateString = moment(slotInfo.start).format('YYYY-MM-DD');
@@ -224,8 +239,6 @@ const NeedPlans = () => {
     setFilteredEvents(data)
   }, [selectedDate]);
   
-  console.log(filteredEvents.length)
-
 
 
 
