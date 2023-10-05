@@ -17,6 +17,8 @@ import randomColor from 'randomcolor'
 import Avatar from '@mui/material/Avatar';
 import {format} from 'date-fns'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 
 const localizer = momentLocalizer(moment);
@@ -25,15 +27,15 @@ const NeedPlans = () => {
   const userId = useSelector((state)=> state.user.data.osid)
   const userList = useSelector((state) => state.userlist.data);
   const userMap = {}
+  const userContact = {}
   for (const user of userList){
-    userMap[user.osid] = user;
+    userMap[user.osid] = user.identityDetails.fullname;
+    userContact[user.osid] = user.contactDetails.mobile;
   }
 
   //get needs raised by nCoordinator
   const needList = useSelector((state) => state.need.data);
-  console.log(needList)
   const needsByUser = needList.filter(item => item && item.need && item.need.userId === userId)
-  console.log(needsByUser)
 
   //see if needIds by user have need plans and save if they
   const [nomNeedMap, setNomNeedMap] = useState([])
@@ -63,14 +65,12 @@ const NeedPlans = () => {
     }
     fetchNoms();
   }, [userId]);
-  console.log(nomNeedMap)
 
   const [needPlans, setNeedPlans] = useState([]);
   useEffect(() => {
     const newResultArray = [];
     for (const needId in nomNeedMap) {
       const matchingNeed = needList.filter(needItem => needItem && needItem.need).find(needItem => needItem.need.id === needId);
-      console.log(matchingNeed)
       if (matchingNeed) {
         const resultObject = {
           needId: matchingNeed.need.id,
@@ -83,16 +83,14 @@ const NeedPlans = () => {
     }
     setNeedPlans(newResultArray);
   }, [nomNeedMap, needList]);
-
-  console.log(needPlans)
+  const totalAssignedUsers = needPlans.reduce((acc, plan) => acc + plan.assignedUserId.length, 0);
 
   //make the events from start to end date
-  function getTimeSlots(needName, startDate, endDate, timeSlots) {
+  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId) {
     const timeSlotObject = {};
     timeSlots.forEach(slot => {
       const day = slot.day.toLowerCase();
-      timeSlotObject[day] = [format(new Date(slot.startTime), 'h:mm a'), format(new Date(slot.endTime), 'h:mm a')];
-      console.log(timeSlotObject[day])
+      timeSlotObject[day] = [format(new Date(slot.startTime), 'hh:mm a'), format(new Date(slot.endTime), 'h:mm a')];
     });
   
     const dateWithTimeSlots = [];
@@ -109,7 +107,8 @@ const NeedPlans = () => {
           startTime: timeSlotObject[day][0],
           endTime: timeSlotObject[day][1],
           startDate: new Date(startDate).toDateString(),
-          endDate: new Date(endDate).toDateString()
+          endDate: new Date(endDate).toDateString(),
+          assignedUsers: assignedUserId
         });
       }
       currentDate.setDate(currentDate.getDate() + 1);
@@ -123,14 +122,12 @@ const NeedPlans = () => {
     for (const item of needPlans) {
       if (item.needInfo.occurrence !== null) {
         const { startDate, endDate } = item.needInfo.occurrence;
-        const sessions = getTimeSlots(item.needInfo.need.name, startDate, endDate, item.needInfo.timeSlots); // Use getTimeSlots function
+        const sessions = getTimeSlots(item.needInfo.need.name, startDate, endDate, item.needInfo.timeSlots, item.assignedUserId); // Use getTimeSlots function
         newEvents.push(...sessions);
       }
     }
     setEvents(newEvents);
   }, [needPlans]);
-
-  console.log(events)
 
   //view of calender: to show monthwise
   const views = {
@@ -193,17 +190,17 @@ const NeedPlans = () => {
       const selected = moment(selectedDate)
       return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
     })
-
     setFilteredEvents(data)
   }, [selectedDate]);
   
+  const [expandEvent, setExpandEvent] = useState(false)
 
 
 
   return (
       <div>
         <div className="wrapCalender">
-          <Calendar className="vCalender"
+          <Calendar className="ncCalender"
             localizer={localizer}
             events={events}     //data into calender
             startAccessor="start"
@@ -220,28 +217,42 @@ const NeedPlans = () => {
           />
           
           {/* Side List showing list of events */}
-          {selectedDate && ( <div className="event-list">
+          { selectedDate && ( <div className="event-list-nc">
           {/* Selected Event Date */}
-          <div className="headEventList">{moment(selectedDate).format('MMMM D, YYYY')}</div>
+          <div className="headEventListNC">{moment(selectedDate).format('MMMM D, YYYY')}</div>
           {/* Need and Volunteer Stats */}
           <div className="stats-need-volunteer">
-              <div className="needCount1">
-                <i><StickyNote2Icon /></i> Needs
+              <div className="needCountNC">
+                <i><StickyNote2Icon /></i> 
+                <span>{needPlans.length} Needs</span>
               </div>
-              <div className="volunteerCount1">
-                <i><PeopleAltIcon /></i> Volunteers
+              <div className="volunteerCountNC">
+                <i><PeopleAltIcon /></i> 
+                <span>{totalAssignedUsers} Volunteers</span>
               </div>
           </div>
           {/* EVENTS LIST when selected date falls within date range of any event */}
           { filteredEvents.map((event) => (
-            <li className="dayEventList" key={event.title}>
-              <div className="dayEventTitle">
-                <span><ChevronRightIcon /></span>
-                <span className="nameDayEvent">{event.title}</span>
-                <span className="timeDayEvent">{event.startTime}</span> 
+            <button className="dayEventListNC" key={event.title} onClick={() => setExpandEvent(!expandEvent)}>
+              <div className="dayEventTitleNC">
+                <i> { expandEvent ? <ExpandMoreIcon/> : <ChevronRightIcon /> }</i>
+                <span className="nameDayEventNC">{event.title}</span>
+                <span className="timeDayEventNC">
+                  <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
+                  {event.startTime}
+                </span> 
               </div>
-              <div className="dayEventDate"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
-            </li>
+              <div className="dayEventDateNC"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
+              { expandEvent && 
+                event.assignedUsers.map((user) => <div className="user-boxNC">
+                  <div className="userNameNC">
+                    <div><Avatar style={{padding:'5px',height:'24px',width:'24px',fontSize:'16px',backgroundColor:randomColor()}}></Avatar></div>
+                    <div className="userName-eventList">{userMap[user]}</div>
+                  </div>
+                  <div className="userContact-eventList">{userContact[user]}</div>
+                </div>)
+              }
+            </button>
           )) }
 
 
