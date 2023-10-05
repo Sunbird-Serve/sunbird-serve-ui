@@ -1,4 +1,7 @@
-.vCalender {
+.wrapCalender {
+  display: flex;
+}
+.ncCalender {
   display: flex;
   height: 600px;
   width: 840px;
@@ -6,104 +9,87 @@
   background-color: white;
   border: solid 1px #DBDBDB;
 }
-.wrapCalender {
-  display: flex;
-}
-.rbc-today {
-  box-sizing: border-box;
-  background-color: #E7DEFF;
-}
-
-.custom-toolbar {
-  display: flex;
-  align-items: center;
-  margin: 10px 0px;
-}
-.calendar-month-year {
-  display: inline-block;
-  font-size: 18px; 
-  font-weight: 500; 
-}
-.selected-date-cell {
-  background-color: #E9F6FF; 
-}
-
-.event-list {
+.event-list-nc {
   border: solid 1px;
-  margin-left: 5px;
-  width: 400px;
+  margin-left: 15px;
+  width: 450px;
   border: solid 1px #EBEBEB;
   background-color: white;
 }
-.rbc-header-bg {
-  background-color: #FAFAFA; 
-}
-.rbc-header {
-  font-weight: 500; 
-  color: #686C73; 
-  background-color: #FAFAFA;
-}
-.rbc-header > span {
-  display: block;
-  padding: 10px; 
-  text-align: center;
-}
-.rbc-off-range-bg {
-  background-color: white; 
-}
-.rbc-off-range {
-  color: #999; 
-}
-.rbc-off-range-bg .rbc-day-bg {
-  background-color: #f0f0f0; /* Example background color */
-}
-.headEventList {
+.headEventListNC {
   height: 60px;
   display: flex;
   align-items: center;
   padding-left: 20px;
   font-size: 18px;
 }
-.statsEventList {
+.stats-need-volunteer {
   display: flex;
+  justify-content: space-around;
   height: 45px;
   align-items: center;
   padding-left: 15px ;
   background-color: #FAFAFA;
 }
-.statsEventList span {
+.stats-need-volunteer span {
   padding: 0px 50px 0px 10px;
 }
-.dayEventList {
-  list-style-type: none;
-  padding: 10px 20px;
+.stats-need-volunteer i {
+  color: #0080BC;
+}
+.dayEventListNC {
+  background-color: inherit;
+  border: none;
   border-left: solid 3px #0080BC;
+  padding: 10px;
   margin-top: 3px;
 }
-.dayEventTitle {
+.dayEventTitleNC {
   display: flex;
-  justify-content: space-between;
 }
-.nameDayEvent {
+.dayEventTitleNC i {
+  color: #0080BC;
+  margin-right: 5px;
+}
+.nameDayEventNC {
   font-weight: 600;
   font-size: 16px;
-  width: 300px;
+  width: 290px;
+  text-align: left;
 }
-.dayEventDate {
+.timeDayEventNC {
+  vertical-align: middle;
+}
+.dayEventDateNC {
+  color: #0080BC;
+  font-weight: 600;
+  text-align: left;
+  margin-left: 30px;
+}
+.user-boxNC {
+  margin-top: 10px;
+  padding: 5px;
+  border: solid 1px #EBEBEB;
+  border-radius: 5px;  
+}
+.userNameNC {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+.userName-eventList {
+  margin: 0px 5px 0px 10px;
+}
+.userContact-eventList {
+  text-align: left;
+  font-size: 12px;
+  margin-left: 34px;
   color: #99999F;
 }
-.dayEventDetails {
-  color: #0080BC;
-  text-align: center;
-}
 .noEventsOnDay {
-  height: 400px;
+  height: 450px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-.stats-need-volunteer {
-  display: flex;
-  justify-content: space-around;
 }
