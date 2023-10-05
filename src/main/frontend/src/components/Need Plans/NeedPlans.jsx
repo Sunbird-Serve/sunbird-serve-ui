@@ -15,7 +15,8 @@ import configData from '../../configData.json'
 import axios from 'axios'
 import randomColor from 'randomcolor'
 import Avatar from '@mui/material/Avatar';
-
+import {format} from 'date-fns'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 
 
 const localizer = momentLocalizer(moment);
@@ -30,144 +31,106 @@ const NeedPlans = () => {
 
   //get needs raised by nCoordinator
   const needList = useSelector((state) => state.need.data);
+  console.log(needList)
   const needsByUser = needList.filter(item => item && item.need && item.need.userId === userId)
   console.log(needsByUser)
 
   //see if needIds by user have need plans and save if they
-  const [plannedNeeds, setPlannedNeeds] = useState([]);
+  const [nomNeedMap, setNomNeedMap] = useState([])
   useEffect(() => {
   async function fetchNoms() {
-    // Use Promise.all to fetch plans for all needs
     const promises = needsByUser.map(item => axios.get(`${configData.NEED_GET}/${item.need.id}/nominate/Approved`));
 
     try {
       const responses = await Promise.all(promises);
 
-      const nomedNeeds = responses.map(response => response.data).filter(item => item.length).map(item => item[0].needId);
-      setPlannedNeeds(nomedNeeds);
+      // const nomedNeeds = responses.map(response => response.data).filter(item => item.length).map(item => item[0].needId);
+      const nomedNeeds = responses.map(response => response.data).filter(item => item.length)
+      const filterNomNeed = nomedNeeds.reduce((acc, elementArray) => {
+        elementArray.forEach(obj => {
+          const { needId, nominatedUserId } = obj;
+          if (!acc[needId]) {
+            acc[needId] = [];
+          }
+          acc[needId].push(nominatedUserId);
+        });
+        return acc;
+      }, {});
+      setNomNeedMap(filterNomNeed)
     } catch (error) {
       console.error("Error fetching plans for: ",promises);
     }
     }
     fetchNoms();
   }, [userId]);
-
-  console.log(plannedNeeds);
+  console.log(nomNeedMap)
 
   const [needPlans, setNeedPlans] = useState([]);
   useEffect(() => {
-    async function getNeedPlan(needId) {
-    try {
-      const response = await axios.get(`${configData.NEEDPLAN_GET}/${needId}`);
-      return response.data; 
-    } catch (error) {
-      console.error(`Error for needId ${needId}:`, error);
-      throw error;
-    }
-    }
+    const newResultArray = [];
+    for (const needId in nomNeedMap) {
+      const matchingNeed = needList.filter(needItem => needItem && needItem.need).find(needItem => needItem.need.id === needId);
+      console.log(matchingNeed)
+      if (matchingNeed) {
+        const resultObject = {
+          needId: matchingNeed.need.id,
+          assignedUserId: nomNeedMap[needId],
+          needInfo: matchingNeed,
+        };
 
-    async function fetchData() {
-      try {
-        const needplan = plannedNeeds.map(needId => getNeedPlan(needId));
-        const responseArray = await Promise.all(needplan);
-        const merged = responseArray.reduce((merged, response) => {
-          return merged.concat(response);
-        }, []);
-        setNeedPlans(merged);
-      } catch (error) {
-        console.log("An error occurred:", error);
+        newResultArray.push(resultObject);
       }
     }
-    fetchData();
-  }, [plannedNeeds]);
+    setNeedPlans(newResultArray);
+  }, [nomNeedMap, needList]);
+
   console.log(needPlans)
 
-  function VolunteerByNeedId({ needId }) {
-    const [volunteerList, setVolunteerList] = useState(null);
-    const [volunteerNames, setVolunteerNames] = useState([]);
-    console.log(volunteerList);
-    console.log(volunteerNames)
-     useEffect(() => {
-       axios
-         .get(`${configData.NEED_GET}/${needId}/nominate`)
-         .then((response) => {
-           setVolunteerList(response.data);
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-         });
-     }, [needId]);
-     
-     useEffect(() => {
-      if (volunteerList) {
-        const volunteerIds = volunteerList.map((item) => item['nominatedUserId']);
-        // Function to fetch volunteer details by volunteerId: NAME
-        const fetchVolunteerDetails = async (volunteerId) => {
-          try {
-            const response = await axios.get(`${configData.USER_GET}/${volunteerId}`); 
-            return response.data.identityDetails.name; // Assuming your API returns a name field
-          } catch (error) {
-            console.error(`Error fetching volunteer details for ID ${volunteerId}:`, error);
-            return null;
-          }
-        };
+  //make the events from start to end date
+  function getTimeSlots(needName, startDate, endDate, timeSlots) {
+    const timeSlotObject = {};
+    timeSlots.forEach(slot => {
+      const day = slot.day.toLowerCase();
+      timeSlotObject[day] = [format(new Date(slot.startTime), 'h:mm a'), format(new Date(slot.endTime), 'h:mm a')];
+      console.log(timeSlotObject[day])
+    });
   
-        // Use Promise.all to make API calls for all volunteerIds concurrently
-        const fetchDataForAllVolunteers = async () => {
-          const promises = volunteerIds.map((volunteerId) => fetchVolunteerDetails(volunteerId));
-          const volunteerNames = await Promise.all(promises);
-          setVolunteerNames(volunteerNames);
-        };
-  
-        fetchDataForAllVolunteers();
+    const dateWithTimeSlots = [];
+    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const currentDate = new Date(startDate);
+    while (currentDate <= new Date(endDate)) {
+      const dayIndex = currentDate.getDay();
+      const day = daysOfWeek[dayIndex];
+      if (timeSlotObject[day]) {
+        dateWithTimeSlots.push({
+          title: needName,
+          start: currentDate.toDateString(),
+          end: currentDate.toDateString(),
+          startTime: timeSlotObject[day][0],
+          endTime: timeSlotObject[day][1],
+          startDate: new Date(startDate).toDateString(),
+          endDate: new Date(endDate).toDateString()
+        });
       }
-    }, [volunteerList]);
-
-    return volunteerNames;
-
-  }
-
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
   
-  const [needPlanDetails, setNeedPlanDetails] = useState([])
-
+    return dateWithTimeSlots;
+  }
+  const [events, setEvents] = useState([]);
   useEffect(() => {
-    const planDetails = needPlans.map((plan) => {
-      const need = needList.filter((item) => item && item.need).find(item => item.need.id === plan.plan.needId);
-      console.log(need)
-    //   async function fetchData() {
-    //     try {
-    //       const response = await axios.get(`${configData.NEED_GET}/${plan.needId}/nominate`);      
-    //       const volunteer = response.data.map((item) => userMap[item['nominatedUserId']]);
-    //       return volunteer;
-    //     } catch (error) {
-    //       console.error("Fetching Entity failed:", error);
-    //     }
-    //   }
-      // let volunteerArray = [];
-    //   fetchData().then((volunteerArray) => {
-    //     console.log(volunteerArray); // Access the resolved array
-    //   }).catch((error) => {
-    //     console.error("Error:", error);
-    //   });
-    
-    //   if(need && volunteerArray ){
-    //     return {...plan, needInfo: need, volunteerInfo: volunteerArray }
-    //   }
-      if(need ){
-          return {...plan, needInfo: need }
-        }
-      return plan
-    })
-    setNeedPlanDetails(planDetails)
+    const newEvents = [];
+    for (const item of needPlans) {
+      if (item.needInfo.occurrence !== null) {
+        const { startDate, endDate } = item.needInfo.occurrence;
+        const sessions = getTimeSlots(item.needInfo.need.name, startDate, endDate, item.needInfo.timeSlots); // Use getTimeSlots function
+        newEvents.push(...sessions);
+      }
+    }
+    setEvents(newEvents);
   }, [needPlans]);
-  console.log(needPlanDetails)
 
-  const events = needPlanDetails.map(item => ({
-    title: item.needInfo.need.name,
-    start: item.occurrence.startDate.slice(0,10),
-    end: item.occurrence.endDate.slice(0,10),
-    timeSlot: '09:00',
-  }));
+  console.log(events)
 
   //view of calender: to show monthwise
   const views = {
@@ -176,7 +139,7 @@ const NeedPlans = () => {
     day: false,
     agenda: false,
   }
-  //styling of ceels inside calender
+  //styling of cells inside calender
   const customEventPropGetter = (event, start, end, isSelected) => {
     const eventStyle = {
       backgroundColor: 'white', 
@@ -190,8 +153,6 @@ const NeedPlans = () => {
       style: eventStyle,
     };
   };
-
-  const month = {'01':'Jan','02':'Feb', '03':'Mar', '04':'Apr', '05':'May', '06':'Jun', '07':'Jul', '08':'Aug', '09':'Sep', '10':'Oct', '11':'Nov', '12':'Dec'}
 
   const CustomToolbar = ({ onNavigate, label }) => (
     <div className="custom-toolbar">
@@ -223,9 +184,6 @@ const NeedPlans = () => {
     const classNames = isSelectedDate ? 'selected-date-cell' : '';
     return { className: classNames };
   };
-
-
- 
 
   const [filteredEvents, setFilteredEvents ] = useState([])
   useEffect(() => {
@@ -261,57 +219,47 @@ const NeedPlans = () => {
             dayPropGetter={customDayPropGetter} // Apply custom day cell styling
           />
           
-        {/* Side List showing list of events */}
-        
-        {selectedDate && ( <div className="event-list">
+          {/* Side List showing list of events */}
+          {selectedDate && ( <div className="event-list">
           {/* Selected Event Date */}
           <div className="headEventList">{moment(selectedDate).format('MMMM D, YYYY')}</div>
           {/* Need and Volunteer Stats */}
-          <div>
+          <div className="stats-need-volunteer">
               <div className="needCount1">
-              <i><StickyNote2Icon /></i>
-              {/* <span>{filteredData.length}</span> */}
-              <label>Needs</label>
-            </div>
-            <div className="volunteerCount1">
-              <i><PeopleAltIcon /></i>
-              <span> </span>
-              <label>Volunteers</label>
-            </div>
-          </div>
-          {/* When selected date falls within date range of any event */}
-            { filteredEvents.map((event) => (
-      <li className="dayEventList" key={event.title}>
-        <div className="dayEventTitle">
-          <span className="nameDayEvent">{event.title}</span>
-          {/* <span className="timeDayEvent">{event.timeSlot}</span> */}
-        </div>
-      <div className="dayEventDate"> {month[event.start.slice(5,7)]} {event.start.slice(8,10)} - {month[event.end.slice(5,7)]} {event.end.slice(8,10)}</div>
-        {/* <div className="dayEventDetails">View Full Details</div> */}
-        <div className="vAvatars-container">{}
-        </div>
-      </li>
-    )) }
-
-
-            {/* NO EVENTS SCREEN */}
-            {!events.some((event) => {
-              const startDate = moment(event.start);
-              const endDate = moment(event.end);
-              const selected = moment(selectedDate);
-              return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
-            }) && (
-              <div className="noEventsOnDay">
-                <img src={noRecords} alt="No Events" />
-                  <p>No needs scheduled on this date</p>
+                <i><StickyNote2Icon /></i> Needs
               </div>
-            )}
+              <div className="volunteerCount1">
+                <i><PeopleAltIcon /></i> Volunteers
+              </div>
+          </div>
+          {/* EVENTS LIST when selected date falls within date range of any event */}
+          { filteredEvents.map((event) => (
+            <li className="dayEventList" key={event.title}>
+              <div className="dayEventTitle">
+                <span><ChevronRightIcon /></span>
+                <span className="nameDayEvent">{event.title}</span>
+                <span className="timeDayEvent">{event.startTime}</span> 
+              </div>
+              <div className="dayEventDate"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
+            </li>
+          )) }
 
+
+          {/* NO EVENTS LIST */}
+          {!events.some((event) => {
+            const startDate = moment(event.start);
+            const endDate = moment(event.end);
+            const selected = moment(selectedDate);
+            return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
+            }) && ( <div className="noEventsOnDay">
+              <img src={noRecords} alt="No Events" />
+              <p>No needs scheduled on this date</p>
+            </div>
+          )}
+
+          </div>
+          )}
         </div>
-      )}
-        </div>
-
-
       </div>
 
   );
