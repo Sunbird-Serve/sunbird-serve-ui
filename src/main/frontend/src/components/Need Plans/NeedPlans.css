@@ -9,16 +9,6 @@
 .wrapCalender {
   display: flex;
 }
-
-/*
-.vCalender .rbc-current {
-  box-sizing: border-box;
-  background-color: #0080BC;
-  border-radius: 2px;
-  color: white;
-}
-*/
-
 .rbc-today {
   box-sizing: border-box;
   background-color: #E7DEFF;
@@ -29,56 +19,41 @@
   align-items: center;
   margin: 10px 0px;
 }
-
 .calendar-month-year {
   display: inline-block;
-  font-size: 18px; /* Adjust font size */
-  font-weight: 500; /* Adjust font weight if desired */
+  font-size: 18px; 
+  font-weight: 500; 
 }
-
 .selected-date-cell {
-  background-color: #E9F6FF; /* Example background color for selected date */
+  background-color: #E9F6FF; 
 }
 
 .event-list {
   border: solid 1px;
   margin-left: 5px;
-  width: 500px;
+  width: 400px;
   border: solid 1px #EBEBEB;
   background-color: white;
 }
-
-/* Style the background of day headers */
 .rbc-header-bg {
-  background-color: #FAFAFA; /* Example background color */
+  background-color: #FAFAFA; 
 }
-
-/* Style the text of day headers */
 .rbc-header {
-  font-weight: 500; /* Adjust font weight */
-  color: #686C73; /* Adjust text color */
+  font-weight: 500; 
+  color: #686C73; 
   background-color: #FAFAFA;
 }
-
-/* Style the individual day header cells */
 .rbc-header > span {
   display: block;
-  padding: 10px; /* Add padding for spacing */
+  padding: 10px; 
   text-align: center;
 }
-
-
-/* Style the background of previous and next month date cells */
 .rbc-off-range-bg {
-  background-color: white; /* Example background color */
+  background-color: white; 
 }
-
-/* Style the text of previous and next month date cells */
 .rbc-off-range {
-  color: #999; /* Adjust text color */
+  color: #999; 
 }
-
-/* Style the background of previous and next month day headers */
 .rbc-off-range-bg .rbc-day-bg {
   background-color: #f0f0f0; /* Example background color */
 }
@@ -122,9 +97,13 @@
   text-align: center;
 }
 .noEventsOnDay {
-  height: 500px;
+  height: 400px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.stats-need-volunteer {
+  display: flex;
+  justify-content: space-around;
 }
