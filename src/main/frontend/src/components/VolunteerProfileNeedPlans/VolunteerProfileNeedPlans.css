@@ -113,6 +113,10 @@
   font-weight: 600;
   font-size: 16px;
   width: 300px;
+  margin: 5px 0px;
+}
+.timeDayEvent i {
+  margin-right: 5px;
 }
 .dayEventDate {
   color: #99999F;

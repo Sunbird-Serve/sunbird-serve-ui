@@ -11,14 +11,15 @@ import noRecords from '../../assets/noRecords.png'
 import { useSelector, useDispatch } from 'react-redux'
 import configData from '../../configData.json'
 import axios from 'axios'
-
+import {format} from 'date-fns'
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
 
 const localizer = momentLocalizer(moment);
 
 const NeedPlans = () => {
   const userId = useSelector((state)=> state.user.data.osid)
-  
+  //get nominations by userId
   const [nominations,setNominations] = useState([])
   useEffect(()=> {
     axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=100`).then(
@@ -29,21 +30,55 @@ const NeedPlans = () => {
   },[userId])
   console.log(nominations)
   //needIds of approved noms
-  const approvedNoms = nominations
-    .filter(item => item.nominationStatus === "Approved")
-    .map(item => item.needId)
-
+  const approvedNoms = nominations.filter(item => item.nominationStatus === "Approved").map(item => item.needId)
   console.log(approvedNoms)
-
+  //needs with approved Noms
   const needsList = useSelector((state) => state.need.data);
   const approvedNeeds = needsList.filter(item => item && item.need && approvedNoms.includes(item.need.id));
   console.log(approvedNeeds)
-  const events = approvedNeeds.map(item => ({
-    title: item.need.name,
-    start: item.needRequirement.startDate.slice(0,10),
-    end: item.needRequirement.endDate.slice(0,10),
-    timeSlot: item.needRequirement.startDate.slice(11,16)
-  }));
+  //create events
+  function getTimeSlots(needName, startDate, endDate, timeSlots) {
+    const timeSlotObject = {};
+    timeSlots.forEach(slot => {
+      const day = slot.day.toLowerCase();
+      timeSlotObject[day] = [format(new Date(slot.startTime), 'hh:mm a'), format(new Date(slot.endTime), 'h:mm a')];
+    });
+  
+    const dateWithTimeSlots = [];
+    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const currentDate = new Date(startDate);
+    while (currentDate <= new Date(endDate)) {
+      const dayIndex = currentDate.getDay();
+      const day = daysOfWeek[dayIndex];
+      if (timeSlotObject[day]) {
+        dateWithTimeSlots.push({
+          title: needName,
+          start: currentDate.toDateString(),
+          end: currentDate.toDateString(),
+          startTime: timeSlotObject[day][0],
+          endTime: timeSlotObject[day][1],
+          startDate: new Date(startDate).toDateString(),
+          endDate: new Date(endDate).toDateString(),
+        });
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  
+    return dateWithTimeSlots;
+  }
+
+  const [events, setEvents] = useState([]);
+  useEffect(() => {
+    const newEvents = [];
+    for (const item of approvedNeeds) {
+      if (item.occurrence !== null) {
+        const { startDate, endDate } = item.occurrence;
+        const sessions = getTimeSlots(item.need.name, startDate, endDate, item.timeSlots); // Use getTimeSlots function
+        newEvents.push(...sessions);
+      }
+    }
+    setEvents(newEvents);
+  }, [nominations]);
   console.log(events)
 
 
@@ -152,9 +187,12 @@ const NeedPlans = () => {
                 <li className="dayEventList" key={event.title}>
                   <div className="dayEventTitle">
                     <span className="nameDayEvent">{event.title}</span>
-                    {/* <span className="timeDayEvent">{event.timeSlot}</span> */}
+                    <span className="timeDayEvent">
+                      <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
+                      {event.startTime}
+                    </span> 
                   </div>
-                <div className="dayEventDate"> {month[event.start.slice(5,7)]} {event.start.slice(8,10)} - {month[event.end.slice(5,7)]} {event.end.slice(8,10)}</div>
+                <div className="dayEventDate"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)}</div>
                   {/* <div className="dayEventDetails">View Full Details</div> */}
                 </li>
               ))}
