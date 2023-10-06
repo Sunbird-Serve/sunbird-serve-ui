@@ -28,14 +28,11 @@ const NeedPlans = () => {
      console.log(error)
   })
   },[userId])
-  console.log(nominations)
   //needIds of approved noms
   const approvedNoms = nominations.filter(item => item.nominationStatus === "Approved").map(item => item.needId)
-  console.log(approvedNoms)
   //needs with approved Noms
   const needsList = useSelector((state) => state.need.data);
   const approvedNeeds = needsList.filter(item => item && item.need && approvedNoms.includes(item.need.id));
-  console.log(approvedNeeds)
   //create events
   function getTimeSlots(needName, startDate, endDate, timeSlots) {
     const timeSlotObject = {};
@@ -68,6 +65,7 @@ const NeedPlans = () => {
   }
 
   const [events, setEvents] = useState([]);
+
   useEffect(() => {
     const newEvents = [];
     for (const item of approvedNeeds) {
@@ -79,7 +77,6 @@ const NeedPlans = () => {
     }
     setEvents(newEvents);
   }, [nominations]);
-  console.log(events)
 
 
   //list of approved nominations for a volunteer
@@ -99,8 +96,6 @@ const NeedPlans = () => {
       boxShadow: "2px 0px #0080BC inset",
       border: 'solid 1px #DBDBDB'
     };
-    const currentDate = end;
-
   return {
     style: eventStyle,
   };
@@ -127,7 +122,12 @@ const NeedPlans = () => {
     </div>
   );
 
-  const [selectedDate, setSelectedDate] = useState(new Date()); // State to store selected date
+  const [selectedDate, setSelectedDate] = useState(new Date()); 
+
+  useEffect(() => {
+    const selectedDateString = moment(selectedDate).format('YYYY-MM-DD');
+    setSelectedDate(selectedDateString); 
+  }, [selectedDate]);
 
   const handleSelectSlot = (slotInfo) => {
     const selectedDateString = moment(slotInfo.start).format('YYYY-MM-DD');
@@ -140,7 +140,6 @@ const NeedPlans = () => {
     const classNames = isSelectedDate ? 'selected-date-cell' : '';
     return { className: classNames };
   };
-
 
   return (
       <div>
@@ -170,45 +169,43 @@ const NeedPlans = () => {
 
               return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
             }) && (
-          <div className="statsEventList">
-            <span>To Do</span>
-            <span>Completed</span>
-            <span>Canceled</span>
-          </div>
+            <div className="statsEventList">
+              <span>To Do</span>
+              <span>Completed</span>
+              <span>Canceled</span>
+            </div>
           )}
-            {events
-              .filter((event) => {
-                const startDate = moment(event.start);
-                const endDate = moment(event.end)
-                const selected = moment(selectedDate)
-                return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
-              })
-              .map((event) => (
-                <li className="dayEventList" key={event.title}>
-                  <div className="dayEventTitle">
-                    <span className="nameDayEvent">{event.title}</span>
-                    <span className="timeDayEvent">
-                      <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
-                      {event.startTime}
-                    </span> 
-                  </div>
+
+          {events.filter((event) => {
+            const startDate = moment(event.start);
+            const endDate = moment(event.end)
+            const selected = moment(selectedDate)
+            return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
+            })
+            .map((event) => (
+              <li className="dayEventList" key={event.title}>
+                <div className="dayEventTitle">
+                  <span className="nameDayEvent">{event.title}</span>
+                  <span className="timeDayEvent">
+                    <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
+                    {event.startTime}
+                  </span> 
+                </div>
                 <div className="dayEventDate"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)}</div>
                   {/* <div className="dayEventDetails">View Full Details</div> */}
-                </li>
-              ))}
+              </li>
+          ))}  
 
-            {!events.some((event) => {
-              const startDate = moment(event.start);
-              const endDate = moment(event.end);
-              const selected = moment(selectedDate);
-
-              return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
-            }) && (
-              <div className="noEventsOnDay">
-                <img src={noRecords} alt="No Events" />
-                  <p>No needs scheduled on this date</p>
-              </div>
-            )}
+          {!events.some((event) => {
+            const startDate = moment(event.start);
+            const endDate = moment(event.end);
+            const selected = moment(selectedDate);
+            return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
+            }) && (<div className="noEventsOnDay">
+              <img src={noRecords} alt="No Events" />
+              <p>No needs scheduled on this date</p>
+            </div>
+          )}  
 
         </div>
       )}

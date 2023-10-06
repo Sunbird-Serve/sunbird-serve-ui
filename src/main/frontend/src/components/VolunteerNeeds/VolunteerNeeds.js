@@ -18,19 +18,12 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSelector, useDispatch } from 'react-redux'
 
 export const VolunteerNeeds = props => {
-  console.log(props.needTypeId)
-
   const needList = useSelector((state) => state.need.data);
   const data = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId)
-  console.log(data)
-
-
-  // const [data, setData] = useState([]);
   const [view, setView] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedNeed, setSelectedNeed] = useState(null); // State to store the selected need
   const [sortRev, setSortRev] = useState("");
-
   const [needBoxesPerRow, setNeedBoxesPerRow] = useState(3); // Initialize with 3 boxes per row for grid view
 
   //for grid, view is true

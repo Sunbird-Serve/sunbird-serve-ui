@@ -34,7 +34,7 @@ const ModifyNeed = props => {
             </div>
             { nomin ? 
                 //load nominations component
-                <Nominations data={props.data} openPopup={openPopup} /> 
+                <Nominations needData={props.data} openPopup={openPopup} /> 
             : ( 
                 //load need information
                     <div className="needInfoBox">

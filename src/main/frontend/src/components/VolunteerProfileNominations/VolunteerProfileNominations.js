@@ -6,7 +6,7 @@ import VolunteerNeedsInProgress from '../../assets/needsInProgress.png';
 import VolunteerPlansDelivered from '../../assets/plansDelivered.png';
 import VolunteerHrs from '../../assets/volunteerHrs.png';
 import axios from 'axios'
-import NeedsImage from '../../assets/tempNeedsImage.png'
+import NeedsImage from '../../assets/fileIcon.png'
 import VolunteerProfileDeliverable from '../VolunteerProfileDeliverables/VolunteerProfileDeliverable';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
@@ -17,7 +17,6 @@ import configData from '../../configData.json'
 function VPNominations() {
   //get userId
   const userId = useSelector((state)=> state.user.data.osid)
-  console.log(userId)
   //get nominations by nominated userId
   const [nominations,setNominations] = useState([])
   useEffect(()=> {
@@ -27,8 +26,6 @@ function VPNominations() {
      console.log(error)
   })
   },[userId])
-  console.log(nominations)
-
   //create needId-name map
   const needsList = useSelector((state) => state.need.data);
   const needById = {};
@@ -46,10 +43,7 @@ function VPNominations() {
     setFullDetails(!fullDetails)
     setNeedId(needid)
   }
-  console.log(needId)
-
   ///
-  
   const [activeTab, setActiveTab] = useState('tabN');
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -66,9 +60,6 @@ function VPNominations() {
       setNomsFiltered(nominations)
     }
   }, [nominations,activeTab])
-  console.log(nomsFiltered)
-
-
 
   const [selectedDateOption, setSelectedDateOption] = useState('');
   const [isDateSelectOpen, setIsDateSelectOpen] = useState(false);
@@ -94,11 +85,6 @@ function VPNominations() {
   const handleNeedOptionChange = (option) => {
     setSelectedNeedOption(option);
   };
-
-
-  
-
-  
 
   return (
     <div>
@@ -191,8 +177,8 @@ function VPNominations() {
         <div className="nomination-grid">
           {nomsFiltered && nomsFiltered.map(nomination => (
             <div key={nomination.id} className="nomination-item">
-              <img src={NeedsImage} alt="Nominated Needs" height="120px" />
               <div className="needItemVolunteer">
+                <img src={NeedsImage} alt="Nominated Needs" width="20px" />
                 <p className="needNameVP">{needById[nomination.needId]}</p> 
                 <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View full details</button>
               </div>

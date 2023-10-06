@@ -170,10 +170,17 @@ const NeedPlans = () => {
 
   const [selectedDate, setSelectedDate] = useState(new Date()); // State to store selected date
 
+  useEffect(() => {
+    const selectedDateString = moment(selectedDate).format('YYYY-MM-DD');
+    setSelectedDate(selectedDateString); 
+  }, [selectedDate]);
+
   const handleSelectSlot = (slotInfo) => {
     const selectedDateString = moment(slotInfo.start).format('YYYY-MM-DD');
-    setSelectedDate(selectedDateString); // Capture selected date
+    setSelectedDate(selectedDateString); 
   };
+
+
 
   // to show selection of date on calender
   const customDayPropGetter = (date) => {
@@ -181,21 +188,8 @@ const NeedPlans = () => {
     const classNames = isSelectedDate ? 'selected-date-cell' : '';
     return { className: classNames };
   };
-
-  const [filteredEvents, setFilteredEvents ] = useState([])
-  useEffect(() => {
-    const data = events.filter((event) => {
-      const startDate = moment(event.start);
-      const endDate = moment(event.end)
-      const selected = moment(selectedDate)
-      return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
-    })
-    setFilteredEvents(data)
-  }, [selectedDate]);
   
   const [expandEvent, setExpandEvent] = useState(false)
-
-
 
   return (
       <div>
@@ -232,7 +226,13 @@ const NeedPlans = () => {
               </div>
           </div>
           {/* EVENTS LIST when selected date falls within date range of any event */}
-          { filteredEvents.map((event) => (
+          { events.filter((event) => {
+            const startDate = moment(event.start);
+            const endDate = moment(event.end)
+            const selected = moment(selectedDate)
+            return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
+            })
+            .map((event) => (
             <button className="dayEventListNC" key={event.title} onClick={() => setExpandEvent(!expandEvent)}>
               <div className="dayEventTitleNC">
                 <i> { expandEvent ? <ExpandMoreIcon/> : <ChevronRightIcon /> }</i>
