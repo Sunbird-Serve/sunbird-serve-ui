@@ -26,7 +26,6 @@ export const NeedsTable = props => {
   //get list of needs raised by user
   const needList = useSelector((state) => state.need.data);
   const needsByUser = needList.filter(item => item && item.need && item.need.userId === uid)
-  console.log(needsByUser)
   //needtype filter
   const needTypes = useSelector((state)=> state.needtype.data.content)
   const [needTypeId, setNeedTypeId] = useState('')
@@ -56,13 +55,15 @@ export const NeedsTable = props => {
         VolunteerByNeedId needId={value} />
         </div>; }
     },
-    { Header: 'Timeline', accessor: 
-      (row) => `${row.needRequirement.occurrenceId}`,
-      Cell: ({ value }) => (
-        <span style={{ whiteSpace: 'nowrap' }}>{(value) ? '' : value}</span>
-        //startDate.substr(2,8).split('-').reverse().join('/')
-        //endDate.substr(2,8).split('-').reverse().join('/')
-      ),
+    { Header: 'Timeline',
+      accessor: (row) => {
+        if(row.occurrence) {
+          return `${row.occurrence.startDate.substr(2,8).split('-').reverse().join('/')}
+            -${row.occurrence.endDate.substr(2,8).split('-').reverse().join('/')}`
+        } else {
+          return ''
+        }
+      } ,
     },
     { Header: 'Status', accessor: 'need.status'}
   ]
@@ -81,15 +82,19 @@ export const NeedsTable = props => {
            console.error("Fetching Entity failed:", error);
          });
      }, [needId]);
+     console.log(volunteerList)
      
      useEffect(() => {
       if (volunteerList) {
         const volunteerIds = volunteerList.map((item) => item['nominatedUserId']);
+        console.log(volunteerIds)
+
         // Function to fetch volunteer details by volunteerId
         const fetchVolunteerDetails = async (volunteerId) => {
           try {
             const response = await axios.get(`${configData.USER_GET}/${volunteerId}`); 
-            return response.data.identityDetails.name; // Assuming your API returns a name field
+            console.log(response.data)
+            return response.data.identityDetails.fullname; // Assuming your API returns a name field
           } catch (error) {
             console.error(`Error fetching volunteer details for ID ${volunteerId}:`, error);
             return null;
@@ -105,6 +110,8 @@ export const NeedsTable = props => {
   
         fetchDataForAllVolunteers();
       }
+      console.log(volunteerNames)
+
     }, [volunteerList]);
 
     const truncateAndDots = (names, maxNamesToShow) => {

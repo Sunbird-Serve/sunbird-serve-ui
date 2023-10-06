@@ -1,4 +1,4 @@
-//USER details for a emailId
+//USER details of all
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
 import configData from '../configData.json'

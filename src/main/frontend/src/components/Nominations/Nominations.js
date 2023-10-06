@@ -6,51 +6,44 @@ import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import configData from './../../configData.json'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 
-const Nominations = ({ data, openPopup }) => {
-  //need to which nomination is done
-  const needId = data.need.id;
-
+const Nominations = ({ needData, openPopup }) => {
+  const dispatch = useDispatch()
   const [activeTab, setActiveTab] = useState('tabN');
-  const handleTabClick = (tab) => {
-    setActiveTab(tab);
-  }
-  //fetch nominations as per active tab
-  const [dataNoms, setDataNoms] = useState([]);
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        // Fetch dataNoms using Axios
-        const response = await axios.get(`${configData.NEED_SEARCH}/${needId}/nominate`)
-        if (activeTab === 'tabA') {
-          setDataNoms(response.data.filter(item => item.nominationStatus === "Approved"))
-        } else if (activeTab === 'tabR') {
-          setDataNoms(response.data.filter(item => item.nominationStatus === "Rejected"))
-        } else if (activeTab === 'tabN') {
-          setDataNoms(response.data.filter(item => item.nominationStatus === "Nominated"))
-        }
-      } catch (error) {
-         console.error('Error fetching dataNoms:', error);
-        }
-      }
-    fetchData();
-  }, [needId, activeTab]);
-  const userList = useSelector((state) => state.userlist.data);
-  const [tableData, setTableData] = useState([]);
-  useEffect(() => {
-    const nomDetails = dataNoms.map((nomination) => {
-      const user = userList.find((user) => user.osid === nomination.nominatedUserId);
-      if(user){
-        return {...nomination, userInfo: user }
-      }
-      return nomination
-    })
-    setTableData(nomDetails)
-  }, [dataNoms]);
+  const [responseFlag, setResponseFlag] = useState(false)
 
   const [rejectPopup,setRejectPopup] = useState(false)    //reject nomination
   const [acceptPopup,setAcceptPopup] = useState(false)    //accept nomination
+  //need to which nomination is done
+  const needId = needData.need.id;
+  //update nominations for the need
+  const [ nomsList, setNomsList ] = useState([])
+  useEffect(()=>{
+      axios.get(`${configData.NEED_SEARCH}/${needId}/nominate`)
+      .then((response) => {
+        console.log('dispatched')
+        setNomsList(response.data) 
+      })
+  },[dispatch, activeTab, acceptPopup, rejectPopup, openPopup, responseFlag])
+
+  // const nomsList = useSelector((state) => state.nominationbynid.data);
+  console.log(nomsList)
+  //filter nominations as per active tab
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  }
+  const [dataNoms, setDataNoms] = useState([]);
+  useEffect(() => {
+    if (activeTab === 'tabA') {
+      setDataNoms(nomsList.filter(item => item.nominationStatus === "Approved"))
+    } else if (activeTab === 'tabR') {
+      setDataNoms(nomsList.filter(item => item.nominationStatus === "Rejected"))
+    } else if (activeTab === 'tabN') {
+      setDataNoms(nomsList.filter(item => item.nominationStatus === "Nominated"))
+    }
+   }, [activeTab, nomsList]);
+
   const [rowData,setRowData] = useState({})
   const [reason,setReason] = useState('')
 
@@ -59,8 +52,8 @@ const Nominations = ({ data, openPopup }) => {
     console.log(rowData.nominatedUserId)  //nominatedUserId
     axios.post(`${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`)
     .then(
-      //function(response){console.log(response.data)},
-      openPopup('accept')
+      function(response){setResponseFlag(!responseFlag)},
+      openPopup('accept'),
     )
     .catch(function (error) {
         console.log('error'); 
@@ -71,7 +64,7 @@ const Nominations = ({ data, openPopup }) => {
   const confirmRejection = e => {
     axios.post(`${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Rejected`)
     .then(
-      //function(response){console.log(response.data)},
+      function(response){setResponseFlag(!responseFlag)},
       openPopup('reject'),
       setRejectPopup(false),
     )
@@ -109,7 +102,21 @@ const Nominations = ({ data, openPopup }) => {
   ] 
   const columns = useMemo(() => COLUMNS, [activeTab])
 
-  
+  const userList = useSelector((state) => state.userlist.data);
+  const [tableData, setTableData] = useState([]);
+  useEffect(() => {
+    const nomDetails = dataNoms.map((nomination) => {
+      const user = userList.find((user) => user.osid === nomination.nominatedUserId);
+      if(user){
+        return {...nomination, userInfo: user }
+      }
+      return nomination
+    })
+    setTableData(nomDetails)
+  }, [dataNoms]);
+
+  const data = useMemo(() => tableData, [tableData])
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -118,7 +125,7 @@ const Nominations = ({ data, openPopup }) => {
     prepareRow,
   } = useTable ({
     columns,
-    data: tableData,
+    data,
     },
     usePagination
   )

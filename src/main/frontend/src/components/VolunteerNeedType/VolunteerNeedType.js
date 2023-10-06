@@ -110,7 +110,6 @@ function VolunteerNeedType() {
             <div className="vGreetNT"> </div> {/* auth.currentUser.displayName */}
             <div className="vTitleNT">Explore Opportunities </div>
             <div className="vCaptionNT">Select a need type to view needs </div>
-
         </div>
         <div className="vfilterHeader">
             <div className="vSortNT">

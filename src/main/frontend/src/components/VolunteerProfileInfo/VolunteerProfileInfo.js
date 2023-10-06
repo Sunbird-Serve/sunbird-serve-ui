@@ -12,11 +12,9 @@ function VolunteerProfileInfoView() {
       setUser(true)
     }
   },[userData])
-  console.log(userData)
   const history = useHistory()
   const handleEditClick = () => {
     history.push('/vprofile/vpedit')
-    console.log('clicked edit')
   };
 
   return (

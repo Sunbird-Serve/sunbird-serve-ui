@@ -14,8 +14,6 @@ import NominationSuccess from '../../assets/nominationSuccess.png';
 
 function NeedPopup({ open, onClose, need }) {
   const userId = useSelector((state)=> state.user.data.osid)
-  console.log(need.need.id)
-
   const [alertLogin, setAlertLogin] = useState(false)
   const [notifyRegister, setNotifyRegister] = useState(false)
   //NOMINATION to a need on Nominate button click

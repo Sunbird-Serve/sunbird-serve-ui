@@ -34,7 +34,6 @@ function App() {
 
   //UPDATE USER STATE based on authenticated email
   const userDetails = useSelector((state)=> state.user.data)
-  console.log(userDetails.role)
   //dispatch the user to store
   useEffect(() => {
     if(presentUser){
