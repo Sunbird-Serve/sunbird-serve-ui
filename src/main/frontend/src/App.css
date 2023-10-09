@@ -4,3 +4,9 @@
   display: flex;
   justify-content: space-around;
 }
+input:focus {
+  outline: none; 
+}
+select:focus {
+  outline: none; 
+}
