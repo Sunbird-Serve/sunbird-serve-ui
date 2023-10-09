@@ -12,18 +12,54 @@ import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined
 import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
 import ShareIcon from '@mui/icons-material/Share';
 import configData from './../../configData.json'
-import SortIcon from "@mui/icons-material/Sort";
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSelector, useDispatch } from 'react-redux'
+import DateRangeIcon from '@mui/icons-material/DateRange';
 
 export const VolunteerNeeds = props => {
   const needList = useSelector((state) => state.need.data);
-  const data = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId)
+  const dataNeeds = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId)
+  const [searchQueryNeed, setSearchQueryNeed] = useState('')
+  const handleSearchChange = (event) => {
+    setSearchQueryNeed(event.target.value)
+  }
+  const dataNotSorted =  dataNeeds.filter(item => {
+    return item.need.name.toLowerCase().includes(searchQueryNeed.toLowerCase())
+  })
+
+  const [sortingOrder, setSortingOrder] = useState('ascending');
+  const [data, setData ] = useState([])
+  useEffect(() => {
+    // Clone the needList to avoid modifying the original array
+    const sortedList = [...dataNotSorted];
+
+    // Separate items into two lists: one with occurrence as null and another with non-null occurrence
+    const itemsWithOccurrence = sortedList.filter(item => item.occurrence !== null);
+    const itemsWithNullOccurrence = sortedList.filter(item => item.occurrence === null);
+
+    // Sort the list with non-null occurrence based on the selected sorting order
+    if (sortingOrder === 'ascending') {
+      itemsWithOccurrence.sort((a, b) => new Date(a.occurrence.startDate) - new Date(b.occurrence.startDate));
+    } else {
+      itemsWithOccurrence.sort((a, b) => new Date(b.occurrence.startDate) - new Date(a.occurrence.startDate));
+    }
+
+    // Concatenate the two lists based on where you want to place items with null occurrence
+    let finalSortedList = [];
+    if (sortingOrder === 'ascending') {
+      finalSortedList = itemsWithOccurrence.concat(itemsWithNullOccurrence);
+    } else {
+      finalSortedList = itemsWithNullOccurrence.concat(itemsWithOccurrence);
+    }
+
+    setData(finalSortedList)
+
+  }, [sortingOrder, searchQueryNeed]);
+  
   const [view, setView] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedNeed, setSelectedNeed] = useState(null); // State to store the selected need
-  const [sortRev, setSortRev] = useState("");
   const [needBoxesPerRow, setNeedBoxesPerRow] = useState(3); // Initialize with 3 boxes per row for grid view
 
   //for grid, view is true
@@ -36,12 +72,8 @@ export const VolunteerNeeds = props => {
     setNeedBoxesPerRow(4);
   };
 
-  const handleSort = (event) => {
-    setSortRev(event.target.value);
-  };
-
   const handlePopupOpen = (need) => {
-    setSelectedNeed(need); // Store the selected need in the state
+    setSelectedNeed(need); 
     setShowPopup(true);
   };
 
@@ -57,23 +89,25 @@ export const VolunteerNeeds = props => {
   return (
     <div className="wrapvolunteerNeeds">
       <div className="volunteerNeeds">
+        {/* Back Button */}
         <div className="vHeaderBack">
           <button onClick={handleBackButton}><ArrowBackIcon /></button>
           {props.nTypeName}
         </div>
+        {/* Filter bar */}
         <div className="vNeedFilters">  
           <div className="vSortNeed">
-            <i className="vsort1"><SortIcon /></i>
-            <select value={sortRev} onChange={handleSort}>
-              <option value="" disabled hidden> Sort by</option>
-              <option value="true">Today</option>
-              <option value="false">Current Month</option>
-              <option value="true">Yesterday</option>
-              <option value="false">Last Week</option>
-              <option value="false">Last Month</option>
-              <option value="false">Last Year</option>
+            <i className="vSortDateIcon"><DateRangeIcon /></i>
+            <select onChange={(e) => setSortingOrder(e.target.value)}>
+              <option value="" disabled hidden select>Sort By</option>
+              <option value="ascending">Ascending</option>
+              <option value="descending">Descending</option>
             </select>
           </div>
+          <div className="vSearchNeed">
+              <i><SearchIcon /></i>
+              <input type="text" name="searchQueryNeed" placeholder="Search needs" value={searchQueryNeed} onChange={handleSearchChange} ></input>
+            </div>
           <div className="toggleNeedView">  
               <button className={`${view ? "blueText" : "grayText"}`} onClick={handleToggleGrid}> 
                 <i><GridOnIcon style={{fontSize:"19px"}}/></i>
@@ -86,8 +120,9 @@ export const VolunteerNeeds = props => {
               </button>
           </div>
         </div>
-      {(!data.length) && <div> No needs under this type</div>}
-      { data.length && 
+        {/* Needs List Display */}
+      {(!data.length) && <div className="emptyNeedType"> No needs under this type</div>}
+      {data.length && 
         <div className="needs">
           <div className="needContainer">
             {data.map((item) => (

@@ -19,43 +19,43 @@ function VolunteerProfileInfoView() {
 
   return (
     <div className="main-content">
+      {/* Header */}
       <div className="pro">
-        <h3 className="main-header">Profile Info</h3>
-        <p className="gray-text">Info about you and your preferences</p>
+        <div className="proInfo-title">
+          <div className="main-header">Profile Info</div>
+          <div className="gray-text">Info about you and your preferences</div>
+        </div>
         <div className="button-group">
-        <button className="discord-profile-custom-button" onClick={handleEditClick}>Edit Profile</button>
-
+          <button className="discord-profile-custom-button" onClick={handleEditClick}>Edit Profile</button>
         </div>
       </div>
 
       { user && (
         <div>
           <div className="profile-info-box">
-            <h3 className="box-header">Basic Info</h3>
-            <hr className="gray-horizontal" />
-            <div className="info-group">
-              { <div className="info-box">
-                <p className="info-label">Name</p>
-                <p className="info-data">{userData.identityDetails.fullname}</p>
-              </div> }
-              <div className="info-box">
-                <p className="info-label">Gender</p>
-                <p className="info-data">{userData.identityDetails.gender}</p>
+            <div className="box-header">Basic Info</div>
+              <div className="info-group">
+                <div className="info-box">
+                  <p className="info-label">Name</p>
+                  <p className="info-data">{userData.identityDetails.fullname}</p>
+                </div> 
+                <div className="info-box">
+                  <p className="info-label">Gender</p>
+                  <p className="info-data">{userData.identityDetails.gender}</p>
+                </div>
+                <div className="info-box">
+                  <p className="info-label">Date of Birth</p>
+                  <p className="info-data">{userData.identityDetails.dob}</p>
+                </div>
+                <div className="info-box">
+                  <p className="info-label">Nationality</p>
+                  <p className="info-data">{userData.identityDetails.nationality}</p>
+                </div> 
               </div>
-              <div className="info-box">
-                <p className="info-label">Date of Birth</p>
-                <p className="info-data">{userData.identityDetails.dob}</p>
-              </div>
-              { <div className="info-box">
-                <p className="info-label">Nationality</p>
-                <p className="info-data">{userData.identityDetails.nationality}</p>
-              </div> }
             </div>
-          </div>
 
           {<div className="profile-info-box">
-            <h3 className="box-header">Contact Info</h3>
-            <hr className="gray-horizontal" />
+            <div className="box-header">Contact Info</div>
             <div className="info-group">
               <div className="info-box">
                 <p className="info-label">Email Id</p>
@@ -76,8 +76,7 @@ function VolunteerProfileInfoView() {
           </div> }
 
           <div className="profile-info-box">
-            <h3 className="box-header">Password Info</h3>
-            <hr className="gray-horizontal" />
+            <div className="box-header">Password Info</div>
             <div className="info-box">
               <p className="info-label">Password</p>
               <p className="info-data">********</p>

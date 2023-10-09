@@ -110,8 +110,10 @@ function VolunteerProfileEdit() {
   return (
     <div className="main-content1">
       <div className="pro1">
-        <h3 className="main-header1">Profile Info</h3>
-        <p className="gray-text1">Info about you and your preferences</p>
+        <div>
+          <div className="main-header1">Profile Info</div>
+          <p className="gray-text1">Info about you and your preferences</p>
+        </div>
         <div className="button-group1">
           <button className="discord-profile1" onClick={handleDiscordClick}>
             Discard
@@ -124,12 +126,11 @@ function VolunteerProfileEdit() {
 
       <div className="profile-info-box1">
         {/* Basic Info */}
-        <h4 className="box-header1">Basic Info</h4>
-        <hr className="gray-horizontal1" />
+        <div className="box-header1">Basic Info</div>
         <div className="info-group1">
           {/* Name and Gender rows*/}
           <div className="info-row">
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">Name</p>
               <input
                 className="info-input1"
@@ -140,7 +141,7 @@ function VolunteerProfileEdit() {
               />
             </div>
 
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">Gender</p>
               <div className="custom-dropdown">
                   <select className="info-input3"  name="gender" value={gender} onChange={handleChangeIdentityDetails}>
@@ -153,14 +154,14 @@ function VolunteerProfileEdit() {
 
           {/* DOB and Nationality */}
           <div className="info-row">
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">Date of Birth</p>
               <div className="input-with-icon">
                 <input className="editProfileDOB" type="date" name="dob" value={dob} onChange={handleChangeIdentityDetails} />
               </div>
             </div>
 
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">Nationality</p>
               <div className="custom-dropdown">
                 <input
@@ -173,16 +174,14 @@ function VolunteerProfileEdit() {
               </div>
             </div>
           </div>
-
-
         </div>
 
 
         {/* Contact Info */}
-        <h4 className="box-header1">Contact Info</h4>
-          <hr className="gray-horizontal1" />
+        <div className="box-header1">Contact Info</div>
+          {/* Email-ID */}
           <div className="info-row">
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">E-mail ID</p>
               <input
                 className="info-input1"
@@ -192,7 +191,8 @@ function VolunteerProfileEdit() {
                 onChange={handleChangeContactDetails}
               />
             </div>
-            <div className="info-item">
+          {/* Mobile Number */}
+            <div className="info-item1">
               <p className="info-label1">Mobile Number</p>
               <input
                 className="info-input1"
@@ -204,8 +204,9 @@ function VolunteerProfileEdit() {
             </div>
           </div>
 
+          {/* Address */}
           <div className="info-row">
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">Address</p>
               <input
                 className="info-input1"
@@ -215,7 +216,8 @@ function VolunteerProfileEdit() {
                 onChange={handleChangeAddress}
               />
             </div>
-            <div className="info-item">
+          {/* City */}
+            <div className="info-item1">
               <p className="info-label1">City</p>
               <input
                 className="info-input1"
@@ -227,8 +229,10 @@ function VolunteerProfileEdit() {
               />
             </div>
           </div>
-          <div className="info-row">
-            <div className="info-item">
+
+           {/* State */}
+           <div className="info-row">
+            <div className="info-item1">
               <p className="info-label1">State</p>
               <input
                 className="info-input1"
@@ -238,7 +242,8 @@ function VolunteerProfileEdit() {
                 onChange={handleChangeAddress}
               />
             </div>
-            <div className="info-item">
+            {/* Country */}
+            <div className="info-item1">
               <p className="info-label1">Country</p>
               <input
                 className="info-input1"
@@ -252,7 +257,7 @@ function VolunteerProfileEdit() {
 
           {/*
           <div className="info-row">
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">Landmark</p>
               <input
                 className="info-input1"
@@ -263,7 +268,7 @@ function VolunteerProfileEdit() {
                 onChange={handleAddressChange}
               />
             </div>
-            <div className="info-item">
+            <div className="info-item1">
               <p className="info-label1">Pincode</p>
               <input
                 className="info-input1"
@@ -278,9 +283,7 @@ function VolunteerProfileEdit() {
           */}
           
         {/* Password Info */}
-        <div className="profile-info-box no-margin-bottom">
           <h4 className="box-header1">Password Info</h4>
-          <hr className="gray-horizontal" />
           <div className="info-box">
             <p className="info-label">Password</p>
             <input
@@ -291,7 +294,6 @@ function VolunteerProfileEdit() {
               onChange={handleChange}  
             />
           </div>
-        </div>
           
       </div>
     </div>

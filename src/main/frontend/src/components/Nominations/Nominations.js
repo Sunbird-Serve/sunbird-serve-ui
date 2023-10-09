@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import './Nominations.css'
 import axios from 'axios'
-import { useTable, usePagination } from 'react-table'
+import { useTable, usePagination, useGlobalFilter, useFilters, useSortBy } from 'react-table'
 import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
@@ -121,14 +121,27 @@ const Nominations = ({ needData, openPopup }) => {
     getTableProps,
     getTableBodyProps,
     headerGroups,
+    state,
+    setGlobalFilter,
     page,
+    nextPage,
+    previousPage,
+    canNextPage,
+    canPreviousPage,
+    pageOptions,
+    gotoPage,
+    pageCount,
+    setPageSize,
     prepareRow,
-  } = useTable ({
+    setFilter,
+    } = useTable ({
     columns,
-    data,
+    data
     },
-    usePagination
-  )
+  useFilters, useGlobalFilter, useSortBy, usePagination)
+
+  const { globalFilter, pageIndex, pageSize } = state;  
+  const [filterValue, setFilterValue] = useState('')
 
   const handleReason = e => {
     setReason(e.target.value)
@@ -146,10 +159,10 @@ const Nominations = ({ needData, openPopup }) => {
           <div className="rightBarNomination">
             <div className="boxSearchNomins">
               <i><SearchIcon style={{height:'18px',width:'18px'}}/></i>
-              <input type="search" name="nsearch" placeholder="Search" ></input>
+              <input type="search" name="nsearch" placeholder="Search" value={globalFilter || ''} onChange={(e) => setGlobalFilter(e.target.value)}></input>
             </div>
             <div className="searchLocNomins">
-              <input type="search" name="nsearch" placeholder="Location" ></input>
+              <input type="text" placeholder="Location" onChange={(e)=>{setFilter('userInfo.contactDetails.address.city',e.target.value || undefined)}} ></input>
             </div>
           </div>
         </div>
