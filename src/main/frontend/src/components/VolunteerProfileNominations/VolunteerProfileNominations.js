@@ -13,6 +13,8 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import { useSelector, useDispatch } from 'react-redux'
 import configData from '../../configData.json'
+import Select from 'react-select';
+
 
 function VPNominations() {
   //get userId
@@ -26,16 +28,29 @@ function VPNominations() {
      console.log(error)
   })
   },[userId])
-  //create needId-name map
+  //create needId maps to get data from need
+  const needTypes = useSelector((state)=> state.needtype.data.content)
+  const mapNType = {}
+  needTypes.forEach(item => {
+    mapNType[item.id]= item.name;
+  })
   const needsList = useSelector((state) => state.need.data);
   const needById = {};
+  const dateById = {};
+  const typeById = {};
   needsList.forEach(item => {
     if (item && item.need) {
       const { id, name } = item.need;
       needById[id] = name;
+      if(item.occurrence != null){
+        dateById[id] = item.occurrence.startDate;
+      } else {
+        dateById[id] = new Date()
+      }
+      typeById[id] = item.need.needTypeId
     }
   })
-
+  
   //hadle view nomination details
   const [fullDetails, setFullDetails] = useState(false)
   const [needId, setNeedId ] = useState(null)
@@ -43,48 +58,59 @@ function VPNominations() {
     setFullDetails(!fullDetails)
     setNeedId(needid)
   }
-  ///
+
+  //filter by tabs of nomination status
   const [activeTab, setActiveTab] = useState('tabN');
   const handleTabClick = (tab) => {
     setActiveTab(tab);
   }
-  const [nomsFiltered, setNomsFiltered] = useState(null)
+  const [nomsByTab, setNomsByTab] = useState([])
   useEffect(() => {
     if (activeTab === 'tabN') {
-      setNomsFiltered(nominations.filter(item => item.nominationStatus === "Nominated"))
+      setNomsByTab(nominations.filter(item => item.nominationStatus === "Nominated"))
     }
     else if (activeTab === 'tabA') {
-      setNomsFiltered(nominations.filter(item => item.nominationStatus === "Approved"))
+      setNomsByTab(nominations.filter(item => item.nominationStatus === "Approved"))
+    }
+    else if (activeTab === 'tabP') {
+      setNomsByTab(nominations.filter(item => item.nominationStatus === "Inprogress"))
     }
     else {
-      setNomsFiltered(nominations)
+      setNomsByTab(nominations)
     }
   }, [nominations,activeTab])
 
-  const [selectedDateOption, setSelectedDateOption] = useState('');
-  const [isDateSelectOpen, setIsDateSelectOpen] = useState(false);
-  const [selectedNeedOption, setSelectedNeedOption] = useState('');
-  const [isNeedSelectOpen, setIsNeedSelectOpen] = useState(false);
-  const handleDateOptionChange = (option) => {
-    setSelectedDateOption(option);
-  };
-  const toggleDateSelect = () => {
-    setIsDateSelectOpen(!isDateSelectOpen);
-    setIsNeedSelectOpen(false); // Close the need select when opening date select
-  };
-  
-  const toggleNeedSelect = () => {
-    setIsNeedSelectOpen(!isNeedSelectOpen);
-    setIsDateSelectOpen(false); // Close the date select when opening need select
-  };
-  
-  const closeSelect = () => {
-    setIsDateSelectOpen(false);
-    setIsNeedSelectOpen(false);
-  };
-  const handleNeedOptionChange = (option) => {
-    setSelectedNeedOption(option);
-  };
+  const [sortingOrder, setSortingOrder] = useState('ascending');
+
+  const [nomsByDate, setNomsByDate ] = useState([])
+  useEffect(() => {
+    // Clone the needList to avoid modifying the original array
+    const sortedList = [...nomsByTab];
+    if (sortingOrder === 'ascending') {
+      sortedList.sort((a, b) => new Date(dateById[a.needId]) - new Date(dateById[b.needId]));
+    } else {
+      sortedList.sort((a, b) => new Date(dateById[b.needId]) - new Date(dateById[a.needId]));
+    }
+    setNomsByDate(sortedList)
+  }, [sortingOrder, nomsByTab]);
+
+
+  //nomsFiltered is the final displayed list
+  const [nomsFiltered, setNomsFiltered] = useState(null)
+  const [needTypeId, setNeedTypeId] = useState('')
+  const handleNeedTypeFilter = e => {
+    setNeedTypeId(e.target.value)
+  }
+  useEffect(()=>{
+    let filtered = nomsByDate
+    if(needTypeId){
+      const filtered = nomsByDate.filter(item => typeById[item.needId] === needTypeId)
+      setNomsFiltered(filtered)
+    } else {
+      setNomsFiltered(filtered)
+    }
+  },[needTypeId, nomsByDate])
+ 
 
   return (
     <div>
@@ -133,44 +159,35 @@ function VPNominations() {
             <div className="statsVPNomsName">Total Plans Delivered</div>
           </div>
         </div>
-        {/* Tabs */}
-        <div className="vnomTabs">
-          <div className={`${activeTab === 'tabN' ? 'VNomTabN selectedVNomTab' : 'VNomTabN'}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
-          <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
-        </div>
+        <div className="vNomFilters">
+          {/* Tabs */}
+          <div className="vnomTabs">
+            <div className={`${activeTab === 'tabN' ? 'VNomTabN selectedVNomTab' : 'VNomTabN'}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
+            <div className={`${activeTab === 'tabP' ? 'VNomTabP selectedVNomTab' : 'VNomTabP'}`} onClick={() => handleTabClick('tabP')}>In Progress</div>
+            <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
+          </div>
     
-        <div className="selectDateAndNeed">
-        <div className="selectDate">
-          <div className="custom-select date-select" onClick={toggleDateSelect} onBlur={closeSelect}>
-            <CalendarTodayIcon className="calendar-icon" />
-            <span className="selected-option">{selectedDateOption ? selectedDateOption : 'Date'}</span>
-            <span className="dropdown-indicator">{isDateSelectOpen ? '^' : '^'}</span>
-            {isDateSelectOpen && (
-              <div className="options">
-                <div onClick={() => handleDateOptionChange('Recent')}>Recent</div>
-                <div onClick={() => handleDateOptionChange('Oldest')}>Oldest</div>
-              </div>
-            )}
-          </div>
-        </div>
+          <div className="selectDateAndNeed">
+            <div className="selectDate">
+              <i className="nSortDateIcon"><CalendarTodayIcon style={{fontSize:"18px",margin:"0px 3px"}} /></i>
+              <select onChange={(e) => setSortingOrder(e.target.value)}>
+                <option value="" disabled hidden select>Sort By</option>
+                <option value="ascending">Ascending</option>
+                <option value="descending">Descending</option>
+              </select>
+            </div>
 
-        <div className="selectNeed">
-          <div className="custom-select  need-select" onClick={toggleNeedSelect} onBlur={closeSelect}>
-            <StickyNote2OutlinedIcon className="note-icon" />
-            <span className="selected-option">{selectedNeedOption ? selectedNeedOption : 'Need Type'}</span>
-            <span className="dropdown-indicator">{isNeedSelectOpen ? '^' : '^'}</span>
-            {isNeedSelectOpen && (
-              <div className="optionss">
-             
-                <div onClick={() => handleNeedOptionChange('Offline Teaching')}>Offline Teaching</div>
-                <div onClick={() => handleNeedOptionChange('Road Cleaning')}>Road Cleaning</div>
-                <div onClick={() => handleNeedOptionChange('River Cleaning')}>River Cleaning</div>
-                <div onClick={() => handleNeedOptionChange('Online Teaching')}>Online Teaching</div>
-                <div onClick={() => handleNeedOptionChange('Lake Cleaning')}>Lake Cleaning</div>
-              </div>
-            )}
+            <div className="selectNeed">
+              <select className="selectNeedType" name="needTypeId" value={needTypeId} onChange={handleNeedTypeFilter} >
+              <option value="" defaultValue>All Need Types</option>
+              {
+                needTypes.map(
+                  (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
+                )
+              }
+              </select>
+            </div>
           </div>
-        </div>
         </div>
 
         {/* Nominations Display */}

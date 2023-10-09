@@ -12,6 +12,8 @@ import ntypeImage02 from '../../assets/field_activity.png'
 import ntypeImage03 from '../../assets/mentoring.png'
 import ntypeImage04 from '../../assets/online_teaching.png'
 import { useSelector, useDispatch } from 'react-redux'
+import SortIcon from "@mui/icons-material/Sort";
+
 
 
 function VolunteerNeedType() {
@@ -113,6 +115,7 @@ function VolunteerNeedType() {
         </div>
         <div className="vfilterHeader">
             <div className="vSortNT">
+              <i className="vSortNTicon"><SortIcon /></i>
               <select value={sortRev} onChange={handleSort}>
                 <option value="" disabled hidden select>Sort By</option>
                 <option value="true">Sort A to Z</option>
