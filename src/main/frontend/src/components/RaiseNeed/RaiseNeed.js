@@ -9,6 +9,7 @@ import UploadImageBG from '../../assets/bgImgUpload.png'
 import MultiSelect from './MultiSelect';
 import MonoSelect from './MonoSelect';
 
+
 import configData from './../../configData.json'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchNeedsByUid } from "../../state/needByUidSlice";
@@ -87,6 +88,9 @@ const RaiseNeed = props => {
     }
     // Handler to update selected event days
     const handleSelectedDaysChange = (selected) => {
+        setSelectedDays(selected);
+    };
+    const handleSelectedDaysChangeMulti = (selected) => {
         setSelectedDays(selected.map((obj) => ({
             ...obj,
             startTime: `2023-10-02T${obj.startTime}:21.937Z`,
@@ -308,7 +312,8 @@ const RaiseNeed = props => {
                                 <label>Event Days</label>
                                 <div className="itemFormNeedDays">
                                     {frequency === 'off' ? 
-                                        <MultiSelect onAdd={handleSelectedDaysChange} /> 
+                                        <></>
+                                        // <MultiSelect onAdd={handleSelectedDaysChangeMulti} /> 
                                         : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} />}
                                 </div>
                             </div>

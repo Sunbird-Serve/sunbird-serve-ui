@@ -1,10 +1,11 @@
 .container-daysTime {
-  gap: 10px;
+  gap: 5px;
+  display: flex;
   margin-bottom: 10px;
 }
 .days-label {
   height: 30px;
-  margin-right: 10px;
+  width: 100px;
 }
 .add-button {
   height: 30px;

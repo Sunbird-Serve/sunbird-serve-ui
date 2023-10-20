@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import {
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  TextField,
-  Grid,
-} from '@mui/material';
+import {  FormControl,  InputLabel,  Select,  MenuItem, TextField,  Grid } from '@mui/material';
 import './MonoSelect.css';
+import dayjs from 'dayjs';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const MonoSelect = ({ onAdd, frequency }) => {
   const [selectedDay, setSelectedDay] = useState('Monday'); // Set 'Monday' as the default value
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
+  const [startTime, setStartTime] = useState(dayjs())
+  const [endTime, setEndTime] = useState(dayjs())
 
   useEffect(() => {
     // Set the default selected day(s) based on the frequency prop
@@ -34,15 +32,10 @@ const MonoSelect = ({ onAdd, frequency }) => {
     saveValues();
   };
 
-  const handleStartTimeChange = (event) => {
-    setStartTime(event.target.value);
+  useEffect(()=> {
     saveValues();
-  };
-
-  const handleEndTimeChange = (event) => {
-    setEndTime(event.target.value);
-    saveValues();
-  };
+    console.log(startTime)
+  },[selectedDay, startTime,endTime])
 
   const saveValues = () => {
     let selectedDaysArray = [];
@@ -73,10 +66,9 @@ const MonoSelect = ({ onAdd, frequency }) => {
 
   return (
     <div>
-      <Grid container spacing={0} className="wrapDayTime">
-        <Grid item xs={3.2}>
-          <FormControl fullWidth>
-            <Select
+      <div className="wrapDayTime">
+        <div>
+          <Select
               value={selectedDay}
               onChange={handleDayChange}
               className="label-days"
@@ -94,32 +86,38 @@ const MonoSelect = ({ onAdd, frequency }) => {
                   </MenuItem>
                 ))
               )}
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid item xs={3.6}>
-          <TextField
-            type="time"
-            value={startTime}
-            onChange={handleStartTimeChange}
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-        <Grid item xs={3.6}>
-          <TextField
-            type="time"
-            value={endTime}
-            onChange={handleEndTimeChange}
-            fullWidth
-            InputLabelProps={{
-              shrink: true,
-            }}
-          />
-        </Grid>
-      </Grid>
+          </Select>
+        </div>
+        <div className="container-time">
+        <div className="label-time ">
+          <span> Start Time </span>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['TimePicker']}>
+              <TimePicker
+                className="label-startTime"
+                renderInput = {(params) => <TextField {...params} />}
+                value={startTime}
+                onChange={(newValue)=>setStartTime(newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ'))}
+              />
+            </DemoContainer>
+          </LocalizationProvider>
+        </div>
+
+        <div className="label-time ">
+        <span> End Time </span>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['TimePicker']}>
+              <TimePicker
+                className="label-startTime"
+                renderInput = {(params) => <TextField {...params} />}
+                value={endTime}
+                onChange={(newValue)=>setEndTime(newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ'))}
+              />
+            </DemoContainer>
+          </LocalizationProvider>
+        </div>
+        </div>
+      </div>
     </div>
   );
 };
