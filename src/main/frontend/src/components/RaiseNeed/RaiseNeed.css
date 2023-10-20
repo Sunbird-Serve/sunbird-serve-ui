@@ -142,6 +142,7 @@
     color: #1F1F1F;
     font-weight: 600;
     border-width: 1px;
+    margin-top: -5px;
 }
 .itemDate input {
     width: 98%;

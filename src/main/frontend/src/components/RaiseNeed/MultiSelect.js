@@ -23,23 +23,23 @@ const MultiSelect = ({ onAdd }) => {
 
   const handleStartTimeChange = (event, index) => {
     const updatedScheduleItems = [...scheduleItems];
-    updatedScheduleItems[index].startTime = event.target.value;
+    updatedScheduleItems[index].startTime = event.target.value ;
     setScheduleItems(updatedScheduleItems);
-    onAdd(updatedScheduleItems); // Save values immediately
+    onAdd(updatedScheduleItems); 
   };
 
   const handleEndTimeChange = (event, index) => {
     const updatedScheduleItems = [...scheduleItems];
     updatedScheduleItems[index].endTime = event.target.value;
     setScheduleItems(updatedScheduleItems);
-    onAdd(updatedScheduleItems); // Save values immediately
+    onAdd(updatedScheduleItems); 
   };
 
   const handleRemove = (index) => {
     const updatedScheduleItems = [...scheduleItems];
     updatedScheduleItems.splice(index, 1);
     setScheduleItems(updatedScheduleItems);
-    onAdd(updatedScheduleItems); // Save values immediately
+    onAdd(updatedScheduleItems); 
   };
 
   const handleAdd = () => {
@@ -52,9 +52,8 @@ const MultiSelect = ({ onAdd }) => {
   return (
     <div>
       {scheduleItems.map((scheduleItem, index) => (
-        <Grid container spacing={0} key={index} className="container-daysTime">
-          <Grid item xs={3.2}>
-            <FormControl fullWidth>
+        <div className="container-daysTime">
+          <div >
               <Select
                 value={scheduleItem.day}
                 onChange={(e) => handleDayChange(e, index)}
@@ -66,10 +65,9 @@ const MultiSelect = ({ onAdd }) => {
                   </MenuItem>
                 ))}
               </Select>
-            </FormControl>
-          </Grid>
-          <Grid item xs={3.4}>
-            <TextField
+          </div>
+          <div className="time-item">
+            <input
               type="time"
               value={scheduleItem.startTime}
               onChange={(e) => handleStartTimeChange(e, index)}
@@ -78,9 +76,10 @@ const MultiSelect = ({ onAdd }) => {
                 shrink: true,
               }}
             />
-          </Grid>
-          <Grid item xs={3.4}>
-            <TextField
+          </div>
+
+          <div >
+            <input
               type="time"
               value={scheduleItem.endTime}
               onChange={(e) => handleEndTimeChange(e, index)}
@@ -89,11 +88,12 @@ const MultiSelect = ({ onAdd }) => {
                 shrink: true,
               }}
             />
-          </Grid>
-          <Grid item xs={1} className="button-add-remove">
+          </div>
+
+          <div className="button-add-remove">
             <button onClick={() => handleRemove(index)} className="remove-button"> x </button>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
       ))}
       <button onClick={handleAdd} className="add-button"> + </button>
     </div>
