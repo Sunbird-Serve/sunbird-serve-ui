@@ -1,28 +1,36 @@
 import React, { useState } from 'react'
 import VolunteerHeader from '../../components/VolunteerHeader/VolunteerHeader'
 import VolunteerFooter from '../../components/VolunteerFooter/VolunteerFooter'
-import VolunteerExplore from '../../components/VolunteerExplore/VolunteerExplore'
+import VolunteerNeedType from '../../components/VolunteerNeedType/VolunteerNeedType'
 import VolunteerProfile from '../../components/VolunteerProfile/VolunteerProfile'
+import Registration from '../../components/Registration/Registration'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { Redirect } from "react-router";
 
 function ExplorePage() {
-  const [activeComponent, setActiveComponent] = useState('explore');
-  
-  const toggleComponent = () => {
-    setActiveComponent(activeComponent === 'explore' ? 'profile' : 'explore');
-  }
   
   return (
-    <div className="exploreNeeds">
+    <BrowserRouter>
+      <Switch>     
+      <div className="exploreNeeds">
       <div className="vHeader">
-        <VolunteerHeader activeComponent={activeComponent} onToggle={toggleComponent}/>
+        <VolunteerHeader/>
       </div>
       <div className="wrapContent row mt-5 mt-sm-0 pl-5">
-        {activeComponent === 'explore' ? <VolunteerExplore /> : <VolunteerProfile />}
+        <div>
+            <Route exact path="/vneedtypes" component={VolunteerNeedType} />
+            <Route path="/vregistration" component={Registration} />
+            <Route path="/vprofile" component={VolunteerProfile} />
+            <Redirect from="/" to="/vneedtypes" />
+         </div>
       </div>
       <div>
         <VolunteerFooter />
       </div>
     </div>
+    </Switch>
+      
+    </BrowserRouter>
   )
 }
 
