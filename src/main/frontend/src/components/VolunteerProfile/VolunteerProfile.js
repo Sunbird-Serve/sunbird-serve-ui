@@ -2,56 +2,40 @@ import React, { useState, useEffect } from 'react'
 import Avatar from '@mui/material/Avatar';
 import randomColor from 'randomcolor'
 import './VolunteerProfile.css'
-import { NavLink } from 'react-router-dom';
+import { NavLink, Redirect } from 'react-router-dom';
 import { BrowserRouter, Switch, Route} from 'react-router-dom'
 import VolunteerProfileInfo from '../VolunteerProfileInfo/VolunteerProfileInfo'
+import VolunteerProfileEdit from '../VolunteerProfileInfo/VolunteerProfileEdit'
 import VolunteerProfileNominations from '../VolunteerProfileNominations/VolunteerProfileNominations'
 import VolunteerProfileNeedPlans from '../VolunteerProfileNeedPlans/VolunteerProfileNeedPlans'
 import VolunteerProfileFavourites from '../VolunteerProfileFavourites/VolunteerProfileFavourites'
 import {auth} from '../../firebase.js'
-import configData from './../../configData.json'
-import axios from 'axios'
-
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUserByEmail } from '../../state/userSlice'
+import { useHistory } from 'react-router'
 
 function VProfile() {
-    const [avatarColor, setAvatarColor] = useState(randomColor())
-    const currentUser = auth.currentUser;
+  const dispatch = useDispatch()
+  const history = useHistory()
 
-    const [userData, setUserData] = useState('')
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const email = currentUser.email.replace(/@/g, "%40");
-        console.log(email);
-  
-        const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
-        
-        if (response.data.length > 0) {
-          setUserData(response.data[0]);
-        } else {
-          // Handle case when no data is returned
-        }
-      } catch (error) {
-        console.log(error);
-        // Handle error
-      }
-    };
-  
-    if (currentUser.email) {
-      fetchData();
+  const userData = useSelector((state)=> state.user.data)
+  const [user, setUser] = useState(false)
+  useEffect(()=>{
+    if(userData){
+      setUser(true)
     }
-  }, [currentUser]);
+  },[userData])
 
-  console.log(userData)
+  const [avatarColor, setAvatarColor] = useState(randomColor())
 
   const handleLogout = () => {
     auth.signOut()
+    dispatch(fetchUserByEmail(''))
+    history.push('/')
     window.location.reload()
   }
 
   return (
-    <BrowserRouter>
     <div className="wrapVProfile col">
         <div className="vProfileBanner">
             <div className="wrapUserInfo">
@@ -59,12 +43,13 @@ function VProfile() {
                   <Avatar style={{height:'64px',width:'64px',fontSize:'32px',backgroundColor:avatarColor}}>
                   </Avatar>
                 </div>
-                <div className="userInfo">
-                    <div className="vName"> {(userData)? userData.identityDetails.fullname : '' }</div>
+            
+                    <div className="userInfo">
+                    <div className="vName"> { (user && userData.identityDetails) ? userData.identityDetails.fullname : 'Unregistered User' }</div>
                     <div className="vContact">
-                        <div className="vEmail">{(userData)? userData.contactDetails.email : '' }</div>
+                        <div className="vEmail">{ (user && userData.identityDetails) ? userData.contactDetails.email : 'Complete registration to create profile' }</div>
                         <span>.</span>
-                        <div className="vMobile">{(userData)? userData.contactDetails.mobile : '' }</div>
+                        <div className="vMobile">{ (user && userData.identityDetails) ? userData.contactDetails.mobile : '' }</div>
                     </div>
                 </div>
             </div>
@@ -73,21 +58,24 @@ function VProfile() {
             </div>
         </div>
         <div className="vProfNav">
-            <NavLink to="/vpinfo" className="vpNavItem" activeClassName="selectedTab">Profile</NavLink>
-            <NavLink to="/vpnominations" className="vpNavItem" activeClassName="selectedTab">Nominations</NavLink>
-            <NavLink to="/vpneedplans" className="vpNavItem" activeClassName="selectedTab">Need Plans</NavLink>
-            <NavLink to="/vpfavourites" className="vpNavItem" activeClassName="selectedTab">Favourites</NavLink>
+            <NavLink to="/vprofile/vpinfo" default className="vpNavItem" activeClassName="selectedTab">Profile</NavLink>
+            <NavLink to="/vprofile/vpnominations" className="vpNavItem" activeClassName="selectedTab">Nominations</NavLink>
+            <NavLink to="/vprofile/vpneedplans" className="vpNavItem" activeClassName="selectedTab">Need Plans</NavLink>
+            <NavLink to="/vprofile/vpfavourites" className="vpNavItem" activeClassName="selectedTab">Favourites</NavLink>
         </div>
+        { user && userData &&
         <div className="vpContent">
             <Switch>     
-                <Route exact path="/vpinfo" component={VolunteerProfileInfo} />
-                <Route path="/vpnominations" component={VolunteerProfileNominations} />
-                <Route path="/vpneedplans" component={VolunteerProfileNeedPlans} />
-                <Route path="/vpfavourites" component={VolunteerProfileFavourites} />
+                <Route exact path="/vprofile/vpinfo" component={VolunteerProfileInfo} />
+                <Route path="/vprofile/vpedit" component={VolunteerProfileEdit} />
+                <Route path="/vprofile/vpnominations" component={VolunteerProfileNominations} />
+                <Route path="/vprofile/vpneedplans" component={VolunteerProfileNeedPlans} />
+                <Route path="/vprofile/vpfavourites" component={VolunteerProfileFavourites} />
+                <Redirect from="/vprofile" to="/vprofile/vpinfo" />
             </Switch>
         </div>
+        }
     </div>
-    </BrowserRouter>
   )
 }
 

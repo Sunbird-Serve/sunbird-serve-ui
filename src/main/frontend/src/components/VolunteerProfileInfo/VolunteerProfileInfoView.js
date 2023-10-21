@@ -1,7 +1,13 @@
 import React from 'react';
 import './VolunteerProfileInfoView.css';
+import { useSelector, useDispatch } from 'react-redux'
 
-function VolunteerProfileInfoView({ onEditClick, userData }) {
+function VolunteerProfileInfoView({ onEditClick, userDatas }) {
+  const userData = useSelector((state)=> state.user.data)
+  const handleEditClick = () => {
+
+  };
+
   return (
     <div className="main-content">
       <div className="pro">
@@ -15,7 +21,7 @@ function VolunteerProfileInfoView({ onEditClick, userData }) {
         </div>
       </div>
 
-      {userData && (
+      {user && userData && (
         <div>
           <div className="profile-info-box">
             <h3 className="box-header">Basic Info</h3>
@@ -23,19 +29,19 @@ function VolunteerProfileInfoView({ onEditClick, userData }) {
             <div className="info-group">
               { <div className="info-box">
                 <p className="info-label">Name</p>
-                <p className="info-data">{userData.identityDetails.fullname}</p>
+                <p className="info-data">{(user && userData.identityDetails && userData.identityDetails.fullname ) ? userData.identityDetails.fullname : ''}</p>
               </div> }
               <div className="info-box">
                 <p className="info-label">Gender</p>
-                <p className="info-data">{userData.identityDetails.gender}</p>
+                <p className="info-data">{ (user && userData.identityDetails) ? userData.identityDetails.gender : ''}</p>
               </div>
               <div className="info-box">
                 <p className="info-label">Date of Birth</p>
-                <p className="info-data">{userData.identityDetails.dob}</p>
+                <p className="info-data">{ (user && userData.identityDetails) ? userData.identityDetails.dob : ''}</p>
               </div>
               { <div className="info-box">
                 <p className="info-label">Nationality</p>
-                <p className="info-data">{userData.identityDetails.nationality}</p>
+                <p className="info-data">{ (user && userData.identityDetails) ? userData.identityDetails.nationality : ''}</p>
               </div> }
             </div>
           </div>
@@ -46,16 +52,18 @@ function VolunteerProfileInfoView({ onEditClick, userData }) {
             <div className="info-group">
               <div className="info-box">
                 <p className="info-label">Email Id</p>
-                <p className="info-data">{userData.contactDetails.email}</p>
+                <p className="info-data">{ (user && userData.contactDetails) ? userData.contactDetails.email : ''}</p>
               </div>
               {<div className="info-box">
                 <p className="info-label">Phone</p>
-                <p className="info-data">{userData.contactDetails.mobile}</p>
+                <p className="info-data">{(user && userData.contactDetails) ? userData.contactDetails.mobile : ''}</p>
               </div> }
               { <div className="info-box">
                 <p className="info-label">Address</p>
                 <p className="info-data">
-                  {`${userData.contactDetails.address.state}, ${userData.contactDetails.address.city}, ${userData.contactDetails.address.country}`}
+                  {`${userData.contactDetails ? userData.contactDetails.address.state : ''}, 
+                  ${userData.contactDetails ? userData.contactDetails.address.city : ''}, 
+                  ${userData.contactDetails ? userData.contactDetails.address.country : ''}`}
                   {/* {`${userData.contactDetails.address.plot}, ${userData.contactDetails.address.street}, ${userData.contactDetails.address.landmark}, ${userData.contactDetails.address.locality}, ${userData.contactDetails.address.state}, ${userData.contactDetails.address.district}, ${userData.contactDetails.address.village}, ${userData.contactDetails.address.pincode}`} */}
                 </p>
               </div> }

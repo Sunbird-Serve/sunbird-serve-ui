@@ -1,95 +1,249 @@
 .need-popup {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100%;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    transition: width 0.3s ease-out;
-    z-index: 9999;
-    overflow: hidden;
-  }
-  .need-popup.open {
-    margin-left: calc(100% + 15px);
-    z-index: 20;
-  }
-  .wrapNeedPopup {
-    width: 25%;
-    height: 100%;
-    margin-left: 75%;
-  }
-  .close-button {
-    position: absolute;
-    top: 0px;
-    cursor: pointer;
-    font-size: 20px;
-    width: 28px;
-    height: 28px;
-    background-color: white;
-    display: flex;
-    align-items: center;
-    border-radius: 5px;
-    justify-content: center;
-  }
-  .contentNeedPopup {
-    height: 100%;
-    width: 100%;
-    padding: 20px;
-    background-color: #fff;
-    margin-left: 30px;  
-    display: flex;
-    flex-direction: column;
-    font-size: 15px;
-  }
-
-  .needPTitle {
-    font-size: 20px;
-    font-weight: 600;
-    height: fit-content;
-    display: block;
-  }
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: width 0.3s ease-out;
+  z-index: 99;
+  overflow: scroll;
+}
+.need-popup open {
+  margin-left: calc(100% + 15px);
+  z-index: 20;
+}
+.wrapNeedPopup {
+  width: 25%;
+  height: 100%;
+  margin-left: 75%;
+}
+.close-button {
+  position: absolute;
+  top: 0px;
+  cursor: pointer;
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  justify-content: center;
+}
+.contentNeedPopup {
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  background-color: #fff;
+  margin-left: 30px;  
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+}
+.needPTitle {
+  font-size: 20px;
+  font-weight: 600;
+  height: fit-content;
+  display: block;
+}
 .nominate-button {
-    background-color: #005C87;
-    color: white;
-    border: none;
-    margin-right: 70%;
-    padding: 10px 15px;
-    font-size: 14px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-bottom: 50px;
-  }
-  .nominate-button:hover {
-    background-color: #005C87;
-  }
-  /* ... (previous CSS rules) */
-.date-container {
-    display: flex;
-    align-items: center;
-  }
-  .date-item {
-    margin-right: 100px;
-    margin-bottom: 10px;
-  }
-  /* ... (remaining CSS rules) */
-  hr {
-    border: 0.8px solid lightgray; /* Replace 'lightgray' with the color code you prefer */
-    margin: 20px 0; /* Adjust the margin to control the spacing around the line */
-    width: 400px;
-  }
-
+  background-color: #005C87;
+  color: white;
+  border: none;
+  margin-right: 70%;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.nominate-button:hover {
+  background-color: #005C87;
+}
+.aboutHeading {
+  border-top: solid 1px #EBEBEB;
+  border-bottom: solid 1px #EBEBEB;
+  margin: 5px -20px;
+  padding: 15px 20px;
+  font-size: 20px;
+}
 .popupNKey {
   font-size: 14px;
   color: #99999F;
+  margin: 5px 0px;
+}
+.popupNValue{
+  margin: 0px 5px 5px 0px;
+  }
+
+.date-container {
+  display: flex;
+  align-items: center;
+}
+.date-item {
+  margin-right: 10px;
+  width: 50%;
+}
+.inviteToEvent {
+  margin: 0px 0px 0px -20px;
+  background-color: #F1FDFD;
+  display: flex;
+  align-items: center;
+  padding: 20px 15px;
+  position: absolute;
+  bottom: 0;
+  width: calc( 25% - 30px) ;
+}
+.nominationSuccess {
+  position: relative;
+  /* bottom: 100px; */
+  font-weight: 600;
+  font-size: 18px;
+  color: green;
+}
+.notification-needpopup {
+  color: rgba(213, 91, 68, 1);
+  background-color: rgba(254, 246, 241, 1);
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 15px;
   margin-bottom: 0px;
 }
-.aboutHeading {
+
+.alertLogin {
+  position: absolute;
+  background: white;
+  top: 35%;
+  left: 25%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+}
+.closeBtnLoginVol {
+  height: 50px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 25px;
+  padding: 0px 10px;
+}
+.closeBtnLoginVol button {
+  border: none;
+  background-color: inherit;
+  cursor: pointer;
+}
+.alterVolLoginHead {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0px 40px 10px 40px;
+}
+.textHeadVolLogin {
   font-size: 20px;
+  font-weight: 600;
+  color: #3C4044;
+  padding: 5px 0px;
+}
+.createVolAccount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border: solid 1px #D0D5DD;
+  margin: 0px 90px;
+  border-radius: 6px;
+}
+.createVolAccount button {
+  border: none;
+  background-color: inherit;
+}
+.createVolAccount i {
+  margin-right: 10px;
+}
+.signInVolunteer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  margin-bottom: 30px;
+  margin-top: 10px;
+}
+.signInVolunteer button {
+  border: none;
+  background-color: inherit;
+  color: #0080BC;
+  font-weight: 600;
+}
+.signInVolunteer span {
+  color: #99999F;
+}
+.volunteerSignup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+.btnLoginVol{
+  padding: 10px;
+  border: none;
+  margin-left: 160px;
+}
+
+.notifyRegister {
+  position: absolute;
+  background-color: white;
+  top: 35%;
+  left: 25%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  padding: 30px 25px;
+}
+.notifyRegister span {
+  font-weight: 600;
+}
+.notifyRegister button {
+  color: white;
+  background-color: #276EB9;
+  border: none;
+  width: 100%;
+  padding: 5px;
 }
 
 .nominationSuccess {
-  margin-top: 200px;;
-  color: green;
+  position: absolute;
+  background: white;
+  top: 25%;
+  left: 25%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  width: 500px;
+  padding: 30px;
+  align-items: center;
 }
-
-
+.textNomSuccess {
+  color: #5D5B5B;
+  font-weight: 300;
+  font-size: 16px;
+  margin: 20px 10px;
+  text-align: center;
+}
+.textNomSuccess span {
+  color: #5D5B5B;
+  font-weight: 700;
+}
+.nominationSuccess button {
+  font-size: 16px;
+  border: none;
+  background-color: white;
+  width: fit-content;
+  padding: 3px 10px;
+}
+.buttonNSClose {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}

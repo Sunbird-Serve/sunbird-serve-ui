@@ -1,255 +1,278 @@
-import React, { useState } from "react";
-import "./NeedPlans.css";
-import { Calendar, dayjsLocalizer } from "react-big-calendar";
-import dayjs from "dayjs";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import EventsSideBar from "./EventsSideBar/EventsSideBar";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import EventIcon from "@mui/icons-material/Event";
-import { useDispatch, useSelector, shallowEqual } from "react-redux";
-import * as needPlansActions from "../../redux/features/needplans/actions";
-import { bindActionCreators } from "redux";
-import * as selector from "../../redux/features/needplans/selectors";
+import React, { useEffect, useState } from 'react'
+import { Calendar, momentLocalizer } from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import './NeedPlans.css'
+import moment from 'moment';
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import IconButton from '@mui/material/IconButton'; // Import IconButton from Material-UI
+import KeyboardArrowLeftIcon from '@mui/icons-material/KeyboardArrowLeft';
+import TodayIcon from '@mui/icons-material/Today';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
+import noRecords from '../../assets/noRecords.png'
+import { useSelector, useDispatch } from 'react-redux'
+import axios from 'axios'
+import randomColor from 'randomcolor'
+import Avatar from '@mui/material/Avatar';
+import {format} from 'date-fns'
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
-function NeedPlans() {
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selSlotInfo, setSelSlotInfo] = React.useState(null);
+const configData = require('../../configure.js');
 
-  // using selectors to get data from redux, here state is the redux global state 
-  const { needs } = useSelector(
-    (state) => ({
-      needs: selector.getData(state), 
-    }),
-    shallowEqual, // makes sure that the component rerenders only when the above redux state data changes (avoids unnecessary rerenders)
-  );
+const localizer = momentLocalizer(moment);
 
-  // this function helps us to dispatch actions which will trigger reducers/sagas
-  const dispatch = useDispatch();
-
-  // binds the actions creators with dispatch. Action creators return action object
-  const bindedActions = bindActionCreators({ ...needPlansActions }, dispatch);
-  const mockEvents = [
-    {
-      title: "Event 1",
-      start: new Date(2023, 6, 10, 9, 0, 0),
-      end: new Date(2023, 6, 10, 10, 0, 0),
-      color: "blue", // Custom property to define the color
-    },
-    {
-      title: "Event 4",
-      start: new Date(2023, 6, 10, 15, 0, 0),
-      end: new Date(2023, 6, 10, 16, 0, 0),
-      color: "blue", // Custom property to define the color
-    },
-    {
-      title: "Event 5",
-      start: new Date(2023, 6, 12, 9, 0, 0),
-      end: new Date(2023, 6, 12, 10, 0, 0),
-      color: "blue", // Custom property to define the color
-    },
-    {
-      title: "Event 2",
-      start: new Date(2023, 6, 15, 9, 0, 0),
-      end: new Date(2023, 6, 15, 10, 0, 0),
-      color: "red", // Custom property to define the color
-    },
-  ];
-
-  const localizer = dayjsLocalizer(dayjs);
-
-  // Custom event style getter
-  const eventStyleGetter = (event) => {
-    const style = {
-      backgroundColor: event.color, // Set the background color dynamically
-      borderRadius: "5px",
-      opacity: 0.8,
-      color: "white",
-      border: "0px",
-      display: "block",
-    };
-    return {
-      style,
-    };
-  };
-
-  function dateHandler(date, flag) {
-    const modifiedDate = new Date(date);
-    switch (flag) {
-      case "+":
-        modifiedDate.setMonth(modifiedDate.getMonth() + 1);
-        break;
-      case "-":
-        modifiedDate.setMonth(modifiedDate.getMonth() - 1);
-        break;
-      default:
-        break;
-    }
-    console.log(date, "date here");
-    console.log(modifiedDate, "check here");
-    setCurrentDate(modifiedDate);
+const NeedPlans = () => {
+  const userId = useSelector((state)=> state.user.data.osid)
+  const userList = useSelector((state) => state.userlist.data);
+  const userMap = {}
+  const userContact = {}
+  for (const user of userList){
+    userMap[user.osid] = user.identityDetails.fullname;
+    userContact[user.osid] = user.contactDetails.mobile;
   }
 
-  const handleSelectEvent = (event, e) => {
-    // Handle the selection of an event
-    console.log("Selected event:", JSON.stringify(event));
-    setSelectedDate(event.start);
-    setSelSlotInfo(event.start);
-    // Perform any additional logic or dispatch actions
-    // based on the selected event
+  //get needs raised by nCoordinator
+  const needList = useSelector((state) => state.need.data);
+  const needsByUser = needList.filter(item => item && item.need && item.need.userId === userId)
+
+  //see if needIds by user have need plans and save if they
+  const [nomNeedMap, setNomNeedMap] = useState([])
+  useEffect(() => {
+  async function fetchNoms() {
+    const promises = needsByUser.map(item => axios.get(`${configData.NEED_GET}/${item.need.id}/nominate/Approved`));
+
+    try {
+      const responses = await Promise.all(promises);
+
+      // const nomedNeeds = responses.map(response => response.data).filter(item => item.length).map(item => item[0].needId);
+      const nomedNeeds = responses.map(response => response.data).filter(item => item.length)
+      const filterNomNeed = nomedNeeds.reduce((acc, elementArray) => {
+        elementArray.forEach(obj => {
+          const { needId, nominatedUserId } = obj;
+          if (!acc[needId]) {
+            acc[needId] = [];
+          }
+          acc[needId].push(nominatedUserId);
+        });
+        return acc;
+      }, {});
+      setNomNeedMap(filterNomNeed)
+    } catch (error) {
+      console.error("Error fetching plans for: ",promises);
+    }
+    }
+    fetchNoms();
+  }, [userId]);
+
+  const [needPlans, setNeedPlans] = useState([]);
+  useEffect(() => {
+    const newResultArray = [];
+    for (const needId in nomNeedMap) {
+      const matchingNeed = needList.filter(needItem => needItem && needItem.need).find(needItem => needItem.need.id === needId);
+      if (matchingNeed) {
+        const resultObject = {
+          needId: matchingNeed.need.id,
+          assignedUserId: nomNeedMap[needId],
+          needInfo: matchingNeed,
+        };
+
+        newResultArray.push(resultObject);
+      }
+    }
+    setNeedPlans(newResultArray);
+  }, [nomNeedMap, needList]);
+  const totalAssignedUsers = needPlans.reduce((acc, plan) => acc + plan.assignedUserId.length, 0);
+
+  //make the events from start to end date
+  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId) {
+    const timeSlotObject = {};
+    timeSlots.forEach(slot => {
+      const day = slot.day.toLowerCase();
+      timeSlotObject[day] = [format(new Date(slot.startTime), 'hh:mm a'), format(new Date(slot.endTime), 'h:mm a')];
+    });
+  
+    const dateWithTimeSlots = [];
+    const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const currentDate = new Date(startDate);
+    while (currentDate <= new Date(endDate)) {
+      const dayIndex = currentDate.getDay();
+      const day = daysOfWeek[dayIndex];
+      if (timeSlotObject[day]) {
+        dateWithTimeSlots.push({
+          title: needName,
+          start: currentDate.toDateString(),
+          end: currentDate.toDateString(),
+          startTime: timeSlotObject[day][0],
+          endTime: timeSlotObject[day][1],
+          startDate: new Date(startDate).toDateString(),
+          endDate: new Date(endDate).toDateString(),
+          assignedUsers: assignedUserId
+        });
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+  
+    return dateWithTimeSlots;
+  }
+  const [events, setEvents] = useState([]);
+  useEffect(() => {
+    const newEvents = [];
+    for (const item of needPlans) {
+      if (item.needInfo.occurrence !== null) {
+        const { startDate, endDate } = item.needInfo.occurrence;
+        const sessions = getTimeSlots(item.needInfo.need.name, startDate, endDate, item.needInfo.timeSlots, item.assignedUserId); // Use getTimeSlots function
+        newEvents.push(...sessions);
+      }
+    }
+    setEvents(newEvents);
+  }, [needPlans]);
+
+  //view of calender: to show monthwise
+  const views = {
+    month: true,
+    week: false,
+    day: false,
+    agenda: false,
+  }
+  //styling of cells inside calender
+  const customEventPropGetter = (event, start, end, isSelected) => {
+    const eventStyle = {
+      backgroundColor: 'white', 
+      borderRadius: '5px',
+      color: 'black',
+      boxShadow: "2px 0px #0080BC inset",
+      border: 'solid 1px #DBDBDB'
+    };
+    const currentDate = end;
+    return {
+      style: eventStyle,
+    };
   };
 
-  const handleDrillDown = (date, view) => {
-    // Handle the click on the "More" link
-    console.log("Drill down date:", date);
-    console.log("Drill down view:", view);
-    setSelectedDate(date);
-    setSelSlotInfo(date);
-  };
-
-  const onSelectSlot = (slotInfo) => {
-    setSelSlotInfo(slotInfo.start);
-    setSelectedDate(slotInfo.start);
-    console.log(slotInfo, "slotInfo");
-  }; // onSelectSlot
-
-  const dateCellWrapper = ({ children, value }) => {
-    const styleObject = { backgroundColor: "lightpink" };
-    return (
-      <div
-        style={
-          dayjs(value).isSame(dayjs(selSlotInfo), "day") ? styleObject : {}
-        }
-        className={children.props.className}
-      >
-        {children}
+  const CustomToolbar = ({ onNavigate, label }) => (
+    <div className="custom-toolbar">
+      <IconButton onClick={() => onNavigate('PREV')}>
+        <KeyboardArrowLeftIcon />
+      </IconButton>
+      <IconButton onClick={() => onNavigate('TODAY')}>
+        <TodayIcon />
+      </IconButton>
+      <IconButton onClick={() => onNavigate('NEXT')}>
+        <KeyboardArrowRightIcon />
+      </IconButton>
+      <div className="calendar-month-year">
+        {moment(label).format('MMMM YYYY')} {/* Display month and year */}
       </div>
-    );
+    </div>
+  );
+
+  const [selectedDate, setSelectedDate] = useState(new Date()); // State to store selected date
+
+  useEffect(() => {
+    const selectedDateString = moment(selectedDate).format('YYYY-MM-DD');
+    setSelectedDate(selectedDateString); 
+  }, [selectedDate]);
+
+  const handleSelectSlot = (slotInfo) => {
+    const selectedDateString = moment(slotInfo.start).format('YYYY-MM-DD');
+    setSelectedDate(selectedDateString); 
   };
+
+
+
+  // to show selection of date on calender
+  const customDayPropGetter = (date) => {
+    const isSelectedDate = moment(date).format('YYYY-MM-DD') === selectedDate;
+    const classNames = isSelectedDate ? 'selected-date-cell' : '';
+    return { className: classNames };
+  };
+  
+  const [expandEvent, setExpandEvent] = useState(false)
 
   return (
-    <div className="wrapNeeds">
-      <div className="needPlansGrid">
-        <div className="calendar">
-          <div>
-            <div>
-              <span style={{ float: "left", width: "8%", marginRight: "1%" }}>
-                {currentDate.toLocaleString("default", { month: "long" })}
-              </span>
-              <span style={{ float: "left", width: "5%", marginRight: "1%" }}>
-                {currentDate.getFullYear()}
-              </span>
-            </div>
-            <div style={{ float: "left" }}>
-              <button
-                className="changeMonthButton"
-                type="button"
-                onClick={() => dateHandler(currentDate, "-")}
-              >
-                <ArrowBackIosNewIcon
-                  style={{ fontSize: "smaller", margin: "5px 0px 3px 0px" }}
-                />
-              </button>
-              <button
-                className="changeMonthButton"
-                type="button"
-                onClick={() => dateHandler(currentDate, "+")}
-              >
-                <ArrowForwardIosIcon
-                  style={{ fontSize: "smaller", margin: "5px 0px 3px 0px" }}
-                />
-              </button>
-            </div>
+      <div>
+        <div className="wrapCalender">
+          <Calendar className="ncCalender"
+            localizer={localizer}
+            events={events}     //data into calender
+            startAccessor="start"
+            endAccessor="end"
+            views={views}   //which views to enable or disable
+            style={{ width: 840 }} // Set the overall calendar width
+            eventPropGetter={customEventPropGetter}
+            components={{
+              toolbar: CustomToolbar,
+            }}
+            selectable={true} // Enable date selection
+            onSelectSlot={handleSelectSlot} // Handle date slot selection
+            dayPropGetter={customDayPropGetter} // Apply custom day cell styling
+          />
+          
+          {/* Side List showing list of events */}
+          { selectedDate && ( <div className="event-list-nc">
+          {/* Selected Event Date */}
+          <div className="headEventListNC">{moment(selectedDate).format('MMMM D, YYYY')}</div>
+          {/* Need and Volunteer Stats */}
+          <div className="stats-need-volunteer">
+              <div className="needCountNC">
+                <i><StickyNote2Icon /></i> 
+                <span>{needPlans.length} Needs</span>
+              </div>
+              <div className="volunteerCountNC">
+                <i><PeopleAltIcon /></i> 
+                <span>{totalAssignedUsers} Volunteers</span>
+              </div>
           </div>
-          <br style={{ clear: "both" }} />
-          <div className="box">
-            <div className="content">
-              <div className="label">
-                <VisibilityIcon
-                  style={{
-                    fontSize: "small",
-                    paddingRight: "0.5vw",
-                    color: "#888",
-                  }}
-                />
-                Needs
+          {/* EVENTS LIST when selected date falls within date range of any event */}
+          { events.filter((event) => {
+            const startDate = moment(event.start);
+            const endDate = moment(event.end)
+            const selected = moment(selectedDate)
+            return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
+            })
+            .map((event) => (
+            <button className="dayEventListNC" key={event.title} onClick={() => setExpandEvent(!expandEvent)}>
+              <div className="dayEventTitleNC">
+                <i> { expandEvent ? <ExpandMoreIcon/> : <ChevronRightIcon /> }</i>
+                <span className="nameDayEventNC">{event.title}</span>
+                <span className="timeDayEventNC">
+                  <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
+                  {event.startTime}
+                </span> 
               </div>
-              <div className="value">565</div>
-            </div>
-            <div className="content">
-              <div className="label">
-                <VisibilityIcon
-                  style={{
-                    fontSize: "small",
-                    paddingRight: "0.5vw",
-                    color: "#888",
-                  }}
-                />
-                Volunteers
-              </div>
-              <div className="value">565</div>
-            </div>
-            <button
-              onClick={() =>
-                bindedActions.setNeeds([{ action1: "" }, { action2: "" }])
+              <div className="dayEventDateNC"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
+              { expandEvent && 
+                event.assignedUsers.map((user) => <div className="user-boxNC">
+                  <div className="userNameNC">
+                    <div><Avatar style={{padding:'5px',height:'24px',width:'24px',fontSize:'16px',backgroundColor:randomColor()}}></Avatar></div>
+                    <div className="userName-eventList">{userMap[user]}</div>
+                  </div>
+                  <div className="userContact-eventList">{userContact[user]}</div>
+                </div>)
               }
-            >
-              dispatch
             </button>
-            <button onClick={() => bindedActions.getNeeds()}>get needs</button>
-          </div>
-          <br style={{ clear: "both" }} />
-          <div style={{ height: "95vh" }}>
-            <p>look here {JSON.stringify(needs)}</p>
-            <Calendar
-              localizer={localizer}
-              events={mockEvents}
-              toolbar={false}
-              startAccessor="start"
-              date={currentDate}
-              step={50}
-              endAccessor="end"
-              style={{ height: 500 }}
-              views={{ month: true }}
-              eventPropGetter={eventStyleGetter}
-              onSelectEvent={handleSelectEvent}
-              onDrillDown={handleDrillDown}
-              components={{
-                dateCellWrapper: dateCellWrapper,
-              }}
-              selectable
-              onSelectSlot={onSelectSlot}
-            />
-          </div>
-        </div>
-        <div className="events">
-          {selectedDate ? (
-            <EventsSideBar selectedDate={selectedDate} />
-          ) : (
-            <div
-              style={{
-                height: "80vh",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <EventIcon
-                style={{
-                  fontSize: "150px",
-                  margin: "auto auto 0 auto",
-                  color: "#c4c4c4",
-                }}
-              />
-              <span style={{ margin: "0 auto auto auto" }}>
-                Select a date to display the needs
-              </span>
+          )) }
+
+
+          {/* NO EVENTS LIST */}
+          {!events.some((event) => {
+            const startDate = moment(event.start);
+            const endDate = moment(event.end);
+            const selected = moment(selectedDate);
+            return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
+            }) && ( <div className="noEventsOnDay">
+              <img src={noRecords} alt="No Events" />
+              <p>No needs scheduled on this date</p>
             </div>
+          )}
+
+          </div>
           )}
         </div>
       </div>
-    </div>
+
   );
 }
 

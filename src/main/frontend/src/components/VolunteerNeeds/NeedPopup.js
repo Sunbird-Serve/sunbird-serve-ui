@@ -2,47 +2,27 @@ import React, { useState, useEffect } from 'react';
 import './NeedPopup.css';
 import CloseIcon from "@mui/icons-material/Close";
 import axios from 'axios';
-import configData from './../../configData.json'
-import {auth} from '../../firebase.js'
+import ShareIcon from "@mui/icons-material/Share";
+import { auth } from '../../firebase'
+import VolunteerSignup from '../VolunteerSignup/VolunteerSignup';
+import { useHistory } from 'react-router-dom';
+import VolunteerLogin from '../VolunteerLogin/VolunteerLogin';
+import EmailIcon from '@mui/icons-material/Email';
+import { useSelector, useDispatch } from 'react-redux'
+import NominationSuccess from '../../assets/nominationSuccess.png';
+
+const configData = require('../../configure.js');
 
 function NeedPopup({ open, onClose, need }) {
-  const [popUp, setPopup] = useState(false);
-  const [nominationStatus, setNominationStatus] = useState(false)
-  const togglePopup = () => {
-    setPopup(!popUp);
-  };
-
-  const currentUser = auth.currentUser;
-  const [userId, setUserId] = useState('')
-
-  if(currentUser){
-    const fetchData = async () => {
-      try {
-        const email = currentUser.email.replace(/@/g, "%40");
-        console.log(email);
-  
-        const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
-        
-        if (response.data.length > 0) {
-          setUserId(response.data[0].osid);
-        } else {
-          // Handle case when no data is returned
-        }
-      } catch (error) {
-        console.log(error);
-        // Handle error
-      }
-    };
-  
-    if (currentUser.email) {
-      fetchData();
-    }
-  }
-  console.log(userId)
-
+  const userId = useSelector((state)=> state.user.data.osid)
+  const [alertLogin, setAlertLogin] = useState(false)
+  const [notifyRegister, setNotifyRegister] = useState(false)
+  //NOMINATION to a need on Nominate button click
   const nominateNeed = () => {
-    const needId = need.id; //  the need.id represents the needId
+    const needId = need.need.id; //  the need.id represents the needId
     console.log(needId)
+    console.log(userId)
+    if(userId){
     axios.post(`${configData.NEED_SEARCH}/${needId}/nominate/${userId}`)
       .then((response) => {
         console.log("Nomination successful!");
@@ -51,75 +31,136 @@ function NeedPopup({ open, onClose, need }) {
       .catch((error) => {
         console.error("Nomination failed:", error);
       });
+    } else {
+      if(auth.currentUser){
+        setNotifyRegister(true)
+      } else {
+        setAlertLogin(true)
+      }
+    }
   };
- 
-  const [needType, setNeedType] = useState(null);
-  function NeedTypeById( needTypeId ) {
-    axios
-      .get(`${configData.NEED_BY_TYPE}/${needTypeId}?page=0&size=10&status=New`)
-      .then((response) => {
-        setNeedType(response.data.content.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Need Type failed:", error);
-      });
-   return <span>{needType || ''}</span>;
+
+  const [nominationStatus, setNominationStatus] = useState(false)
+
+  const [vlogin, setVlogin ] = useState(false)
+  const handleVolunteerLogin = () => {
+    setVlogin(!vlogin)
+    setAlertLogin(false)
+  };
+
+  const [vsignup, setVsignup] = useState(false);
+  const handleVolunteerSignup = () => {
+    setVsignup(!vsignup)
+    setAlertLogin(false)
   }
 
-
-  const [entityName, setEntityName] = useState(null);
-
-  /*
-  function EntityById( entityId ) {
-       axios
-         .get(`http://43.204.25.161:8081/api/v1/Entity/${entityId}`)
-         .then((response) => {
-           setEntityName(response.data.name);
-         })
-         .catch((error) => {
-           console.error("Fetching Entity failed:", error);
-         });
-     return entityName || '';
+  const history = useHistory();
+  const handleRegisterClick = (e) => {
+    e.preventDefault();
+    history.push("/vregistration")
   }
-  */
+
+  const gotoHome = (e) => {
+    e.preventDefault();
+    setNominationStatus(false)
+    onClose()
+  }
 
   return (
     <div className={`need-popup ${open ? "open" : ""}`}>
+      {/*Nomination Popup*/}
       <div className="wrapNeedPopup">
       <div className="close-button" onClick={onClose}>
         <CloseIcon />
       </div>
       <div className="contentNeedPopup">
-        <div className="needPTitle">{need.name}</div>
+        <div className="needPTitle">{need.need.name}</div>
         <br/>
         <button className="nominate-button" onClick={nominateNeed}>
           Nominate
         </button>
+        <p className="notification-needpopup">Hurry! Nominations will be closed soon</p>
         <div className="aboutHeading">About</div>
-        <hr />
         <p className="popupNKey">About the Need </p>
-        <p className="popupNValue">{need.description.slice(3,-4)}</p>
+        <p className="popupNValue">{ (need.need && need.need.description) ? need.need.description.slice(3,-4) : '' }</p>
         <p className="popupNKey">Need Type </p>
-        <p>{NeedTypeById(need.needTypeId)}</p>
+        <p>{need.needType.name} </p>
         <div className="date-container">
           <div className="date-item">
-            <p className="popupNKey"> Start Date </p>
-            <p>{need.startDate}</p>
+            <span className="popupNKey"> Start Date </span>
+            <p>{ (need.occurrence && need.occurrence.startDate)? need.occurrence.startDate.substr(0,10) : '' }</p>
           </div>
           <div className="date-item">
             <p className="popupNKey">End Date </p>
-            <p>{need.endDate}</p>
+            <p>{ (need.occurrence && need.occurrence.endDate)? need.occurrence.endDate.substr(0,10) : '' }</p>
           </div>
         </div>
         <p className="popupNKey">Entity Name </p>
-        <p>{/*  EntityById(need.entityId) */}</p>
-        <p className="popupNKey">Skills Required</p><br/>
+        <p>{ need.entity.name }</p>
+        <p className="popupNKey">Skills Required</p>
+        <p className="popupNValue">{ (need.needRequirement && need.needRequirement.skillDetails)? need.needRequirement.skillDetails : '' }</p>
         <p className="popupNKey">Volunteers Required</p>
-        {nominationStatus && <p className="nominationSuccess">Nomination Successful</p>}
+        <p className="popupNValue">{ (need.needRequirement && need.needRequirement.volunteersRequired)? need.needRequirement.volunteersRequired : '' }</p>
+        <div className="inviteToEvent">
+            <ShareIcon style={{ fontSize: "15px" }} />
+            <p style={{ margin: "0 10px", fontSize: "15px", width: "400px" }}>Invite your friends to this event</p>
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Gmail_icon_%282020%29.svg/1024px-Gmail_icon_%282020%29.svg.png?20221017173631"
+              alt="Gmail Icon"
+              style={{ width: "24px", height: "15px", marginRight: "10px", cursor: "pointer" }}
+            />
+            <img
+              src="https://thenounproject.com/api/private/icons/3039256/edit/?backgroundShape=SQUARE&backgroundShapeColor=%23000000&backgroundShapeOpacity=0&exportSize=752&flipX=false&flipY=false&foregroundColor=%23000000&foregroundOpacity=1&imageFormat=png&rotation=0"
+              alt="Copy Icon"
+              style={{ width: "24px", height: "24px", cursor: "pointer" }}
+            />
+        </div>
+        {/* { <p className="nominationSuccess">Nomination Successful</p>} */}
       </div>
       </div>
+
+      { nominationStatus && <div className="nominationSuccess">
+          <div className="buttonNSClose"><button onClick={gotoHome}>X</button></div>
+          <div className="imageNomSuccess">
+            <img src={NominationSuccess} alt="SunBirdLogo" width="400px" />
+          </div>
+          
+          <div className="textNomSuccess">
+            Hurray! You've successfully nominated for the event "<span>{need.name}</span>". You'll be notified
+            once the organiser accepts your nomination.
+          </div>
+      </div> }
       
+      {alertLogin && <div className="alertLogin">
+        <div className='closeBtnLoginVol'>
+          <button onClick={()=>setAlertLogin(false)}>x</button>
+        </div> 
+        <div className="alterVolLoginHead">
+          <div className="textHeadVolLogin">Hey There!</div>
+          <p>Create an account to nominate, save your favourite events, and much more</p>
+        </div>
+        <div className="createVolAccount">
+          <button type="login" onClick={handleVolunteerSignup}> 
+            <i><EmailIcon/></i>Create account with Email ID 
+          </button>
+        </div> 
+        <div className="signInVolunteer">
+          <span>Already have an account?</span>
+          <button onClick={handleVolunteerLogin}> Login </button>
+        </div>
+      </div>}
+
+      {notifyRegister && <div className="notifyRegister">
+            <p>You are logged in with email id <span>{auth.currentUser ? auth.currentUser.email : ''}</span>.</p> 
+            <p>Please complete registration to nominate a need.</p>
+            <button onClick={handleRegisterClick}>Click to Register</button>
+            </div>} 
+     
+      { vsignup && <VolunteerSignup onClose={handleVolunteerSignup}/>}
+      { vlogin && <VolunteerLogin onClose={handleVolunteerLogin}/> }
     </div>
+
+
   );
 }
 export default NeedPopup;

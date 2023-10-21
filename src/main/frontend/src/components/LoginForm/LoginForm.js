@@ -36,7 +36,7 @@ const LoginForm = ({loginState}) => {
         <div className="loginForm row">
             {/* Logo */}
             <div className="sbLogo col-12 col-sm-7 offset-sm-1 mt-sm-5">
-                <img src={SBLogo} alt="BlueBirdLogo" width="120px" />
+                <img src={SBLogo} alt="BlueBirdLogo" width="150px" />
             </div>
             {/* Add Login Form */}
             <form className="menuLogin col-12 col-sm-7 offset-sm-1 mt-sm-5">

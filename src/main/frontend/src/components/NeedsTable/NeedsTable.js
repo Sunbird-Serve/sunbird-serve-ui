@@ -1,6 +1,9 @@
 import React, {useState, useEffect, useMemo} from 'react'
-import axios from 'axios'
+import { useSelector, useDispatch } from 'react-redux'
 import { useTable, usePagination, useGlobalFilter, useFilters, useSortBy } from 'react-table'
+import { useHistory } from 'react-router'
+import randomColor from 'randomcolor'
+import axios from 'axios'
 import ModifyNeed from '../ModifyNeed/ModifyNeed'
 import './NeedsTable.css'
 import SearchIcon from '@mui/icons-material/Search';
@@ -9,127 +12,143 @@ import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FaSort } from "react-icons/fa"
-import configData from './../../configData.json'
-import {auth} from '../../firebase.js'
+import Avatar from '@mui/material/Avatar';
+
+const configData = require('../../configure.js');
 
 export const NeedsTable = props => {
-  const [dataNew,setDataNew] = useState([]);
-  const [dataNominated,setDataNominated] = useState([]);
-  const [dataApproved,setDataApproved] = useState([]);
-  const [dataRejected,setDataRejected] = useState([]);
-  const [dataNeed, setDataNeed] = useState([]);
-  const [dataNeedType,setDataNeedType] = useState([]);
+  const dispatch = useDispatch()
 
-  const currentUser = auth.currentUser;
-  const [userId, setUserId] = useState(null)
-
-  useEffect(()=> {
-    axios.get(`${configData.NEEDTYPE_GET}/?page=0&size=10&status=Approved`)
-    .then(
-      //function(response){console.log(response.data.content)},
-      response => setDataNeedType(Object.values(response.data.content))
-    )
-    .catch(function (error) {
-        console.log('error'); 
-    }) 
-  },[])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const email = currentUser.email.replace(/@/g, "%40");
-        console.log(email);
-  
-        const response = await axios.get(`${configData.USER_GET}/?email=${email}`);
-        
-        if (response.data.length > 0) {
-          setUserId(response.data[0].osid);
-        } else {
-          // Handle case when no data is returned
-        }
-      } catch (error) {
-        console.log(error);
-        // Handle error
-      }
-    };
-  
-    if (currentUser.email) {
-      fetchData();
-    }
-  }, [currentUser.email, userId]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const newNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=New`);
-        const nominatedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Nominated`);
-        const approvedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Approved`);
-        const rejectedNeedsResponse = axios.get(`${configData.NEED_BY_USER}/${userId}?page=0&size=10&status=Rejected`);
-
-        const [newNeeds, approvedNeeds, nominatedNeeds, rejectedNeeds] = await Promise.all(
-          [newNeedsResponse, approvedNeedsResponse, nominatedNeedsResponse, rejectedNeedsResponse]);
-        setDataNew(newNeeds.data.content);
-        setDataApproved(approvedNeeds.data.content);
-        setDataRejected(rejectedNeeds.data.content);
-        setDataNominated(nominatedNeeds.data.content);
-        setDataNeed([...newNeeds.data.content, ...approvedNeeds.data.content, ...rejectedNeeds.data.content, ...nominatedNeeds.data.content]);
-      } catch (error) {
-        console.log("Error fetching needs:", error);
-      }
-    };
-  
-    fetchData();
-  }, [userId]);
-
-  // got need data through props
-  const data = useMemo(() => dataNeed,[dataNeed])
-
-  function NeedTypeById({ needTypeId }) {
-    const [needType, setNeedType] = useState(null);
-    useEffect(() => {
-    axios
-      .get(`${configData.NEEDTYPE_GET}/${needTypeId}`)
-      .then((response) => {
-        setNeedType(response.data.name);
-      })
-      .catch((error) => {
-        console.error("Fetching Need Type failed:", error);
-      });
-    }, [needTypeId]);
-   return <span>{needType || ''}</span>;
+  //get userId
+  const uid = useSelector((state)=> state.user.data.osid)
+  //get list of needs raised by user
+  const needList = useSelector((state) => state.need.data);
+  const needsByUser = needList.filter(item => item && item.need && item.need.userId === uid)
+  //needtype filter
+  const needTypes = useSelector((state)=> state.needtype.data.content)
+  const [needTypeId, setNeedTypeId] = useState('')
+  const handleNeedTypeFilter = e => {
+    setNeedTypeId(e.target.value)
   }
+  const [filteredData, setFilteredData] = useState([])
+  useEffect(()=>{
+    let filtered = needsByUser
+    if(needTypeId){
+      const filtered = needsByUser.filter(item => item.need.needTypeId === needTypeId)
+      setFilteredData(filtered)
+    } else {
+      setFilteredData(filtered)
+    }
+  },[needTypeId, needList])
+  const data = useMemo(() => filteredData,[filteredData, needList])
 
-  /*
-  function EntityById({ entityId }) {
-    const [entityName, setEntityName] = useState(null);
+  const COLUMNS = [
+    { Header: 'Need Name', accessor: 'need.name', width: 250 },
+    { Header: 'Need Type', accessor: 'needType.name'  },
+    { Header: 'Location', accessor: 'entity.district'},
+    { Header: 'Entity', accessor: 'entity.name' }, 
+    { Header: 'Volunteer', accessor: 'need.id',
+      Cell: ({ value }) => {
+      return <div className="vAvatars-container"><
+        VolunteerByNeedId needId={value} />
+        </div>; }
+    },
+    { Header: 'Timeline',
+      accessor: (row) => {
+        if(row.occurrence) {
+          return `${row.occurrence.startDate.substr(2,8).split('-').reverse().join('/')}
+            -${row.occurrence.endDate.substr(2,8).split('-').reverse().join('/')}`
+        } else {
+          return ''
+        }
+      } ,
+    },
+    { Header: 'Status', accessor: 'need.status'}
+  ]
+  const columns = useMemo(() => COLUMNS, []);
+
+  function VolunteerByNeedId({ needId }) {
+    const [volunteerList, setVolunteerList] = useState(null);
+    const [volunteerNames, setVolunteerNames] = useState([]);
      useEffect(() => {
        axios
-         .get(`${configData.ENTITY_FETCH}/${entityId}`)
+         .get(`${configData.NEED_GET}/${needId}/nominate`)
          .then((response) => {
-           setEntityName(response.data.name);
+           setVolunteerList(response.data);
          })
          .catch((error) => {
            console.error("Fetching Entity failed:", error);
          });
-     }, [entityId]);
-     return <span>{entityName || ''}</span>;
-  }
-  */
+     }, [needId]);
+     console.log(volunteerList)
+     
+     useEffect(() => {
+      if (volunteerList) {
+        const volunteerIds = volunteerList.map((item) => item['nominatedUserId']);
+        console.log(volunteerIds)
 
-  const COLUMNS = [
-    { Header: 'Need Name', accessor: 'name', width: 250 },
-    { Header: 'Need Type', accessor: 'needTypeId',
-      Cell: ({ value }) => {
-      return <NeedTypeById needTypeId={value} />;
+        // Function to fetch volunteer details by volunteerId
+        const fetchVolunteerDetails = async (volunteerId) => {
+          try {
+            const response = await axios.get(`${configData.USER_GET}/${volunteerId}`); 
+            console.log(response.data)
+            return response.data.identityDetails.fullname; // Assuming your API returns a name field
+          } catch (error) {
+            console.error(`Error fetching volunteer details for ID ${volunteerId}:`, error);
+            return null;
+          }
+        };
+  
+        // Use Promise.all to make API calls for all volunteerIds concurrently
+        const fetchDataForAllVolunteers = async () => {
+          const promises = volunteerIds.map((volunteerId) => fetchVolunteerDetails(volunteerId));
+          const volunteerNames = await Promise.all(promises);
+          setVolunteerNames(volunteerNames);
+        };
+  
+        fetchDataForAllVolunteers();
       }
-    },
-    { Header: 'Location', width: 144 },
-    { Header: 'Entity', accessor: 'entityId', width: 244 }, 
-    { Header: 'Volunteer', width: 112 },
-    { Header: 'Timeline', width: 164 },
-    { Header: 'Status', accessor: 'status', width: 109, filter: 'text' }
-  ]
-  const columns = useMemo(() => COLUMNS, [])
+      console.log(volunteerNames)
+
+    }, [volunteerList]);
+
+    const truncateAndDots = (names, maxNamesToShow) => {
+        const firstLetters = names.map((element) => 
+        element === null ? null : (
+          <Avatar className="avatar" style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
+            {element.charAt(0)}
+          </Avatar>
+        )
+        
+        );
+        
+      if (names.length <= maxNamesToShow) {
+        return firstLetters
+          ;
+      } else {
+        return firstLetters.slice(0,maxNamesToShow);
+      }
+    
+    };
+
+    if (volunteerNames.length > 0) {
+      const maxNamesToShow = 3; // Adjust the number of names to show
+      const truncatedVolunteerNames = truncateAndDots(volunteerNames, maxNamesToShow);
+      if(volunteerNames.length > maxNamesToShow){
+        return <span>{truncatedVolunteerNames}
+          <Avatar className="avatar" style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
+          {'+'}{volunteerNames.length-maxNamesToShow}
+          </Avatar>
+        
+        </span>;
+      } else {
+        return <span>{truncatedVolunteerNames}</span>;
+      }
+    } else {
+      return <span>No volunteers</span>;
+    }
+
+  }
   const {
     getTableProps,
     getTableBodyProps,
@@ -151,49 +170,63 @@ export const NeedsTable = props => {
     columns,
     data
     },
-    useFilters, useGlobalFilter, useSortBy, usePagination)
+  useFilters, useGlobalFilter, useSortBy, usePagination)
 
-  const [showPopup, setShowPopup] = useState(false);
+  //Filters on the needs table
+  const { globalFilter, pageIndex, pageSize } = state;  
+  const [filterValue, setFilterValue] = useState('')
+  //filter tabs
+  const [status, setStatus ] = useState('all')  
+  const [activeTab, setActiveTab] = useState('all');
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  }
+  useEffect(() => {
+    if (activeTab === 'approved') {
+      setFilter('need.status', 'Approved')
+    }
+    else if (activeTab == 'requested') {
+      setFilter('need.status', 'New')
+    }
+    else {
+      setFilter('need.status','')
+    }
+  }, [activeTab])
+
+  //Popup on row click showing nominations and need details
   const [rowData, setRowData] = useState(null);
-  const [date,setDate] = useState('')
-  const [needTypeId, setNeedTypeId] = useState('')
-
+  const [showPopup, setShowPopup] = useState(false);
   const handleRowClick = (rowData) => {
     setRowData(rowData);
     setShowPopup(!showPopup);
   };
-  const handleDate = e => {
-    setDate(e.target.value)
+
+  //raise need page
+  const history = useHistory()
+  const gotoRaiseNeed = e => {
+    history.push('/raiseneed')
   }
-  const handleNeedType = e => {
-    setNeedTypeId(e.target.value)
-  }
-
-  const { globalFilter, pageIndex, pageSize } = state;
-
-  const [filterValue, setFilterValue] = useState('')
-
-  useEffect(() => {
-    if (props.tab === 'approved') {
-      setFilter('status', 'Approved')
-    }
-    else if (props.tab == 'requested') {
-      setFilter('status', 'Nominated')
-    }
-    else {
-      setFilter('status','')
-    }
-  }, [props.tab])
-
 
   return (
     <div className="wrapTable">
-      {/* Header on top of table containing search, data, type, need and volunteer count */}
+      <div className="needBar">
+        {/* Tabs */}
+        <div className="needMenu">
+          <div className={`tabNeed ${activeTab === 'all' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('all')}>All</div>
+          <div className={`tabNeed ${activeTab === 'approved' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('approved')}>Approved</div>
+          <div className={`tabNeed ${activeTab === 'requested' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('requested')}>Requested</div>
+        </div>
+        {/* Raise Need Button */}
+        <button onClick={gotoRaiseNeed}>Raise Need</button>
+      </div>
+
+      {/* Header on top of table: stats and filters */}
       <div className="topBarNeedTable">
+        {/*Counts*/}
         <div className="leftTopBarNeedTable">
           <div className="needCount">
             <i><StickyNote2Icon /></i>
-            <span>{Object.keys(dataNeed).length}</span>
+            <span>{filteredData.length}</span>
             <label>Needs</label>
           </div>
           <div className="volunteerCount">
@@ -202,25 +235,29 @@ export const NeedsTable = props => {
             <label>Volunteers</label>
           </div>
         </div>
+        {/*Filters*/}
         <div className="rightTopBarNeedTable">
           {/* Following are filters on need table */}
           <div className="boxSearchNeeds">
             <i><SearchIcon style={{height:'18px',width:'18px'}}/></i>
-            <input type="search" name="globalfilter" placeholder="Search" value={globalFilter || ''} onChange={(e) => setGlobalFilter(e.target.value)}></input>
+            <input type="search" name="globalfilter" placeholder="Search need" value={globalFilter || ''} onChange={(e) => setGlobalFilter(e.target.value)}></input>
           </div>
+          {/*
           <div className="selectNeedDate">
-            <input type="date" name="date" value={date} onChange={handleDate} />
+            <input type="date" name="selectedDate" value={selectedDate} onChange={handleDateChange} />
           </div>
-          <select className="selectNeedType" name="needTypeId" value={needTypeId} onChange={handleNeedType} >
-            <option value="" defaultValue>Need Type</option>
+          */}
+          <select className="selectNeedType" name="needTypeId" value={needTypeId} onChange={handleNeedTypeFilter} >
+            <option value="" defaultValue>All Need Types</option>
             {
-              dataNeedType.map(
+              needTypes.map(
                   (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
                 )
               }
           </select>
         </div>
       </div>
+
       {/* Following is TABLE that loads list of needs and its details */}
       <table className="tableNeedList">
         <thead>
@@ -282,6 +319,7 @@ export const NeedsTable = props => {
         <button onClick={()=>nextPage()} disabled={!canNextPage}><ArrowForwardIosIcon style={{height:"18px"}}/></button>
         </div>
       </div>
+
       {/* Open nominations and need info page as popup */}
       { showPopup && <ModifyNeed handleClose={handleRowClick} data={rowData} /> }
     </div>

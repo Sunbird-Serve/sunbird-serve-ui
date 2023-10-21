@@ -1,88 +1,106 @@
-import React, { useState, useRef, useEffect } from 'react';
-import './MultiSelect.css'; 
+import React, { useState } from 'react';
+import { FormControl, InputLabel, Select, MenuItem, TextField, Grid } from '@mui/material';
+import './MultiSelect.css';
+import dayjs from 'dayjs';
+import { DemoContainer, DemoItem } from '@mui/x-date-pickers/internals/demo';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
-const MultiSelect = ({ options, selectedOptions, onSelectedOptionsChange }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
+const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-  const toggleDropdown = (event) => {
-    event.stopPropagation();
-    setIsOpen(!isOpen);
+const MultiSelect = ({ onAdd }) => {
+  const today = dayjs()
+  const [scheduleItems, setScheduleItems] = useState([{ day: '', startTime: today, endTime: today }]);
+
+  const handleDayChange = (event, index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems[index].day = event.target.value;
+    setScheduleItems(updatedScheduleItems);
+    onAdd(updatedScheduleItems); 
   };
 
-  const handleOptionClick = (option) => {
-    const isSelected = selectedOptions.some((selectedOption) => selectedOption.id === option.id);
-
-    const updatedOptions = isSelected
-      ? selectedOptions.filter((selectedOption) => selectedOption.id !== option.id)
-      : [...selectedOptions, { ...option, startTime: '', endTime: '' }];
-
-    onSelectedOptionsChange(updatedOptions);
+  const handleStartTimeChange = (newValue, index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems[index].startTime = newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ') ;
+    setScheduleItems(updatedScheduleItems);
+    onAdd(updatedScheduleItems); 
   };
 
-  const handleTimeChange = (optionId, field, value) => {
-    const updatedOptions = selectedOptions.map((option) => {
-      if (option.id === optionId) {
-        return { ...option, [field]: value };
-      }
-      return option;
-    });
-
-    onSelectedOptionsChange(updatedOptions);
+  const handleEndTimeChange = (event, index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems[index].endTime = event.target.value;
+    setScheduleItems(updatedScheduleItems);
+    onAdd(updatedScheduleItems); 
   };
 
-  const handleDocumentClick = (event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
-    }
+  const handleRemove = (index) => {
+    const updatedScheduleItems = [...scheduleItems];
+    updatedScheduleItems.splice(index, 1);
+    setScheduleItems(updatedScheduleItems);
+    onAdd(updatedScheduleItems); 
   };
 
-  useEffect(() => {
-    document.addEventListener('click', handleDocumentClick);
-    return () => {
-      document.removeEventListener('click', handleDocumentClick);
-    };
-  }, []);
+  const handleAdd = () => {
+    const newScheduleItem = { day: '', startTime: '', endTime: '' };
+    const updatedScheduleItems = [...scheduleItems, newScheduleItem];
+    setScheduleItems(updatedScheduleItems);
+    onAdd(updatedScheduleItems); // Save values immediately
+  };
 
   return (
-    <div className="multi-select col-sm-12">
-      <div className="select-box" onClick={toggleDropdown}>
-        {selectedOptions.length === 0 ? 'Select' : selectedOptions.map((option) => (
-          <span key={option.id} className="token">
-            {option.label} <button onClick={() => handleOptionClick(option)}>x</button>
-          </span>
-        ))}
-      </div>
-      {isOpen && (
-        <div ref={dropdownRef} className="daysList col-sm-8">
-          {options.map((option) => (
-            <div key={option.id} className="dayOption">
-              <input
-                type="checkbox"
-                checked={selectedOptions.some((selectedOption) => selectedOption.id === option.id)}
-                onChange={() => handleOptionClick(option)}
-              />
-              <div className="optionLabel">{option.label}</div>
-              {selectedOptions.some((selectedOption) => selectedOption.id === option.id) && (
-                <div className="time-input">
-                  {/* <label>Start Time:</label> */}
-                  <input
-                    type="time"
-                    value={option.startTime} 
-                    onChange={(e) => handleTimeChange(option.id, 'startTime', e.target.value)}
-                  />
-                  {/* <label>End Time:</label> */}
-                  <input
-                    type="time"
-                    value={option.endTime}
-                    onChange={(e) => handleTimeChange(option.id, 'endTime', e.target.value)}
-                  />
-                </div>
-              )}
-            </div>
-          ))}
+    <div className="container-multiselect">
+      {scheduleItems.map((scheduleItem, index) => (
+        <div className="container-daysTime">
+          <div className="day-container">
+          <div >
+              <Select
+                value={scheduleItem.day}
+                onChange={(e) => handleDayChange(e, index)}
+                className="days-label"
+              >
+                {daysOfWeek.map((day) => (
+                  <MenuItem key={day} value={day}>
+                    {day}
+                  </MenuItem>
+                ))}
+              </Select>
+          </div>
+          <div className="button-add-remove">
+            <button onClick={() => handleRemove(index)} className="remove-button"> x </button>
+          </div>
+          
+          </div>
+          <div className="time-container">
+          <div className="time-item">
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['TimePicker']}>
+            <TimePicker
+              value={scheduleItem.startTime}
+              renderInput = {(params) => <TextField {...params} />}
+              onChange={(newValue) => handleStartTimeChange(newValue, index)}
+            />
+            </DemoContainer>
+          </LocalizationProvider>
+          </div>
+
+          <div className="time-item">
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DemoContainer components={['TimePicker']}>
+            <TimePicker
+              value={scheduleItem.endTime}
+              renderInput = {(params) => <TextField {...params} />}
+              onChange={(newValue) => handleEndTimeChange(newValue, index)}
+            />
+            </DemoContainer>
+          </LocalizationProvider>
+          </div>
+
+          </div>
+
         </div>
-      )}
+      ))}
+      <button onClick={handleAdd} className="add-button"> + </button>
     </div>
   );
 };

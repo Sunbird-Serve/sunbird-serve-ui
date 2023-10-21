@@ -1,110 +1,172 @@
-.wrapvolunteer {
-    height: 100%;
+.wrapvolunteerNeeds {
+  height: 100%;
+}
+.volunteerNeeds {
+  height: 100%;
+}
+.vHeaderBack {
+  height: 100px;
+  font-size: 20px;
+  color: #3C4044;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  padding-left: 100px;
+  background-color: #FAFAFA;
+  margin-bottom: 20px;
+}
+.vHeaderBack button {
+  margin-right: 10px ; 
+  border: none;
+  background-color: inherit;
+}
+.vNeedFilters {
+  display: flex;
+  justify-content: space-between;
+}
+.vSortNeed {
+  display: flex;
+  align-items: center;
+  border: solid #DBDBDB;
+  padding: 4px;
+  border-radius: 5px;
+  margin-left: 100px;
+  background-color: white;
   }
-  
-  .wrapNeedVol {
-    height: 100%;
-  }
-  
-  .needs {
-    display: flex;
-    justify-content: center;
-  }
-  
-  .needContainer {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-  }
-  
-  .needBox {
-    width: 410px;
-    height: 105px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    position: relative; /* Add position relative for absolute positioning */
-  }
-  
-  /* Customize the appearance of text inside the boxes */
-  .needBox h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
-  .needBox p {
-    font-size: 13px;
-  }
-  
-  .vHeaderneeds {
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 50px;
-  }
-  
-  .vSearchNeed {
-    margin: 0px 15px 5px 15px;
-  }
-  
-  .location-container {
-    position: absolute;
-    bottom: 40px;
-    left: 10px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .location-container p {
-    margin-left: 5px;
-    margin-bottom: 0px;
+.vSortNeed select {
+  padding: 3px;
+}
 
-  }
-  
-  .required-container {
-    position: absolute;
-    bottom: 40px;
-    right: 10px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .required-container p {
-    margin-left: 5px;
-    margin-bottom: 0px;
-  }
-  
-  .calendar-container {
-    position: absolute;
-    bottom: 10px;
-    left: 10px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .calendar-container p {
-    margin-left: 5px;
-    margin-bottom: 0px;
+.toggleNeedView {
+  border: solid #DBDBDB;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  margin-right:100px;
+  padding: 2px;
+  background-color: #F7F8F9;
+}
+.toggleNeedView button {
+  border: none;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
 
-  }
+.needs {
+  display: flex;
+  justify-content: center;
+  margin: 10px 85px;
+}
 
+.needContainer {
+  width: 100%;
+  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0px;
+  flex-wrap: wrap;
+}
+.needBox {
+  width: 30%;
+  height: 130px;
+  border: 1px solid #ccc;
+  padding: 16px;
+  margin: 15px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(219, 219, 219, 1);
+  gap: 12px;
+  position: relative; /* Add position relative for absolute positioning */
+}
+.needBox:hover {
+  cursor: pointer;
+}
+.need-container-volunteer {
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+} 
+.heart-icon {
+  color: rgba(200, 199, 198, 1);
+  width: 30px; /* Adjust this value to resize the icon */
+} 
+.location-vrequired {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px;
+  margin-bottom: 5px;
+}
+.location-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px;
+  width: fit-content;
+  font-size: 14px;
+}
+.required-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 4px;
+  background-color:#FAFAFA;
+  width: fit-content;
+  border: solid 1px #DBDBDB;
+  font-size: 12px;
+  padding: 2px 5px;
+}
+.calendar-container {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: gray;
+  padding: 3px;
+}
 
+.blueText {
+  color:rgba(0, 128, 188, 1);
+  background-color: white;
+}
+.grayText {
+  background-color: inherit;
+}
 
-  .icons-container {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    display: flex;
-    align-items: center;
-  }
-  
-  .favorite-icon{
-    margin: 5px;
-  }
-
-  .share-icon {
-    font-size: 24px;
-    margin: 5px;
-  }
+.vSortNeed select {
+  border: none;
+  background-color: white;
+}
+.share-icon {
+  font-size: 24px;
+  margin: 5px;
+}    
+.emptyNeedType {
+  text-align: center;
+  border: solid 1px #DBDBDB;
+  margin: 50px 100px;
+  font-size: 20px;
+  padding: 20px;
+  border-radius: 5px
+}
+.vSearchNeed {
+  border: solid #DBDBDB;
+  height: fit-content;
+  padding: 3px 5px;
+  border-radius: 5px;
+  background-color: #FFFFFF;
+}
+.vSearchNeed input {
+  border: none;
+  background-color: inherit;
+  width: 400px;
+  margin-left: 10px;
+}
+.vSearchNeed i {
+  color: #99999F;
+  margin: 0px 8px;
+}

@@ -8,11 +8,23 @@ import { useState, useEffect } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
 import SBLogo from '../../assets/sunbirdlogo.png';
 import randomColor from 'randomcolor'
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUserByEmail } from '../../state/userSlice'
 
 function Header() {
   const [open,setOpen] = useState(false);
   const [avatarColor, setAvatarColor] = useState(randomColor())
   const currentUser = auth.currentUser;
+  const dispatch = useDispatch()
+  const userData = useSelector((state)=> state.user.data)
+
+
+  const handleLogout = () => {
+    auth.signOut()
+    dispatch(fetchUserByEmail(''))
+    console.log(userData)
+    //window.location.reload()
+  }
   
   return (
         <div className="head row">
@@ -25,10 +37,10 @@ function Header() {
               <img src={SBLogo} alt="SunBirdLogo" height="35px" />
             </div>
             <div className="wrapProfile">
-              <div className="searchMenu">
+              {/* <div className="searchMenu">
                 <i><SearchIcon /></i>
                 <input type="search" name="msearch" placeholder="Search need type" className="d-none d-sm-inline" ></input>
-              </div>
+              </div> */}
               <div className="verticalLine"></div>
               <div className="notification">
                 <Badge variant="dot" color="secondary">
@@ -58,7 +70,7 @@ function Header() {
                   <div className='userTag'>{currentUser.email}</div>
                 </div>
                 {/* Logout button */}
-                <button className="btnLogout" onClick={() => auth.signOut()}>Logout</button>
+                <button className="btnLogout" onClick={handleLogout}>Logout</button>
               </div>
             </div>)
           } 

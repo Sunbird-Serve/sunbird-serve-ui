@@ -7,8 +7,12 @@ import './VolunteerHeader.css'
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import VolunterLogin from '../VolunteerLogin/VolunteerLogin'
+import { useHistory } from "react-router";
+
 
 function VHeader({ activeComponent, onToggle }) {
+  const history = useHistory();
+
     const [open,setOpen] = useState(false);
     const [avatarColor, setAvatarColor] = useState(randomColor())
     const currentUser = auth.currentUser;
@@ -17,14 +21,21 @@ function VHeader({ activeComponent, onToggle }) {
     const loginVolunteer = () => {
       setVlogin(!vlogin)
     };
-    useEffect(()=> {
-      setVlogin(false)
-    },[currentUser]);
+    
+    const handleProfileClick = () => {
+      history.push("/vprofile")
+    }
+
+    const handleLogoClick = () => {
+      history.push("/vneedtypes");
+    };
 
   return (
     <div className="wrapVHeader">
         <div className="vhLogo">
-            <img src={SBLogo} alt="SunBirdLogo" height="50px" />
+            <button className="logobutton" onClick={handleLogoClick}>
+              <img src={SBLogo} alt="SunBirdLogo" height="50px" />
+            </button>
         </div>
         {!currentUser && 
           <button className="btnLoginVolunteer" onClick={loginVolunteer}>Login</button>
@@ -35,7 +46,7 @@ function VHeader({ activeComponent, onToggle }) {
               <NotificationsIcon color="action" style={{height:'24px'}} />
             </Badge>
           </div>
-          <button className="btnProf" onClick={onToggle}>
+          <button className="btnProf" onClick={handleProfileClick}>
             <div className="profIcon"> 
               <Avatar style={{height:'40px',width:'40px',fontSize:'16px',backgroundColor:avatarColor}}>
               </Avatar>

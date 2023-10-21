@@ -14,26 +14,24 @@
     margin-left: 35%;
 }
 
-.loginForm {
+.vloginForm {
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: left;
     background-color: #FAFAFA;
+    border-radius: 8px;
 }
-.sbLogo {
-    padding: 15px;
+.vmenuLogin {
+    padding: 0px 15px 60px 20px;
 }
-.menuLogin {
-    padding: 40px 15px;
-}
-.greetLogin {
+.vgreetLogin {
     font-size: 16px;
     color: #5F6367; 
     height: fit-content;
     font-weight: 400;
 }
-.titleLogin {
+.vtitleLogin {
     height: fit-content;
     font-size: 24px;
     font-weight: 600;
@@ -95,13 +93,15 @@
     justify-content: center;   
 }
 .hline hr { 
-    width: 100px; 
     margin-top: 12px;
 }
 .hline span {
     padding: 0px 12px;
     font-size: 14px;
     color: #99999F;
+    width: 120px;
+    display: flex;
+    justify-content: center;
 }
 .btnSLogin {
     display: flex;
@@ -134,4 +134,24 @@
     margin-left: calc(100% + 10px);
     border: none;
     cursor: pointer;
+}
+.vloginFormHead {
+    display: flex;
+    justify-content: space-between;
+}
+.alertRegister {
+    margin-top: 25px;
+    background-color: white;
+    padding: 30px 25px;
+    border-radius: 8px;
+}
+.alertRegister span {
+    font-weight: 600;
+}
+.alertRegister button {
+    color: white;
+    background-color: #276EB9;
+    border: none;
+    width: 100%;
+    padding: 5px;
 }

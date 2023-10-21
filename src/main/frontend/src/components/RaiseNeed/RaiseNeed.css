@@ -77,25 +77,30 @@
 .formTop {
     margin-bottom: 15px;
 }
-.itemForm {
+.itemFormNeed {
     padding: 5px;
     font-size: 14px;
 }
-.itemForm label {
+.itemFormNeed label {
     width: 100%;
     font-size: 14px;
     color: #1F1F1F;
     font-weight: 600;
-    margin-bottom: 5px;
+    margin-top: 5px;
 }
-.itemForm input {
+.itemFormNeed input {
     width: 100%;
     border-radius: 3px;
     font-size: 14px;
     padding: 3px 10px;
     border: solid 1px #DBDBDB;
 }
-.itemForm select {
+.itemFormNeedDays {
+    width: 100%;
+    font-size: 14px;
+    color: #1F1F1F;
+}
+.itemFormNeed select {
     width: 100%;
     padding: 5px;
     border-radius: 3px;
@@ -125,17 +130,19 @@
     display: flex;
     justify-content: space-between;
     padding: 5px;
+    margin-bottom: 5px;
 }
 .itemDate {
-    width: 48%;
+    width: 35%;
+    margin-top: 10px;
 }
 .itemDate label {
     width: 100%;
     font-size: 14px;
     color: #1F1F1F;
     font-weight: 600;
-    margin-bottom: 5px;
     border-width: 1px;
+    margin-top: -5px;
 }
 .itemDate input {
     width: 98%;
@@ -144,24 +151,35 @@
     padding: 3px 10px;
     border: solid 1px #DBDBDB;
 }
-.itemDescription {
-    height: 135px;
-    margin: 0px 5px;
-}
-.itemDescription label {
-    width: 100%;
+.itemDate select {
+    width: 98%;
+    border-radius: 3px;
     font-size: 14px;
-    color: #1F1F1F;
+    padding: 4px 10px;
+    border: solid 1px #DBDBDB;
+}
+.itemDescriptionNeedLabel {
+    margin-bottom: 10px;
     font-weight: 600;
-    margin-bottom: 5px;
+    font-size: 14px;
+}
+.itemDescriptionNeed {
+    margin-top: 40px;
 }
 .quillEdit {
     font-size: 14px;
     border: none;
+    margin-top: 10px;
 }
 .ql-container {
     height: 65px;
 }
 .inpVolunteerNum {
     height: 38px;
+}
+.addSkillsInput {
+    margin-top: 10px;
+}
+.label-eventdaytime {
+    display: flex;
 }

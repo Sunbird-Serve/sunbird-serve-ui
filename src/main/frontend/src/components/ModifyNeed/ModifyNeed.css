@@ -120,7 +120,7 @@
     margin-bottom: 5px;
 }
 .itemNInfoDescrip {
-    height: 135px;
+    height: 65px;
     margin: 0px 5px;
 }
 .itemNInfoDescrip label {
@@ -131,11 +131,13 @@
 }
 .itemNInfoDescrip span{
     font-size: 14px;
+    margin: 10px;;
 }
 .itemWrapNInfoDate {
     display: flex;
     justify-content: space-between;
     padding: 5px;
+    font-size: 14px;
 }
 .itemNInfoDate {
     width: 48%;
@@ -147,12 +149,11 @@
     margin-bottom: 5px;
     border-width: 1px;
 }
-.itemNInfoDate input {
+.itemNInfoDate span {
     width: 98%;
     border-radius: 3px;
     font-size: 14px;
     padding: 3px 10px;
-    border: solid 1px #DBDBDB;
 }
 .alertNomin {
     position: absolute;
