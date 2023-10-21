@@ -1,4 +1,4 @@
-const baseDomain = "https://ekal.evean.net"; //https://ekal.evean.net/
+const baseDomain = "https://serve-v1.evean.net"; 
 
 const configData = {
     "USER_GET" : `${baseDomain}/api/v1/user`,
