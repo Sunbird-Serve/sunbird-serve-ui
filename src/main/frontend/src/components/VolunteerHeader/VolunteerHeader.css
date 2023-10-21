@@ -1,0 +1,30 @@
+.wrapVHeader {
+    width: 100%;
+    height: 74px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.vhProfile {
+    width: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    margin-right: 20px;
+}
+.vhLogo {
+    margin: 0px 30px;
+}
+.logobutton {
+    border: none;
+    background-color: inherit;
+    cursor: pointer;
+}
+.btnLoginVolunteer {
+    background-color: #0080BC;
+    border: none;
+    padding: 5px 20px;
+    margin-right: 20px;
+    color: white;
+    border-radius: 5px;
+}

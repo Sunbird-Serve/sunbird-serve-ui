@@ -1,0 +1,10 @@
+.wrapSettings {
+    display: flex;
+    float: right;
+    background-color: #fafafa;
+}
+.settings {
+    width: 100%;
+    margin: 15px;
+    background-color: white;
+}

@@ -1,0 +1,73 @@
+.successPage{
+    display: flex;
+    flex-direction: column;
+    
+}
+
+.successImg {
+    display: flex;
+    flex-direction: column;
+    background-color: #F5FBF3;
+    padding: 2% 5%;
+    align-items: center;
+}
+
+.successComment1{
+    font-family: Raleway;
+    font-size: 32px;
+    font-weight: 600;
+    line-height: 38px;
+    letter-spacing: 0em;
+    text-align: center;
+    color: #277C3B;
+    margin: 2% 0% 1% 0%;
+
+}
+
+.successComment2{
+    font-family: Inter;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 24px;
+    letter-spacing: 0px;
+    text-align: center;
+    color: #277C3B;
+
+}
+.successMsg {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2% 5%;
+}
+
+.msgBody{
+    width: 60%;
+    
+
+}
+.msg{
+    font-family: Inter;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    letter-spacing: 0px;
+    text-align: center;
+    color: #5D5B5B;
+}
+.moreButton {
+    width: 20%;
+    margin: 0.5% 0;
+    background-color:#0080BC ;
+    color: white;
+    border: 1px solid #DBDBDB;
+    padding: 0.5% 0.2%;
+    cursor: pointer;
+}
+.homeButton {
+    width: 20%;
+    margin: 0.5% 0;
+    border: 1px solid #DBDBDB;
+    padding: 0.5% 0.2%;
+    cursor: pointer;
+}

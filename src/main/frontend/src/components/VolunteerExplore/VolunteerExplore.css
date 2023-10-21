@@ -1,0 +1,106 @@
+.wrapVolunteer {
+    height: 100%;
+    background-color: white;
+}
+.vNeedType {
+    height: calc(100% - 20px) ;
+    margin: 10px 20px 10px 10px;
+    background-color: white;
+    overflow: scroll;
+}
+.vHeader {
+    padding: 10px 10px;
+    display: flex;
+    justify-content: space-between;
+}
+.vrightHeader {
+    display: flex;
+    align-items: flex-end;
+}
+.vGreetNT {
+    font-size: 16px;
+}
+.vTitleNT {
+    font-size: 30px;
+    color: #0F181F;
+}
+.vCaptionNT {
+    font-size: 15px;
+    color: #99999F;
+}
+.vSearchNT {
+    border: solid #DBDBDB;
+    height: fit-content;
+    padding: 2px;
+    border-radius: 5px;
+    background-color: #FFFFFF;
+}
+.vSearchNT i {
+    color: #99999F;
+}
+.vSearchNT input {
+    border: none;
+    background-color: inherit;
+}
+.vSortNT {
+    display: flex;
+    align-items: center;
+    border: solid #DBDBDB;
+    padding: 4px;
+    border-radius: 5px;
+    margin-left: 15px;
+    background-color: white;
+}
+.vSortNT select {
+    border: none;
+    background-color: white;
+}
+.vline {
+    border-left: solid #EBEBEB;
+    height: 30px;
+}
+.toggleView {
+    padding: 2px;
+    margin: 0px 5px;
+}
+.toggleView i {
+    padding: 5px 5px;
+}
+.vGrid {
+    background-color: #FBFBFB;
+}
+.wrapAllNT {
+    width: 100%;
+}
+.wrapGrid {
+    padding: 10px ;
+    display: flex;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.gridItem {
+    padding: 15px;
+    border-radius: 5px;
+    border: solid #F6F6F9;
+    color: #3C4044;
+    font-weight: 600;
+    font-size: 15px;
+    z-index: 10;
+    width: 160px;
+    background-color: white;
+}
+.gridItem:hover {
+    cursor: pointer;
+}
+.numNeedsNT {
+    font-size: 12px;
+    color: #99999F;
+}
+.imgGridNT {
+    border: solid;
+    height: 120px;
+    margin-bottom: 15px;
+}
+.alphabetNT {
+    font-size: 18px;
+}
