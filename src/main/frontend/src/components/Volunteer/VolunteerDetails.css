@@ -1,0 +1,76 @@
+.wrapVolunteerDetails {
+    background-color: rgba(0,0,0,0.4);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: solid;
+}
+.volunteerDetails {
+    background-color: white;
+    width: 50%;
+    height: 60%;
+    border-radius: 8px;
+}
+.header-volunteerDetails {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    gap: 20px
+}
+.volunteer-name {
+    font-size: 32px;
+    color: #006FA2;
+}
+.volunteer-email {
+    color: #5D5B5B;
+}
+.title-volunteerinfo {
+    color: #A2A5A9;
+    padding: 10px 15px 0px 10px;
+    border-top: solid 1px #DBDBDB;
+}
+.volunteerInfo {
+    display: flex;
+    border-bottom: solid 1px  #DBDBDB;
+}
+.vInfo-half {
+    width: 50%;
+    padding: 15px;
+}
+.vInfo-item {
+    padding: 5px;
+}
+.vInfo-key {
+    color: #686C73;
+}
+.vInfo-value {
+    color: #3C4044;
+}
+.recommend-voluteer {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+}
+.recommend-voluteer button {
+    border: solid 1px #DBDBDB;
+    background-color: white;
+    padding: 5px 20px;
+    border-radius: 5px;
+}
+.btnCloseVDetails {
+    height: 60%;
+    margin-top: -60px;
+}
+.btnCloseVDetails button{
+    border: none;
+    border-radius: 3px;
+}

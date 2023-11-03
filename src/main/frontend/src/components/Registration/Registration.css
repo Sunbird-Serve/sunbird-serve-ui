@@ -1,0 +1,212 @@
+.reg-main {
+    width: 100vw;
+}
+.regContainer {
+    /* display: grid;
+    grid-template-columns: 20% 80%; */
+    padding: 1% 7% 3% 25%;
+    gap: 1%;
+    align-items: start;
+}
+
+.seperator {
+    border: none;
+    border-top: 1px solid #EBEBEB;
+}
+
+.info-card {
+    color: #5D5B5B;
+    font-size: 1.5vh;
+}
+
+.title-container {
+    padding: 4vh 3vw;
+}
+
+.title {
+    color: #0080BC;
+    font-size: 3vh;
+    font-weight: 500;
+    text-align: center;
+    display: block;
+    margin-bottom: 1vh;
+}
+
+.button-container {
+    padding: 1% 7% 3% 7%;
+    color: #5D5B5B;
+}
+
+.clear-btn {
+    border-radius: 4px;
+    border: 1px solid var(--com-pri-blue-b-700, #1B8EC4);
+    background: var(--com-neutrals-white-w-50, #FFF);
+    padding: 1vh 1vw;
+    color:#0080BC;
+    margin: 0 1vw;
+}
+
+.clear-btn:hover {
+    cursor: pointer;
+    border: 1px solid var(--com-pri-blue-b-700, #c43d1b);
+}
+
+.register-btn {
+    color: white;
+    background-color: #0080BC;
+}
+
+.nav-container {
+	border: 1px solid #EBEBEB;
+	border-radius: 12px;
+	color: var(--accent-black-bk-300, #2C2E30);
+	font-size: 1.5vh;
+	font-style: normal;
+	font-weight: 400;
+	text-align: left;
+	border-collapse: collapse;
+	height: auto;
+	position: fixed;
+	left: 7%;
+	z-index: 1;
+	width: 17%;
+}
+
+.nav-element {
+    display: block;
+    padding: 5%;
+}
+
+.active {
+    color:#0080BC;
+}
+.nav-element:hover {
+    color:#0080BC;
+    cursor: pointer;
+}
+
+
+.nav-line {
+    border: none;
+    margin: 0;
+    border-top: 1px solid #EBEBEB;
+}
+
+.currentItem {
+    color: #0080BC;
+}
+
+.formContainer {
+    background: var(--neutrals-white-w-50, #FFF);
+    border: 1px solid #EBEBEB;
+    border-radius: 12px;
+    padding: 0.5% 2%
+}
+
+.formEntries {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    gap: 1%;
+    justify-items: start;
+}
+
+.formCat {
+    color: var(--accent-grey-gy-700, #686C73);
+    font-family: Inter;
+    font-size: 2.5vh;
+    font-style: normal;
+    font-weight: 500;
+    display: block;
+    width: 100%;
+    clear: both;
+    text-align: left;
+    padding-bottom: 1vh;
+}
+
+.formElement {
+    align-items: start;
+    padding-top: 2%;
+    width: 100%;
+}
+
+label {
+    float: left;
+    padding-bottom: 1vh;
+}
+
+.form-input {
+    width: 100%;
+    height: 4vh;
+    padding: 1vh;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    box-sizing: border-box;
+}  
+
+.form-input:hover {
+    border-color: black;
+}
+
+.form-select {
+    width: 100%;
+    height: 4vh;
+}
+
+.form-select:hover {
+    box-shadow: #0080BC;
+}
+
+.form-line {
+    margin: 0 -2%;
+    border: none;
+    border-top: 1px solid #EBEBEB;
+}
+
+.form-section {
+    padding: 1vh 0;
+}
+
+.form-skill {
+    display: grid;
+    grid-template-columns: 85% 15%;
+    width: 100%;
+}
+
+.remove-btn {
+    border: none;
+    margin: 0;
+    padding: 0,;    
+    background: none;
+    font-size: 2vh;
+    text-decoration: 'none';
+    color: black;
+    display: 'inline-block';
+    width: 3vh;
+    height: 3vh;
+    margin-left: 1.5vw;
+
+}
+
+.remove-btn:hover {
+    border: 1px solid red;
+    cursor: pointer;
+}
+
+.consent-container {
+    text-align: left;
+    padding: 2vh 0px;
+    color: rgb(104, 108, 115);
+}
+
+.addSkillButton {
+    float: left;
+    background: none;
+    border: none;
+    color: #2693c6;
+    cursor: pointer;
+    margin: 1vh 0;
+    font-size: 1.5vh;
+}
+
