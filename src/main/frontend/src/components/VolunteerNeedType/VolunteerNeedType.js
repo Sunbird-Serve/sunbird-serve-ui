@@ -6,7 +6,6 @@ import GridOnIcon from '@mui/icons-material/GridOn';
 import ListIcon from '@mui/icons-material/List';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import VolunteerNeeds from '../VolunteerNeeds/VolunteerNeeds';
-import configData from '../../configData.json'
 import ntypeImage01 from '../../assets/content_development.png'
 import ntypeImage02 from '../../assets/field_activity.png'
 import ntypeImage03 from '../../assets/mentoring.png'
@@ -14,7 +13,7 @@ import ntypeImage04 from '../../assets/online_teaching.png'
 import { useSelector, useDispatch } from 'react-redux'
 import SortIcon from "@mui/icons-material/Sort";
 
-
+const configData = require('../../configure.js');
 
 function VolunteerNeedType() {
   const [ntypeData,setNtypeData] = useState([])   //for storing need types

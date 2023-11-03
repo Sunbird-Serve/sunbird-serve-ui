@@ -14,8 +14,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { fetchUserByEmail } from '../../state/userSlice'
 import { useHistory } from 'react-router'
 
-
-
 function VProfile() {
   const dispatch = useDispatch()
   const history = useHistory()
@@ -47,11 +45,11 @@ function VProfile() {
                 </div>
             
                     <div className="userInfo">
-                    <div className="vName"> { (user) ? userData.identityDetails.fullname : 'Unregistered User' }</div>
+                    <div className="vName"> { (user && userData.identityDetails) ? userData.identityDetails.fullname : 'Unregistered User' }</div>
                     <div className="vContact">
-                        <div className="vEmail">{ (user)? userData.contactDetails.email : 'Complete registration to create profile' }</div>
+                        <div className="vEmail">{ (user && userData.identityDetails) ? userData.contactDetails.email : 'Complete registration to create profile' }</div>
                         <span>.</span>
-                        <div className="vMobile">{ (user)? userData.contactDetails.mobile : '' }</div>
+                        <div className="vMobile">{ (user && userData.identityDetails) ? userData.contactDetails.mobile : '' }</div>
                     </div>
                 </div>
             </div>
@@ -65,7 +63,7 @@ function VProfile() {
             <NavLink to="/vprofile/vpneedplans" className="vpNavItem" activeClassName="selectedTab">Need Plans</NavLink>
             <NavLink to="/vprofile/vpfavourites" className="vpNavItem" activeClassName="selectedTab">Favourites</NavLink>
         </div>
-        { userData &&
+        { user && userData &&
         <div className="vpContent">
             <Switch>     
                 <Route exact path="/vprofile/vpinfo" component={VolunteerProfileInfo} />

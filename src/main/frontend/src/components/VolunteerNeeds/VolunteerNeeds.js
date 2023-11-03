@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import "./VolunteerNeeds.css"; // Import the CSS file
 import SearchIcon from "@mui/icons-material/Search";
 import GridOnIcon from "@mui/icons-material/GridOn";
 import ListIcon from "@mui/icons-material/List";
-import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import NeedPopup from "./NeedPopup"; // Import the NeedPopup component
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined"; // Import the location icon from Material Icons
 import PeopleIcon from "@mui/icons-material/People";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined"; 
-import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
-import ShareIcon from '@mui/icons-material/Share';
-import configData from './../../configData.json'
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSelector, useDispatch } from 'react-redux'

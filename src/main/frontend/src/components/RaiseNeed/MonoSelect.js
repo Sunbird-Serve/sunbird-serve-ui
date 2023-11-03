@@ -90,7 +90,6 @@ const MonoSelect = ({ onAdd, frequency }) => {
         </div>
         <div className="container-time">
         <div className="label-time ">
-          <span> Start Time </span>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={['TimePicker']}>
               <TimePicker
@@ -104,7 +103,6 @@ const MonoSelect = ({ onAdd, frequency }) => {
         </div>
 
         <div className="label-time ">
-        <span> End Time </span>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={['TimePicker']}>
               <TimePicker

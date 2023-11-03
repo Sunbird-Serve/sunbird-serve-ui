@@ -7,8 +7,6 @@ import "react-datepicker/dist/react-datepicker.css"; // Import the DatePicker st
 import countryList from "react-select-country-list"; // Import from react-select-country-list
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router";
-import configData from './../../configData.json'
-import axios from 'axios'
 import { auth } from "../../firebase";
 import { fetchUserByEmail } from '../../state/userSlice'
 

@@ -4,11 +4,8 @@ import { useTable, usePagination, useGlobalFilter, useFilters, useSortBy } from 
 import { useHistory } from 'react-router'
 import randomColor from 'randomcolor'
 import axios from 'axios'
-
-import configData from './../../configData.json'
 import ModifyNeed from '../ModifyNeed/ModifyNeed'
 import './NeedsTable.css'
-
 import SearchIcon from '@mui/icons-material/Search';
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
@@ -17,6 +14,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { FaSort } from "react-icons/fa"
 import Avatar from '@mui/material/Avatar';
 
+const configData = require('../../configure.js');
 
 export const NeedsTable = props => {
   const dispatch = useDispatch()

@@ -6,7 +6,6 @@ import VolunteerProfile from '../../components/VolunteerProfile/VolunteerProfile
 import Registration from '../../components/Registration/Registration'
 import { BrowserRouter, Switch, Route } from 'react-router-dom'
 import { Redirect } from "react-router";
-import {auth} from '../../firebase.js'
 
 function ExplorePage() {
   
@@ -19,10 +18,10 @@ function ExplorePage() {
       </div>
       <div className="wrapContent row mt-5 mt-sm-0 pl-5">
         <div>
-                <Route exact path="/vneedtypes" component={VolunteerNeedType} />
-                <Route path="/vregistration" component={Registration} />
-                <Route path="/vprofile" component={VolunteerProfile} />
-                <Redirect from="/" to="/vneedtypes" />
+            <Route exact path="/vneedtypes" component={VolunteerNeedType} />
+            <Route path="/vregistration" component={Registration} />
+            <Route path="/vprofile" component={VolunteerProfile} />
+            <Redirect from="/" to="/vneedtypes" />
          </div>
       </div>
       <div>

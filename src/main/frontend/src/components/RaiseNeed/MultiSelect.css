@@ -1,11 +1,19 @@
+.container-multiselect {
+  display: flex;
+}
 .container-daysTime {
   gap: 5px;
   display: flex;
+  flex-direction: column;
   margin-bottom: 10px;
+}
+.day-container {
+  display: flex;
+  justify-content: space-between;
 }
 .days-label {
   height: 30px;
-  width: 100px;
+  width: 120px;
 }
 .add-button {
   height: 30px;
@@ -16,9 +24,8 @@
   background-color: inherit;
   margin-left: 10px;
   font-weight: 800;
-  font-size: 28px;
-  margin-top: -8px;
-  
+  font-size: 32px;
+  margin-top: -14px;
 }
 .remove-button {
   height: 30px;
@@ -34,4 +41,12 @@
 }
 .button-save {
   margin-top: 10px;
+}
+.custom-time-picker {
+  width: 120px;
+}
+.time-container {
+  display: flex;
+  margin-top: -5px;
+  gap: 5px
 }

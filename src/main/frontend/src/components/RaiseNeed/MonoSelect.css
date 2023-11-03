@@ -6,12 +6,10 @@
 .label-days {
     width: 120px;
     height: 30px;
-    margin-top: 4px;
 }
 .container-time {
     display: flex;
     gap: 30px;
-    margin-top: 10px;
 }
 .label-time {
     display: flex;

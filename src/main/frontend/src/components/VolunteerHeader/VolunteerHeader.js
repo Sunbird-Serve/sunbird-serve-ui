@@ -7,7 +7,6 @@ import './VolunteerHeader.css'
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import VolunterLogin from '../VolunteerLogin/VolunteerLogin'
-import { Redirect } from "react-router";
 import { useHistory } from "react-router";
 
 

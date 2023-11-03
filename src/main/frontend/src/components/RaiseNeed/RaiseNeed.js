@@ -8,16 +8,16 @@ import { useHistory } from 'react-router'
 import UploadImageBG from '../../assets/bgImgUpload.png'
 import MultiSelect from './MultiSelect';
 import MonoSelect from './MonoSelect';
-
-
-import configData from './../../configData.json'
 import { useSelector, useDispatch } from 'react-redux'
-import { fetchNeedsByUid } from "../../state/needByUidSlice";
+import { fetchNeedsByUid } from '../../state/needByUidSlice'
+
+const configData = require('../../configure.js');
 
 const RaiseNeed = props => {
     const dispatch = useDispatch();
     const history = useHistory()
     const uid = useSelector((state) => state.user.data.osid)
+    console.log(uid)
     const entities = useSelector((state) => state.entity.data.content)
     const needTypes = useSelector((state) => state.needtype.data.content)
     console.log(needTypes)
@@ -309,11 +309,14 @@ const RaiseNeed = props => {
                                 </div>
                             </div>
                             <div className="itemFormNeed">
-                                <label>Event Days</label>
+                                <div className="label-eventdaytime">
+                                    <label>Event Days</label>
+                                    <label>Start Time</label>
+                                    <label>End Time</label>
+                                </div>
                                 <div className="itemFormNeedDays">
                                     {frequency === 'off' ? 
-                                        <></>
-                                        // <MultiSelect onAdd={handleSelectedDaysChangeMulti} /> 
+                                        <MultiSelect onAdd={handleSelectedDaysChange} /> 
                                         : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} />}
                                 </div>
                             </div>

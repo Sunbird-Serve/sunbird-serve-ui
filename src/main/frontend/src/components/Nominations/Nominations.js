@@ -5,8 +5,9 @@ import { useTable, usePagination, useGlobalFilter, useFilters, useSortBy } from 
 import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
-import configData from './../../configData.json'
 import { useSelector, useDispatch } from 'react-redux'
+
+const configData = require('../../configure.js');
 
 const Nominations = ({ needData, openPopup }) => {
   const dispatch = useDispatch()
