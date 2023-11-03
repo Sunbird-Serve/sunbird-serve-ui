@@ -10,11 +10,11 @@ import {
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import configData from './../../configData.json'
 import axios from 'axios'
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
 
+const configData = require('../../configure.js');
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 

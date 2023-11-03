@@ -12,9 +12,8 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import StickyNote2OutlinedIcon from '@mui/icons-material/StickyNote2Outlined';
 import { useSelector, useDispatch } from 'react-redux'
-import configData from '../../configData.json'
-import Select from 'react-select';
 
+const configData = require('../../configure.js');
 
 function VPNominations() {
   //get userId

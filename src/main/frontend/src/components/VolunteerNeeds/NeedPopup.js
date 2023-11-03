@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './NeedPopup.css';
 import CloseIcon from "@mui/icons-material/Close";
 import axios from 'axios';
-import configData from './../../configData.json'
 import ShareIcon from "@mui/icons-material/Share";
 import { auth } from '../../firebase'
 import VolunteerSignup from '../VolunteerSignup/VolunteerSignup';
@@ -11,6 +10,8 @@ import VolunteerLogin from '../VolunteerLogin/VolunteerLogin';
 import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
 import NominationSuccess from '../../assets/nominationSuccess.png';
+
+const configData = require('../../configure.js');
 
 function NeedPopup({ open, onClose, need }) {
   const userId = useSelector((state)=> state.user.data.osid)

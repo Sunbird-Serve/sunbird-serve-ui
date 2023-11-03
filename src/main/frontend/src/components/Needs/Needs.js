@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 import { fetchNeeds } from "../../state/needSlice";
 
-
 const Needs = props => {
   const dispatch = useDispatch()
   const history = useHistory()

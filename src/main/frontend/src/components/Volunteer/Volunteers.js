@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useTable, usePagination, useGlobalFilter, useFilters, useSortBy } from 'react-table'
 import './Volunteers.css'
-import {auth} from '../../firebase.js'
-import axios from 'axios'
 import GroupIcon from '@mui/icons-material/Group';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -11,8 +9,6 @@ import ListIcon from '@mui/icons-material/List';
 import { useSelector } from 'react-redux'
 import { FaSort } from "react-icons/fa"
 import VolunteerDetails from './VolunteerDetails'
-
-
 
 function Volunteers() {
   //const userDetails = useSelector((state)=> state.user.data)

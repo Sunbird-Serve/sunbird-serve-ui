@@ -99,7 +99,6 @@
     width: 100%;
     font-size: 14px;
     color: #1F1F1F;
-    margin-top: 35px;
 }
 .itemFormNeed select {
     width: 100%;
@@ -131,6 +130,7 @@
     display: flex;
     justify-content: space-between;
     padding: 5px;
+    margin-bottom: 5px;
 }
 .itemDate {
     width: 35%;
@@ -179,4 +179,7 @@
 }
 .addSkillsInput {
     margin-top: 10px;
+}
+.label-eventdaytime {
+    display: flex;
 }

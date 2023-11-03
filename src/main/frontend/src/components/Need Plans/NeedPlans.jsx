@@ -11,7 +11,6 @@ import TodayIcon from '@mui/icons-material/Today';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import noRecords from '../../assets/noRecords.png'
 import { useSelector, useDispatch } from 'react-redux'
-import configData from '../../configData.json'
 import axios from 'axios'
 import randomColor from 'randomcolor'
 import Avatar from '@mui/material/Avatar';
@@ -20,6 +19,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
+const configData = require('../../configure.js');
 
 const localizer = momentLocalizer(moment);
 

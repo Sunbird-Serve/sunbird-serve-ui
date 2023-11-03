@@ -9,12 +9,11 @@ import TodayIcon from '@mui/icons-material/Today';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import noRecords from '../../assets/noRecords.png'
 import { useSelector, useDispatch } from 'react-redux'
-import configData from '../../configData.json'
 import axios from 'axios'
 import {format} from 'date-fns'
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 
-
+const configData = require('../../configure.js');
 const localizer = momentLocalizer(moment);
 
 const NeedPlans = () => {
@@ -170,9 +169,9 @@ const NeedPlans = () => {
               return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
             }) && (
             <div className="statsEventList">
-              <span>To Do</span>
+              {/* <span>To Do</span>
               <span>Completed</span>
-              <span>Canceled</span>
+              <span>Canceled</span> */}
             </div>
           )}
 
