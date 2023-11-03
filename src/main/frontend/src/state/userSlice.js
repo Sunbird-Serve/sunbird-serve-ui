@@ -1,7 +1,7 @@
 //USER details for a emailId
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import axios from 'axios'
-import configData from './../configData.json'
+const configData = require('../configure.js');
 
 const initialState = {
     data: {},

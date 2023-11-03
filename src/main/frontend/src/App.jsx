@@ -4,7 +4,6 @@ import LoginPage from "./containers/LoginPage/LoginPage";
 import MainPage from "./containers/MainPage/MainPage";
 import ExplorePage from "./containers/ExplorePage/ExplorePage"
 import { auth } from "./firebase";
-
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchUserByEmail } from './state/userSlice'
 import { fetchNeeds } from './state/needSlice'
@@ -34,6 +33,9 @@ function App() {
 
   //UPDATE USER STATE based on authenticated email
   const userDetails = useSelector((state)=> state.user.data)
+  console.log(userDetails)
+
+  
   //dispatch the user to store
   useEffect(() => {
     if(presentUser){
@@ -70,7 +72,8 @@ function App() {
 
   const [volunteer,setVolunteer] = useState(false)
   const handleVolunteer = (value) => {
-    setVolunteer(value);
+    setVolunteer(value);    //explore button on-click
+    console.log('button-clicked')
   };
 
 
@@ -81,16 +84,16 @@ function App() {
         { /* when clicks explore button, volunteer will be true*/}
         { /* if not volunteer and logins, go to nCoordinator screen */}
         { !volunteer && (<>
-          { presentUser ? 
-              userDetails.role && userDetails.role.includes('Volunteer') ?
-                <ExplorePage />
-              :
-              <MainPage /> 
+          { (presentUser && userDetails ) ? 
+               (userDetails.role && userDetails.role.includes('nCoordinator')) ?
+                  <MainPage /> 
+                :
+                  <ExplorePage />
             : 
             <LoginPage getVolunteerStatus={handleVolunteer}/>
           }</>)}
         { /* if volunteer, go to volunteer screen */ }
-        { volunteer && <ExplorePage />  }
+        { volunteer && <ExplorePage />  }    
       </div>
   );
 }
