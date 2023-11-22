@@ -1,0 +1,102 @@
+.head {
+    width: 100%;
+    height: 100%;
+    align-items: center;
+}
+.leftHead {
+    background-color: white;
+    height: 100%;
+}
+.rightHead {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    justify-content: right;
+    z-index: 2;
+}
+.wrapProfile {
+    display:flex;
+    align-items: center;
+    background-color: white;
+    justify-content: right;
+}
+.searchMenu {
+    border: solid #DBDBDB;
+    padding: 1px 5px;
+    margin-right: 15px;
+    border-radius: 5px;
+}
+.searchMenu input {
+    border: none;
+    margin-left: 3px;
+}
+.searchMenu i {
+    color: #99999F;
+}
+.verticalLine {
+    height: 32px;
+    width: 1px;
+    margin-right:10px;
+    border-right: solid #EBEBEB;
+}
+.wrapSideMenu {
+    display:flex;
+    align-items: center;
+    justify-content: right;
+}
+.notification {
+    padding: 2px;
+    padding-right: 15px;
+}
+.btnProf {
+    width: fit-content;
+    border: none;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    justify-content: space-between;
+    text-align: left;
+}
+.wrapDropDownProfile {
+    position: absolute;
+    top: 48px;
+    z-index: 3;
+    padding: 3px 54px;
+}
+.dropDownProfile {
+    float: right;
+    background-color: white;
+    border: solid #DBDBDB;
+    width: 240px;
+    border-radius: 5px;
+}
+.btnLogout {
+    width: 100%;
+    border: none;
+    background-color: inherit;
+    text-align: left;
+    padding: 4px 16px 8px 16px;
+    color: #3C4044;
+    font-size: 14px;
+}
+.btnLogout:hover {
+    background-color: gainsboro;
+    cursor: pointer;
+}
+.profileInfo {
+    padding: 8px 16px 4px 16px;
+    border-bottom: solid #DBDBDB;
+    background-color: #FAFAFA;
+}
+.profileInfo:hover {
+    background-color: gainsboro;
+    cursor: pointer;
+}
+.userName {
+    font-size: 16px;
+    color: #3C4044;
+}
+.userTag {
+    font-size: 12px;
+}

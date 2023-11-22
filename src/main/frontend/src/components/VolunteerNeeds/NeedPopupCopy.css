@@ -1,0 +1,123 @@
+.need-popup {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  transition: width 0.3s ease-out;
+  z-index: 99;
+  overflow: scroll;
+}
+.need-popup open {
+  margin-left: calc(100% + 15px);
+  z-index: 20;
+}
+.wrapNeedPopup {
+  width: 25%;
+  height: 100%;
+  margin-left: 75%;
+}
+.close-button {
+  position: absolute;
+  top: 0px;
+  cursor: pointer;
+  font-size: 20px;
+  width: 28px;
+  height: 28px;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  justify-content: center;
+}
+.contentNeedPopup {
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  background-color: #fff;
+  margin-left: 30px;  
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+}
+.needPTitle {
+  font-size: 20px;
+  font-weight: 600;
+  height: fit-content;
+  display: block;
+}
+.nominate-button {
+  background-color: #005C87;
+  color: white;
+  border: none;
+  margin-right: 70%;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.nominate-button:hover {
+  background-color: #005C87;
+}
+.aboutHeading {
+  border-top: solid 1px #EBEBEB;
+  border-bottom: solid 1px #EBEBEB;
+  margin: 5px -20px;
+  padding: 15px 20px;
+  font-size: 20px;
+}
+.popupNKey {
+  font-size: 14px;
+  color: #99999F;
+  margin: 5px 0px;
+}
+.popupNValue{
+  margin: 0px 5px 5px 0px;
+  }
+
+.date-container {
+  display: flex;
+  align-items: center;
+}
+.date-item {
+  margin-right: 10px;
+  width: 50%;
+}
+.inviteToEvent {
+  margin: 0px 0px 0px -20px;
+  background-color: #F1FDFD;
+  display: flex;
+  align-items: center;
+  padding: 20px 15px;
+  position: absolute;
+  bottom: 0;
+  width: calc( 25% - 30px) ;
+}
+.nominationSuccess {
+  position: relative;
+  font-weight: 600;
+  font-size: 18px;
+  color: green;
+  margin-top: 60px;
+}
+.notification-needpopup {
+color: rgba(213, 91, 68, 1);
+background-color: rgba(254, 246, 241, 1);
+padding: 10px;
+border-radius: 5px;
+font-size: 15px;
+margin-bottom: 0px;
+}
+.alertLogin {
+  position: absolute;
+  background: white;
+  top: 50%;
+  left: 25%;
+  padding: 30px 50px;
+}
+.alertLogin button {
+  border: none;
+  margin-left: 10px;
+}

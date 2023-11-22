@@ -1,0 +1,40 @@
+.title-vHeader {
+    font-size: 32px;
+    color: #006FA2;
+}
+.tag-vHeader {
+    font-size: 14px;
+    color: #99999F;
+}
+.wrap-tabs-vCoord {
+    margin-top: 10px;
+    display: flex;
+    height: 40px;
+    align-items: center;
+}
+.stats-vCoord {
+    display: flex;
+    height: 64px;
+    align-items: center;
+}
+.tabs-vCoord {
+    padding: 5px 15px;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+.count-vCoord {
+    display: flex;
+    padding: 5px 15px;
+    gap: 5px;
+}
+.stats-filters-vCoord {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 20px;
+}
+.filters-vCoord {
+    display: flex;
+    gap: 5px
+}

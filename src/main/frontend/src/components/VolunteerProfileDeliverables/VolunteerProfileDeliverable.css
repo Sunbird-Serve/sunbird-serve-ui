@@ -1,0 +1,123 @@
+.detailsNeedVoluntProfile {
+    border: solid 1px #DBDBDB;
+    height: 300px;
+    padding: 25px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+.nameNVP {
+    font-size: 20px;
+    font-weight: 500;
+    color: #2C2E30;
+}
+.typeNVP {
+    font-size: 14px;
+    color: #99999F;
+    margin: 5px 0px;
+}
+.aboutNVP {
+    font-size: 15px;
+    color: #4D4D4D;
+    margin-top: 20px;
+}
+.rowNVP {
+    display: flex;
+    margin: 10px 0px;
+}
+.itemNVP span {
+    font-size: 15px;
+    color: #99999F;
+    margin-right: 10px;
+}
+.itemNVP {
+    font-size: 15px;
+    color: #4D4D4D;
+    width: 320px;
+}
+.deliverablesNeedVolunteerProfile {
+    margin-top: 30px;
+}
+.headDNVP {
+    margin-bottom: 20px;
+}
+.listDNVP {
+    display: flex;
+    gap: 20px;
+}
+.listDNVPbox {
+    width: 400px;
+}
+.todoDNVP, .completedDNVP, .canceledDNVP {
+    border: none;
+    color: white;
+    border-radius: 4px;
+    font-size: 18px;
+    padding: 2px 12px;
+}
+.upcomingDNVP {
+    background-color: #1B6C92 ;
+}
+.todoDNVP {
+    background-color: #0080BC ;
+}
+.completedDNVP {
+    background-color: #277C3B ;
+}
+.canceledDNVP {
+    background-color: #BA1E12 ;
+}
+.deliverable-container {
+    border: solid 1px #DBDBDB;
+    width: 380px;
+    margin: 20px 0px;
+    border-radius: 5px;
+    padding: 8px 10px;
+}
+.deliverable-title {
+    display: flex;
+    gap: 8px;
+}
+.date-deliverable {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 30px ;
+    font-size: 14px;
+    color: #99999F;
+}
+.button-dstat {
+    background-color: inherit;
+    color: black;
+    margin-right: -10px;
+    border: none;
+}
+.status-ticker {
+    position: absolute;
+    margin-left: 190px;
+    margin-top: -5px;
+    padding: 3px 30px 5px 10px;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+.delstat-complete, .delstat-cancel {
+    color: black;
+    background-color: white;
+    padding: 3px 8px;
+    width: 150px;
+    border: solid 1px #DBDBDB;
+    text-align: left;
+}
+.delstat-complete {
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+}
+.delstat-cancel { 
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-top: none;
+}
+.delstat-complete:hover , .delstat-cancel:hover { 
+    background-color: #F0FAFF;
+}
