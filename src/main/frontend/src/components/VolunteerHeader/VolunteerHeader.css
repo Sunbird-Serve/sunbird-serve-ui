@@ -28,3 +28,11 @@
     color: white;
     border-radius: 5px;
 }
+.btnSignupVolunteer {
+    background-color: green;
+    border: none;
+    padding: 5px 20px;
+    margin-right: 20px;
+    color: white;
+    border-radius: 5px;
+}

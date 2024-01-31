@@ -1,8 +1,19 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import './RegFormSuccess.css'
 import formSuccessImg from './Illustration_Success.jpg'
+import { useHistory } from "react-router-dom";
 
 const RegFormSuccess = () => {
+  const navigate = useHistory();
+  const gotoHome = () => {
+    navigate.push("/vneedtypes")
+  }
+  const delayTime = 3000;
+  useEffect(() => {
+    const timeoutId = setTimeout(gotoHome, delayTime);
+    // Cleanup the timeout when the component unmounts
+    return () => clearTimeout(timeoutId);
+  }, [navigate])
   return (
     <div className='successPage'>
       <div className='successImg'>
@@ -20,12 +31,9 @@ const RegFormSuccess = () => {
             Hurray! You've successfully registered. 
           </p>
         </div>
-        {/* <button className='moreButton'>
-            View more details
-        </button>
-        <button className='homeButton'>
-            Back to home
-        </button> */}
+        <button className='homeButton2' onClick={gotoHome}>
+            Back to Home
+        </button> 
       </div>
     </div>
   )

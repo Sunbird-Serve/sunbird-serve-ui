@@ -1,8 +1,16 @@
 import React from 'react'
 import './RegFormFailure.css'
 import formFailureImg from './Illustration_Error.jpg'
+import { useHistory } from "react-router-dom";
 
-function RegFormFailure() {
+const RegFormFailure = ({retryReg}) => {
+  const navigate = useHistory();
+  const gotoHome = () => {
+    navigate.push("/vneedtypes")
+  }
+  const gotoRegister = () => {
+    retryReg()
+  }
   return (
     <div className='errorPage'>
       <div className='errorImg'>
@@ -14,19 +22,19 @@ function RegFormFailure() {
             Oops! Network Error
         </div>
       </div>
-      {/* <div className='errorMsg'>
-        <div className='msgBody'>
+      <div className='errorMsg'>
+        {/* <div className='msgBody'>
           <p className='msg'>
             No Internet Connection. Please try again
           </p>
-        </div>
-        <button className='retryButton'>
-            View more details
+        </div> */}
+        <button className='retryButton' onClick={gotoRegister}>
+            Retry
         </button>
-        <button className='homeButton'>
+        <button className='homeButtonF' onClick={gotoHome}>
             Back to home
         </button>
-      </div> */}
+      </div>
     </div>
   )
 }

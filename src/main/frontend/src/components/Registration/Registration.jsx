@@ -549,6 +549,10 @@ const Registration = (props) => {
     setNav(key);
   };
 
+  const retryReg = () => {
+    setRegStatus('')
+  }
+
   return (
     <div>
     { (!regStatus) &&
@@ -1144,10 +1148,7 @@ const Registration = (props) => {
     </div>)}
 
     {(regStatus === 'success') && <RegFormSuccess />}
-    {(regStatus === 'failure') && <RegFormFailure />}
-
-
-
+    {(regStatus === 'failure') && <RegFormFailure retryReg={retryReg} />}
     </div>
   );
 };

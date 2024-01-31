@@ -41,7 +41,7 @@ const NeedPlans = () => {
   const [nomNeedMap, setNomNeedMap] = useState([])
   useEffect(() => {
   async function fetchNoms() {
-    const promises = needsByUser.map(item => axios.get(`${configData.NEED_GET}/${item.need.id}/nominate/Approved`));
+    const promises = needsByUser.map(item => axios.get(`${configData.NEED_FULFILL}/${item.need.id}/nominate/Approved`));
 
     try {
       const responses = await Promise.all(promises);

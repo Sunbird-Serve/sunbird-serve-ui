@@ -72,7 +72,7 @@ export const NeedsTable = props => {
     const [volunteerNames, setVolunteerNames] = useState([]);
      useEffect(() => {
        axios
-         .get(`${configData.NEED_GET}/${needId}/nominate`)
+         .get(`${configData.NEED_FULFILL}/${needId}/nominate`)
          .then((response) => {
            setVolunteerList(response.data);
          })
