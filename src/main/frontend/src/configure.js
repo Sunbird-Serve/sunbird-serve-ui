@@ -1,8 +1,8 @@
 //const baseDomain = "https://serve-v1.evean.net"; //https://ekal.evean.net
-const baseDomain = "https://serve-v1.evean.net";
-const baseDomainNeed = "https://ekal.evean.net"
-const baseDomainFulfill = "https://ekal.evean.net"
-const baseDomainVolunteering = "https://ekal.evean.net"
+const baseDomain = "https://ekal.evean.net";
+const baseDomainNeed = "https://ekal.evean.net";
+const baseDomainFulfill = "https://ekal.evean.net";
+const baseDomainVolunteering = "https://ekal.evean.net";
 
 const configData = {
     "USER_GET" : `${baseDomainVolunteering}/api/v1/serve-volunteering/user`,

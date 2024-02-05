@@ -1,15 +1,15 @@
 {
-    "USER_GET" : "https://serve-v1.evean.net/api/v1/user",
-    "NEED_GET": "https://serve-v1.evean.net/api/v1/need",
-    "NEED_SEARCH": "https://serve-v1.evean.net/api/v1/need",
-    "NEEDTYPE_GET": "https://serve-v1.evean.net/api/v1/needtype",
-    "ENTITY_GET": "https://serve-v1.evean.net/api/v1/entity",
-    "NEED_POST" : "https://serve-v1.evean.net/api/v1/need/",
-    "NEED_BY_TYPE" : "https://serve-v1.evean.net/api/v1/need/need-type",
-    "NOMINATED_USER_FETCH" : "https://serve-v1.evean.net/api/v1/user",
-    "NEED_BY_USER" : "https://serve-v1.evean.net/api/v1/need/user",
-    "NOMINATION_CONFIRM" : "https://serve-v1.evean.net/api/v1/need/{needId}/nominate",
-    "NEED_REQUIREMENT_GET": "https://serve-v1.evean.net/api/v1/need-requirement",
-    "NOMINATIONS_GET": "https://serve-v1.evean.net/api/v1/need/nomination",
-    "NEEDPLAN_GET": "https://serve-v1.evean.net/api/v1/need-plan"
+    "USER_GET" : "https://ekal.evean.net/api/v1/user",
+    "NEED_GET": "https://ekal.evean.net/api/v1/need",
+    "NEED_SEARCH": "https://ekal.evean.net/api/v1/need",
+    "NEEDTYPE_GET": "https://ekal.evean.net/api/v1/needtype",
+    "ENTITY_GET": "https://ekal.evean.net/api/v1/entity",
+    "NEED_POST" : "https://ekal.evean.net/api/v1/need/",
+    "NEED_BY_TYPE" : "https://ekal.evean.net/api/v1/need/need-type",
+    "NOMINATED_USER_FETCH" : "https://ekal.evean.net/api/v1/user",
+    "NEED_BY_USER" : "https://ekal.evean.net/api/v1/need/user",
+    "NOMINATION_CONFIRM" : "https://ekal.evean.net/api/v1/need/{needId}/nominate",
+    "NEED_REQUIREMENT_GET": "https://ekal.evean.net/api/v1/need-requirement",
+    "NOMINATIONS_GET": "https://ekal.evean.net/api/v1/need/nomination",
+    "NEEDPLAN_GET": "https://ekal.evean.net/api/v1/need-plan"
 }
