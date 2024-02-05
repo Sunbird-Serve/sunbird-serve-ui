@@ -1,0 +1,178 @@
+.wrapNeedNominations {
+    background-color: rgba(0,0,0,0.5);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btnCloseNomination {
+    width: fit-content;
+    height: 80%;
+    padding: 0px;
+    margin-top: -5px;
+}
+.btnCloseNomination button {
+    font-size: 12px;
+    cursor: pointer;
+    border-radius: 20%;
+    background-color: white;
+    color: black;
+    border:none;
+    padding: 2px 6px;
+    margin: 0px 4px;
+}
+.needNominations {
+    height: 80%;
+    width: 70%;
+    background-color: white;
+}
+.wrapTabs {
+    height: 64px;
+    display: flex;
+    align-items: flex-end;
+    background-color: white;
+    padding: 14px 24px 0px 24px;
+}
+.wrapTabs button {
+    height: 40px;
+    border-style: none;
+    width: fit-content;
+    font-size: 14px;
+    background-color: white;
+    padding: 0px 20px 0px 5px;
+}
+.ulTab {
+    border-bottom: solid 2px #006FA2;
+    padding: 6px 2px;
+    font-weight: 600;
+    color: #006FA2;
+}
+.needInfoBox {
+    border: hidden;
+}
+.needInfoBar {
+    height: 72px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 24px;
+    border-top: solid 2px #F0EFEF;
+    border-bottom: solid 1px #F0EFEF;
+}
+.needIName {
+    font-size: 20px;
+    color: #0080BC;
+    font-weight: 600;
+}
+.needITag {
+    font-size: 12px;
+}
+.needInfoForm {
+    padding: 0px 24px;
+}
+.needIFormTop {
+    display: flex;
+}
+.catergoryNInfo {
+    font-size: 14px;
+    font-weight: 600;
+    color: #A2A5A9;
+    margin-top: 15px;
+}
+.itemNInfo {
+    padding: 5px;
+}
+.itemNInfo label {
+    width: 100%;
+    font-size: 14px;
+    color: #686C73;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+.itemNInfo span {
+    width: 100%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+    border: none;
+}
+.itemNInfo select {
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    font-size: 14px;
+    border: none;
+}
+.infoNImage {
+    height: 135px;
+    padding: 5px 10px;
+}
+.infoNImage label {
+    width: 100%;
+    font-size: 14px;
+    color: #686C73;
+    margin-bottom: 5px;
+}
+.itemNInfoDescrip {
+    height: 65px;
+    margin: 0px 5px;
+}
+.itemNInfoDescrip label {
+    width: 100%;
+    font-size: 14px;
+    color: #686C73;
+    margin-bottom: 5px;
+}
+.itemNInfoDescrip span{
+    font-size: 14px;
+    margin: 10px;;
+}
+.itemWrapNInfoDate {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px;
+    font-size: 14px;
+}
+.itemNInfoDate {
+    width: 48%;
+}
+.itemNInfoDate label {
+    width: 100%;
+    font-size: 14px;
+    color: #686C73;
+    margin-bottom: 5px;
+    border-width: 1px;
+}
+.itemNInfoDate span {
+    width: 98%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+}
+.alertNomin {
+    position: absolute;
+    top: 90%;
+    left: 36%;
+    z-index: 10;
+    border: solid 1px #2F9346;
+    background-color: #4D4D4D;
+    padding: 5px 10px;
+    color: white;
+    width: fit-content;
+}
+.alertNomin button {
+    background-color: inherit;
+    border: none;
+    cursor: pointer;
+    color: white;
+    margin-left: 10px;
+    padding-left: 15px;
+    background-color: inherit;
+    border-left: solid 1px #5D5B5B;
+}

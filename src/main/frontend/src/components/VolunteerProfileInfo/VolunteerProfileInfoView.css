@@ -1,0 +1,135 @@
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.name-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.name-section h1 {
+  margin: 0;
+}
+.contact-info p {
+  margin: 5px 0;
+}
+.logout-button {
+  margin-top: 10px;
+  align-self: flex-end;
+}
+
+.profile-info-box {
+  display: flex;
+  flex-direction: column;
+  width: 800px;
+  margin-bottom: 30px;
+  border: 1px solid #dbdbdb;
+  border-radius: 12px;
+}
+.info-box {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #dbdbdb;
+  height: 60px;
+  width: Fill (783px);
+  padding: 12px 24px 12px 24px;
+  border: 0px 0px 1px 0px;
+  gap: 10px;
+}
+
+.info-label {
+  margin: 1px;
+  color: #686c73;
+  flex: 1;
+}
+
+.info-data {
+  margin: 0;
+  flex: 0.8;
+}
+
+.box-header {
+  margin-top: 10px;
+  margin-left: 15px;
+  color: rgba(104, 108, 115, 1);
+  font-size: 26px;
+}
+
+.pro {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.gray-text {
+  color: gray;
+  margin-top: -30px;
+}
+
+.gray-horizontal {
+  width: 46.2vw;
+  border-top: 1px solid gray;
+}
+
+.info-and-edit {
+  display: flex;
+  align-items: center;
+}
+
+.header-container {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.main-header {
+  margin: 0;
+  color: rgba(60, 64, 68, 1);
+  margin-bottom: 5px;
+}
+
+.main-content {
+  margin-bottom: 1900px;
+}
+
+.gray-text {
+  color: gray;
+  margin-top: -3px;
+}
+
+.profile-info-box > .info-box:last-child,
+.profile-info-box .info-group > .info-box:last-child {
+  border-bottom: none;
+}
+
+.button-group {
+  justify-content: flex-end; /* Align buttons to the right */
+  margin-top: -45px; /* Adjust spacing as needed */
+  margin-bottom: 40px;
+  margin-left: -10px;
+  gap: 8px;
+}
+
+.discord-profile-custom-button {
+  margin-left: 700px;
+
+  padding: 4px 12px;
+
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: lighter;
+  cursor: pointer;
+  background-color: white;
+  border: solid lightgray;
+  color: rgba(60, 64, 68, 1);
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.discord-profile-custom-button:hover {
+  background-color: whitesmoke;
+}

@@ -1,0 +1,95 @@
+.wrapCalender {
+  display: flex;
+}
+.ncCalender {
+  display: flex;
+  height: 600px;
+  width: 840px;
+  border: none;
+  background-color: white;
+  border: solid 1px #DBDBDB;
+}
+.event-list-nc {
+  border: solid 1px;
+  margin-left: 15px;
+  width: 450px;
+  border: solid 1px #EBEBEB;
+  background-color: white;
+}
+.headEventListNC {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding-left: 20px;
+  font-size: 18px;
+}
+.stats-need-volunteer {
+  display: flex;
+  justify-content: space-around;
+  height: 45px;
+  align-items: center;
+  padding-left: 15px ;
+  background-color: #FAFAFA;
+}
+.stats-need-volunteer span {
+  padding: 0px 50px 0px 10px;
+}
+.stats-need-volunteer i {
+  color: #0080BC;
+}
+.dayEventListNC {
+  background-color: inherit;
+  border: none;
+  border-left: solid 3px #0080BC;
+  padding: 10px;
+  margin-top: 3px;
+}
+.dayEventTitleNC {
+  display: flex;
+}
+.dayEventTitleNC i {
+  color: #0080BC;
+  margin-right: 5px;
+}
+.nameDayEventNC {
+  font-weight: 600;
+  font-size: 16px;
+  width: 290px;
+  text-align: left;
+}
+.timeDayEventNC {
+  vertical-align: middle;
+}
+.dayEventDateNC {
+  color: #0080BC;
+  font-weight: 600;
+  text-align: left;
+  margin-left: 30px;
+}
+.user-boxNC {
+  margin-top: 10px;
+  padding: 5px;
+  border: solid 1px #EBEBEB;
+  border-radius: 5px;  
+}
+.userNameNC {
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+.userName-eventList {
+  margin: 0px 5px 0px 10px;
+}
+.userContact-eventList {
+  text-align: left;
+  font-size: 12px;
+  margin-left: 34px;
+  color: #99999F;
+}
+.noEventsOnDay {
+  height: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}

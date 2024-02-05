@@ -1,0 +1,62 @@
+.headerBar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    top: 0;
+    z-index: 100;
+}
+
+.headerLogo {
+    width: 100px;
+    object-fit: contain;   /* keeps aspect ration */
+    margin: 0 20px;
+}
+
+.headerSearch {
+    padding: 0 10%;
+    display: flex;
+    flex: 1;  /* stretch as big as it can go*/
+    align-items: center;
+}
+
+.headerSearchInput{
+    display: flex;
+    flex: 1;  /* stretch as big as it can go*/
+    align-items: center;
+    height: 20px;
+    border: 1px solid rgb(221, 221, 221);
+}
+
+.selectSearch {
+    height: 23px;
+    border: 1px solid rgb(242, 242, 242);
+}
+
+.headerSearchIcon {
+    padding: 5px;
+    height: 14px !important;
+    background-color: rgb(201, 201, 201);
+}
+
+.headerNav {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.headerNavOption {
+    display: flex;
+    flex-direction: row;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.selectCity {
+    border: 1px solid rgb(242, 242, 242);
+}
+
+.profileInitial{
+    border-radius: 50%;
+    background-color: orange;
+    padding:7px;
+}

@@ -1,0 +1,10 @@
+.wrapHelp {
+    display: flex;
+    float: right;
+    height: 100%;
+    background-color: #fafafa;
+}
+.help {
+    width: 100%;
+    background-color: white;
+}
