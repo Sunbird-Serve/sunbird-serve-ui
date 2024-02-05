@@ -2,16 +2,16 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: ["main", "release-*"]
+    branches: ["release-*","ekal-release-*"]
   #pull_request:
   # The branches below must be a subset of the branches above
   #branches: [ "main" ]
 
 env:
-  AWS_REGION: ${{ github.ref == 'refs/heads/main' && 'us-east-1' || startsWith(github.ref, 'refs/heads/release-') && 'ap-south-1' }}
+  AWS_REGION: ${{ github.ref == 'refs/heads/main' && 'us-east-1' || startsWith(github.ref, 'refs/heads/ekal-release-') && 'ap-south-1' }}
   ECR_REPOSITORY: sunbird-serve-ui # set this to your Amazon ECR repository name
   ECS_SERVICE: sunbird-serve-ui # set this to your Amazon ECS service name
-  ECS_CLUSTER: ${{ github.ref == 'refs/heads/main' && 'ecs-staging' || startsWith(github.ref, 'refs/heads/release-') && 'ecs-production' }}
+  ECS_CLUSTER: ${{ github.ref == 'refs/heads/main' && 'ecs-staging' || startsWith(github.ref, 'refs/heads/ekal-release-') && 'ecs-production' }}
   ECS_TASK_DEFINITION:
     .github/workflows/task-definition.json # set this to the path to your Amazon ECS task definition
     # file, e.g. .aws/task-definition.json
@@ -35,13 +35,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Set environment variables for the "release-" branch
+      - name: Set environment variables for the "ekal-release-" branch
         run: |
-          if [ "${GITHUB_REF##*/}" = "release-" ]; then
-            echo "Setting environment variables for release- branch"
+          if [ "${GITHUB_REF##*/}" = "ekal-release-" ]; then
+            echo "Setting environment variables for ekal-release- branch"
             echo "environment=stage-" >> $GITHUB_ENV
           else
-            echo "release- branch not detected. No environment variables to set."
+            echo "ekal-release- branch not detected. No environment variables to set."
           fi
 
       - name: Shell script to create JSON
@@ -52,8 +52,8 @@ jobs:
 
       - name: Dump older task definition
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_815722535543 }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_815722535543 }}
         run: |
           aws ecs describe-task-definition --region ${{ env.AWS_REGION }} --task-definition ${{ env.ECS_SERVICE }} --query taskDefinition > .github/workflows/task-definition.json
           aws ecs list-clusters --region ${{ env.AWS_REGION }}
@@ -69,8 +69,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_815722535543 }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_815722535543 }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
