@@ -55,19 +55,11 @@
     text-align: center;
     color: #5D5B5B;
 }
-.moreButton {
-    width: 20%;
-    margin: 0.5% 0;
-    background-color:#0080BC ;
+.homeButton2 {
+    padding: 8px 30px;
     color: white;
-    border: 1px solid #DBDBDB;
-    padding: 0.5% 0.2%;
+    background-color:#0080BC ;
     cursor: pointer;
-}
-.homeButton {
-    width: 20%;
-    margin: 0.5% 0;
-    border: 1px solid #DBDBDB;
-    padding: 0.5% 0.2%;
-    cursor: pointer;
+    border-radius: 5px;
+    border: none;
 }

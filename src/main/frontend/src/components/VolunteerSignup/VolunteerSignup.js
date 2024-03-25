@@ -24,10 +24,11 @@ const VolunteerSignup = ({ loginState, onClose }) => {
   const signUp = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
-      .then(
+      .then(user => {
         // user => console.log('User created')
+        onClose()
         navigate.push("/vregistration")
-      )
+      })
       .catch((err) => setError(err.code));
   };
   const signInWithGoogle = (e) => {
