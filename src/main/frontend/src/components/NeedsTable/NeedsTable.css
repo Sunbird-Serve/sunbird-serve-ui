@@ -148,3 +148,7 @@
 .vAvatars-container {
   padding: 0px 15px;
 }
+.count-label {
+  vertical-align:middle;
+  padding: 5px 2px;
+}

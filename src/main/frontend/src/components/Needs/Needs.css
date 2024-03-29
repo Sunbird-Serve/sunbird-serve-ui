@@ -4,7 +4,6 @@
     overflow: scroll;
 }
 .needsList {
-    height: 100%;
     background-color: white; 
     border: solid;
     border-color: rgba(242, 242, 242, 1);

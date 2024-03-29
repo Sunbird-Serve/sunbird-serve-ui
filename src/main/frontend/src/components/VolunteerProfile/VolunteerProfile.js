@@ -39,18 +39,18 @@ function VProfile() {
     <div className="wrapVProfile col">
         <div className="vProfileBanner">
             <div className="wrapUserInfo">
-                <div className="profVIcon"> 
-                  <Avatar style={{height:'64px',width:'64px',fontSize:'32px',backgroundColor:avatarColor}}>
-                  </Avatar>
-                </div>
-            
-                    <div className="userInfo">
+              <div className="profVIcon"> 
+                <Avatar style={{height:'64px',width:'64px',fontSize:'32px',backgroundColor:avatarColor}}>
+                </Avatar>
+              </div>
+                <div className="userInfo">
                     <div className="vName"> { (user && userData.identityDetails) ? userData.identityDetails.fullname : 'Unregistered User' }</div>
                     <div className="vContact">
                         <div className="vEmail">{ (user && userData.identityDetails) ? userData.contactDetails.email : 'Complete registration to create profile' }</div>
                         <span>.</span>
                         <div className="vMobile">{ (user && userData.identityDetails) ? userData.contactDetails.mobile : '' }</div>
                     </div>
+                    <div className="volunteerStatus">Status</div>
                 </div>
             </div>
             <div className="logoutButton">
