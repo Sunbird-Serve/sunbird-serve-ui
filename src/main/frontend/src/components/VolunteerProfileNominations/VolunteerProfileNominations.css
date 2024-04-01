@@ -86,6 +86,7 @@
 }
 .selectedVNomTab {
   background-color: white;
+  color: #006FA2;
 }
 .selectDateAndNeed {
   display: flex;
@@ -126,6 +127,9 @@
   align-items: flex-start;
   height: 100px;
   width: 210px;
+  padding: 10px;
+  border-radius: 8px;
+  border: solid 1px;
 }
 .needItemVolunteer {
   display: flex;
