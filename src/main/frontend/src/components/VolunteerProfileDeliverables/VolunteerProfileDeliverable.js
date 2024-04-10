@@ -4,8 +4,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NeedsImage from '../../assets/fileIcon.png'
+import { format } from 'date-fns';
+import CloseIcon from '@mui/icons-material/Close';
 
 const configData = require('../../configure.js');
+const currentDate = format(new Date(), 'yyyy-MM-dd');
 
 const VolunteerProfileDeliverable = props => {
 //   console.log(props.needId)
@@ -51,29 +54,90 @@ const VolunteerProfileDeliverable = props => {
   const plans = needplans && needplans.filter(obj => obj.plan.assignedUserId === userId)
   const planId = plans && plans[plans.length-1].plan.id 
   const [deliverables, setDeliverables] = useState(null)
+
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [clickMarker, setClickMarker] = useState(false);
+  const [cancelPopup, setCancelPopup] = useState('')
+  const [rejection, setRejection] = useState('')
+
+  const [todoDeliverables, setTodoDeliverables] = useState(null)
+  const [completedDeliverables, setCompletedDeliverables] = useState(null)
+  const [cancelledDeliverables, setCancelledDeliverables] = useState(null)
+  const [dstat, setDstat ] = useState(false)
+
   useEffect(()=>{
     const fetchData = async () => {
         try {
           const response = await axios.get(`${configData.NEEDPLAN_DELIVERABLES}/${planId}`);
           setDeliverables(response.data);
-          // console.log(response.data); 
+          console.log(response.data); 
         } catch (error) {
           console.error('Error fetching need deliverables');
         }
-      };
-      fetchData();
-  },[planId])
-  const todoDeliverables = deliverables && deliverables.filter(item => item.status === 'NotStarted')
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [clickMarker, setClickMarker] = useState(false);
+    };
+    fetchData();
 
-  const handleCompleted = (deliverableId) => {
+  },[planId, clickMarker, rejection, cancelPopup, dstat])
+
+  // const todoDeliverables = deliverables && deliverables.filter(item => item.status === 'NotStarted')
+  // const completedDeliverables = deliverables && deliverables.filter(item => item.status === 'Completed')
+  // const cancelledDeliverables = deliverables && deliverables.filter(item => item.status === 'Cancelled')
+
+  useEffect(()=>{
+    setTodoDeliverables(deliverables && deliverables.filter(item => item.status === 'NotStarted'))
+    setCompletedDeliverables(deliverables && deliverables.filter(item => item.status === 'Completed'))
+    setCancelledDeliverables(deliverables && deliverables.filter(item => item.status === 'Cancelled'))
+  },[deliverables, dstat])
+
+
+  const handleCompleted = (item) => {
     setClickMarker(!clickMarker)
-    console.log('Deliverable Completed', deliverableId)
+    axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
+      "needPlanId": planId,
+      "comments": item.comments,
+      "status": "Completed",
+      "deliverableDate": currentDate
+    }).then(response => {
+      console.log('Deliverable Completed')
+      setDstat(!dstat)
+    })
+    .catch(error => {
+      console.log('Error marking deliverable completed')
+    });
   }
-  const handleCancel = (deliverableId) => {
+  const [cindex, setCIndex] = useState('')
+  const handleCancel = (item, index) => {
     setClickMarker(!clickMarker)
-    console.log('Deliverable Cancelled',deliverableId)
+    setCancelPopup(item)
+    setCIndex(index)
+    console.log(index)
+    console.log('Deliverable Cancelled')
+  }
+  const handleChange = (e) => {
+    setRejection(e.target.value)
+  }
+  const confirmRejection = (item) => {
+    setRejection('')
+    setCancelPopup('')
+    console.log({
+      "needPlanId": planId,
+      "comments": item.comments,
+      "status": "Cancelled",
+      "deliverableDate": currentDate
+    })
+    axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
+      "needPlanId": planId,
+      "comments": rejection,
+      "status": "Cancelled",
+      "deliverableDate": currentDate
+    }).then(response => {
+      console.log('Deliverable Completed')
+      setDstat(!dstat)
+    })
+    .catch(error => {
+      console.log('Error marking deliverable completed')
+    })
+    console.log(rejection)
   }
 
   return (
@@ -133,20 +197,79 @@ const VolunteerProfileDeliverable = props => {
                              }}
                           >
                             <MoreVertIcon style={{color:'black',fontSize:'16px'}} />     
-                            </button>
+                          </button>
                         </div>
                       </div>
                       { index === selectedIndex && clickMarker && <div className="status-ticker">
-                        <button className="delstat-complete" onClick={()=>handleCompleted(item.id)}>Mark as Complete</button>
-                        <button className="delstat-cancel" onClick={()=>handleCancel(item.id)}>Cancel Plan</button>
+                        <button className="delstat-complete" onClick={()=>handleCompleted(item)}>Mark as Complete</button>
+                        <button className="delstat-cancel" onClick={()=>handleCancel(item, index+1)}>Cancel Plan</button>
                       </div> }
+
+                      { /* CANCEL popup */ }
+                      { cancelPopup && <div className="wrap-cpopup">
+                        <div className="inwrap-cpopup">
+                          <div className="cpopup">
+                            <div className="topbar-cpopup">
+                              <div>Reason for Rejection</div>
+                              <div> 
+                                <button className="cancel-button" onClick={()=>setCancelPopup('')} >
+                                  <div className="close-cpopup"><CloseIcon style={{height:"20px"}}/></div>
+                                </button>
+                              </div>
+                            </div>
+                            <div className="title-cancel">
+                            {needById[props.needId].name}: Session {cindex}
+                            </div>
+                            <div className="wrap-reasonbox">
+                              <label>Reason</label>
+                              <textarea className="reject-reason" value={rejection} onChange={handleChange} rows={4} cols={60}
+                               placeholder='Write a reason for cancelling the need plan deliverable'
+                              ></textarea>
+                            </div>
+                            <div className="cancel-buttons">
+                              <button className="reject-cancel-button" onClick={()=>setCancelPopup('')}>Cancel</button>
+                              <button className="reject-confirm-button" onClick={()=>confirmRejection(item)}>Confirm</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>}
+
+
+
+
                        
                     </div>
                     ))}
                 </div>
             </div>
-            <div className="listDNVPbox"><button className="completedDNVP">Completed</button></div>
-            <div className="listDNVPbox"><button className="canceledDNVP">Canceled</button></div>
+            <div className="listDNVPbox">
+              <button className="completedDNVP">Completed</button>
+              <div>
+                {completedDeliverables && completedDeliverables.map((item, index) => (
+                    <div key={index} className="deliverable-container">
+                      <div className="deliverable-title">
+                            <div><img src={NeedsImage} alt="Nominated Needs" width="20px" /></div>
+                            <div>{needById[props.needId].name}: Session {index+1}</div>
+                      </div>
+                      <div className="date-completed-deliverable">Completed on {item.deliverableDate}</div>
+                      
+                    </div>
+                    ))}
+                </div>
+            </div>
+            <div className="listDNVPbox">
+              <button className="canceledDNVP">Canceled</button>
+              {cancelledDeliverables && cancelledDeliverables.map((item, index) => (
+                    <div key={index} className="deliverable-container">
+                      <div className="deliverable-title">
+                            <div><img src={NeedsImage} alt="Nominated Needs" width="20px" /></div>
+                            <div>{needById[props.needId].name}: Session {index+1}</div>
+                      </div>
+                      <div className="date-completed-deliverable">Cancelled on {item.deliverableDate}</div>
+                      
+                    </div>
+                    ))}
+            </div>
         </div>
         
 

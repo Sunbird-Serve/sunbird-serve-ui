@@ -85,6 +85,14 @@
     font-size: 14px;
     color: #99999F;
 }
+.date-completed-deliverable {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 30px ;
+    font-size: 14px;
+    color: #277C3B;
+}
 .button-dstat {
     background-color: inherit;
     color: black;
@@ -120,4 +128,75 @@
 }
 .delstat-complete:hover , .delstat-cancel:hover { 
     background-color: #F0FAFF;
+}
+.wrap-cpopup {
+    background-color: rgba(0,0,0,0.3);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 200%;
+    z-index: 5;
+    margin: 0px;
+    display: flex;
+}
+.inwrap-cpopup {
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.cpopup {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+}
+.wrap-reasonbox {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+.reject-confirm-button {
+    border-radius: 5px;
+    background-color: #0080BC;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+}
+.reject-cancel-button {
+    border-radius: 5px;
+    padding: 4px 12px;
+    background-color: inherit;
+    border: solid 1px;
+}
+.cancel-buttons {
+    display: flex;
+    margin: 20px 15px;
+    gap: 20px;
+    align-items: center;
+    justify-content: right;
+}
+.topbar-cpopup {
+    padding: 15px 15px 5px 15px;
+    display: flex;
+    justify-content: space-between;
+}
+.cancel-button {
+    border: none;
+    background-color: inherit;
+}
+.title-cancel {
+    padding: 10px 15px;
+}
+.reject-reason {
+    padding: 10px;
+}
+.close-cpopup {
+    border: solid;
+    border-radius: 50%;
+    background-color: #F2F2F2;
+    padding: 2px;
+    border: none;
 }
