@@ -54,6 +54,17 @@ const VolunteerProfileDeliverable = props => {
   const plans = needplans && needplans.filter(obj => obj.plan.assignedUserId === userId)
   const planId = plans && plans[plans.length-1].plan.id 
   const [deliverables, setDeliverables] = useState(null)
+
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [clickMarker, setClickMarker] = useState(false);
+  const [cancelPopup, setCancelPopup] = useState('')
+  const [rejection, setRejection] = useState('')
+
+  const [todoDeliverables, setTodoDeliverables] = useState(null)
+  const [completedDeliverables, setCompletedDeliverables] = useState(null)
+  const [cancelledDeliverables, setCancelledDeliverables] = useState(null)
+  const [dstat, setDstat ] = useState(false)
+
   useEffect(()=>{
     const fetchData = async () => {
         try {
@@ -63,17 +74,21 @@ const VolunteerProfileDeliverable = props => {
         } catch (error) {
           console.error('Error fetching need deliverables');
         }
-      };
-      fetchData();
-  },[planId])
-  const todoDeliverables = deliverables && deliverables.filter(item => item.status === 'NotStarted')
-  const completedDeliverables = deliverables && deliverables.filter(item => item.status === 'Completed')
-  const cancelledDeliverables = deliverables && deliverables.filter(item => item.status === 'Cancelled')
+    };
+    fetchData();
 
-  const [selectedIndex, setSelectedIndex] = useState(null);
-  const [clickMarker, setClickMarker] = useState(false);
-  const [cancelPopup, setCancelPopup] = useState('')
-  const [rejection, setRejection] = useState('')
+  },[planId, clickMarker, rejection, cancelPopup, dstat])
+
+  // const todoDeliverables = deliverables && deliverables.filter(item => item.status === 'NotStarted')
+  // const completedDeliverables = deliverables && deliverables.filter(item => item.status === 'Completed')
+  // const cancelledDeliverables = deliverables && deliverables.filter(item => item.status === 'Cancelled')
+
+  useEffect(()=>{
+    setTodoDeliverables(deliverables && deliverables.filter(item => item.status === 'NotStarted'))
+    setCompletedDeliverables(deliverables && deliverables.filter(item => item.status === 'Completed'))
+    setCancelledDeliverables(deliverables && deliverables.filter(item => item.status === 'Cancelled'))
+  },[deliverables, dstat])
+
 
   const handleCompleted = (item) => {
     setClickMarker(!clickMarker)
@@ -84,6 +99,7 @@ const VolunteerProfileDeliverable = props => {
       "deliverableDate": currentDate
     }).then(response => {
       console.log('Deliverable Completed')
+      setDstat(!dstat)
     })
     .catch(error => {
       console.log('Error marking deliverable completed')
@@ -116,6 +132,7 @@ const VolunteerProfileDeliverable = props => {
       "deliverableDate": currentDate
     }).then(response => {
       console.log('Deliverable Completed')
+      setDstat(!dstat)
     })
     .catch(error => {
       console.log('Error marking deliverable completed')
