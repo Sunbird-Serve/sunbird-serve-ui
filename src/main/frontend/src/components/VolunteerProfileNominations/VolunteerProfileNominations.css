@@ -70,7 +70,7 @@
   padding: 3px 12px;
   font-size: 14px;
   background-color: #F7F8F9;
-  border: solid #D3D4D5;
+  border: solid 1px #D3D4D5;
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
 }
@@ -79,7 +79,7 @@
   padding: 3px 12px;
   font-size: 14px;
   background-color: #F7F8F9;
-  border: solid #D3D4D5;
+  border: solid 1px #D3D4D5;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   border-left: none;
@@ -129,7 +129,7 @@
   width: 210px;
   padding: 10px;
   border-radius: 8px;
-  border: solid 1px;
+  border: solid 1px #DBDBDB;
 }
 .needItemVolunteer {
   display: flex;

@@ -71,6 +71,21 @@
     border-top: solid 2px #F0EFEF;
     border-bottom: solid 1px #F0EFEF;
 }
+
+/**/
+.needInfoForm {
+    padding: 0px 24px;
+}
+.catergoryNInfo {
+    font-size: 14px;
+    font-weight: 600;
+    color: #A2A5A9;
+    margin-top: 15px;
+}
+.needIFormTop {
+    display: flex;
+}
+
 .needIName {
     font-size: 20px;
     color: #0080BC;
@@ -79,18 +94,7 @@
 .needITag {
     font-size: 12px;
 }
-.needInfoForm {
-    padding: 0px 24px;
-}
-.needIFormTop {
-    display: flex;
-}
-.catergoryNInfo {
-    font-size: 14px;
-    font-weight: 600;
-    color: #A2A5A9;
-    margin-top: 15px;
-}
+
 .itemNInfo {
     padding: 5px;
     border-bottom: 1px solid #d3d2d2; 
@@ -217,3 +221,4 @@
     padding: 5px 10px;
     border-radius: 5px;
 }
+

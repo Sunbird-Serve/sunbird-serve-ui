@@ -16,7 +16,6 @@ import { useHistory } from 'react-router'
 
 function VProfile() {
   const dispatch = useDispatch()
-  const history = useHistory()
 
   const userData = useSelector((state)=> state.user.data)
   const [user, setUser] = useState(false)
@@ -34,6 +33,13 @@ function VProfile() {
     history.push('/')
     window.location.reload()
   }
+  const history = useHistory();
+
+  const handleRegisterClick = (e) => {
+    e.preventDefault();
+    history.push("/vregistration")
+}
+
 
   return (
     <div className="wrapVProfile col">
@@ -50,7 +56,13 @@ function VProfile() {
                         <span>.</span>
                         <div className="vMobile">{ (user && userData.identityDetails) ? userData.contactDetails.mobile : '' }</div>
                     </div>
-                    <div className="volunteerStatus">Status</div>
+                    {user && userData.identityDetails ? <></> : <div>
+                      <button className="register-vprofile" onClick={handleRegisterClick}>Click here to Register</button>
+                    </div>}
+                    <div className="wrap-status">
+                      <div className="volunteerStatus">Status</div>
+                      <div><button className="vtooltip" title="Make note of this">i</button></div>
+                    </div>
                 </div>
             </div>
             <div className="logoutButton">

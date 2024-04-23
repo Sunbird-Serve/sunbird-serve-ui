@@ -13,12 +13,16 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import axios from 'axios'
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUserList } from "../../state/userListSlice";
+
 
 const configData = require('../../configure.js');
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Registration = (props) => {
+  const dispatch = useDispatch()
   //constants
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
@@ -412,7 +416,7 @@ const Registration = (props) => {
     city: "",
     district: "",
     state: "",
-    landmark: "",
+    country: "",
     pincode: "",
     languages: [],
     prefDays: [],
@@ -490,10 +494,6 @@ const Registration = (props) => {
     return true;
   };
 
-  // useEffect(() => {
-  //   console.log(formData, "inside useEffect");
-  // }, [formData]);
-
   const dataToPost = {
       "identityDetails": {
         "fullname": formData.firstName,
@@ -511,7 +511,7 @@ const Registration = (props) => {
           "country": 'India'
         }
       },
-      "agencyId": "123",
+      "agencyId": "",
       "status": "Active",
       "role": [
         "Volunteer"
@@ -520,6 +520,48 @@ const Registration = (props) => {
 
   const [ regStatus, setRegStatus ] = useState('')
 
+  const [userId, setUserId] = useState('')
+  const currentDate = new Date().toLocaleDateString();
+
+  const [dataProfile, setDataProfile] = useState({
+    "skills": {
+      "skills": formData.skills
+    },
+    "genericDetails": {
+      "qualification": formData.qualification,
+      "affiliation": formData.affiliation,
+      "yearsOfExperience": formData.yoe,
+      "employmentStatus": formData.empStatus,
+    },
+    "userPreference": {
+      "timePreferred": formData.prefTime,
+      "dayPreferred": formData.prefDays,
+      "interestAreas": formData.interests,
+      "language": formData.languages
+    },
+    "agencyId": "",
+    "userId": userId,
+    "onboardDetails": null,
+    "consentDetails": {
+      "consentGiven": true,
+      "consentDate": currentDate,
+      "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+    },
+    "referenceChannelId": "",
+    "volunteeringHours": {
+      "totalHours": 0,
+      "hoursPerWeek": 0
+    }
+  })
+
+  useEffect(()=>{
+    setDataProfile(prev => ({
+      ...prev, "userId": userId
+    }))
+  },[userId])
+
+
+
   const onsubmit = () => {
     // if (validateFields()) {
     //   window.alert("Form submitted");
@@ -527,8 +569,16 @@ const Registration = (props) => {
     // }
     // window.alert("Please enter all the details");
 
-    console.log(dataToPost)
+    // console.log(dataToPost)
     axios.post(`${configData.USER_GET}/`, dataToPost)
+      .then(function(response){
+        setUserId('response.data.result.Users.osid')
+      })
+      .catch(function (error) {
+        console.log(error); 
+    }) 
+    if(userId){
+      axios.post(`${configData.USER_PROFILE}/`, dataProfile)
       .then(function(response){
         console.log('user created sucessfully',response);
         setRegStatus('success');
@@ -537,6 +587,10 @@ const Registration = (props) => {
         console.log(error); 
         setRegStatus('failure');
     }) 
+    }
+    console.log(formData)
+    console.log(dataProfile)
+    
   };
 
   const onNavClick = (key) => {
@@ -553,9 +607,13 @@ const Registration = (props) => {
     setRegStatus('')
   }
 
+  useEffect(()=>{
+    dispatch(fetchUserList())
+  },[regStatus])
+
   return (
     <div>
-    { (!regStatus) &&
+    {/* { (!regStatus) && */}
     (<div className="reg-main">
       <div className="title-container">
         <span className="title">User Registration</span>
@@ -789,15 +847,24 @@ const Registration = (props) => {
                 ></input>
               </div>
               <div className="formElement">
-                <label>Landmark</label>
+                <label>Country</label>
                 <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter nearest landmark"
-                  name="landmark"
-                  value={formData.landmark ? formData.landmark : ""}
+                <Select
+                  displayEmpty
+                  renderValue={
+                    formData.country !== "" ? undefined : () => "Select"
+                  }
+                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
+                  name="country"
+                  value={formData.country ? formData.country : ""}
                   onChange={handleChange}
-                ></input>
+                >
+                  {countries.map((country, index) => (
+                    <MenuItem key={index + country} value={country}>
+                      {country}
+                    </MenuItem>
+                  ))}
+                </Select>
               </div>
               <div className="formElement">
                 <label>Pincode</label>
@@ -1145,10 +1212,11 @@ const Registration = (props) => {
           </div>
         </div>
       </div>
-    </div>)}
+    </div>)
+    {/* } */}
 
-    {(regStatus === 'success') && <RegFormSuccess />}
-    {(regStatus === 'failure') && <RegFormFailure retryReg={retryReg} />}
+    {/* {(regStatus === 'success') && <RegFormSuccess />} */}
+    {/* {(regStatus === 'failure') && <RegFormFailure retryReg={retryReg} />} */}
     </div>
   );
 };
