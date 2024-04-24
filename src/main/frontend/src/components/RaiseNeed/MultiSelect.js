@@ -27,22 +27,24 @@ const MultiSelect = ({ onAdd }) => {
     onAdd(updatedScheduleItems); 
   };
 
-  const handleEndTimeChange = (event, index) => {
+  const handleEndTimeChange = (newValue, index) => {
     const updatedScheduleItems = [...scheduleItems];
-    updatedScheduleItems[index].endTime = event.target.value;
+    updatedScheduleItems[index].endTime = newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
     setScheduleItems(updatedScheduleItems);
     onAdd(updatedScheduleItems); 
   };
 
-  const handleRemove = (index) => {
+  const handleRemove = (e,index) => {
+    e.preventDefault()
     const updatedScheduleItems = [...scheduleItems];
     updatedScheduleItems.splice(index, 1);
     setScheduleItems(updatedScheduleItems);
     onAdd(updatedScheduleItems); 
   };
 
-  const handleAdd = () => {
-    const newScheduleItem = { day: '', startTime: '', endTime: '' };
+  const handleAdd = (e) => {
+    e.preventDefault()
+    const newScheduleItem = { day: '', startTime: today, endTime: today };
     const updatedScheduleItems = [...scheduleItems, newScheduleItem];
     setScheduleItems(updatedScheduleItems);
     onAdd(updatedScheduleItems); // Save values immediately
@@ -67,7 +69,7 @@ const MultiSelect = ({ onAdd }) => {
               </Select>
           </div>
           <div className="button-add-remove">
-            <button onClick={() => handleRemove(index)} className="remove-button"> x </button>
+            <button onClick={(e) => handleRemove(e,index)} className="remove-button"> x </button>
           </div>
           
           </div>

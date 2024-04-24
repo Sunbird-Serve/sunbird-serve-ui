@@ -1,5 +1,6 @@
 .container-multiselect {
   display: flex;
+  flex-direction: column;
 }
 .container-daysTime {
   gap: 5px;

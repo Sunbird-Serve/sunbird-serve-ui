@@ -46,6 +46,7 @@ const NeedPlans = () => {
     while (currentDate <= new Date(endDate)) {
       const dayIndex = currentDate.getDay();
       const day = daysOfWeek[dayIndex];
+      // EVENT is created 
       if (timeSlotObject[day]) {
         dateWithTimeSlots.push({
           title: needName,
@@ -63,6 +64,25 @@ const NeedPlans = () => {
     return dateWithTimeSlots;
   }
 
+  const GetDeliverableDetails = ({ needId }) => {
+    const [responseData, setResponseData] = useState(null);  
+    useEffect(() => {
+      const fetchData = async () => {
+        try {
+          const response = await axios.get(`https://api.example.com/endpoint/${needId}`);
+          setResponseData(response.data);
+        } catch (error) {
+          setResponseData(null);
+        }
+      };
+      fetchData();
+    }, [needId]); 
+    // Return the response data
+    return responseData ? responseData : null;
+  };
+
+  const result = GetDeliverableDetails('8be43c75-66cc-4490-93e5-5617cc0de8d0')
+  console.log(result)
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
@@ -70,6 +90,9 @@ const NeedPlans = () => {
     for (const item of approvedNeeds) {
       if (item.occurrence !== null) {
         const { startDate, endDate } = item.occurrence;
+        // get deliverable details for each item.need.id
+        console.log(item.need.id)
+        // input to create EVENT are passed from here
         const sessions = getTimeSlots(item.need.name, startDate, endDate, item.timeSlots); // Use getTimeSlots function
         newEvents.push(...sessions);
       }
@@ -161,6 +184,7 @@ const NeedPlans = () => {
           
         {selectedDate && ( <div className="event-list">
           <div className="headEventList">{moment(selectedDate).format('MMMM D, YYYY')}</div>
+
           {events.some((event) => {
               const startDate = moment(event.start);
               const endDate = moment(event.end);

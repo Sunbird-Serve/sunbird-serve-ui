@@ -15,6 +15,7 @@ const configData = require('../../configure.js');
 
 const RaiseNeed = props => {
     const dispatch = useDispatch();
+    
     const history = useHistory()
     const uid = useSelector((state) => state.user.data.osid)
     console.log(uid)
@@ -271,7 +272,7 @@ const RaiseNeed = props => {
                                 <select className="selectMenu" name="entityId" value={entityId} onChange={changeHandler}>
                                     <option value="" defaultValue>Select Entity</option>
                                     {
-                                        entities.map(
+                                        entities && entities.map(
                                             (entype) => <option key={entype.osid} value={entype.id}>{entype.name}</option>
                                         )
                                     }
@@ -320,15 +321,6 @@ const RaiseNeed = props => {
                                         : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} />}
                                 </div>
                             </div>
-
-                            {/* Time */}
-
-                            {/*}
-                        <div className="itemForm">
-                            <label>Time</label>
-                            <input type="time" name="timeSlot" value={timeSlot} onChange={changeHandlerOther} />
-                        </div> 
-                            */}
 
                         </div>
                     </div>
