@@ -15,6 +15,8 @@ import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchUserList } from "../../state/userListSlice";
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
 
 
 const configData = require('../../configure.js');
@@ -378,16 +380,23 @@ const Registration = (props) => {
   ];
 
   const qualifications = [
-    "No Formal Education",
-    "Primary Education",
-    "Secondary Education",
-    "Vocational Qualification",
-    "Bachelor's Degree",
-    "Master's Degree",
-    "Doctorate or Higher",
+    "High School", 
+    "Pre University", 
+    "Graduate", 
+    "Post Graduate", 
+    "Professional Degree"
   ];
 
-  const employmentStatus = ["Full Time", "Part Time", "Unemployed"];
+  const employmentStatus = [
+    "Full Time", 
+    "Part Time", 
+    "Self Employed", 
+    "Homemaker", 
+    "Student", 
+    "Retired", 
+    "Not Employed", 
+    "Others"
+  ];
 
   const skillLevel = [
     "Beginner",
@@ -521,12 +530,27 @@ const Registration = (props) => {
   const [ regStatus, setRegStatus ] = useState('')
 
   const [userId, setUserId] = useState('')
-  const currentDate = new Date().toLocaleDateString();
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); 
+  const day = String(today.getDate()).padStart(2, '0');
+
+  const currentDate = `${year}-${month}-${day}`;
+  // const currentDate = new Date().toLocaleDateString();
+
+  const onboradingInfo = {
+    "onboardStatus": [
+        {
+            "onboardStep": "Discussion",
+            "status": "completed"
+         }
+     ],
+     "refreshPeriod": "2 years",
+     "profileCompletion": "50"
+    }
 
   const [dataProfile, setDataProfile] = useState({
-    "skills": {
-      "skills": formData.skills
-    },
+    "skills": formData.skills,
     "genericDetails": {
       "qualification": formData.qualification,
       "affiliation": formData.affiliation,
@@ -536,12 +560,12 @@ const Registration = (props) => {
     "userPreference": {
       "timePreferred": formData.prefTime,
       "dayPreferred": formData.prefDays,
-      "interestAreas": formData.interests,
+      "interestArea": formData.interests,
       "language": formData.languages
     },
     "agencyId": "",
     "userId": userId,
-    "onboardDetails": null,
+    "onboardDetails": onboradingInfo,
     "consentDetails": {
       "consentGiven": true,
       "consentDate": currentDate,
@@ -556,29 +580,56 @@ const Registration = (props) => {
 
   useEffect(()=>{
     setDataProfile(prev => ({
-      ...prev, "userId": userId
+      ...prev,  
+      "skills": formData.skills,
+      "genericDetails": {
+        "qualification": formData.qualification,
+        "affiliation": formData.affiliation,
+        "yearsOfExperience": formData.yoe,
+        "employmentStatus": formData.empStatus,
+      },
+      "userPreference": {
+        "timePreferred": formData.prefTime,
+        "dayPreferred": formData.prefDays,
+        "interestArea": formData.interests,
+        "language": formData.languages
+      },
+      "agencyId": "",
+      "userId": userId,
+      "onboardDetails": onboradingInfo,
+      "consentDetails": {
+        "consentGiven": true,
+        "consentDate": currentDate,
+        "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+      },
+      "referenceChannelId": "",
+      "volunteeringHours": {
+        "totalHours": 0,
+        "hoursPerWeek": 0
+      }
     }))
-  },[userId])
+  },[userId, formData])
 
-
+  const [loading, setLoading] = useState(false);
 
   const onsubmit = () => {
-    // if (validateFields()) {
-    //   window.alert("Form submitted");
-    //   return;
-    // }
-    // window.alert("Please enter all the details");
-
-    // console.log(dataToPost)
+    setLoading(true)
     axios.post(`${configData.USER_GET}/`, dataToPost)
       .then(function(response){
-        setUserId('response.data.result.Users.osid')
+        setUserId(response.data.result.Users.osid)
+        console.log(response.data)
       })
       .catch(function (error) {
+        setLoading(false)
         console.log(error); 
-    }) 
+      }) 
+  }  
+
+  useEffect(()=>{
     if(userId){
-      axios.post(`${configData.USER_PROFILE}/`, dataProfile)
+      console.log(userId)
+      console.log(dataProfile)
+      axios.post(`${configData.USER_PROFILE}`, dataProfile)
       .then(function(response){
         console.log('user created sucessfully',response);
         setRegStatus('success');
@@ -586,12 +637,12 @@ const Registration = (props) => {
       .catch(function (error) {
         console.log(error); 
         setRegStatus('failure');
-    }) 
+      }) 
+      .finally(() => {
+        setLoading(false)
+      }); 
     }
-    console.log(formData)
-    console.log(dataProfile)
-    
-  };
+  },[userId])
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
@@ -611,9 +662,18 @@ const Registration = (props) => {
     dispatch(fetchUserList())
   },[regStatus])
 
+ 
+
   return (
     <div>
-    {/* { (!regStatus) && */}
+    {loading && <div className="loading-box">
+      <span>Creating the user. Please wait...</span>
+      <Box sx={{ width: '80%' }}>
+        <LinearProgress />
+      </Box>
+    </div>}
+
+    { (!regStatus) &&
     (<div className="reg-main">
       <div className="title-container">
         <span className="title">User Registration</span>
@@ -1213,12 +1273,12 @@ const Registration = (props) => {
         </div>
       </div>
     </div>)
-    {/* } */}
-
-    {/* {(regStatus === 'success') && <RegFormSuccess />} */}
-    {/* {(regStatus === 'failure') && <RegFormFailure retryReg={retryReg} />} */}
+     } 
+    
+    {(regStatus === 'success') && userId && <RegFormSuccess />}
+    {(regStatus === 'failure') && userId && <RegFormFailure retryReg={retryReg} />}
     </div>
   );
 };
 
-export default Registration;
+export default Registration
