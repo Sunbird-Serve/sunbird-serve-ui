@@ -1,3 +1,4 @@
+// MainPage.js
 import './MainPage.css'
 import { BrowserRouter, Switch, Route} from 'react-router-dom'
 import SideNav from '../../components/SideNav/SideNav'
@@ -10,23 +11,29 @@ import Volunteers from '../../components/Volunteer/Volunteers'
 import Settings from '../../components/Settings/Settings'
 import Accounts from '../../components/Accounts/Accounts'
 import Help from '../../components/Help/Help'
+import VerifyEmailPage from '../../components/VerifyEmailPage/VerifyEmailPage.JS'; // Import your VerifyEmailPage component
+import { useState } from 'react';
 
 const MainPage = () => {
+    const [isSideNavOpen, setIsSideNavOpen] = useState(false);
+    
+    const toggleSideNav = () => {
+        setIsSideNavOpen(!isSideNavOpen);
+    };
+
     return(
-        //main is the base container for all components
         <BrowserRouter>
             <div className="wrapMainPage">
                 <div className="mainPage row">
-                    {/* Side Navigation Component*/}
                     <div className="wrapSideNav col-8 col-sm-4 col-lg-2 d-none d-sm-block">
-                        <SideNav/>      
+                        <SideNav isOpen={isSideNavOpen} /> 
                     </div>
+                   { isSideNavOpen  && <SideNav /> }
+
                     <div className="wrapDisplay col-12 col-sm-8 col-lg-10">
-                        {/* Top Header component*/}
                         <div className="wrapHeader row">
-                            <Header/> 
+                            <Header toggleSideNav={toggleSideNav} />
                         </div>
-                        {/*load different components by path which is selected in side navigation */}
                         <div className="wrapContent row mt-5 mt-sm-0 pl-5">
                             <Switch>     
                                 <Route exact path="/" component={Dashboard} />
@@ -37,6 +44,7 @@ const MainPage = () => {
                                 <Route path="/settings" component={Settings} />
                                 <Route path="/accounts" component={Accounts} />
                                 <Route path="/help" component={Help} /> 
+                                <Route exact path="/verify-email" component={VerifyEmailPage} />
                             </Switch>
                         </div>
                     </div>

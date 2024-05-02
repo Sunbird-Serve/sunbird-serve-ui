@@ -13,18 +13,12 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import axios from 'axios'
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchUserList } from "../../state/userListSlice";
-import Box from '@mui/material/Box';
-import LinearProgress from '@mui/material/LinearProgress';
-
 
 const configData = require('../../configure.js');
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Registration = (props) => {
-  const dispatch = useDispatch()
   //constants
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
@@ -380,23 +374,16 @@ const Registration = (props) => {
   ];
 
   const qualifications = [
-    "High School", 
-    "Pre University", 
-    "Graduate", 
-    "Post Graduate", 
-    "Professional Degree"
+    "No Formal Education",
+    "Primary Education",
+    "Secondary Education",
+    "Vocational Qualification",
+    "Bachelor's Degree",
+    "Master's Degree",
+    "Doctorate or Higher",
   ];
 
-  const employmentStatus = [
-    "Full Time", 
-    "Part Time", 
-    "Self Employed", 
-    "Homemaker", 
-    "Student", 
-    "Retired", 
-    "Not Employed", 
-    "Others"
-  ];
+  const employmentStatus = ["Full Time", "Part Time", "Unemployed"];
 
   const skillLevel = [
     "Beginner",
@@ -425,7 +412,7 @@ const Registration = (props) => {
     city: "",
     district: "",
     state: "",
-    country: "",
+    landmark: "",
     pincode: "",
     languages: [],
     prefDays: [],
@@ -503,6 +490,10 @@ const Registration = (props) => {
     return true;
   };
 
+  // useEffect(() => {
+  //   console.log(formData, "inside useEffect");
+  // }, [formData]);
+
   const dataToPost = {
       "identityDetails": {
         "fullname": formData.firstName,
@@ -520,7 +511,7 @@ const Registration = (props) => {
           "country": 'India'
         }
       },
-      "agencyId": "",
+      "agencyId": "123",
       "status": "Active",
       "role": [
         "Volunteer"
@@ -529,107 +520,15 @@ const Registration = (props) => {
 
   const [ regStatus, setRegStatus ] = useState('')
 
-  const [userId, setUserId] = useState('')
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0'); 
-  const day = String(today.getDate()).padStart(2, '0');
-
-  const currentDate = `${year}-${month}-${day}`;
-  // const currentDate = new Date().toLocaleDateString();
-
-  const onboradingInfo = {
-    "onboardStatus": [
-        {
-            "onboardStep": "Discussion",
-            "status": "completed"
-         }
-     ],
-     "refreshPeriod": "2 years",
-     "profileCompletion": "50"
-    }
-
-  const [dataProfile, setDataProfile] = useState({
-    "skills": formData.skills,
-    "genericDetails": {
-      "qualification": formData.qualification,
-      "affiliation": formData.affiliation,
-      "yearsOfExperience": formData.yoe,
-      "employmentStatus": formData.empStatus,
-    },
-    "userPreference": {
-      "timePreferred": formData.prefTime,
-      "dayPreferred": formData.prefDays,
-      "interestArea": formData.interests,
-      "language": formData.languages
-    },
-    "agencyId": "",
-    "userId": userId,
-    "onboardDetails": onboradingInfo,
-    "consentDetails": {
-      "consentGiven": true,
-      "consentDate": currentDate,
-      "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
-    },
-    "referenceChannelId": "",
-    "volunteeringHours": {
-      "totalHours": 0,
-      "hoursPerWeek": 0
-    }
-  })
-
-  useEffect(()=>{
-    setDataProfile(prev => ({
-      ...prev,  
-      "skills": formData.skills,
-      "genericDetails": {
-        "qualification": formData.qualification,
-        "affiliation": formData.affiliation,
-        "yearsOfExperience": formData.yoe,
-        "employmentStatus": formData.empStatus,
-      },
-      "userPreference": {
-        "timePreferred": formData.prefTime,
-        "dayPreferred": formData.prefDays,
-        "interestArea": formData.interests,
-        "language": formData.languages
-      },
-      "agencyId": "",
-      "userId": userId,
-      "onboardDetails": onboradingInfo,
-      "consentDetails": {
-        "consentGiven": true,
-        "consentDate": currentDate,
-        "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
-      },
-      "referenceChannelId": "",
-      "volunteeringHours": {
-        "totalHours": 0,
-        "hoursPerWeek": 0
-      }
-    }))
-  },[userId, formData])
-
-  const [loading, setLoading] = useState(false);
-
   const onsubmit = () => {
-    setLoading(true)
-    axios.post(`${configData.USER_GET}/`, dataToPost)
-      .then(function(response){
-        setUserId(response.data.result.Users.osid)
-        console.log(response.data)
-      })
-      .catch(function (error) {
-        setLoading(false)
-        console.log(error); 
-      }) 
-  }  
+    // if (validateFields()) {
+    //   window.alert("Form submitted");
+    //   return;
+    // }
+    // window.alert("Please enter all the details");
 
-  useEffect(()=>{
-    if(userId){
-      console.log(userId)
-      console.log(dataProfile)
-      axios.post(`${configData.USER_PROFILE}`, dataProfile)
+    console.log(dataToPost)
+    axios.post(`${configData.USER_GET}/`, dataToPost)
       .then(function(response){
         console.log('user created sucessfully',response);
         setRegStatus('success');
@@ -637,12 +536,8 @@ const Registration = (props) => {
       .catch(function (error) {
         console.log(error); 
         setRegStatus('failure');
-      }) 
-      .finally(() => {
-        setLoading(false)
-      }); 
-    }
-  },[userId])
+    }) 
+  };
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
@@ -658,21 +553,8 @@ const Registration = (props) => {
     setRegStatus('')
   }
 
-  useEffect(()=>{
-    dispatch(fetchUserList())
-  },[regStatus])
-
- 
-
   return (
     <div>
-    {loading && <div className="loading-box">
-      <span>Creating the user. Please wait...</span>
-      <Box sx={{ width: '80%' }}>
-        <LinearProgress />
-      </Box>
-    </div>}
-
     { (!regStatus) &&
     (<div className="reg-main">
       <div className="title-container">
@@ -761,29 +643,31 @@ const Registration = (props) => {
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>First Name</label>
+              <label >First Name<span className="mandatory-label">*</span></label>
                 <br />
                 <input
-                  className="form-input"
-                  placeholder="Enter your first name"
-                  name="firstName"
-                  value={formData.firstName ? formData.firstName : ""}
-                  onChange={handleChange}
-                ></input>
+    className="form-input"
+    placeholder="Enter your first name"
+    name="firstName"
+    value={formData.firstName ? formData.firstName : ""}
+    onChange={handleChange}
+    required
+></input>
               </div>
               <div className="formElement">
-                <label>Last Name</label>
+              <label >Last Name<span className="mandatory-label">*</span></label>
                 <br />
                 <input
-                  className="form-input"
-                  placeholder="Enter your last name"
-                  name="lastName"
-                  value={formData.lastName ? formData.lastName : ""}
-                  onChange={handleChange}
-                ></input>
+    className="form-input"
+    placeholder="Enter your last name"
+    name="lastName"
+    value={formData.lastName ? formData.lastName : ""}
+    onChange={handleChange}
+    required
+></input>
               </div>
               <div className="formElement">
-                <label>Gender</label>
+              <label >Gender<span className="mandatory-label">*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -794,6 +678,7 @@ const Registration = (props) => {
                   name="gender"
                   value={formData.gender ? formData.gender : ""}
                   onChange={handleChange}
+                  required
                 >
                   {genderOptions.map((gender, index) => (
                     <MenuItem key={index + gender} value={gender}>
@@ -815,7 +700,7 @@ const Registration = (props) => {
                 ></input>
               </div>
               <div className="formElement">
-                <label>Nationality</label>
+              <label>Nationality<span className="mandatory-label">*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -826,6 +711,7 @@ const Registration = (props) => {
                   name="nationality"
                   value={formData.nationality ? formData.nationality : ""}
                   onChange={handleChange}
+                  required
                 >
                   {countries.map((country, index) => (
                     <MenuItem key={index + country} value={country}>
@@ -841,7 +727,7 @@ const Registration = (props) => {
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>Mobile Number</label>
+              <label >Mobile Number<span className="mandatory-label">*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -849,10 +735,11 @@ const Registration = (props) => {
                   name="mobileNumber"
                   value={formData.mobileNumber ? formData.mobileNumber : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>E-mail ID</label>
+              <label >Email<span className="mandatory-label">*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -860,6 +747,7 @@ const Registration = (props) => {
                   name="email"
                   value={formData.email ? formData.email : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
@@ -907,24 +795,15 @@ const Registration = (props) => {
                 ></input>
               </div>
               <div className="formElement">
-                <label>Country</label>
+                <label>Landmark</label>
                 <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.country !== "" ? undefined : () => "Select"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="country"
-                  value={formData.country ? formData.country : ""}
+                <input
+                  className="form-input"
+                  placeholder="Enter nearest landmark"
+                  name="landmark"
+                  value={formData.landmark ? formData.landmark : ""}
                   onChange={handleChange}
-                >
-                  {countries.map((country, index) => (
-                    <MenuItem key={index + country} value={country}>
-                      {country}
-                    </MenuItem>
-                  ))}
-                </Select>
+                ></input>
               </div>
               <div className="formElement">
                 <label>Pincode</label>
@@ -1086,7 +965,7 @@ const Registration = (props) => {
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>Qualification</label>
+              <label >Qualification<span className="mandatory-label">*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -1099,6 +978,8 @@ const Registration = (props) => {
                   name="qualification"
                   value={formData.qualification ? formData.qualification : ""}
                   onChange={handleChange}
+                  required
+
                 >
                   {qualifications.map((qualification, index) => (
                     <MenuItem key={index + qualification} value={qualification}>
@@ -1108,7 +989,7 @@ const Registration = (props) => {
                 </Select>
               </div>
               <div className="formElement">
-                <label>Affiliation</label>
+              <label>Affiliation<span className="mandatory-label">*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -1116,10 +997,11 @@ const Registration = (props) => {
                   name="affiliation"
                   value={formData.affiliation ? formData.affiliation : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Employment Status</label>
+              <label >Employment Status<span className="mandatory-label">*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -1132,6 +1014,7 @@ const Registration = (props) => {
                   name="empStatus"
                   value={formData.empStatus ? formData.empStatus : ""}
                   onChange={handleChange}
+                  required
                 >
                   {employmentStatus.map((empStatus, index) => (
                     <MenuItem key={index + empStatus} value={empStatus}>
@@ -1272,13 +1155,12 @@ const Registration = (props) => {
           </div>
         </div>
       </div>
-    </div>)
-     } 
-    
-    {(regStatus === 'success') && userId && <RegFormSuccess />}
-    {(regStatus === 'failure') && userId && <RegFormFailure retryReg={retryReg} />}
+    </div>)}
+
+    {(regStatus === 'success') && <RegFormSuccess />}
+    {(regStatus === 'failure') && <RegFormFailure retryReg={retryReg} />}
     </div>
   );
 };
 
-export default Registration
+export default Registration;
