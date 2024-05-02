@@ -11,7 +11,6 @@ import Volunteers from '../../components/Volunteer/Volunteers'
 import Settings from '../../components/Settings/Settings'
 import Accounts from '../../components/Accounts/Accounts'
 import Help from '../../components/Help/Help'
-import VerifyEmailPage from '../../components/VerifyEmailPage/VerifyEmailPage.JS'; // Import your VerifyEmailPage component
 import { useState } from 'react';
 
 const MainPage = () => {
@@ -44,7 +43,6 @@ const MainPage = () => {
                                 <Route path="/settings" component={Settings} />
                                 <Route path="/accounts" component={Accounts} />
                                 <Route path="/help" component={Help} /> 
-                                <Route exact path="/verify-email" component={VerifyEmailPage} />
                             </Switch>
                         </div>
                     </div>
