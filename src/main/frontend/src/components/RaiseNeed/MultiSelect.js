@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormControl, InputLabel, Select, MenuItem, TextField, Grid } from '@mui/material';
 import './MultiSelect.css';
 import dayjs from 'dayjs';
@@ -9,9 +9,15 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const MultiSelect = ({ onAdd }) => {
+const MultiSelect = (props) => {
   const today = dayjs()
-  const [scheduleItems, setScheduleItems] = useState([{ day: '', startTime: today, endTime: today }]);
+  const { onAdd, scheduleTime } = props
+
+  const [scheduleItems, setScheduleItems] = useState(scheduleTime);
+
+  useEffect(()=>{
+    onAdd(scheduleItems);
+  },[])
 
   const handleDayChange = (event, index) => {
     const updatedScheduleItems = [...scheduleItems];
@@ -22,14 +28,14 @@ const MultiSelect = ({ onAdd }) => {
 
   const handleStartTimeChange = (newValue, index) => {
     const updatedScheduleItems = [...scheduleItems];
-    updatedScheduleItems[index].startTime = newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ') ;
+    updatedScheduleItems[index].startTime = newValue
     setScheduleItems(updatedScheduleItems);
     onAdd(updatedScheduleItems); 
   };
 
   const handleEndTimeChange = (newValue, index) => {
     const updatedScheduleItems = [...scheduleItems];
-    updatedScheduleItems[index].endTime = newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+    updatedScheduleItems[index].endTime = newValue
     setScheduleItems(updatedScheduleItems);
     onAdd(updatedScheduleItems); 
   };
@@ -41,13 +47,16 @@ const MultiSelect = ({ onAdd }) => {
     setScheduleItems(updatedScheduleItems);
     onAdd(updatedScheduleItems); 
   };
-
   const handleAdd = (e) => {
     e.preventDefault()
-    const newScheduleItem = { day: '', startTime: today, endTime: today };
+    const newScheduleItem = { 
+      day:'Sunday', 
+      startTime: dayjs('2024-04-30T09:30:00.000Z'), 
+      endTime: dayjs('2024-04-30T17:00:00.000Z')
+    }
     const updatedScheduleItems = [...scheduleItems, newScheduleItem];
     setScheduleItems(updatedScheduleItems);
-    onAdd(updatedScheduleItems); // Save values immediately
+    onAdd(updatedScheduleItems);
   };
 
   return (
@@ -55,33 +64,23 @@ const MultiSelect = ({ onAdd }) => {
       {scheduleItems.map((scheduleItem, index) => (
         <div className="container-daysTime">
           <div className="day-container">
-          <div >
-              <Select
-                value={scheduleItem.day}
-                onChange={(e) => handleDayChange(e, index)}
-                className="days-label"
-              >
-                {daysOfWeek.map((day) => (
-                  <MenuItem key={day} value={day}>
-                    {day}
-                  </MenuItem>
-                ))}
+            <div >
+              <Select value={scheduleItem.day} onChange={(e) => handleDayChange(e, index)} className="days-label">
+                {daysOfWeek.map((day) => (<MenuItem key={day} value={day}> {day}</MenuItem>))}
               </Select>
+            </div>
+            <div className="button-add-remove">
+              <button onClick={(e) => handleRemove(e,index)} className="remove-button"> x </button>
+            </div>
           </div>
-          <div className="button-add-remove">
-            <button onClick={(e) => handleRemove(e,index)} className="remove-button"> x </button>
-          </div>
-          
-          </div>
+
           <div className="time-container">
-          <div className="time-item">
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DemoContainer components={['TimePicker']}>
-            <TimePicker
-              value={scheduleItem.startTime}
-              renderInput = {(params) => <TextField {...params} />}
-              onChange={(newValue) => handleStartTimeChange(newValue, index)}
-            />
+            <div className="time-item">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DemoContainer components={['TimePicker']}>
+                  <TimePicker value={scheduleItem.startTime} renderInput = {(params) => <TextField {...params} />}
+                  onChange={(newValue) => handleStartTimeChange(newValue, index)}
+                />
             </DemoContainer>
           </LocalizationProvider>
           </div>
