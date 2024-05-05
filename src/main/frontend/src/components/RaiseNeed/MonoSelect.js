@@ -9,13 +9,15 @@ import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-const MonoSelect = ({ onAdd, frequency }) => {
-  const [selectedDay, setSelectedDay] = useState('Monday'); // Set 'Monday' as the default value
-  const [startTime, setStartTime] = useState(dayjs())
-  const [endTime, setEndTime] = useState(dayjs())
+const MonoSelect = (props) => {
+  const { onAdd, frequency, scheduleTime } = props
+  const [selectedDay, setSelectedDay] = useState(''); 
+  //scheduleTime is in dayjs object format, being converted in ModifyNeed.js
+  const [startTime, setStartTime] = useState(scheduleTime[0].startTime)
+  const [endTime, setEndTime] = useState(scheduleTime[0].endTime)
 
+  //Set the default selected day based on the frequency prop
   useEffect(() => {
-    // Set the default selected day(s) based on the frequency prop
     if (frequency === 'weekdays') {
       setSelectedDay('Mon-Fri');
     } else if (frequency === 'weekend') {
@@ -27,16 +29,7 @@ const MonoSelect = ({ onAdd, frequency }) => {
     }
   }, [frequency]);
 
-  const handleDayChange = (event) => {
-    setSelectedDay(event.target.value);
-    saveValues();
-  };
-
-  useEffect(()=> {
-    saveValues();
-    console.log(startTime)
-  },[selectedDay, startTime,endTime])
-
+  //splitting day range into days
   const saveValues = () => {
     let selectedDaysArray = [];
 
@@ -64,31 +57,40 @@ const MonoSelect = ({ onAdd, frequency }) => {
     onAdd(selectedDaysArray);
   };
 
+  const handleDayChange = (e) => {
+    setSelectedDay(e.target.value);
+    saveValues();
+  }
+
+  const handleStartTimeChange = (newValue) => {
+    setStartTime(newValue)
+  }
+
+  const handleEndTimeChange = (newValue) => {
+    setEndTime(newValue)
+  }
+
+  useEffect(()=> {
+    saveValues();
+    // console.log(startTime)
+    // console.log(endTime)
+  },[selectedDay, startTime, endTime])
+
   return (
-    <div>
-      <div className="wrapDayTime">
-        <div>
-          <Select
-              value={selectedDay}
-              onChange={handleDayChange}
-              className="label-days"
-            >
-              {frequency === 'weekdays' ? (
-                <MenuItem value="Mon-Fri">Mon-Fri</MenuItem>
-              ) : frequency === 'weekend' ? (
-                <MenuItem value="Sat-Sun">Sat-Sun</MenuItem>
-              ) : frequency === 'daily' ? (
-                <MenuItem value="Mon-Sun">Mon-Sun</MenuItem>
-              ) : (
-                daysOfWeek.map((day) => (
-                  <MenuItem key={day} value={day}>
-                    {day}
-                  </MenuItem>
-                ))
-              )}
-          </Select>
-        </div>
-        <div className="container-time">
+    <div className="wrapDayTime">
+      {/* automatically select event days */}
+      <div>
+        <Select value={selectedDay} onChange={handleDayChange} className="label-days">
+          { frequency === 'weekdays' ? ( <MenuItem value="Mon-Fri">Mon-Fri</MenuItem>) 
+          : frequency === 'weekend' ? ( <MenuItem value="Sat-Sun">Sat-Sun</MenuItem>) 
+          : frequency === 'daily' ? (<MenuItem value="Mon-Sun">Mon-Sun</MenuItem>) 
+          : ( daysOfWeek.map((day) => ( <MenuItem key={day} value={day}> {day}</MenuItem>))
+          )}
+        </Select>
+      </div>
+        
+      <div className="container-time">
+        {/* Start time */}
         <div className="label-time ">
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={['TimePicker']}>
@@ -96,12 +98,13 @@ const MonoSelect = ({ onAdd, frequency }) => {
                 className="label-startTime"
                 renderInput = {(params) => <TextField {...params} />}
                 value={startTime}
-                onChange={(newValue)=>setStartTime(newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ'))}
+                onChange={(newValue)=>handleStartTimeChange(newValue)}
               />
             </DemoContainer>
           </LocalizationProvider>
         </div>
 
+        {/* End time */}
         <div className="label-time ">
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DemoContainer components={['TimePicker']}>
@@ -109,11 +112,10 @@ const MonoSelect = ({ onAdd, frequency }) => {
                 className="label-startTime"
                 renderInput = {(params) => <TextField {...params} />}
                 value={endTime}
-                onChange={(newValue)=>setEndTime(newValue.format('YYYY-MM-DDTHH:mm:ss.SSSZ'))}
+                onChange={(newValue)=>handleEndTimeChange(newValue)}
               />
             </DemoContainer>
           </LocalizationProvider>
-        </div>
         </div>
       </div>
     </div>

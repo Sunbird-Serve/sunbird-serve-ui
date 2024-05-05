@@ -80,7 +80,7 @@
     font-size: 14px;
     font-weight: 600;
     color: #A2A5A9;
-    margin-top: 15px;
+    margin: 15px 0px;
 }
 .needIFormTop {
     display: flex;
@@ -125,10 +125,9 @@
 }
 .itemNInfo select {
     width: 100%;
-    padding: 5px;
+    padding: 2px;
     border-radius: 3px;
     font-size: 14px;
-    border: none;
 }
 .infoNImage {
     height: 135px;
@@ -143,7 +142,7 @@
 .itemNInfoDescrip {
     height: 65px;
     margin: 0px 5px;
-     border-bottom: 1px solid #d8d4d4; 
+    border-bottom: 1px solid #d8d4d4; 
 
 }
 .itemNInfoDescrip label {
@@ -160,17 +159,20 @@
     display: flex;
     justify-content: space-between;
     font-size: 14px;
-    margin-bottom: 5px;
+    padding-bottom: 3px;
 }
 .itemNInfoDate-modify {
     width: 48%;
+}
+.itemNInfoDate-modified {
+    width: 48%;
+    padding: 1px;
 }
 .itemNInfoDate-modify label {
     width: 100%;
     font-size: 14px;
     color: #686C73;
-    border-width: 1px;
-    text-align: middle;
+    margin-bottom: -3px;
 }
 .itemNInfoDate-modify span {
     width: 98%;
@@ -183,7 +185,7 @@
     border-radius: 3px;
     font-size: 14px;
     padding: 2px 10px;
-    margin-bottom: -0.15px;
+    margin: 0px;
 }
 .alertNomin {
     position: absolute;
@@ -221,4 +223,27 @@
     padding: 5px 10px;
     border-radius: 5px;
 }
-
+.itemDaysTime span{
+    display: flex;
+}
+.itemNInfo-dayNtime {
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    height: 133px;
+    overflow: scroll;
+    border-bottom: 1px solid #d8d4d4 ;
+}
+.itemNInfo-dayNtime label {
+    width: 100%;
+    font-size: 14px;
+    color: #686C73;
+    font-weight: 500;
+}
+.itemNInfo-dayNtime span {
+    width: 100%;
+    border-radius: 3px;
+    font-size: 14px;
+    border: none;
+    margin-bottom: 5px;
+}

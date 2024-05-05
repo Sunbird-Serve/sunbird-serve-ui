@@ -5,11 +5,12 @@ import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import MultiSelect from '../RaiseNeed/MultiSelect';
 import MonoSelect from '../RaiseNeed/MonoSelect';
+import axios from 'axios'
+import dayjs from 'dayjs';
 
 const ModifyNeed = props => {
-    console.log(props.data)     //details of single need
+    // console.log(props.data)     //details of single need
     const [data,setData] = useState(null)
-   
     useEffect(()=> {
          setData(props.data);
          console.log(props.data)
@@ -24,22 +25,48 @@ const ModifyNeed = props => {
         frequency: props.data.occurrence ? props.data.occurrence.frequency : '',
         timeSlots: timeSlotsArray
     })
-    const { startDate, endDate, days, frequency, timeSlots } = dataOccurrence;
+    const { startDate, endDate, days, frequency, timeSlots } = dataOccurrence
 
-    //change start date, end date, frequency
-    const handleStartDate = e => {
-        setDataOccurrence({ ...dataOccurrence, startDate: (e.target.value + 'T08:57:00.000Z') })
-    }
+    //scheduleTime is in object format and for passing to select
+    const [ scheduleTime, setScheduleTime ] = useState([{ day:'', startTime:'', endTime:'' }])
+    useEffect(()=>{
+        setScheduleTime(timeSlotsArray.map(item => ({
+            day: item.day,
+            startTime: dayjs(item.startTime),
+            endTime: dayjs(item.endTime)
+        }))) 
+
+    },[timeSlotsArray])
+    //Date in backend are stored in dateTime format whereas 
+    //needs to be YYYY-mm-dd format input element of type date
+    const [startYMD, setStartYMD] = useState(props.data.occurrence ? props.data.occurrence.startDate.substr(0,10) : '')  
+    const [endYMD, setEndYMD] = useState(props.data.occurrence ? props.data.occurrence.endDate.substr(0,10) : '')
+    //while date from UI changed in YMD format, save it by adding time string to it
     const handleEndDate = e => {
-        setDataOccurrence({ ...dataOccurrence, endDate: (e.target.value + 'T08:57:00.000Z') })
+        setEndYMD(e.target.value)
+        setDataOccurrence({ ...dataOccurrence, endDate: (e.target.value + 'T17:00:00.000Z') })
+    }
+    const handleStartDate = e => {
+        setStartYMD(e.target.value)
+        setDataOccurrence({ ...dataOccurrence, startDate: (e.target.value + 'T09:00:00.000Z') })
     }
     const changeFrequency= e => {
         setDataOccurrence({ ...dataOccurrence, frequency: e.target.value })
     }
-    const [selectedDays, setSelectedDays] = useState([]);
+
+    const [selectedDays, setSelectedDays] = useState([])
+    //selected values be in object format, convert to UTC format
+    const objToUTC = (timeObj) => {
+        const timeValue = timeObj.format('YYYY-MM-DDTHH:mm:ss.SSSZ')
+        return timeValue.substr(0,16)+':00.000Z'
+    }
     const handleSelectedDaysChange = (selected) => {
-        setSelectedDays(selected);
-    };
+        setSelectedDays(selected && selected.map(item => ({
+            day: item.day,
+            startTime: objToUTC(item.startTime),
+            endTime: objToUTC(item.endTime)
+        })))
+    }
     //updating selected days and timeslots
     useEffect(() => {
         setDataOccurrence({ ...dataOccurrence, timeSlots: selectedDays, days: selectedDays.map((obj) => obj.day).join(', ') })
@@ -73,10 +100,14 @@ const ModifyNeed = props => {
         setNeedData({ ...needData, [e.target.name]: e.target.value })
     }
 
-    const [dataPost, setDataPost] = useState({
+    const [dataToPost, setDataToPost] = useState({
         needRequest: needData,
         needRequirementRequest: reqData
     })
+
+    useEffect(()=>{
+        setDataToPost({...dataToPost, needRequest: needData, needRequirementRequest: reqData})
+    },[needData,reqData])
 
     const [platform, setPlatform] = useState('')
     const [link, setLink] = useState('')
@@ -91,20 +122,35 @@ const ModifyNeed = props => {
     const closePopup = () => {
         setPopupType(null);
       };
-    console.log(popupType)
 
     //MODIFYING
 
     const [modify, setModify] = useState(false)
 
     const handleModify = (e) => {
-        console.log('modifying')
         setModify(!modify)
     }
 
-    useEffect(()=> {
-        //do update API call
-   },[modify]);
+    const handleDone = (e) => {
+        setModify(!modify)
+        const needId = data.need.id
+        axios.put(`http://serve-v1.evean.net/api/v1/serve-need/need/update/${needId}`, dataToPost)
+        .then(response => {
+            console.log(response.data)
+        })
+        .catch(error => {
+            console.log(error)
+        });
+
+        // console.log(needId)
+        console.log(dataToPost)
+        //post API request
+    }
+    const formatTime = (timeString) => {
+        const [hourString, minute] = timeString.split(":");
+        const hour = +hourString % 24;
+        return (hour % 12 || 12) + ":" + minute + (hour < 12 ? "AM" : "PM");
+    }
     
   return (
     <div className="wrapModifyNeed">
@@ -129,9 +175,8 @@ const ModifyNeed = props => {
                                 <div className="needITag">{data.need.description ? data.need.description.slice(3,-4) : '-'}</div>
                             </div>
                             <div className="wrap-modify-button">
-                                <div>{status}</div>
                                 {!modify && <button className="modify-button" onClick={handleModify}>Modify</button>}
-                                {modify && <button className="modify-button" onClick={handleModify}>Done</button>}
+                                {modify && <button className="modify-button" onClick={handleDone}>Done</button>}
                             </div>
                         </div>
                         {/* Need info below */}
@@ -145,24 +190,13 @@ const ModifyNeed = props => {
                                             {modify && status == 'Approved' && <span>{data.need.name ? data.need.name : ''}</span>}
                                             {modify && status != 'Approved' && <input type="text" name="name" value={name} onChange={changeHandler}/>}
                                     </div>
-                                    <div className="itemNInfo">
-                                            <label>Need Type</label>
-                                            {<span>{data.needType.name ? data.needType.name : ''}</span>}
-                                    </div>
+
                                     <div className="itemNInfo">
                                             <label>Need Purpose</label>
                                             {!modify && <span>{data.need.needPurpose ? data.need.needPurpose : '-'}</span>}
                                             {modify && status == 'Approved' && <span>{data.need.needPurpose ? data.need.needPurpose : '-'}</span>}
                                             {modify && status != 'Approved' && <input type="text" name="needPurpose" value={needPurpose} onChange={changeHandler}/>}
                                     </div>
-                                    { status == 'Approved' && <div className="itemNInfo">
-                                            <label>Platform</label>
-                                            {!modify && <span>Google Meet</span>}
-                                            {modify && <input type="text" name="platform" value={platform} onChange={changeHandler}/>}
-                                    </div> }
-
-                                </div>  
-                                <div className="needInfoTopRight col-sm-6">
                                     <div className="itemNInfo">
                                         <label>Need Description</label>
                                         {!modify && <span>{data.need.description ? data.need.description.slice(3,-4) : '-'}</span>}
@@ -174,21 +208,44 @@ const ModifyNeed = props => {
                                         <label>Entity Name</label>
                                         {<span>{data.entity.name ? data.entity.name : ''} </span>}
                                     </div>
-                                    {/* Date */}
-                                    <div className="itemNInfo">
 
+                                    { status == 'Approved' && <div className="itemNInfo">
+                                            <label>Platform</label>
+                                            {!modify && <span>Google Meet</span>}
+                                            {modify && <input type="text" name="platform" value={platform} onChange={changeHandler}/>}
+                                    </div> }
+
+                                </div>  
+                                <div className="needInfoTopRight col-sm-6">
+                                <div className="itemNInfo">
+                                    <label>Need Type</label>
+                                    {<span>{data.needType.name ? data.needType.name : ''}</span>}
+                                </div>
+
+                                {/* Date */}
+                                <div className="itemNInfo">
                                     <div className="itemWrapNInfoDate">
-                                        <div className="itemNInfoDate-modify">
+                                        {!modify && <div className="itemNInfoDate-modified">
                                             <label>Start Date</label>
-                                            {!modify && <span>{data.occurrence ? data.occurrence.startDate.substr(0,10) : '-'}</span>}
-                                            {modify && <input type="date" name="startYMD" value={startDate} onChange={handleStartDate} />}
-                                        </div>
-                                        <div className="itemNInfoDate-modify">
+                                            <span>{data.occurrence ? data.occurrence.startDate.substr(0,10) : '-'}</span>
+                                        </div>}
+
+                                        {modify && <div className="itemNInfoDate-modify">
+                                            <label>Start Date</label>
+                                            <input type="date" name="startYMD" value={startYMD} onChange={handleStartDate} />
+                                        </div>}
+                                        
+                                        {!modify && <div className="itemNInfoDate-modified">
                                             <label>End Date</label>
-                                            {!modify && <span>{data.occurrence ? data.occurrence.endDate.substr(0,10) : '-'}</span>}
-                                            {modify && <input type="date" name="endYMD" value={endDate} onChange={handleEndDate} />}
-                                        </div>
-                                        {modify && <div className="itemDate">
+                                            <span>{data.occurrence ? data.occurrence.endDate.substr(0,10) : '-'}</span>
+                                        </div>}
+
+                                        {modify && <div className="itemNInfoDate-modify">
+                                            <label>End Date</label>
+                                            <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                                        </div>}
+
+                                        {modify && <div className="itemNInfoDate-modify">
                                             <label>Recurrence </label>
                                             <select className="selectFrequency" name="frequency" value={frequency} onChange={changeFrequency}>
                                                 <option value="off" defaultValue>Off</option>
@@ -199,6 +256,15 @@ const ModifyNeed = props => {
                                              </select>
                                         </div>}
                                     </div>
+                                </div>
+
+                                <div className="itemNInfo-dayNtime">
+                                    {!modify && <div className="itemDaysTime">
+                                        <label>Event days and time</label>
+                                        {data.timeSlots.map((slot, index) => (
+                                            <span key={index}> {slot.day} {formatTime(slot.startTime.substr(11,5))} - {formatTime(slot.endTime.substr(11,5))} </span>
+                                        ))}
+                                    </div>}
 
                                     {modify && <div className="itemWrapNInfoFreq">
                                         <div className="label-eventdaytime">
@@ -208,13 +274,13 @@ const ModifyNeed = props => {
                                         </div>
                                         <div className="itemDaySelect">
                                         {frequency === 'off' ? 
-                                            <MultiSelect onAdd={handleSelectedDaysChange} /> 
-                                            : <MonoSelect onAdd={handleSelectedDaysChange} frequency={frequency} />}
+                                            <MultiSelect onAdd={handleSelectedDaysChange} scheduleTime={scheduleTime} /> 
+                                            : <MonoSelect onAdd={handleSelectedDaysChange} frequency={frequency} scheduleTime={scheduleTime}/>}
                                         </div>
                                     </div>}
+                                </div>
 
-                                    </div>
-                                    { status == 'Approved' && <div className="itemNInfo">
+                                { status == 'Approved' && <div className="itemNInfo">
                                             <label>Link</label>
                                             {!modify && <span> meet.google.com/xyz-abcd-pqr </span>}
                                             {modify && <input type="text" name="link" value={link} onChange={changeHandler} />}
