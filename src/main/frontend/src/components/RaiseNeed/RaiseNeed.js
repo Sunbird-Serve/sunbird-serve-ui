@@ -267,13 +267,6 @@ const RaiseNeed = props => {
                                     }
                                 </select>
                             </div>
-                            {/* Need Description */}
-                            <label className="itemDescriptionNeedLabel">Need Description</label>
-                            <div className="itemDescriptionNeed">
-                                <ReactQuill className="quillEdit" modules={module} theme="snow" value={description}
-                                    placeholder='Write a small brief about the Need' onChange={handleQuillEdit}
-                                />
-                            </div>
                         </div>
                         {/* right half of upper side */}
                         <div className="formRight col-sm-6">
@@ -289,42 +282,54 @@ const RaiseNeed = props => {
                                     }
                                 </select>
                             </div>                            
-                            {/* Date */}
-                            <div className="itemWrapDate">
-                                <div className="itemDate">
-                                    <label>Start Date </label>
-                                    <input type="date" name="startYMD" value={startYMD} onChange={handleStartDate} />
-                                </div>
-                                <div className="itemDate">
-                                    <label>End Date </label>
-                                    <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
-                                </div>
-                                <div className="itemDate">
-                                    <label>Recurrence </label>
-                                    <select className="selectFrequency" name="frequency" value={frequency} onChange={changeFrequency}>
-                                        <option value="off" defaultValue>Off</option>
-                                        <option value="weekdays">Every Weekday</option>
-                                        <option value="weekend">Every Weekend</option>
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                    </select>
-                                </div>
+                            {/* Need Description */}
+                            <label className="itemDescriptionNeedLabel">Need Description</label>
+                            <div className="itemDescriptionNeed">
+                                <ReactQuill className="quillEdit" modules={module} theme="snow" value={description}
+                                    placeholder='Write a small brief about the Need' onChange={handleQuillEdit}
+                                />
                             </div>
-                            <div className="itemFormNeed">
-                                <div className="label-eventdaytime">
-                                    <label>Event Days</label>
-                                    <label>Start Time</label>
-                                    <label>End Time</label>
-                                </div>
-                                <div className="itemFormNeedDays">
-                                    {frequency === 'off' ? 
-                                        <MultiSelect onAdd={handleSelectedDaysChange} scheduleTime={scheduleTime}/> 
-                                        : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} scheduleTime={scheduleTime} />}
-                                </div>
-                            </div>
-
                         </div>
                     </div>
+
+                    <div className="formRNcatergory">SESSION DETAILS</div>
+                    <div className="wrap-sessionDetails"></div>
+                    {/* Date */}
+                    <div className="itemWrapDate">
+                        <div className="itemDate">
+                            <label>Start Date </label>
+                            <input type="date" name="startYMD" value={startYMD} onChange={handleStartDate} />
+                        </div>
+                        <div className="itemDate">
+                            <label>End Date </label>
+                            <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                        </div>
+                        <div className="itemDate">
+                            <label>Recurrence </label>
+                            <select className="selectFrequency" name="frequency" value={frequency} onChange={changeFrequency}>
+                                <option value="off" defaultValue>Off</option>
+                                <option value="weekdays">Every Weekday</option>
+                                <option value="weekend">Every Weekend</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    {/* Time */}
+                    <div className="itemFormTime">
+                        <div className="label-eventdaytime">
+                            <label className="day-label">Event Days</label>
+                            <label className="time-label">Start Time</label>
+                            <label className="time-label">End Time</label>
+                        </div>
+                        <div className="itemSelectSlots">
+                            {frequency === 'off' ? 
+                                <MultiSelect onAdd={handleSelectedDaysChange} scheduleTime={scheduleTime}/> 
+                                : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} scheduleTime={scheduleTime} />}
+                        </div>
+                    </div>
+
                     {/* lower side of form : prerequisites */}
                     <div className="formRNcatergory">VOLUNTEER PREREQUISITE</div>
                     <div className="formBottom row">
