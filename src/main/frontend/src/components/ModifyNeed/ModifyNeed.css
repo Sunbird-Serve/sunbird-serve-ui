@@ -97,6 +97,7 @@
 
 .itemNInfo {
     padding: 5px;
+    width: 90%;
     border-bottom: 1px solid #d3d2d2; 
     display: flex;
     flex-direction: column;
@@ -121,7 +122,6 @@
     border: solid 0.5px;
     border-radius: 3px;
     padding: 2px 5px;
-    margin-bottom: 5px;
 }
 .itemNInfo select {
     width: 100%;
@@ -155,38 +155,7 @@
     font-size: 14px;
     margin: 10px;;
 }
-.itemWrapNInfoDate {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    padding-bottom: 3px;
-}
-.itemNInfoDate-modify {
-    width: 48%;
-}
-.itemNInfoDate-modified {
-    width: 48%;
-    padding: 1px;
-}
-.itemNInfoDate-modify label {
-    width: 100%;
-    font-size: 14px;
-    color: #686C73;
-    margin-bottom: -3px;
-}
-.itemNInfoDate-modify span {
-    width: 98%;
-    border-radius: 3px;
-    font-size: 14px;
-    padding: 3px 10px;
-}
-.itemNInfoDate-modify input {
-    width: 98%;
-    border-radius: 3px;
-    font-size: 14px;
-    padding: 2px 10px;
-    margin: 0px;
-}
+
 .alertNomin {
     position: absolute;
     top: 90%;
@@ -223,27 +192,130 @@
     padding: 5px 10px;
     border-radius: 5px;
 }
-.itemDaysTime span{
-    display: flex;
-}
-.itemNInfo-dayNtime {
-    padding: 5px;
+.itemDaysTime {
     display: flex;
     flex-direction: column;
-    height: 133px;
+}
+.itemDaysTime span{
+    display: flex;
+    font-size: 14px;
+}
+.itemNInfo-dayNtime {
+    display: flex;
+    flex-direction: column;
     overflow: scroll;
     border-bottom: 1px solid #d8d4d4 ;
 }
 .itemNInfo-dayNtime label {
-    width: 100%;
     font-size: 14px;
     color: #686C73;
     font-weight: 500;
 }
 .itemNInfo-dayNtime span {
-    width: 100%;
     border-radius: 3px;
     font-size: 14px;
     border: none;
     margin-bottom: 5px;
+}
+.itemDescripInfo {
+    height: 135px;
+    padding: 5px;
+    width: 90%;
+    border-bottom: 1px solid #d3d2d2; 
+    display: flex;
+    flex-direction: column;
+}
+.itemDescripInfo label {
+    width: 100%;
+    font-size: 14px;
+    color: #686C73;
+    font-weight: 500;
+}
+.itemDescripInfo span {
+    width: 100%;
+    border-radius: 3px;
+    font-size: 14px;
+    /* padding: 3px 10px; */
+    border: none;
+    margin-bottom: 5px;
+}
+.itemDateInfo {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+.wrap-itemDateMN {
+    width: 100%;
+}
+.itemDate-modified {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid #d3d2d2;    
+}
+.itemDate-modified label {
+    font-size: 14px;
+    color: #686C73;
+    font-weight: 500;
+}
+.itemDate-modified span {
+    border-radius: 3px;
+    font-size: 14px;
+}
+
+.itemNInfoDate {
+    display: flex;
+    padding-bottom: 5px;
+    margin-bottom: 10px; 
+    width: 75%; 
+    gap: 20px;
+}
+.itemNInfoDate-modify label {
+    width: 100%;
+    font-size: 14px;
+    color: #686C73;
+    margin-bottom: -3px;
+}
+.itemNInfoDate-modify span {
+    width: 98%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+}
+.itemNInfoDate-modify input {
+    width: 98%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 2px 10px;
+    border: solid 1px;
+}
+.itemNInfoDate-modify select {
+    width: 98%;
+    border-radius: 3px;
+    font-size: 14px;
+    padding: 3px 10px;
+}
+/* .itemNInfoDate-modify {
+    width: 48%;
+} */
+.day-labelMN {
+    width: 120px;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+}
+.time-labelMN {
+    width: 230px;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+}
+.label-eventdaytimeMN {
+    display: flex;
+    gap: 50px;
+    padding: 0px;
+}
+.wrap-sessionInfo {
+    padding: 0px 15px;
 }
