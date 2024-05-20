@@ -1,0 +1,57 @@
+.container-multiselect {
+  display: flex;
+  flex-direction: column;
+}
+.wrap-add-button {
+  display: flex;
+  gap: 10px;
+}
+.wrap-add-button span{
+  vertical-align: middle;
+}
+.container-daysTime {
+  display: flex;
+  gap: 50px;
+  margin-bottom: 5px;
+}
+.wrap-remove-button {
+  border: none;
+}
+.day-item {
+  border: none;
+}
+.time-item {
+  border: none;
+}
+.days-label {
+  height: 30px;
+  width: 120px;
+  padding: 28px 0px;
+}
+.add-button {
+  height: 30px;
+  border-radius: 50%;
+  color: green;
+  border: none;
+  background-color: inherit;
+  margin-left: 10px;
+  font-weight: 800;
+  font-size: 32px;
+  margin-top: -14px;
+}
+.remove-button {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  color: red;
+  border: none;
+  background-color: inherit;
+  margin-left: 10px;
+  font-weight: 800;
+  font-size: 24px;
+  margin-top: -8px;
+}
+
+/* .custom-time-picker {
+  width: 120px;
+} */
