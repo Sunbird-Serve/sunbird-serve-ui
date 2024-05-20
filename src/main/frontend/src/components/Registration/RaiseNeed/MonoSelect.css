@@ -1,0 +1,22 @@
+.wrapDayTime {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+.label-days {
+    width: 120px;
+    height: 30px;
+}
+.container-time {
+    display: flex;
+    gap: 30px;
+}
+.label-time {
+    display: flex;
+    flex-direction: column;
+}
+.label-time span {
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+}

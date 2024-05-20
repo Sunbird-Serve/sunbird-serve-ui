@@ -13,12 +13,18 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import axios from 'axios'
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUserList } from "../../state/userListSlice";
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+
 
 const configData = require('../../configure.js');
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Registration = (props) => {
+  const dispatch = useDispatch()
   //constants
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
@@ -374,16 +380,23 @@ const Registration = (props) => {
   ];
 
   const qualifications = [
-    "No Formal Education",
-    "Primary Education",
-    "Secondary Education",
-    "Vocational Qualification",
-    "Bachelor's Degree",
-    "Master's Degree",
-    "Doctorate or Higher",
+    "High School", 
+    "Pre University", 
+    "Graduate", 
+    "Post Graduate", 
+    "Professional Degree"
   ];
 
-  const employmentStatus = ["Full Time", "Part Time", "Unemployed"];
+  const employmentStatus = [
+    "Full Time", 
+    "Part Time", 
+    "Self Employed", 
+    "Homemaker", 
+    "Student", 
+    "Retired", 
+    "Not Employed", 
+    "Others"
+  ];
 
   const skillLevel = [
     "Beginner",
@@ -412,7 +425,7 @@ const Registration = (props) => {
     city: "",
     district: "",
     state: "",
-    landmark: "",
+    country: "",
     pincode: "",
     languages: [],
     prefDays: [],
@@ -490,10 +503,6 @@ const Registration = (props) => {
     return true;
   };
 
-  // useEffect(() => {
-  //   console.log(formData, "inside useEffect");
-  // }, [formData]);
-
   const dataToPost = {
       "identityDetails": {
         "fullname": formData.firstName,
@@ -511,7 +520,7 @@ const Registration = (props) => {
           "country": 'India'
         }
       },
-      "agencyId": "123",
+      "agencyId": "",
       "status": "Active",
       "role": [
         "Volunteer"
@@ -520,15 +529,107 @@ const Registration = (props) => {
 
   const [ regStatus, setRegStatus ] = useState('')
 
-  const onsubmit = () => {
-    // if (validateFields()) {
-    //   window.alert("Form submitted");
-    //   return;
-    // }
-    // window.alert("Please enter all the details");
+  const [userId, setUserId] = useState('')
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); 
+  const day = String(today.getDate()).padStart(2, '0');
 
-    console.log(dataToPost)
+  const currentDate = `${year}-${month}-${day}`;
+  // const currentDate = new Date().toLocaleDateString();
+
+  const onboradingInfo = {
+    "onboardStatus": [
+        {
+            "onboardStep": "Discussion",
+            "status": "completed"
+         }
+     ],
+     "refreshPeriod": "2 years",
+     "profileCompletion": "50"
+    }
+
+  const [dataProfile, setDataProfile] = useState({
+    "skills": formData.skills,
+    "genericDetails": {
+      "qualification": formData.qualification,
+      "affiliation": formData.affiliation,
+      "yearsOfExperience": formData.yoe,
+      "employmentStatus": formData.empStatus,
+    },
+    "userPreference": {
+      "timePreferred": formData.prefTime,
+      "dayPreferred": formData.prefDays,
+      "interestArea": formData.interests,
+      "language": formData.languages
+    },
+    "agencyId": "",
+    "userId": userId,
+    "onboardDetails": onboradingInfo,
+    "consentDetails": {
+      "consentGiven": true,
+      "consentDate": currentDate,
+      "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+    },
+    "referenceChannelId": "",
+    "volunteeringHours": {
+      "totalHours": 0,
+      "hoursPerWeek": 0
+    }
+  })
+
+  useEffect(()=>{
+    setDataProfile(prev => ({
+      ...prev,  
+      "skills": formData.skills,
+      "genericDetails": {
+        "qualification": formData.qualification,
+        "affiliation": formData.affiliation,
+        "yearsOfExperience": formData.yoe,
+        "employmentStatus": formData.empStatus,
+      },
+      "userPreference": {
+        "timePreferred": formData.prefTime,
+        "dayPreferred": formData.prefDays,
+        "interestArea": formData.interests,
+        "language": formData.languages
+      },
+      "agencyId": "",
+      "userId": userId,
+      "onboardDetails": onboradingInfo,
+      "consentDetails": {
+        "consentGiven": true,
+        "consentDate": currentDate,
+        "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+      },
+      "referenceChannelId": "",
+      "volunteeringHours": {
+        "totalHours": 0,
+        "hoursPerWeek": 0
+      }
+    }))
+  },[userId, formData])
+
+  const [loading, setLoading] = useState(false);
+
+  const onsubmit = () => {
+    setLoading(true)
     axios.post(`${configData.USER_GET}/`, dataToPost)
+      .then(function(response){
+        setUserId(response.data.result.Users.osid)
+        console.log(response.data)
+      })
+      .catch(function (error) {
+        setLoading(false)
+        console.log(error); 
+      }) 
+  }  
+
+  useEffect(()=>{
+    if(dataProfile.userId){
+      console.log(userId)
+      console.log(dataProfile)
+      axios.post(`${configData.USER_PROFILE}`, dataProfile)
       .then(function(response){
         console.log('user created sucessfully',response);
         setRegStatus('success');
@@ -536,8 +637,12 @@ const Registration = (props) => {
       .catch(function (error) {
         console.log(error); 
         setRegStatus('failure');
-    }) 
-  };
+      }) 
+      .finally(() => {
+        setLoading(false)
+      }); 
+    }
+  },[userId])
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
@@ -549,8 +654,25 @@ const Registration = (props) => {
     setNav(key);
   };
 
+  const retryReg = () => {
+    setRegStatus('')
+  }
+
+  useEffect(()=>{
+    dispatch(fetchUserList())
+  },[regStatus])
+
+ 
+
   return (
     <div>
+    {loading && <div className="loading-box">
+      <span>Creating the user. Please wait...</span>
+      <Box sx={{ width: '80%' }}>
+        <LinearProgress />
+      </Box>
+    </div>}
+
     { (!regStatus) &&
     (<div className="reg-main">
       <div className="title-container">
@@ -785,15 +907,24 @@ const Registration = (props) => {
                 ></input>
               </div>
               <div className="formElement">
-                <label>Landmark</label>
+                <label>Country</label>
                 <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter nearest landmark"
-                  name="landmark"
-                  value={formData.landmark ? formData.landmark : ""}
+                <Select
+                  displayEmpty
+                  renderValue={
+                    formData.country !== "" ? undefined : () => "Select"
+                  }
+                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
+                  name="country"
+                  value={formData.country ? formData.country : ""}
                   onChange={handleChange}
-                ></input>
+                >
+                  {countries.map((country, index) => (
+                    <MenuItem key={index + country} value={country}>
+                      {country}
+                    </MenuItem>
+                  ))}
+                </Select>
               </div>
               <div className="formElement">
                 <label>Pincode</label>
@@ -1141,15 +1272,13 @@ const Registration = (props) => {
           </div>
         </div>
       </div>
-    </div>)}
-
-    {(regStatus === 'success') && <RegFormSuccess />}
-    {(regStatus === 'failure') && <RegFormFailure />}
-
-
-
+    </div>)
+     } 
+    
+    {(regStatus === 'success') && userId && <RegFormSuccess />}
+    {(regStatus === 'failure') && userId && <RegFormFailure retryReg={retryReg} />}
     </div>
   );
 };
 
-export default Registration;
+export default Registration
