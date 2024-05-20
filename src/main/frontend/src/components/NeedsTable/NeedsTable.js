@@ -40,7 +40,6 @@ export const NeedsTable = props => {
     } else {
       setFilteredData(filtered)
     }
-    console.log(filteredData)
   },[needTypeId, needList])
   const data = useMemo(() => filteredData,[filteredData, needList])
 
