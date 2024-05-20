@@ -61,8 +61,8 @@ function VolunteerProfileInfoView({ onEditClick, userDatas }) {
               { <div className="info-box">
                 <p className="info-label">Address</p>
                 <p className="info-data">
-                  {`${userData.contactDetails ? userData.contactDetails.address.state : ''}, 
-                  ${userData.contactDetails ? userData.contactDetails.address.city : ''}, 
+                  {`${userData.contactDetails ? userData.contactDetails.address.city : ''},
+                  ${userData.contactDetails ? userData.contactDetails.address.state : ''},  
                   ${userData.contactDetails ? userData.contactDetails.address.country : ''}`}
                   {/* {`${userData.contactDetails.address.plot}, ${userData.contactDetails.address.street}, ${userData.contactDetails.address.landmark}, ${userData.contactDetails.address.locality}, ${userData.contactDetails.address.state}, ${userData.contactDetails.address.district}, ${userData.contactDetails.address.village}, ${userData.contactDetails.address.pincode}`} */}
                 </p>

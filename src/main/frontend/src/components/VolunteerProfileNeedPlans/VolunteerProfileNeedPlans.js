@@ -17,23 +17,95 @@ const configData = require('../../configure.js');
 const localizer = momentLocalizer(moment);
 
 const NeedPlans = () => {
-  const userId = useSelector((state)=> state.user.data.osid)
-  //get nominations by userId
-  const [nominations,setNominations] = useState([])
-  useEffect(()=> {
-    axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=100`).then(
-      response => setNominations(Object.values(response.data))
-    ).catch (function (error) {
-     console.log(error)
-  })
+  // const userId = useSelector((state)=> state.user.data.osid)
+  const userId='1-153e9fdf-a17c-40f1-83ca-4d7d10ff495a'
+  console.log(userId)
+  //get fullfillments by volunteerId
+  const [fulfillments, setFulfillments] = useState([])
+  useEffect(()=>{
+    if(userId){
+      axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=10`)
+      .then(response => {
+          console.log(response.data)
+          setFulfillments(response.data)
+      })
+      .catch(error => {
+          console.log(error)
+      });
+    }
   },[userId])
-  //needIds of approved noms
-  const approvedNoms = nominations.filter(item => item.nominationStatus === "Approved").map(item => item.needId)
-  //needs with approved Noms
-  const needsList = useSelector((state) => state.need.data);
-  const approvedNeeds = needsList.filter(item => item && item.need && approvedNoms.includes(item.need.id));
-  //create events
-  function getTimeSlots(needName, startDate, endDate, timeSlots) {
+  console.log(fulfillments)
+
+  //
+  //fetch all plans from fulfillments
+  const [needPlans, setNeedPlans] = useState([]);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchData = () => {
+      
+      const fetchRequests = fulfillments.map(obj => {
+        const { needId, needPlanId } = obj;
+
+
+      // Fetch needPlan details
+        const fetchNeedPlan = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-plan/read/${needPlanId}`)
+          .then(response => response.data)
+          .catch(error => {
+            console.error(`Error fetching needPlan for ${needPlanId}:`, error);
+            return null;
+          });
+
+        // Fetch need details
+        const fetchNeed = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need/${needId}`)
+          .then(response => response.data)
+          .catch(error => {
+            console.error(`Error fetching need for ${needId}:`, error);
+            return null;
+          });
+        // Fetch platform details
+        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-details/${needId}`)
+          .then(response => response.data)
+          .catch(error => {
+            console.error(`Error fetching platform for ${needId}:`, error);
+            return null;
+          });
+          return Promise.all([fetchNeedPlan, fetchNeed, fetchPlatform])
+          .then(([needPlan, need, platform]) => ({
+            ...obj,
+            needPlan,
+            need,
+            platform
+          }));
+      });
+
+      Promise.all(fetchRequests)
+        .then(results => {
+          setNeedPlans(results.filter(result => result !== null));
+        })
+        .catch(error => {
+          setError(error.message);
+        });
+    };
+
+    fetchData();
+  }, [fulfillments]);
+  console.log(needPlans)
+
+  //counts
+  // Extract needId and assignedUserId arrays
+  const needIds = needPlans.map(item => item.needId);
+  const assignedUserIds = needPlans.map(item => item.assignedUserId);
+  // Create sets to get unique values
+  const uniqueNeedIds = new Set(needIds);
+  const uniqueAssignedUserIds = new Set(assignedUserIds);
+  // Get the count of unique values
+  const needIdCount = uniqueNeedIds.size;
+  const assignedUserIdCount = uniqueAssignedUserIds.size;
+  console.log(needIdCount)
+  console.log(assignedUserIdCount)
+
+  //make the events from start to end date
+  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId) {
     const timeSlotObject = {};
     timeSlots.forEach(slot => {
       const day = slot.day.toLowerCase();
@@ -46,16 +118,17 @@ const NeedPlans = () => {
     while (currentDate <= new Date(endDate)) {
       const dayIndex = currentDate.getDay();
       const day = daysOfWeek[dayIndex];
-      // EVENT is created 
       if (timeSlotObject[day]) {
         dateWithTimeSlots.push({
           title: needName,
-          start: currentDate.toDateString(),
-          end: currentDate.toDateString(),
+          start: currentDate.toDateString(), //for session
+          end: currentDate.toDateString(), //for session
           startTime: timeSlotObject[day][0],
           endTime: timeSlotObject[day][1],
-          startDate: new Date(startDate).toDateString(),
-          endDate: new Date(endDate).toDateString(),
+          startDate: new Date(startDate).toDateString(),//for entire plan
+          endDate: new Date(endDate).toDateString(),//for entire plan
+          assignedUserId: assignedUserId,
+          needId: needId
         });
       }
       currentDate.setDate(currentDate.getDate() + 1);
@@ -63,42 +136,19 @@ const NeedPlans = () => {
   
     return dateWithTimeSlots;
   }
-
-  const GetDeliverableDetails = ({ needId }) => {
-    const [responseData, setResponseData] = useState(null);  
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(`https://api.example.com/endpoint/${needId}`);
-          setResponseData(response.data);
-        } catch (error) {
-          setResponseData(null);
-        }
-      };
-      fetchData();
-    }, [needId]); 
-    // Return the response data
-    return responseData ? responseData : null;
-  };
-
-  const result = GetDeliverableDetails('8be43c75-66cc-4490-93e5-5617cc0de8d0')
-  console.log(result)
   const [events, setEvents] = useState([]);
-
   useEffect(() => {
     const newEvents = [];
-    for (const item of approvedNeeds) {
-      if (item.occurrence !== null) {
-        const { startDate, endDate } = item.occurrence;
-        // get deliverable details for each item.need.id
-        console.log(item.need.id)
-        // input to create EVENT are passed from here
-        const sessions = getTimeSlots(item.need.name, startDate, endDate, item.timeSlots); // Use getTimeSlots function
+    for (const item of needPlans) {
+      if (item.needPlan.occurrence !== null) {
+        const { startDate, endDate } = item.needPlan.occurrence;
+        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId); // Use getTimeSlots function
         newEvents.push(...sessions);
       }
     }
     setEvents(newEvents);
-  }, [nominations]);
+  }, [needPlans]);
+  console.log(events)
 
 
   //list of approved nominations for a volunteer
