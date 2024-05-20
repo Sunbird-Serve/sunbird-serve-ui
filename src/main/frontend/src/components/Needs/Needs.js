@@ -16,6 +16,7 @@ const Needs = props => {
 
   //get userId from store
   const userId = useSelector((state)=> state.user.data.osid)
+  console.log(userId)
   //get needCount from store
   const needList = useSelector((state) => state.need.data);
   const needsCount = needList.filter(item => item && item.need && item.need.userId === userId).length

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import './VolunteerProfileDeliverable.css'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
@@ -140,6 +140,23 @@ const VolunteerProfileDeliverable = props => {
     console.log(rejection)
   }
 
+  const divRef = useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (divRef.current && !divRef.current.contains(event.target)) {
+        setClickMarker(false);
+      }
+    };
+
+    // Add event listener when component mounts
+    document.addEventListener('mousedown', handleClickOutside);
+
+    // Clean up event listener when component unmounts
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div>
         <div className="detailsNeedVoluntProfile">
@@ -200,7 +217,7 @@ const VolunteerProfileDeliverable = props => {
                           </button>
                         </div>
                       </div>
-                      { index === selectedIndex && clickMarker && <div className="status-ticker">
+                      { index === selectedIndex && clickMarker && <div ref={divRef} className="status-ticker">
                         <button className="delstat-complete" onClick={()=>handleCompleted(item)}>Mark as Complete</button>
                         <button className="delstat-cancel" onClick={()=>handleCancel(item, index+1)}>Cancel Plan</button>
                       </div> }

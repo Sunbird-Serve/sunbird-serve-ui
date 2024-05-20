@@ -23,13 +23,11 @@ const Nominations = ({ needData, openPopup }) => {
   useEffect(()=>{
       axios.get(`${configData.NEED_SEARCH}/${needId}/nominate`)
       .then((response) => {
-        console.log('dispatched')
         setNomsList(response.data) 
       })
   },[dispatch, activeTab, acceptPopup, rejectPopup, openPopup, responseFlag])
 
   // const nomsList = useSelector((state) => state.nominationbynid.data);
-  console.log(nomsList)
   //filter nominations as per active tab
   const handleTabClick = (tab) => {
     setActiveTab(tab);

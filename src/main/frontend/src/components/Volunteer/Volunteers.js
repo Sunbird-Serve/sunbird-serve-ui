@@ -9,12 +9,15 @@ import ListIcon from '@mui/icons-material/List';
 import { useSelector } from 'react-redux'
 import { FaSort } from "react-icons/fa"
 import VolunteerDetails from './VolunteerDetails'
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 function Volunteers() {
   //const userDetails = useSelector((state)=> state.user.data)
 
   const userList = useSelector((state) => state.userlist.data);
   const volunteerList = userList.filter(item => item.role.includes('nCoordinator'))
+  console.log(userList)
 
   const COLUMNS = [
     { Header: 'Name', accessor:'identityDetails.fullname' },
@@ -28,7 +31,6 @@ function Volunteers() {
 
    const columns = useMemo(() => COLUMNS, []);
    const data = useMemo(() => volunteerList,[userList])
-   console.log(data)
 
   const {
     getTableProps,
@@ -51,7 +53,28 @@ function Volunteers() {
     columns,
     data
     },
-  useFilters, useGlobalFilter, useSortBy, usePagination)
+    useFilters, useGlobalFilter, useSortBy, usePagination)
+
+  //Filters on the needs table
+  const { globalFilter, pageIndex, pageSize } = state;  
+  const [filterValue, setFilterValue] = useState('')
+  //filter tabs
+  const [status, setStatus ] = useState('all')  
+  const [activeTab, setActiveTab] = useState('all');
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  }
+  // useEffect(() => {
+  //   if (activeTab === 'approved') {
+  //     setFilter('need.status', 'Approved')
+  //   }
+  //   else if (activeTab == 'requested') {
+  //     setFilter('need.status', 'New')
+  //   }
+  //   else {
+  //     setFilter('need.status','')
+  //   }
+  // }, [activeTab])
 
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -116,6 +139,39 @@ function Volunteers() {
             })}
         </tbody>
       </table>
+
+      <div className="pageNav">
+        <div className="needsPerPage">
+          <span>Rows per page:</span>
+          <select value={pageSize} onChange={(e)=>setPageSize(Number(e.target.value))}>
+            {[10, 15, 25].map((pageSize) => (
+              <option key={pageSize} value={pageSize}>{pageSize}</option>
+            ))}
+          </select>
+        </div>
+        <span>
+          Go to
+            <input type="number" defaultValue={pageIndex+1}
+            onChange={e => {
+              const pageNumber = e.target.value ? Number(e.target.value) - 1 : 0
+              gotoPage(pageNumber)
+            }}
+            style={{width:'50px'}}
+            />
+          page
+        </span>
+
+        <div className="pageNumber">
+        <button onClick={()=>previousPage()} disabled={!canPreviousPage}> <ArrowBackIosIcon style={{height:"18px"}}/></button>
+        <span> Page
+          <strong>
+              {pageIndex + 1} 
+          </strong>
+          of {pageOptions.length}
+        </span>
+        <button onClick={()=>nextPage()} disabled={!canNextPage}><ArrowForwardIosIcon style={{height:"18px"}}/></button>
+        </div>
+      </div>
 
     { showPopup && <VolunteerDetails handleClose={handleRowClick} data={rowData} /> }
 
