@@ -16,6 +16,7 @@
     width: 50%;
     height: 60%;
     border-radius: 8px;
+    overflow: scroll;
 }
 .header-volunteerDetails {
     height: 100px;

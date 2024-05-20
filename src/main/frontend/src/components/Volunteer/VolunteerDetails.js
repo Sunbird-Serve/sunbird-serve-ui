@@ -23,23 +23,23 @@ const VolunteerDetails = props => {
                 <div className="vInfo-half">
                     <div className="vInfo-item">
                         <div className="vInfo-key">Name</div>
-                        <div className="vInfo-value">Raviteja</div>
+                        <div className="vInfo-value">{props.data.identityDetails.name}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Email ID</div>
-                        <div className="vInfo-value">raviteja@egurukulapps.com</div>
+                        <div className="vInfo-value">{props.data.contactDetails.email}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Gender</div>
-                        <div className="vInfo-value">Male</div>
+                        <div className="vInfo-value">{props.data.identityDetails.gender}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">City</div>
-                        <div className="vInfo-value">Chennai</div>
+                        <div className="vInfo-value">{props.data.contactDetails.address.city}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Qualifications</div>
-                        <div className="vInfo-value">Bachelodrs of Engineering</div>
+                        <div className="vInfo-value">???</div>
                     </div>
                 </div>
                 <div className="vInfo-half">
