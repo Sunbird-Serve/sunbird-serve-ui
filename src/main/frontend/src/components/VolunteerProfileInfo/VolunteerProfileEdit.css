@@ -1,0 +1,104 @@
+.main-content1 {
+  width: 800px;
+}
+.pro1{
+  display: flex;
+  margin: 10px 0px 20px 0px;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-header1 {
+  color: rgba(60, 64, 68, 1);
+  margin-bottom: 5px;
+  font-size: 24px;
+}
+.gray-text1 {
+  color: gray;
+  width: fit-content;
+}
+.button-group1 {
+  display: flex;
+  justify-content: flex-end; 
+  gap: 30px;
+}
+.discord-profile1 {
+  cursor: pointer;
+  width: fit-content;
+  height: fit-content;
+  color:#686C73;
+  background-color:white;
+  border: solid 1px #DBDBDB;
+  border-radius: 5px ;
+  padding: 2px 15px;
+}
+.save-profile1 {
+  cursor: pointer;
+  background-color:rgba(0, 128, 188, 1);
+  padding: 2px 15px;
+  color: white;
+  border-radius: 5px;
+}
+.discord-profile1:hover{
+  background-color: whitesmoke;
+}
+.save-profile1:hover {
+  background-color: rgb(6, 104, 149);
+}
+
+.profile-info-box1 {
+  display: flex;
+  flex-direction: column;
+  width: 800px;
+  border: 1px solid #DBDBDB;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.box-header1{
+  color:rgba(104, 108, 115, 1);
+  font-size: 20px;
+  border-bottom: 1px solid #DBDBDB;
+  padding: 20px 20px 10px 20px;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 5px 20px;
+  gap: 30px;
+}
+.info-item1 {
+  text-align: left;
+  width: 50%;
+}
+.info-label1{
+  padding: 5px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+.info-input1 {
+  width: 100%;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid rgba(219, 219, 219, 1);
+}
+.custom-dropdown {
+  width: 100%;
+}
+.info-input3 {
+  width: 100%;
+  border-radius: 4px;
+  background:white;
+  padding: 5px 12px;
+  border: solid 1px #DBDBDB;
+}
+.input-with-icon {
+  display: flex;
+  cursor: pointer; 
+}
+.editProfileDOB {
+  width: 100%;
+  background-color: white;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: solid 1px #DBDBDB;
+}
