@@ -1,15 +1,17 @@
 //const baseDomain = "https://serve-v1.evean.net"; //https://ekal.evean.net
-//const baseDomain = "http://ec2-13-234-30-170.ap-south-1.compute.amazonaws.com";
+// const baseDomain = "https://serve-v1.evean.net";
 const baseDomainNeed = "https://serve-v1.evean.net"
 const baseDomainFulfill = "https://serve-v1.evean.net"
 const baseDomainVolunteering = "https://serve-v1.evean.net"
 
 const configData = {
     "USER_GET" : `${baseDomainVolunteering}/api/v1/serve-volunteering/user`,
+    "USER_PROFILE":`${baseDomainVolunteering}/api/v1/serve-volunteering/user/user-profile`,
     "NEED_GET": `${baseDomainNeed}/api/v1/serve-need/need`,
     "NEED_SEARCH": `${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEED_FULFILL":`${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEEDTYPE_GET": `${baseDomainNeed}/api/v1/serve-need/needtype`,
+    "DELIVERABLE":`${baseDomainNeed}/api/v1/serve-need/deliverable-details`,
     "ENTITY_GET": `${baseDomainNeed}/api/v1/serve-need/entity`,
     "NEED_POST" : `${baseDomainNeed}/api/v1/serve-need/need/raise`,
     "NEED_BY_TYPE" : `${baseDomainNeed}/api/v1/need/serve-need/need-type/create`,
