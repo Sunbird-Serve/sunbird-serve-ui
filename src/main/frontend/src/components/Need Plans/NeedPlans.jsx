@@ -30,9 +30,8 @@ const NeedPlans = () => {
   const [fulfillments, setFulfillments] = useState([])
   useEffect(()=>{
     if(userId){
-      axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/coordinator-read/1-93306fba-dc9f-4834-a730-71efc36f2d27?page=0&size=10`)
+      axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=10`)
       .then(response => {
-          console.log(response.data)
           setFulfillments(response.data)
       })
       .catch(error => {
@@ -42,7 +41,7 @@ const NeedPlans = () => {
   },[userId])
   console.log(fulfillments)
 
-  //fetch all plans 
+  //fetch all plans: plans created by joining needs, plans and platforms 
   const [needPlans, setNeedPlans] = useState([]);
   const [error, setError] = useState(null);
   useEffect(() => {
@@ -69,9 +68,9 @@ const NeedPlans = () => {
           });
         // Fetch platform details
         const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-details/${needId}`)
-          .then(response => response.data)
+          .then(response => console.log(response.data))
           .catch(error => {
-            console.error(`Error fetching platform for ${needId}:`, error);
+            // console.error(`Error fetching platform for ${needId}:`, error);
             return null;
           });
           return Promise.all([fetchNeedPlan, fetchNeed, fetchPlatform])
@@ -94,7 +93,7 @@ const NeedPlans = () => {
 
     fetchData();
   }, [fulfillments]);
-  console.log(needPlans)
+  // console.log(needPlans)
 
   //counts
   // Extract needId and assignedUserId arrays
@@ -106,8 +105,6 @@ const NeedPlans = () => {
   // Get the count of unique values
   const needIdCount = uniqueNeedIds.size;
   const assignedUserIdCount = uniqueAssignedUserIds.size;
-  console.log(needIdCount)
-  console.log(assignedUserIdCount)
 
   //this is for showing alloted voluteer details
   const userList = useSelector((state) => state.userlist.data);
@@ -163,7 +160,7 @@ const NeedPlans = () => {
     }
     setEvents(newEvents);
   }, [needPlans]);
-  console.log(events)
+  // console.log(events) //in format of calender
 
   const grouped = events.reduce((acc, plan) => {
     const key = `${plan.start}-${plan.needId}`;
@@ -186,7 +183,7 @@ const NeedPlans = () => {
     return acc;
   }, {});
   const schedules = Object.values(grouped)
-  console.log(schedules)
+  // console.log(schedules)  //for navigation on right
 
   //view of calender: to show monthwise
   const views = {

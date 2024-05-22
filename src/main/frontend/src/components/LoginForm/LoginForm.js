@@ -18,9 +18,8 @@ const LoginForm = ({loginState}) => {
     }
     const logIn = e => {
         e.preventDefault();
-        signInWithEmailAndPassword(auth, email,password).then(
-            user => console.log('Login Success')
-        ).catch(err => setError(err.code) )
+        signInWithEmailAndPassword(auth, email,password)
+        .catch(err => setError(err.code) )
     }
     const signInWithGoogle = e => {
         e.preventDefault();
@@ -29,6 +28,10 @@ const LoginForm = ({loginState}) => {
     const signInWithFacebook = e => {
         e.preventDefault();
         signInWithPopup(auth, fprovider)
+    }
+    const handleGoto = e => {
+        e.preventDefault()
+        loginState(true)
     }
 
     return(
@@ -58,7 +61,7 @@ const LoginForm = ({loginState}) => {
                 {/* goto Signup */}  
                 <div className="gotoSignup">
                     <span>Don't have an account?</span>
-                    <a href="#" onClick={() => loginState(true)}>Sign Up! </a>
+                    <button onClick={handleGoto}>Sign Up! </button>
                 </div>
                 <div className="hline">
                     <hr /> <span>or login with</span> <hr/>

@@ -111,9 +111,10 @@ export const NeedsTable = props => {
     }, [volunteerList]);
 
     const truncateAndDots = (names, maxNamesToShow) => {
-        const firstLetters = names.map((element) => 
+        const firstLetters = names.map((element, index) => 
         element === null ? null : (
-          <Avatar className="avatar" style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
+          <Avatar className="avatar" key={index}
+            style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
             {element.charAt(0)}
           </Avatar>
         )
@@ -251,7 +252,7 @@ export const NeedsTable = props => {
             <option value="" defaultValue>All Need Types</option>
             {
               needTypes.map(
-                  (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
+                  (ntype, index) => <option key={index} value={ntype.id}>{ntype.name}</option>
                 )
               }
           </select>
@@ -292,8 +293,8 @@ export const NeedsTable = props => {
         <div className="needsPerPage">
           <span>Rows per page:</span>
           <select value={pageSize} onChange={(e)=>setPageSize(Number(e.target.value))}>
-            {[10, 15, 25].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>{pageSize}</option>
+            {[10, 15, 25].map((pageSize, index) => (
+              <option key={index} value={pageSize}>{pageSize}</option>
             ))}
           </select>
         </div>

@@ -14,6 +14,8 @@ const VolunteerProfileDeliverable = props => {
 //   console.log(props.needId)
   const needsList = useSelector((state) => state.need.data);
   const userId = useSelector((state)=> state.user.data.osid)
+
+  //maps of need, entity, occurance by need id
   const needById = {};
   const entityById = {};
   const occurrenceById = {};
@@ -30,6 +32,8 @@ const VolunteerProfileDeliverable = props => {
         occurrenceById[item.need.id] = { startDate, endDate} ;
     }
   })
+
+  //map of need type with its id
   const needtypeList = useSelector((state) => state.needtype.data.content);
   const needTypeById = {};
   needtypeList.forEach(item => {
@@ -37,13 +41,15 @@ const VolunteerProfileDeliverable = props => {
       needTypeById[item.id] = item.name ;
     }
   })
+
   const [needplans, setNeedplans] = useState(null)
   useEffect(()=>{
+    console.log(props.needId)
     const fetchData = async () => {
         try {
           const response = await axios.get(`${configData.NEEDPLAN_GET}/${props.needId}`);
           setNeedplans(response.data);
-          // console.log(response.data); 
+          console.log(response.data); 
         } catch (error) {
           console.error('Error fetching need plans');
         }
@@ -52,7 +58,7 @@ const VolunteerProfileDeliverable = props => {
       fetchData();
   },[props.needId])
   const plans = needplans && needplans.filter(obj => obj.plan.assignedUserId === userId)
-  const planId = plans && plans[plans.length-1].plan.id 
+  // const planId = plans && plans[plans.length-1].plan.id 
   const [deliverables, setDeliverables] = useState(null)
 
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -65,19 +71,19 @@ const VolunteerProfileDeliverable = props => {
   const [cancelledDeliverables, setCancelledDeliverables] = useState(null)
   const [dstat, setDstat ] = useState(false)
 
-  useEffect(()=>{
-    const fetchData = async () => {
-        try {
-          const response = await axios.get(`${configData.NEEDPLAN_DELIVERABLES}/${planId}`);
-          setDeliverables(response.data);
-          console.log(response.data); 
-        } catch (error) {
-          console.error('Error fetching need deliverables');
-        }
-    };
-    fetchData();
+  // useEffect(()=>{
+  //   const fetchData = async () => {
+  //       try {
+  //         const response = await axios.get(`${configData.NEEDPLAN_DELIVERABLES}/${planId}`);
+  //         setDeliverables(response.data);
+  //         console.log(response.data); 
+  //       } catch (error) {
+  //         console.error('Error fetching need deliverables');
+  //       }
+  //   };
+  //   fetchData();
 
-  },[planId, clickMarker, rejection, cancelPopup, dstat])
+  // },[planId, clickMarker, rejection, cancelPopup, dstat])
 
   // const todoDeliverables = deliverables && deliverables.filter(item => item.status === 'NotStarted')
   // const completedDeliverables = deliverables && deliverables.filter(item => item.status === 'Completed')
@@ -89,22 +95,22 @@ const VolunteerProfileDeliverable = props => {
     setCancelledDeliverables(deliverables && deliverables.filter(item => item.status === 'Cancelled'))
   },[deliverables, dstat])
 
-
-  const handleCompleted = (item) => {
-    setClickMarker(!clickMarker)
-    axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
-      "needPlanId": planId,
-      "comments": item.comments,
-      "status": "Completed",
-      "deliverableDate": currentDate
-    }).then(response => {
-      console.log('Deliverable Completed')
-      setDstat(!dstat)
-    })
-    .catch(error => {
-      console.log('Error marking deliverable completed')
-    });
-  }
+  const handleCompleted = (item) => {}
+  // const handleCompleted = (item) => {
+  //   setClickMarker(!clickMarker)
+  //   axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
+  //     "needPlanId": planId,
+  //     "comments": item.comments,
+  //     "status": "Completed",
+  //     "deliverableDate": currentDate
+  //   }).then(response => {
+  //     console.log('Deliverable Completed')
+  //     setDstat(!dstat)
+  //   })
+  //   .catch(error => {
+  //     console.log('Error marking deliverable completed')
+  //   });
+  // }
   const [cindex, setCIndex] = useState('')
   const handleCancel = (item, index) => {
     setClickMarker(!clickMarker)
@@ -116,29 +122,30 @@ const VolunteerProfileDeliverable = props => {
   const handleChange = (e) => {
     setRejection(e.target.value)
   }
-  const confirmRejection = (item) => {
-    setRejection('')
-    setCancelPopup('')
-    console.log({
-      "needPlanId": planId,
-      "comments": item.comments,
-      "status": "Cancelled",
-      "deliverableDate": currentDate
-    })
-    axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
-      "needPlanId": planId,
-      "comments": rejection,
-      "status": "Cancelled",
-      "deliverableDate": currentDate
-    }).then(response => {
-      console.log('Deliverable Completed')
-      setDstat(!dstat)
-    })
-    .catch(error => {
-      console.log('Error marking deliverable completed')
-    })
-    console.log(rejection)
-  }
+  const confirmRejection = (item) => {}
+  // const confirmRejection = (item) => {
+  //   setRejection('')
+  //   setCancelPopup('')
+  //   console.log({
+  //     "needPlanId": planId,
+  //     "comments": item.comments,
+  //     "status": "Cancelled",
+  //     "deliverableDate": currentDate
+  //   })
+  //   axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
+  //     "needPlanId": planId,
+  //     "comments": rejection,
+  //     "status": "Cancelled",
+  //     "deliverableDate": currentDate
+  //   }).then(response => {
+  //     console.log('Deliverable Completed')
+  //     setDstat(!dstat)
+  //   })
+  //   .catch(error => {
+  //     console.log('Error marking deliverable completed')
+  //   })
+  //   console.log(rejection)
+  // }
 
   const divRef = useRef(null);
   useEffect(() => {

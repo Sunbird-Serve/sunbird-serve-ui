@@ -54,6 +54,7 @@ function VPNominations() {
   const [fullDetails, setFullDetails] = useState(false)
   const [needId, setNeedId ] = useState(null)
   const handleDetail = (needid) => {
+    console.log(needid)
     setFullDetails(!fullDetails)
     setNeedId(needid)
   }
@@ -158,6 +159,7 @@ function VPNominations() {
             <div className="statsVPNomsName">Total Plans Delivered</div>
           </div>
         </div>
+
         <div className="vNomFilters">
           {/* Tabs */}
           <div className="vnomTabs">

@@ -11,26 +11,58 @@ import { FaSort } from "react-icons/fa"
 import VolunteerDetails from './VolunteerDetails'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import axios from 'axios'
 
 function Volunteers() {
   //const userDetails = useSelector((state)=> state.user.data)
 
   const userList = useSelector((state) => state.userlist.data);
   const volunteerList = userList.filter(item => item.role.includes('nCoordinator'))
-  console.log(userList)
+  console.log(volunteerList)
+  const [userDetailsList, setUserDetailsList] = useState([]);
+
+  useEffect(() => {
+    const fetchUserDetails = () => {
+      const promises = volunteerList.map(user =>
+        axios.get(`https://serve-v1.evean.net/api/v1/serve-volunteering/user/user-profile/userId/${user.osid}`)
+          .then(response => ({
+            userDetails: user,
+            userProfile: response.data,
+          }))
+          .catch(error => {
+            console.error(`Error fetching details for osid: ${user.osid}`, error);
+            return null
+            // return {
+            //   userDetails: user,
+            //   userProfile: null,
+            // };
+          })
+      );
+
+      Promise.all(promises).then(results => {
+        const filteredResults = results.filter(result => result && result.userProfile !== null);
+        setUserDetailsList(filteredResults);
+      }).catch(error => {
+        console.error('Error in Promise.all', error);
+      });
+    };
+
+    fetchUserDetails();
+  }, []);
+  console.log(userDetailsList)
 
   const COLUMNS = [
-    { Header: 'Name', accessor:'identityDetails.fullname' },
-    { Header: 'Phone', accessor:'contactDetails.mobile'},
-    { Header: 'City', accessor:'contactDetails.address.city' },
-    { Header: 'Language', accessor:'language' },
-    { Header: 'Interested Areas', accessor:'interestAreas' },
-    { Header: 'Status', accessor:'status' },
-    { Header: 'Nomination Status', accessor:'nominationStatus' }
+    { Header: 'Name', accessor:'userDetails.identityDetails.fullname' },
+    { Header: 'Phone', accessor:'userDetails.contactDetails.mobile'},
+    { Header: 'City', accessor:'userDetails.contactDetails.address.city' },
+    { Header: 'Language', accessor:'userProfile.userPreference.language', Cell: ({ value }) => value.join(', ') },
+    { Header: 'Interested Areas', accessor:'userProfile.userPreference.interestArea', Cell: ({ value }) => value.join(', ')  },
+    { Header: 'Status', accessor:'userDetails.status' },
+    { Header: 'Onboard Status', accessor:'nominationStatus' }
   ]
 
    const columns = useMemo(() => COLUMNS, []);
-   const data = useMemo(() => volunteerList,[userList])
+   const data = useMemo(() => userDetailsList,[userDetailsList])
 
   const {
     getTableProps,

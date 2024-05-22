@@ -29,7 +29,7 @@ const RaiseNeed = props => {
         name: '',    
         needPurpose: '',
         description: '',     
-        status: 'Approved',     
+        status: 'New',     
         userId: uid,      
         entityId: '',     
         //requirementId: '',       
