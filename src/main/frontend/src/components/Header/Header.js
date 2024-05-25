@@ -52,10 +52,13 @@ function Header({ toggleSideNav }) { // Receive toggleSideNav function as prop
               </button>
             </div>
           </div>
+          
           <div className="leftHead col-12 col-sm-6 order-sm-1">
             <div className="headname">  
             </div> 
           </div>
+
+          {/* onclicking PROFILE */}
           {open && 
           ( <div className="wrapDropDownProfile col-sm-10">
               <div className="dropDownProfile">    

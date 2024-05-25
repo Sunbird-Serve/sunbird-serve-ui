@@ -54,7 +54,6 @@ function VPNominations() {
   const [fullDetails, setFullDetails] = useState(false)
   const [needId, setNeedId ] = useState(null)
   const handleDetail = (needid) => {
-    console.log(needid)
     setFullDetails(!fullDetails)
     setNeedId(needid)
   }
