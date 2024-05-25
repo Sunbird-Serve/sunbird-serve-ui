@@ -6,7 +6,7 @@
     height: 59px;
     display: flex;
     align-items: center;
-    justify-items: center;
+    justify-content: space-evenly;
     border-bottom: solid #EBEBEB;
     padding: 12px 36px;
 }
@@ -29,7 +29,7 @@
 }
 .sideNavItem {
     display: flex;
-    padding: 10px 30px;
+    padding: 10px 0px 10px 30px;
     text-decoration: none;
 }
 .sideNavItem i {
@@ -43,6 +43,7 @@
     align-items: center;
     padding-left: 0px;
     color: #4D4D4D;
+    width: 130px;
 }
 .sideNavItem:hover {
     background-color:  #F0FAFF;

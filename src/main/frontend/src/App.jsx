@@ -73,7 +73,6 @@ function App() {
   const [volunteer,setVolunteer] = useState(false)
   const handleVolunteer = (value) => {
     setVolunteer(value);    //explore button on-click
-    console.log('button-clicked')
   };
 
 
@@ -85,10 +84,10 @@ function App() {
         { /* if not volunteer and logins, go to nCoordinator screen */}
         { !volunteer && (<>
           { (presentUser && userDetails ) ? 
-               (userDetails.role && userDetails.role.includes('nCoordinator')) ?
-                  <MainPage /> 
+               (userDetails.role && userDetails.role.includes('Volunteer')) ?
+                  <ExplorePage />           
                 :
-                  <ExplorePage />
+                  <MainPage /> 
             : 
             <LoginPage getVolunteerStatus={handleVolunteer}/>
           }</>)}

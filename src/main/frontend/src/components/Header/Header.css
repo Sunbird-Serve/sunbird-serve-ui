@@ -6,6 +6,8 @@
 .leftHead {
     background-color: white;
     height: 100%;
+    display: flex;
+    align-items: center;
 }
 .rightHead {
     height: 100%;
@@ -99,4 +101,9 @@
 }
 .userTag {
     font-size: 12px;
+}
+.headname {
+    font-size: 22px;
+    font-weight: 600;
+    color: #006FA2;
 }

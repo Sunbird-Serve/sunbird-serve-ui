@@ -25,10 +25,12 @@ function Header({ toggleSideNav }) { // Receive toggleSideNav function as prop
     console.log(userData)
     //window.location.reload()
   }
-
+  const userRole = userData.role;
   
   return (
         <div className="head row">
+
+          {/* icons near profile button */}
           <div className="rightHead col-12 col-sm-6 order-sm-2 justify-content-between justify-content-sm-end" >
             <div className="wrapSideMenu d-sm-none">
             <div className="menuIcon" onClick={toggleSideNav}>
@@ -53,9 +55,14 @@ function Header({ toggleSideNav }) { // Receive toggleSideNav function as prop
             </div>
           </div>
           
+          {/* nCoord or vCoord depending on role of user loggedin */}
           <div className="leftHead col-12 col-sm-6 order-sm-1">
-            <div className="headname">  
-            </div> 
+            { userRole && userRole.includes('nCoordinator') && <div className="headname"> 
+              Need Coordinator Management
+            </div>}
+            { userRole && userRole.includes('vCoordinator') && <div className="headname"> 
+              Volunteer Coordinator Management 
+            </div>}
           </div>
 
           {/* onclicking PROFILE */}
