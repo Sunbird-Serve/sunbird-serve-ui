@@ -59,3 +59,7 @@
     color: #006FA2;
     font-weight: 600;
 }
+
+.menuIcon:hover{ 
+    cursor: pointer;
+}
