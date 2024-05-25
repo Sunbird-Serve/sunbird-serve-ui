@@ -11,11 +11,10 @@ const configData = require('../../configure.js');
 const currentDate = format(new Date(), 'yyyy-MM-dd');
 
 const VolunteerProfileDeliverable = props => {
-//   console.log(props.needId)
+  // For need section, fetch needId wise information
   const needsList = useSelector((state) => state.need.data);
-  const userId = useSelector((state)=> state.user.data.osid)
 
-  //maps of need, entity, occurance by need id
+  //maps of need, entity, occurance by needId
   const needById = {};
   const entityById = {};
   const occurrenceById = {};
@@ -42,23 +41,28 @@ const VolunteerProfileDeliverable = props => {
     }
   })
 
-  const [needplans, setNeedplans] = useState(null)
-  useEffect(()=>{
-    console.log(props.needId)
-    const fetchData = async () => {
-        try {
-          const response = await axios.get(`${configData.NEEDPLAN_GET}/${props.needId}`);
-          setNeedplans(response.data);
-          console.log(response.data); 
-        } catch (error) {
-          console.error('Error fetching need plans');
-        }
-      };
-  
-      fetchData();
-  },[props.needId])
-  const plans = needplans && needplans.filter(obj => obj.plan.assignedUserId === userId)
-  // const planId = plans && plans[plans.length-1].plan.id 
+  // get fulfillments of particular volunteerId, ie. assignedId
+  // filter fulfillments by needId passed here
+  // for each needPlanId in the filtered fullfilments, get deliverables and make list
+
+  const userId = useSelector((state)=> state.user.data.osid)
+  const [fulfils, setFulfils] = useState([])
+  useEffect(() => {
+    axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=10`)
+    .then(response => {
+      setFulfils(response.data)
+    })
+    .catch(error => {
+      console.log(error)
+    });
+  }, []);
+
+  const needFulfils = fulfils ? fulfils.filter(item => item.needId === props.needId) : []
+  console.log(needFulfils)
+  // considering only one fulfilment for a (nomination)needId+volunteerId
+  const planId = needFulfils[0] ? needFulfils[0].needPlanId : ''
+
+
   const [deliverables, setDeliverables] = useState(null)
 
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -71,7 +75,6 @@ const VolunteerProfileDeliverable = props => {
   const [cancelledDeliverables, setCancelledDeliverables] = useState(null)
   const [dstat, setDstat ] = useState(false)
 
-  const [planId, setPlanId ] = useState('d59fc432-32c5-49e9-a637-cd95e29787e2')
   useEffect(()=>{
     const fetchData = async () => {
         try {
@@ -167,10 +170,12 @@ const VolunteerProfileDeliverable = props => {
 
   return (
     <div>
+        {/* NEED INFORMATION */}
         <div className="detailsNeedVoluntProfile">
             <div className="nameNVP">{needById[props.needId].name}</div> 
             <div className="typeNVP">{needTypeById[needById[props.needId].needTypeId]}</div>
-            <div className="aboutNVP">{needById[props.needId].description.slice(3,-4)} </div>
+            <div className="aboutNVP">{needById[props.needId].description.slice(3,-4)} 
+            </div>
             <div className="rowNVP">
                 <div className="itemNVP">
                     <span>Organizer :</span>  Mohan Kumar
@@ -206,6 +211,8 @@ const VolunteerProfileDeliverable = props => {
                 </div> 
             </div>
         </div>
+
+        {/* NEED PLAN DELIVERABLES*/}
         <div className="deliverablesNeedVolunteerProfile"> 
             {/*DNVP refer to Need Plan Deliverables from Volunteer Profile*/}
             <div className="headDNVP">Need Plan Deliverables</div>
