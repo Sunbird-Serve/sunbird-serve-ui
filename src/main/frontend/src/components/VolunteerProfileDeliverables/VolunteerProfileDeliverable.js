@@ -64,6 +64,7 @@ const VolunteerProfileDeliverable = props => {
 
 
   const [deliverables, setDeliverables] = useState(null)
+  const [delivDetails, setDelivDetails] = useState(null)
 
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [clickMarker, setClickMarker] = useState(false);
@@ -79,7 +80,7 @@ const VolunteerProfileDeliverable = props => {
     const fetchData = async () => {
         try {
           const response = await axios.get(`${configData.NEEDPLAN_DELIVERABLES}/${planId}`);
-          setDeliverables(response.data);
+          setDeliverables(response.data.needDeliverable);
           console.log(response.data); 
         } catch (error) {
           console.error('Error fetching need deliverables');
