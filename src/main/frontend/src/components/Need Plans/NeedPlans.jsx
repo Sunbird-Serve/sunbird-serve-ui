@@ -67,8 +67,8 @@ const NeedPlans = () => {
             return null;
           });
         // Fetch platform details
-        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-details/${needId}`)
-          .then(response => console.log(response.data))
+        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/0e09a476-bac3-4256-8ff6-e2ba1192bd4f`)
+          .then(response => response.data)
           .catch(error => {
             // console.error(`Error fetching platform for ${needId}:`, error);
             return null;
@@ -93,7 +93,7 @@ const NeedPlans = () => {
 
     fetchData();
   }, [fulfillments]);
-  // console.log(needPlans)
+  console.log(needPlans)
 
   //counts
   // Extract needId and assignedUserId arrays
@@ -117,7 +117,7 @@ const NeedPlans = () => {
 
 
   //make the events from start to end date
-  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId) {
+  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId, platform, meetURL) {
     const timeSlotObject = {};
     timeSlots.forEach(slot => {
       const day = slot.day.toLowerCase();
@@ -140,7 +140,9 @@ const NeedPlans = () => {
           startDate: new Date(startDate).toDateString(),//for entire plan
           endDate: new Date(endDate).toDateString(),//for entire plan
           assignedUserId: assignedUserId,
-          needId: needId
+          needId: needId,
+          softwarePlatform: platform,
+          inputUrl: meetURL
         });
       }
       currentDate.setDate(currentDate.getDate() + 1);
@@ -154,13 +156,19 @@ const NeedPlans = () => {
     for (const item of needPlans) {
       if (item.needPlan.occurrence !== null) {
         const { startDate, endDate } = item.needPlan.occurrence;
-        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId); // Use getTimeSlots function
+        let inputURL = "";
+        let softwarePlatform = "";
+        if(item.platform && item.platform.inputParameters.length){
+          inputURL = item.platform.inputParameters[0].inputUrl;
+          softwarePlatform = item.platform.inputParameters[0].softwarePlatform;
+        }
+        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId, softwarePlatform, inputURL); // Use getTimeSlots function
         newEvents.push(...sessions);
       }
     }
     setEvents(newEvents);
   }, [needPlans]);
-  // console.log(events) //in format of calender
+  console.log(events) //in format of calender
 
   const grouped = events.reduce((acc, plan) => {
     const key = `${plan.start}-${plan.needId}`;
@@ -174,6 +182,8 @@ const NeedPlans = () => {
             startDate: plan.startDate,
             endDate: plan.endDate,
             title: plan.title,
+            inputUrl: plan.inputUrl,
+            softwarePlatform: plan.softwarePlatform,
             assignedUsers: []
         };
     }
@@ -244,6 +254,12 @@ const NeedPlans = () => {
   };
   
   const [expandEvent, setExpandEvent] = useState(false)
+  const [clickedEvent, setClickedEvent] = useState(null)
+  const handleEventClick = Index => {
+    console.log(Index)
+    setClickedEvent(Index)
+    setExpandEvent(!expandEvent)
+  }
 
   return (
       <div>
@@ -286,18 +302,35 @@ const NeedPlans = () => {
             const selected = moment(selectedDate)
             return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
             })
-            .map((event) => (
-            <button className="dayEventListNC" key={event.start} onClick={() => setExpandEvent(!expandEvent)}>
-              <div className="dayEventTitleNC">
-                <i> { expandEvent ? <ExpandMoreIcon/> : <ChevronRightIcon /> }</i>
-                <span className="nameDayEventNC">{event.title}</span>
-                <span className="timeDayEventNC">
-                  <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
-                  {event.startTime}
-                </span> 
-              </div>
-              <div className="dayEventDateNC"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
-              { expandEvent && 
+            .map((event, index) => (
+            <div className="dayEventListNC" key={event.start} >
+              <button className="dayEventItemNC" onClick={()=>handleEventClick(index)}>
+                <div className="dayEventTitleNC" >
+                  <div className="wrap-nameDayEventNC">
+                    <i> { expandEvent ? <ExpandMoreIcon/> : <ChevronRightIcon /> } </i>
+                    <span className="nameDayEventNC">{event.title}</span>
+                  </div>
+                  <div className="wrap-timeDayEventNC">
+                    <span className="timeDayEventNC">
+                      <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
+                      {event.startTime}
+                    </span>
+                  </div>
+                </div>
+                <div className="dayEventDateNC"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
+              </button>
+              { expandEvent && ( index === clickedEvent ) && <div className="platformInfoNC">
+                <div className="vplan-platform"> 
+                    <span>Software platform:</span> {event.softwarePlatform}
+                  </div>
+                  <div className="vplan-url"> 
+                    <span>Link :</span> {event.inputUrl}
+                  </div>
+                  <div className="vplan-url"> 
+                    <span>Volunteers :</span> 
+                  </div>
+              </div>}
+              { expandEvent && ( index === clickedEvent ) &&
                 event.assignedUsers.map((user) => <div className="user-boxNC">
                   <div className="userNameNC">
                     <div><Avatar style={{padding:'5px',height:'24px',width:'24px',fontSize:'16px',backgroundColor:randomColor()}}></Avatar></div>
@@ -306,7 +339,7 @@ const NeedPlans = () => {
                   <div className="userContact-eventList">{userContact[user]}</div>
                 </div>)
               }
-            </button>
+            </div>
           )) }
 
 

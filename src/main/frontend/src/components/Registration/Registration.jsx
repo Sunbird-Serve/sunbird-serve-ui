@@ -455,7 +455,7 @@ const Registration = (props) => {
     if (name === "skillName" || name === "skillLevel") {
       const updatedSkills = [...formData.skills];
       updatedSkills[count][name] = value;
-      console.log("updated skills", updatedSkills);
+      // console.log("updated skills", updatedSkills);
       setFormData({
         ...formData,
         skills: updatedSkills,
@@ -517,11 +517,11 @@ const Registration = (props) => {
         "address": {
           "city": formData.city,
           "state": formData.state,
-          "country": 'India'
+          "country": formData.country
         }
       },
       "agencyId": "",
-      "status": "Active",
+      "status": "Registered",
       "role": [
         "Volunteer"
       ]
@@ -631,6 +631,7 @@ const Registration = (props) => {
       console.log(dataProfile)
       axios.post(`${configData.USER_PROFILE}`, dataProfile)
       .then(function(response){
+        console.log(response.data)
         console.log('user created sucessfully',response);
         setRegStatus('success');
       })
@@ -642,7 +643,7 @@ const Registration = (props) => {
         setLoading(false)
       }); 
     }
-  },[userId])
+  },[userId, dataProfile])
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
