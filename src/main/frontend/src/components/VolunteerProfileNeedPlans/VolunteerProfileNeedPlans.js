@@ -17,14 +17,13 @@ const configData = require('../../configure.js');
 const localizer = momentLocalizer(moment);
 
 const NeedPlans = () => {
-  // const userId = useSelector((state)=> state.user.data.osid)
-  const userId='1-153e9fdf-a17c-40f1-83ca-4d7d10ff495a'
+  const userId = useSelector((state)=> state.user.data.osid)
   console.log(userId)
   //get fullfillments by volunteerId
   const [fulfillments, setFulfillments] = useState([])
   useEffect(()=>{
     if(userId){
-      axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=10`)
+      axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=100`)
       .then(response => {
           console.log(response.data)
           setFulfillments(response.data)
@@ -63,7 +62,8 @@ const NeedPlans = () => {
             return null;
           });
         // Fetch platform details
-        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-details/${needId}`)
+        
+        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/0e09a476-bac3-4256-8ff6-e2ba1192bd4f`)
           .then(response => response.data)
           .catch(error => {
             console.error(`Error fetching platform for ${needId}:`, error);
@@ -104,8 +104,8 @@ const NeedPlans = () => {
   console.log(needIdCount)
   console.log(assignedUserIdCount)
 
-  //make the events from start to end date
-  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId) {
+  //make the events using need plan information
+  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId, platform, meetURL) {
     const timeSlotObject = {};
     timeSlots.forEach(slot => {
       const day = slot.day.toLowerCase();
@@ -128,7 +128,9 @@ const NeedPlans = () => {
           startDate: new Date(startDate).toDateString(),//for entire plan
           endDate: new Date(endDate).toDateString(),//for entire plan
           assignedUserId: assignedUserId,
-          needId: needId
+          needId: needId,
+          softwarePlatform: platform,
+          inputUrl: meetURL
         });
       }
       currentDate.setDate(currentDate.getDate() + 1);
@@ -142,7 +144,13 @@ const NeedPlans = () => {
     for (const item of needPlans) {
       if (item.needPlan.occurrence !== null) {
         const { startDate, endDate } = item.needPlan.occurrence;
-        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId); // Use getTimeSlots function
+        let inputURL = "";
+        let softwarePlatform = "";
+        if(item.platform && item.platform.inputParameters.length){
+          inputURL = item.platform.inputParameters[0].inputUrl;
+          softwarePlatform = item.platform.inputParameters[0].softwarePlatform;
+        }
+        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId, softwarePlatform, inputURL); // Use getTimeSlots function
         newEvents.push(...sessions);
       }
     }
@@ -213,6 +221,14 @@ const NeedPlans = () => {
     return { className: classNames };
   };
 
+  const [expandEvent, setExpandEvent] = useState(false)
+  const [clickedEvent, setClickedEvent] = useState(null)
+  const handleEventClick = Index => {
+    console.log(Index)
+    setClickedEvent(Index)
+    setExpandEvent(!expandEvent)
+  }
+
   return (
       <div>
         <div className="wrapCalender">
@@ -255,18 +271,28 @@ const NeedPlans = () => {
             const selected = moment(selectedDate)
             return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
             })
-            .map((event) => (
-              <li className="dayEventList" key={event.title}>
-                <div className="dayEventTitle">
-                  <span className="nameDayEvent">{event.title}</span>
-                  <span className="timeDayEvent">
-                    <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
-                    {event.startTime}
-                  </span> 
-                </div>
-                <div className="dayEventDate"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)}</div>
+            .map((event,index) => (
+              <div className="dayEventList" key={event.title} >
+                <button className="dayEventItem" onClick={()=>handleEventClick(index)}>
+                  <div className="dayEventTitle">
+                    <div className="nameDayEvent">{event.title}</div>
+                    <div className="timeDayEvent">
+                      <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"0px"}}/></i>{event.startTime}
+                    </div> 
+                  </div>
+                  <div className="dayEventDate"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)}</div>
+                </button>
+                { expandEvent && ( index === clickedEvent ) && <div className="vplan-details">  
+                  <div className="vplan-platform"> 
+                    <span>Software platform:</span> {event.softwarePlatform}
+                  </div>
+                  <div className="vplan-url"> 
+                    <span>Link :</span> {event.inputUrl}
+                  </div>
+                </div>}
+                
                   {/* <div className="dayEventDetails">View Full Details</div> */}
-              </li>
+              </div>
           ))}  
 
           {!events.some((event) => {

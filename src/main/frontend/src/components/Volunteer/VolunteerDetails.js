@@ -1,14 +1,40 @@
-import React from 'react'
+import React, {useState} from 'react'
 import './VolunteerDetails.css'
 import Avatar from '@mui/material/Avatar';
 import randomColor from 'randomcolor'
+import axios from 'axios'
+import { fetchUserList } from "../../state/userListSlice";
+import { useDispatch } from 'react-redux'
+
+
 
 const VolunteerDetails = props => {
+    const dispatch = useDispatch()
     const userDetails = props.data.userDetails;
     const userProfile = props.data.userProfile;
-    console.log(props.data)
+    // console.log(props.data)
 
-    console.log(userProfile.skills)
+    const handleVStatus = (newStatus) => {
+        const userToPost = { ...userDetails }
+        delete userToPost.osid
+        delete userToPost.osCreatedAt
+        delete userToPost.osCreatedBy
+        delete userToPost.osOwner
+        delete userToPost.osUpdatedAt
+        delete userToPost.osUpdatedBy
+        userToPost.status = newStatus
+        console.log(userDetails.osid)
+        console.log(userToPost)
+        axios.put(`http://serve-v1.evean.net/api/v1/serve-volunteering/user/${userDetails.osid}`, userToPost)
+        .then(response => {
+            console.log('API response:', response.data);
+            dispatch(fetchUserList())
+        })
+        .catch(error => {
+            console.error('API error:', error);
+        });
+    }
+
     return (
     <div className="wrapVolunteerDetails">
         <div className="volunteerDetails">
@@ -70,10 +96,11 @@ const VolunteerDetails = props => {
                 </div>
             </div>
             <div className="recommend-voluteer">
-                {userDetails.status === 'Registered' && <button>Recommend</button>}
-                {userDetails.status === 'Registered' && <button>On Hold</button>}
-                {userDetails.status === 'Recommended' && <button>On Boarded</button>}
-                {userDetails.status === 'OnBoarded' && <button>Active</button>}
+                {userDetails.status === 'Registered' && <button onClick={()=>handleVStatus('Recommended')}>Recommend</button>}
+                {userDetails.status === 'Registered' && <button onClick={()=>handleVStatus('OnHold')}>On Hold</button>}
+                {userDetails.status === 'Recommended' && <button onClick={()=>handleVStatus('OnBoarded')}>On Boarded</button>}
+                {userDetails.status === 'OnBoarded' && <button onClick={()=>handleVStatus('Active')}> Make Active</button>}
+                {/* {userDetails.status === 'Active' && <button onClick={()=>handleVStatus('Registered')}>Register</button>} */}
             </div>
         </div>
         <div className="btnCloseVDetails">

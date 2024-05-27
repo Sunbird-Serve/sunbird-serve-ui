@@ -37,24 +37,35 @@
 .stats-need-volunteer i {
   color: #0080BC;
 }
+
 .dayEventListNC {
   background-color: inherit;
-  border: none;
-  border-left: solid 3px #0080BC;
-  padding: 10px;
   margin-top: 3px;
 }
+
+.dayEventItemNC {
+  display: flex;
+  flex-direction: column;
+  border: none;
+  border-left: solid 3px #0080BC;
+  background-color: inherit;
+  width: 100%;
+}
+
 .dayEventTitleNC {
   display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
 }
+
 .dayEventTitleNC i {
   color: #0080BC;
-  margin-right: 5px;
 }
 .nameDayEventNC {
   font-weight: 600;
   font-size: 16px;
-  width: 290px;
+  width: 200px;
   text-align: left;
 }
 .timeDayEventNC {
@@ -65,12 +76,13 @@
   font-weight: 600;
   text-align: left;
   margin-left: 30px;
+  font-size: 15px;
 }
+
 .user-boxNC {
-  margin-top: 10px;
   padding: 5px;
   border: solid 1px #EBEBEB;
-  border-radius: 5px;  
+  padding-left: 40px;
 }
 .userNameNC {
   height: 30px;
@@ -92,4 +104,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+.platformInfoNC {
+  margin-left: 40px;
+}
+.platformInfoNC span {
+  color: #99999F;
 }

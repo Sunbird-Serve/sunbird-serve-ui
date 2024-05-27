@@ -56,15 +56,18 @@ const VolunteerProfileDeliverable = props => {
       console.log(error)
     });
   }, []);
-
   const needFulfils = fulfils ? fulfils.filter(item => item.needId === props.needId) : []
-  console.log(needFulfils)
+
+  const userList = useSelector((state) => state.userlist.data);
+  const ncoordInfo = needFulfils.length ? userList.filter(item => item.osid === needFulfils[0].coordUserId) : []
+  
   // considering only one fulfilment for a (nomination)needId+volunteerId
   const planId = needFulfils[0] ? needFulfils[0].needPlanId : ''
+  // const planId = '0e09a476-bac3-4256-8ff6-e2ba1192bd4f'
 
 
-  const [deliverables, setDeliverables] = useState(null)
-  const [delivDetails, setDelivDetails] = useState(null)
+  const [deliverables, setDeliverables] = useState([])
+  const [inParas, setInParas] = useState([])
 
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [clickMarker, setClickMarker] = useState(false);
@@ -81,6 +84,7 @@ const VolunteerProfileDeliverable = props => {
         try {
           const response = await axios.get(`${configData.NEEDPLAN_DELIVERABLES}/${planId}`);
           setDeliverables(response.data.needDeliverable);
+          setInParas(response.data.inputParameters)
           console.log(response.data); 
         } catch (error) {
           console.error('Error fetching need deliverables');
@@ -169,6 +173,14 @@ const VolunteerProfileDeliverable = props => {
     };
   }, []);
 
+  const formatTime = (dateTimeString) => {
+    let hours = parseInt(dateTimeString.slice(11,13))
+    const ampm = hours >= 12 ? ' PM' : ' AM';
+    hours = hours % 12;
+    hours = hours ? hours.toString().padStart(2, '0') : '12'; // the hour '0' should be '12'
+    return hours+dateTimeString.slice(13,16)+ampm
+  };
+
   return (
     <div>
         {/* NEED INFORMATION */}
@@ -179,7 +191,7 @@ const VolunteerProfileDeliverable = props => {
             </div>
             <div className="rowNVP">
                 <div className="itemNVP">
-                    <span>Organizer :</span>  Mohan Kumar
+                    <span>Organizer :</span>  {ncoordInfo.length ? ncoordInfo[0].identityDetails.fullname : ''}
                 </div>
                 <div className="itemNVP">
                     <span>Entity :</span>  {entityById[props.needId]}
@@ -197,7 +209,7 @@ const VolunteerProfileDeliverable = props => {
             </div>
             <div className="rowNVP">
                 <div className="itemNVP">
-                    <span>Time :</span> 3:00 PM - 4:00 PM
+                    <span>Time :</span> { inParas.length ? formatTime(inParas[0].startTime)+' - '+formatTime(inParas[0].endTime) : ''}
                 </div> 
                 {/* <div className="itemNVP">
                     <span>Mode</span> : Online
@@ -205,10 +217,10 @@ const VolunteerProfileDeliverable = props => {
             </div>
             <div className="rowNVP">
                 <div className="itemNVP">
-                    <span>Platform :</span> GMEET
+                    <span>Platform :</span> {inParas.length ? inParas[0].softwarePlatform : ''}
                 </div> 
                 <div className="itemNVP">
-                    <span>URL: </span> <a href="https://meet.google.com/dne-puic-skt"> Session Link  </a>
+                    <span>URL: </span> { inParas.length ? <a href={inParas.length ? inParas[0].inputUrl : ''}> Session Link  </a> : ''}
                 </div> 
             </div>
         </div>

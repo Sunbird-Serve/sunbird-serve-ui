@@ -20,8 +20,11 @@ import SearchIcon from '@mui/icons-material/Search';
 function Volunteers() {
 
   const userList = useSelector((state) => state.userlist.data);
+  // console.log(userList.filter(item=>item.userDetails.osid = "1-342f7901-bc0b-4889-86be-ed98a3f8acee"))
   const volunteerList = userList.filter(item => item.role.includes('Volunteer'))
-  // console.log(volunteerList)
+  // const selUser = volunteerList.filter(item => item.osid === '1-2daf7cee-727d-49ec-9c9a-3e0350b382f3' )
+  // console.log(selUser)
+  console.log(volunteerList)
 
   const [userDetailsList, setUserDetailsList] = useState([]);
   useEffect(() => {
@@ -45,7 +48,8 @@ function Volunteers() {
       Promise.all(promises).then(results => {
         const filteredResults = results.filter(result => result && result.userProfile !== null);
         setUserDetailsList(filteredResults);
-      }).catch(error => {
+      })
+      .catch(error => {
         console.error('Error in Promise.all', error);
       });
     };
