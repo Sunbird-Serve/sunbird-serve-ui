@@ -72,6 +72,7 @@ const VolunteerProfileDeliverable = props => {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [clickMarker, setClickMarker] = useState(false);
   const [cancelPopup, setCancelPopup] = useState('')
+  const [confirmPopup, setConfirmPopup] = useState('')
   const [rejection, setRejection] = useState('')
 
   const [todoDeliverables, setTodoDeliverables] = useState(null)
@@ -104,22 +105,23 @@ const VolunteerProfileDeliverable = props => {
     setCancelledDeliverables(deliverables && deliverables.filter(item => item.status === 'Cancelled'))
   },[deliverables, dstat])
 
-  //const handleCompleted = (item) => {}
-  const handleCompleted = (item) => {
+  const handleCompleted = (item, index) => {
     setClickMarker(!clickMarker)
-    axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
-      "needPlanId": planId,
-      "comments": item.comments,
-      "status": "Completed",
-      "deliverableDate": currentDate
-    }).then(response => {
-      console.log('Deliverable Completed')
-      setDstat(!dstat)
-    })
-    .catch(error => {
-      console.log('Error marking deliverable completed')
-    });
+    // axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
+    //   "needPlanId": planId,
+    //   "comments": item.comments,
+    //   "status": "Completed",
+    //   "deliverableDate": currentDate
+    // }).then(response => {
+    //   console.log('Deliverable Completed')
+    //   setDstat(!dstat)
+    // })
+    // .catch(error => {
+    //   console.log('Error marking deliverable completed')
+    // });
   }
+
+
   const [cindex, setCIndex] = useState('')
   const handleCancel = (item, index) => {
     setClickMarker(!clickMarker)
@@ -181,6 +183,8 @@ const VolunteerProfileDeliverable = props => {
     return hours+dateTimeString.slice(13,16)+ampm
   };
 
+  console.log(deliverables.length)
+
   return (
     <div>
         {/* NEED INFORMATION */}
@@ -230,7 +234,7 @@ const VolunteerProfileDeliverable = props => {
             {/*DNVP refer to Need Plan Deliverables from Volunteer Profile*/}
             <div className="headDNVP">Need Plan Deliverables</div>
         </div>
-        <div className="listDNVP">
+        {deliverables.length ? <div className="listDNVP">
             <div className="listDNVPbox">
                 <button className="todoDNVP">To-Do</button>
                 <div>
@@ -324,6 +328,11 @@ const VolunteerProfileDeliverable = props => {
                     ))}
             </div>
         </div>
+        :
+        <div className="deliverable-unapproved">
+          Need is yet to be approved, Coordinator will get in touch with you soon
+        </div>
+        }
         
 
 
