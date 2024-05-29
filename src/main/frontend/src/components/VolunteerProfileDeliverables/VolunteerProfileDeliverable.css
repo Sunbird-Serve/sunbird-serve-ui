@@ -200,3 +200,8 @@
     padding: 2px;
     border: none;
 }
+.deliverable-unapproved {
+    border: solid 1px #DBDBDB;
+    padding: 30px 30px;
+    border-radius: 5px;
+}

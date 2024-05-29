@@ -13,7 +13,7 @@ export const fetchUserList = createAsyncThunk(
     'user/fetchUserList',
     async() => {
         try {
-            const response = await axios.get(`${configData.USER_GET}/list`)
+            const response = await axios.get(`${configData.USER_GET}/all-users`)
             return response.data
             console.log(response.data)
         } catch(error) {

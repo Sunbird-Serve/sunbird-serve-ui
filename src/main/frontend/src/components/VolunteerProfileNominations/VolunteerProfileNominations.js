@@ -43,9 +43,11 @@ function VPNominations() {
 
   //get userId
   const userId = useSelector((state)=> state.user.data.osid)
+  console.log(userId)
 
   //get nominations by nominated userId
   const [nominations,setNominations] = useState([])
+  const [volunteerHrs, setVolunteerHrs] = useState(null)
   useEffect(()=> {
     axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=100`)
     .then(response => {
@@ -53,7 +55,17 @@ function VPNominations() {
     })
     .catch(function (error) {
      console.log(error)
-  })
+    })
+
+    axios.get(`http://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/read/${userId}`)
+    .then(response => {
+      console.log(response.data)
+      setVolunteerHrs(response.data)
+    })
+    .catch(function (error) {
+      console.log(error)
+    })
+
   },[userId])
 
   //filter nominations by tabs @ nomination status
@@ -145,13 +157,6 @@ function VPNominations() {
             </div>
             <div className="statsVPNomsName">Needs Approved</div>
           </div>
-          {/* <div className="statsVPNomsItem">
-            <div className="statsVPNomsCount">
-              <img src={VolunteerNeedsInProgress} alt="Needs In Progress" height="35px" />
-              <span>00</span>
-            </div>
-            <div className="statsVPNomsName">Needs In Progress</div>
-          </div> */}
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerPlansDelivered} alt="Nominated Needs" height="35px" />
@@ -172,7 +177,6 @@ function VPNominations() {
           {/* Tabs */}
           <div className="vnomTabs">
             <div className={`${activeTab === 'tabN' ? 'VNomTabN selectedVNomTab' : 'VNomTabN'}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
-            <div className={`${activeTab === 'tabP' ? 'VNomTabP selectedVNomTab' : 'VNomTabP'}`} onClick={() => handleTabClick('tabP')}>In Progress</div>
             <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
           </div>
     

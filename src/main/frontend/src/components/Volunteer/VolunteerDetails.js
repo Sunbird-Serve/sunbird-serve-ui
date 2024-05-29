@@ -100,7 +100,7 @@ const VolunteerDetails = props => {
                 {userDetails.status === 'Registered' && <button onClick={()=>handleVStatus('OnHold')}>On Hold</button>}
                 {userDetails.status === 'Recommended' && <button onClick={()=>handleVStatus('OnBoarded')}>On Boarded</button>}
                 {userDetails.status === 'OnBoarded' && <button onClick={()=>handleVStatus('Active')}> Make Active</button>}
-                {/* {userDetails.status === 'Active' && <button onClick={()=>handleVStatus('Registered')}>Register</button>} */}
+                {userDetails.status === 'Register' && <button onClick={()=>handleVStatus('Registered')}>Register</button>}
             </div>
         </div>
         <div className="btnCloseVDetails">

@@ -80,6 +80,14 @@ export const VolunteerNeeds = props => {
     props.updateNeedList(false)
   }
 
+  const truncateString = (str, num) => {
+    if (str.length > num) {
+      return str.slice(0, num) + '...';
+    } else {
+      return str;
+    }
+  };
+
 
   return (
     <div className="wrapvolunteerNeeds">
@@ -123,7 +131,7 @@ export const VolunteerNeeds = props => {
             {data.map((item) => (
               <div key={item.need.id} className="needBox" onClick={() => handlePopupOpen(item)} >
                 <div className="need-container-volunteer">
-                  <div class="h3-container">{item.need.name}</div>
+                  <div class="h3-container">{truncateString(item.need.name,20)}</div>
                   <i class="heart-icon"><FavoriteIcon/></i>
                 </div>
                 <div className="location-vrequired">

@@ -157,13 +157,15 @@ const ModifyNeed = props => {
         // console.log(dataToPost)
         console.log(delivDetails)
 
-        axios.put(`${configData.DELIVERABLE}/update/${needId}`, delivDetails)
-        .then(response => {
-            console.log(response.data)
-        })
-        .catch(error => {
-            console.log(error)
-        });
+        if(status == 'Approved'){
+            axios.put(`${configData.DELIVERABLE}/update/${needId}`, delivDetails)
+            .then(response => {
+                console.log(response.data)
+            })
+            .catch(error => {
+                console.log(error)
+            });
+        }
     }
     const formatTime = (timeString) => {
         const [hourString, minute] = timeString.split(":");

@@ -67,7 +67,9 @@
 }
 .VNomTabN {
   display: flex;
-  padding: 3px 12px;
+  justify-content: center;
+  width: 150px;
+  padding: 5px 15px;
   font-size: 14px;
   background-color: #F7F8F9;
   border: solid 1px #D3D4D5;
@@ -76,13 +78,15 @@
 }
 .VNomTabA {
   display: flex;
-  padding: 3px 12px;
+  justify-content: center;
+  padding: 5px 15px;
   font-size: 14px;
   background-color: #F7F8F9;
   border: solid 1px #D3D4D5;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   border-left: none;
+  width: 150px;
 }
 .selectedVNomTab {
   background-color: white;
