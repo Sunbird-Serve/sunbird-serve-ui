@@ -187,8 +187,13 @@
     border: none;
     background-color: inherit;
 }
+.topbar-cpopup label {
+    font-weight: 600;
+    color:#0080BC;
+}
 .title-cancel {
     padding: 10px 15px;
+    font-weight: 600px;
 }
 .reject-reason {
     padding: 10px;
@@ -204,4 +209,10 @@
     border: solid 1px #DBDBDB;
     padding: 30px 30px;
     border-radius: 5px;
+}
+.wrap-beneficbox {
+    margin: 0px 15px;
+}
+.wrap-beneficbox label {
+    width: 100%;
 }
