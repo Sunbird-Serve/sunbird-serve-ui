@@ -70,9 +70,9 @@ const VolunteerProfileDeliverable = props => {
   const [inParas, setInParas] = useState([])
 
   const [selectedIndex, setSelectedIndex] = useState(null);
-  const [clickMarker, setClickMarker] = useState(false);
+  const [clickMarker, setClickMarker] = useState(false);  //for three dots
   const [cancelPopup, setCancelPopup] = useState('')
-  const [confirmPopup, setConfirmPopup] = useState('')
+  const [completePopup, setCompletePopup] = useState('')
   const [rejection, setRejection] = useState('')
 
   const [todoDeliverables, setTodoDeliverables] = useState(null)
@@ -86,7 +86,6 @@ const VolunteerProfileDeliverable = props => {
           const response = await axios.get(`${configData.NEEDPLAN_DELIVERABLES}/${planId}`);
           setDeliverables(response.data.needDeliverable);
           setInParas(response.data.inputParameters)
-          console.log(response.data); 
         } catch (error) {
           console.error('Error fetching need deliverables');
         }
@@ -105,27 +104,10 @@ const VolunteerProfileDeliverable = props => {
     setCancelledDeliverables(deliverables && deliverables.filter(item => item.status === 'Cancelled'))
   },[deliverables, dstat])
 
-  const handleCompleted = (item, index) => {
-    setClickMarker(!clickMarker)
-    // axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
-    //   "needPlanId": planId,
-    //   "comments": item.comments,
-    //   "status": "Completed",
-    //   "deliverableDate": currentDate
-    // }).then(response => {
-    //   console.log('Deliverable Completed')
-    //   setDstat(!dstat)
-    // })
-    // .catch(error => {
-    //   console.log('Error marking deliverable completed')
-    // });
-  }
-
-
-  const [cindex, setCIndex] = useState('')
+  const [cindex, setCIndex] = useState('') //display on popup
   const handleCancel = (item, index) => {
     setClickMarker(!clickMarker)
-    setCancelPopup(item)
+    setCancelPopup(item)  //for popup to appear
     setCIndex(index)
     console.log(index)
     console.log('Deliverable Cancelled')
@@ -158,6 +140,43 @@ const VolunteerProfileDeliverable = props => {
     console.log(rejection)
   }
 
+  const [numBenefics, setNumBenefics] = useState(null)
+  const handleBenefics = e => {
+    setNumBenefics(e.target.value)
+  }
+  const [notes, setNotes] = useState(null)
+  const handleNotes = e => {
+    setNotes(e.target.value)
+  }
+
+  const handleCompleted = (item, index) => {
+    setClickMarker(!clickMarker)
+    setCompletePopup(item)
+    setCIndex(index)
+  }
+  const confirmCompleted = (item) => {
+    setRejection('')
+    setCompletePopup('')
+    console.log({
+      "needDeliverableId": item.id,
+      "numberOfAttendees": numBenefics,
+      "submittedUrl": "",
+      "remarks": notes
+    })
+    axios.post(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-output/create`,{
+      "needDeliverableId": item.id,
+      "numberOfAttendees": numBenefics,
+      "submittedUrl": "",
+      "remarks": notes
+    }).then(response => {
+      console.log('Deliverable Completed')
+      setDstat(!dstat)
+    })
+    .catch(error => {
+      console.log('Error marking deliverable completed')
+    });
+  }
+
   const divRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -183,7 +202,8 @@ const VolunteerProfileDeliverable = props => {
     return hours+dateTimeString.slice(13,16)+ampm
   };
 
-  console.log(deliverables.length)
+
+
 
   return (
     <div>
@@ -258,7 +278,7 @@ const VolunteerProfileDeliverable = props => {
                         </div>
                       </div>
                       { index === selectedIndex && clickMarker && <div ref={divRef} className="status-ticker">
-                        <button className="delstat-complete" onClick={()=>handleCompleted(item)}>Mark as Complete</button>
+                        <button className="delstat-complete" onClick={()=>handleCompleted(item, index+1)}>Mark as Complete</button>
                         <button className="delstat-cancel" onClick={()=>handleCancel(item, index+1)}>Cancel Plan</button>
                       </div> }
 
@@ -291,7 +311,38 @@ const VolunteerProfileDeliverable = props => {
                         </div>
                       </div>}
 
-
+                      { /* COMPLETE popup */ }
+                      { completePopup && <div className="wrap-cpopup">
+                        <div className="inwrap-cpopup">
+                          <div className="cpopup">
+                            <div className="topbar-cpopup">
+                              <label>Confirmation</label>
+                              <div> 
+                                <button className="cancel-button" onClick={()=>setCompletePopup('')} >
+                                  <div className="close-cpopup"><CloseIcon style={{height:"20px"}}/></div>
+                                </button>
+                              </div>
+                            </div>
+                            <div className="title-cancel">
+                            {needById[props.needId].name}: Session {cindex}
+                            </div>
+                            <div className="wrap-reasonbox">
+                              <label>Comments/Notes</label>
+                              <textarea className="reject-reason" value={notes} onChange={handleNotes} rows={4} cols={60}
+                               placeholder='Write comments or notes on the need plan deliverable'
+                              ></textarea>
+                            </div>
+                            <div className="wrap-beneficbox">
+                              <label>Beneficiaries Attended</label>
+                              <input type="text" name="numBenfics" value={numBenefics} onChange={handleBenefics} />
+                            </div>
+                            <div className="cancel-buttons">
+                              <button className="reject-cancel-button" onClick={()=>setCompletePopup('')}>Cancel</button>
+                              <button className="reject-confirm-button" onClick={()=>confirmCompleted(item)}>Confirm</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>}
 
 
                        
