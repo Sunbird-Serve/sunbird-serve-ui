@@ -186,8 +186,14 @@ export const NeedsTable = props => {
     if (activeTab === 'approved') {
       setFilter('need.status', 'Approved')
     }
-    else if (activeTab == 'requested') {
-      setFilter('need.status', 'New')
+    else if (activeTab == 'nominated') {
+      setFilter('need.status', 'Nominated')
+    }
+    else if (activeTab == 'assigned') {
+      setFilter('need.status', 'Assigned')
+    }
+    else if (activeTab == 'fulfilled') {
+      setFilter('need.status', 'fulfilled')
     }
     else {
       setFilter('need.status','')
@@ -215,7 +221,9 @@ export const NeedsTable = props => {
         <div className="needMenu">
           <div className={`tabNeed ${activeTab === 'all' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('all')}>All</div>
           <div className={`tabNeed ${activeTab === 'approved' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('approved')}>Approved</div>
-          <div className={`tabNeed ${activeTab === 'requested' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('requested')}>Requested</div>
+          <div className={`tabNeed ${activeTab === 'nominated' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('nominated')}>Nominated</div>
+          <div className={`tabNeed ${activeTab === 'assigned' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('assigned')}>Assigned</div>
+          <div className={`tabNeed ${activeTab === 'fulfilled' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('fulfilled')}>Fulfilled</div>
         </div>
         {/* Raise Need Button */}
         <button onClick={gotoRaiseNeed}>Raise Need</button>
