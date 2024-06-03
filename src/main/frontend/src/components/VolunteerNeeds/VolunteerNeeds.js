@@ -14,7 +14,7 @@ import DateRangeIcon from '@mui/icons-material/DateRange';
 
 export const VolunteerNeeds = props => {
   const needList = useSelector((state) => state.need.data);
-  const dataNeeds = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId)
+  const dataNeeds = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId && item.need.status === 'Approved')
   const [searchQueryNeed, setSearchQueryNeed] = useState('')
   const handleSearchChange = (event) => {
     setSearchQueryNeed(event.target.value)
@@ -137,7 +137,8 @@ export const VolunteerNeeds = props => {
                 <div className="location-vrequired">
                   <div className="location-container gray-text">
                     <LocationOnOutlinedIcon style={{ fontSize: 15 }} />
-                    <span>{(item.entity && item.entity.district) ? item.entity.district : ''}</span>
+                    <span>{(item.need && item.need.status) ? item.need.status : ''}</span>
+                    {/* <span>{(item.entity && item.entity.district) ? item.entity.district : ''}</span> */}
                   </div>
                   <div className="required-container gray-text">
                     <PeopleIcon style={{ fontSize: 15 }} />
