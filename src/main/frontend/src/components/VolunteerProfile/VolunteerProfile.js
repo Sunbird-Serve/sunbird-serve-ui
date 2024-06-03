@@ -38,7 +38,15 @@ function VProfile() {
   const handleRegisterClick = (e) => {
     e.preventDefault();
     history.push("/vregistration")
-}
+  }
+  const statusInfo = {
+    'Recommended': 'You have been endorsed for fulfilling the need',
+    'Not Recommended': 'Your involvement is not advised at this time',
+    'On Hold': 'Your status is temporarily pending further review',
+    'Registered': 'You have recently joined our program. Please Nominate a need',
+    'Active': 'You are currently engaged and participating',
+    'Inactive': 'You are currently not engaged and inactive in the program'
+  }
 
 
   return (
@@ -60,8 +68,10 @@ function VProfile() {
                       <button className="register-vprofile" onClick={handleRegisterClick}>Click here to Register</button>
                     </div>}
                     <div className="wrap-status">
-                      <div className="volunteerStatus">Status</div>
-                      <div><button className="vtooltip" title="Make note of this">i</button></div>
+                      <div className="volunteerStatus"> Status: { (user && userData.status) ? userData.status : 'Unknow' }</div>
+                      { (user && userData.status) && <div>
+                        <button className="vtooltip" title={statusInfo[userData.status]}>i</button>
+                      </div>}
                     </div>
                 </div>
             </div>

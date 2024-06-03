@@ -175,6 +175,19 @@ const VolunteerProfileDeliverable = props => {
     .catch(error => {
       console.log('Error marking deliverable completed')
     });
+
+    axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
+      "needPlanId": planId,
+      "comments": notes,
+      "status": "Completed",
+      "deliverableDate": currentDate
+    }).then(response => {
+      console.log('Deliverable Completed')
+      setDstat(!dstat)
+    })
+    .catch(error => {
+      console.log('Error marking deliverable completed')
+    });
   }
 
   const divRef = useRef(null);
@@ -278,7 +291,7 @@ const VolunteerProfileDeliverable = props => {
                         </div>
                       </div>
                       { index === selectedIndex && clickMarker && <div ref={divRef} className="status-ticker">
-                        <button className="delstat-complete" onClick={()=>handleCompleted(item, index+1)}>Mark as Complete</button>
+                        <button className="delstat-complete" onClick={()=>handleCompleted(item, index+1)}>Mark as Fulfilled</button>
                         <button className="delstat-cancel" onClick={()=>handleCancel(item, index+1)}>Cancel Plan</button>
                       </div> }
 
@@ -351,7 +364,7 @@ const VolunteerProfileDeliverable = props => {
                 </div>
             </div>
             <div className="listDNVPbox">
-              <button className="completedDNVP">Completed</button>
+              <button className="completedDNVP">Fulfilled</button>
               <div>
                 {completedDeliverables && completedDeliverables.map((item, index) => (
                     <div key={index} className="deliverable-container">
