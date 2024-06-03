@@ -160,14 +160,14 @@ function VPNominations() {
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerPlansDelivered} alt="Nominated Needs" height="35px" />
-              <span>00</span>
+              <span>4</span>
             </div>
             <div className="statsVPNomsName">Total Volunteer Hrs</div>
           </div>
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerHrs} alt="Nominated Needs" height="35px" />
-              <span>00</span>
+              <span>2</span>
             </div>
             <div className="statsVPNomsName">Total Plans Delivered</div>
           </div>

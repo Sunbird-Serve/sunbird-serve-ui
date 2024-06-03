@@ -256,8 +256,8 @@ const VolunteerProfileDeliverable = props => {
                 <div className="itemNVP">
                     <span>Platform :</span> {inParas.length ? inParas[0].softwarePlatform : ''}
                 </div> 
-                <div className="itemNVP">
-                    <span>URL: </span> { inParas.length ? <a href={inParas.length ? inParas[0].inputUrl : ''}> Session Link  </a> : ''}
+                <div className="itemNVP"> 
+                    <span>URL: </span>  <a href='https://meet.google.com/zsm-uvwd-hry'> Session Link  </a>
                 </div> 
             </div>
         </div>
