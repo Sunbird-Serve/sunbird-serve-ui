@@ -10,6 +10,7 @@ import ntypeImage01 from '../../assets/content_development.png'
 import ntypeImage02 from '../../assets/field_activity.png'
 import ntypeImage03 from '../../assets/mentoring.png'
 import ntypeImage04 from '../../assets/online_teaching.png'
+import ntypeImage05 from '../../assets/guest_lecture.png'
 import { useSelector, useDispatch } from 'react-redux'
 import SortIcon from "@mui/icons-material/Sort";
 
@@ -98,7 +99,8 @@ function VolunteerNeedType() {
     'Content Development': ntypeImage01,
     'Field Activity': ntypeImage02,
     'Mentoring': ntypeImage03,
-    'Online Teaching': ntypeImage04
+    'Online Teaching': ntypeImage04,
+    'Guest Lecture': ntypeImage05
   }
  
   return (
