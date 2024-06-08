@@ -199,3 +199,105 @@
   border-radius: 5px;
   cursor: pointer;
 }
+.wrap-NCDeliverables {
+  overflow: scroll;
+
+}
+.table-NCDeliverables {
+  display: flex;
+  flex-direction: column;
+
+}
+
+.backToNoms {
+  padding: 10px 30px;
+  display: flex;
+  justify-content: space-between;
+}
+.backToNoms span{
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.deliverable-head {
+  margin: 0px 30px;
+  display: flex;
+  width: fit-content;
+  background-color: #ECECEC;
+}
+
+.deliverable-item {
+  margin: 0px 30px;
+  display: flex;
+  border-bottom: solid 0.5px;
+  width: fit-content;
+}
+
+.deliv-serial {
+  border-right: solid 0.5px;
+  padding: 8px 12px;
+  width: 60px;
+  text-align: right;
+}
+.deliv-date {
+  border-right: solid 0.5px;
+  padding: 8px 10px;
+  width: 210px;
+  text-align: center;
+}  
+.deliv-time {
+  border-right: solid 0.5px;
+  padding: 8px 10px;
+  width: 150px;
+  text-align: center;
+}           
+.deliv-platform {
+  border-right: solid 0.5px;
+  padding: 8px 10px;
+  width: 150px;
+  text-align: right;
+}
+.deliv-url {
+  border-right: solid 0.5px;
+  padding: 3px 10px;
+  width: 300px;
+  text-align: right;
+}
+.deliv-status {
+  border-right: solid 0.5px;
+  padding: 3px 10px;
+  width: 150px;
+  text-align: right;
+}
+.deliv-action {
+  padding: 3px 10px;
+  width: 80px;
+  text-align: center;
+}
+.deliv-action button {
+  background-color: inherit;
+  border: none;
+}
+.add-plan-info {
+  margin: 5px 30px 15px 30px;
+  padding: 5px;
+  border: solid 1px;
+  width: fit-content;
+  border-radius: 5px;
+}
+.common-info-delivs {
+  display: flex;
+  margin: 5px 20px 15px 20px;
+  gap: 30px
+}
+.common-info-delivs input {
+  margin-left: 10px;
+}
+.common-info-delivs button {
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+.title-common-info {
+  margin: 5px 10px 10px 10px;
+}
