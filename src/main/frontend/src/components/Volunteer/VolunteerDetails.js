@@ -25,7 +25,7 @@ const VolunteerDetails = props => {
         userToPost.status = newStatus
         console.log(userDetails.osid)
         console.log(userToPost)
-        axios.put(`http://serve-v1.evean.net/api/v1/serve-volunteering/user/${userDetails.osid}`, userToPost)
+        axios.put(`https://serve-v1.evean.net/api/v1/serve-volunteering/user/${userDetails.osid}`, userToPost)
         .then(response => {
             console.log('API response:', response.data);
             dispatch(fetchUserList())

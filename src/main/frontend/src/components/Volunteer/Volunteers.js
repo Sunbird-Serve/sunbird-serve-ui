@@ -131,7 +131,6 @@ function Volunteers() {
   return (
     <div>
       <div className="headerVolunteers">
-        <div className="title-vHeader">Volunteer Dashboard</div>
         <div className="tag-vHeader">Manage & Monitor the Volunteers</div>
       </div>
       <div className="wrap-tabs-search">

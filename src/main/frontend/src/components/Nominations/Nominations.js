@@ -358,6 +358,7 @@ const Nominations = ({ needData, openPopup }) => {
         <div className="table-NCDeliverables">
         <div className="add-plan-info">
           <div className="title-common-info">Common details for all deliverables</div>
+          { !!inParas.length &&  
           <div className="common-info-delivs">
             <div>
               <span>Platform</span>
@@ -367,7 +368,9 @@ const Nominations = ({ needData, openPopup }) => {
               <span>Link</span>
               <input type='text' name="planLink" value={planLink} onChange={handleComnInfo}></input>
             </div>
+            <div><button onClick={submitComnInfo}>Submit</button></div>
           </div>
+          }
           <div className="common-info-delivs">
             {/* <div>
               <span>Start Time</span>
@@ -377,7 +380,7 @@ const Nominations = ({ needData, openPopup }) => {
               <span>End Time</span>
               <input type='time'></input>
             </div> */}
-            <div><button onClick={submitComnInfo}>Submit</button></div>
+           
           </div>
         </div>
         <div className="deliverable-head">
@@ -411,12 +414,18 @@ const Nominations = ({ needData, openPopup }) => {
               }
             </div>
             <div className="deliv-url">
-              {(index === editIndex) ? 
-                  <input type="text" value={data.inputUrl} onChange={(e)=>handleDeliverableChange(e, index, 'inputUrl')}></input>
-                :
-                data.inputUrl
-              }
-            </div>
+      {index === editIndex ? (
+        <input
+          type="text"
+          value={data.inputUrl}
+          onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')}
+        />
+      ) : (
+        <a href={data.inputUrl} target="_blank" rel="noopener noreferrer">
+          Class Link
+        </a>
+      )}
+    </div>
             <div className="deliv-status">
               {(index === editIndex) ? 
                   <input type="text" value={data.status} onChange={(e)=>handleDeliverableChange(e, index, 'status')}></input>

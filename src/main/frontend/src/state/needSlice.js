@@ -19,7 +19,8 @@ export const fetchNeeds = createAsyncThunk('needs/fetchNeeds',
         const response3 = await axios.get(`${configData.NEED_GET}/?page=0&size=100&status=Approved`);
         const response4 = await axios.get(`${configData.NEED_GET}/?page=0&size=100&status=Rejected`);
         const response5 = await axios.get(`${configData.NEED_GET}/?page=0&size=100&status=Assigned`);
-        return [...response1.data.content, ...response2.data.content,...response3.data.content, ...response4.data.content, ...response5.data.content]        
+        const response6 = await axios.get(`${configData.NEED_GET}/?page=0&size=100&status=Fulfilled`);
+        return [...response1.data.content, ...response2.data.content,...response3.data.content, ...response4.data.content, ...response5.data.content, ...response6.data.content]        
     } catch(error){
         throw error
     }
