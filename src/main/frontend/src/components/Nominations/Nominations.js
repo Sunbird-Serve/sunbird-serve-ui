@@ -81,9 +81,9 @@ const Nominations = ({ needData, openPopup }) => {
   const COLUMNS = [
     {Header:'Volunteer Name',accessor:'userInfo.identityDetails.fullname', width: 150}, 
     {Header:'Location',accessor:'userInfo.contactDetails.address.city'},
-    {Header:'Date of Birth',accessor:'userInfo.identityDetails.dob'},
-    {Header:'Contact Info',accessor:'userInfo.contactDetails.mobile'},
-    {Header:'Skills'},
+    {Header:'Phone Number',accessor:'userInfo.contactDetails.mobile'},
+    {Header:'Email',accessor:'userInfo.contactDetails.email'},
+    {Header:'Status', accessor:'userInfo.status'},
     {Header:'Actions',
       Cell : ({ row }) => {
         const handleAccept = () => {
@@ -115,7 +115,7 @@ const Nominations = ({ needData, openPopup }) => {
             { activeTab === 'tabN' && <button className="rejectNomin" onClick={handleReject}>
               <ClearIcon style={{height:"20px",width:"20px",marginLeft:"-4.5px",marginBottom:"3px",color:"red"}}/>
             </button> }
-            { activeTab === 'tabA' && <button onClick={viewDeliverable}>
+            { activeTab === 'tabA' && <button className="styled-button" onClick={viewDeliverable}>
               View Deliverables
             </button> }
           </div>
@@ -352,97 +352,63 @@ const Nominations = ({ needData, openPopup }) => {
       { /*  */}
       {gotoDelivs && <div className="wrap-NCDeliverables">
         <div className="backToNoms">
-          <span> Need Plan Deliverables</span>
+          <span> Need Deliverable Details</span>
           <button onClick={()=>setGotoDelivs(false)} ><ArrowBackIcon/></button>
         </div>
         <div className="table-NCDeliverables">
-        <div className="add-plan-info">
-          <div className="title-common-info">Common details for all deliverables</div>
-          { !!inParas.length &&  
+        <div className="common-info-section">
+          <div className="title-common-info">Common Details For All Deliverables</div>  
           <div className="common-info-delivs">
-            <div>
-              <span>Platform</span>
-              <input type='text' name="planPlatform" value={planPlatform} onChange={handleComnInfo} ></input>
-            </div>
-            <div>
-              <span>Link</span>
-              <input type='text' name="planLink" value={planLink} onChange={handleComnInfo}></input>
-            </div>
-            <div><button onClick={submitComnInfo}>Submit</button></div>
+          <div>
+            <span>Platform</span>
+            <input type="text" name="planPlatform" value={planPlatform} onChange={handleComnInfo} />
           </div>
-          }
-          <div className="common-info-delivs">
-            {/* <div>
-              <span>Start Time</span>
-              <input type='time'></input>
-            </div>
-            <div>
-              <span>End Time</span>
-              <input type='time'></input>
-            </div> */}
-           
+          <div>
+            <span>Link</span>
+            <input type="text" name="planLink" value={planLink} onChange={handleComnInfo} />
           </div>
+          <div>
+            <button onClick={submitComnInfo}>Submit</button>
+          </div>
+        </div>
         </div>
         <div className="deliverable-head">
-          <div className="deliv-serial">S.No.</div>
-          <div className="deliv-date">Date</div>
-          <div className="deliv-time">Time</div>
-          <div className="deliv-platform" >Platform</div>
-          <div className="deliv-url">Link</div>
-          <div className="deliv-status">Status</div>
-          {!!inParas.length && <div className="deliv-action">Action</div>}
-        </div>
-        {formData.length && formData.map((data, index) => (
-          <div className="deliverable-item" key={index}>
-            <div className="deliv-serial">{index+1}</div>
-            <div className="deliv-date">
-              {/* {(index === editIndex) ? 
-                <input type="text" value={data.deliverableDate} onChange={(e)=>handleDeliverableChange(e, index, 'deliverableDate')}></input>
-              :
-              data.deliverableDate
-            } */}
-              {data.deliverableDate}
-            </div>             
-            <div className="deliv-time">
-              {data.startTime ? data.startTime.slice(11,16) : ''} - {data.endTime ? data.endTime.slice(11,16) : ''}
-            </div>
-            <div className="deliv-platform">
-              {(index === editIndex) ? 
-                  <input type="text" value={data.softwarePlatform} onChange={(e)=>handleDeliverableChange(e, index, 'softwarePlatform')}></input>
-                :
-              data.softwarePlatform
-              }
-            </div>
-            <div className="deliv-url">
-      {index === editIndex ? (
-        <input
-          type="text"
-          value={data.inputUrl}
-          onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')}
-        />
-      ) : (
-        <a href={data.inputUrl} target="_blank" rel="noopener noreferrer">
-          Class Link
-        </a>
-      )}
+  <div className="deliv-serial">S.No.</div>
+  <div className="deliv-date">Date</div>
+  <div className="deliv-time">Time</div>
+  <div className="deliv-url">Link</div>
+  <div className="deliv-status">Status</div>
+  {!!inParas.length && <div className="deliv-action">Action</div>}
+</div>
+{formData.length && formData.map((data, index) => (
+  <div className="deliverable-item" key={index}>
+    <div className="deliv-serial">{index + 1}</div>
+    <div className="deliv-date">
+      {data.deliverableDate}
     </div>
-            <div className="deliv-status">
-              {(index === editIndex) ? 
-                  <input type="text" value={data.status} onChange={(e)=>handleDeliverableChange(e, index, 'status')}></input>
-                :
-                data.status
-              }
-              </div>
-            {!!inParas.length && <div className="deliv-action">
-              {(index === editIndex) ?               
-                <button onClick={()=>handleDoneDeliverable(index)}><DoneIcon style={{backgroundColor:'green', borderRadius:'5px', color: 'white'}}/></button>
-                :
-                <button onClick={()=>handleEditDeliverable(data, index)}><ModeEditIcon style={{backgroundColor:'red', borderRadius:'5px', color: 'white', padding:'2px'}}/></button>
-              }
-            </div>}
-          </div>
-          
-          ))}
+    <div className="deliv-time">
+      {data.startTime ? data.startTime.slice(11, 16) : ''} - {data.endTime ? data.endTime.slice(11, 16) : ''}
+    </div>
+    <div className="deliv-url">
+      {index === editIndex ? 
+        <input type="text" value={data.inputUrl} onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')} />
+        : <a href={data.inputUrl} target="_blank" rel="noopener noreferrer">Class Link</a>
+      }
+    </div>
+    <div className="deliv-status">
+      {index === editIndex ? 
+        <input type="text" value={data.status} onChange={(e) => handleDeliverableChange(e, index, 'status')} />
+        : data.status
+      }
+    </div>
+    {!!inParas.length && <div className="deliv-action">
+      {index === editIndex ? 
+        <button onClick={() => handleDoneDeliverable(index)}><DoneIcon className="done-icon" /></button>
+        : <button onClick={() => handleEditDeliverable(data, index)}><ModeEditIcon className="edit-icon" /></button>
+      }
+    </div>}
+  </div>
+))}
 
         </div>
       </div>}

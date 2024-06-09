@@ -210,7 +210,7 @@ function VPNominations() {
               <div className="needItemVolunteer">
                 <img src={NeedsImage} alt="Nominated Needs" width="20px" />
                 <p className="needNameVP">{needById[nomination.needId]}</p> 
-                <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View full details</button>
+                <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View Full Details</button>
               </div>
             </div>
           ))}
