@@ -11,10 +11,12 @@ import ListIcon from '@mui/icons-material/List';
 import { useSelector } from 'react-redux'
 import { FaSort } from "react-icons/fa"
 import VolunteerDetails from './VolunteerDetails'
+import VolunteersList from './Volunteers'
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios'
 import SearchIcon from '@mui/icons-material/Search';
+import { BrowserRouter, Switch, Route} from 'react-router-dom'
 
 
 function Volunteers() {
@@ -24,7 +26,6 @@ function Volunteers() {
   const volunteerList = userList.filter(item => item.role.includes('Volunteer'))
   // const selUser = volunteerList.filter(item => item.osid === '1-2daf7cee-727d-49ec-9c9a-3e0350b382f3' )
   // console.log(selUser)
-  console.log(volunteerList)
 
   const [userDetailsList, setUserDetailsList] = useState([]);
   useEffect(() => {
@@ -151,10 +152,6 @@ function Volunteers() {
                 <icon><GroupIcon /></icon>               
                 {statActive ? statActive.length : ''} Active
             </div>
-            <div className={`tabs-vCoord ${activeTab === 'OnBoarded' ? 'activeVTab' : ''}`} onClick={() => handleTabClick('OnBoarded')}>
-                <icon><CheckCircleOutlineIcon /> </icon>
-                {statOnBoard ? statOnBoard.length : ''} On Boarded
-            </div>
         </div>
         <div className="search-vCoord">
             <i><SearchIcon style={{height:'18px',width:'18px'}}/></i>
@@ -228,8 +225,9 @@ function Volunteers() {
 
     { showPopup && <VolunteerDetails handleClose={handleRowClick} data={rowData} /> }
 
-
+   
     </div>
+    
     
   )
 }

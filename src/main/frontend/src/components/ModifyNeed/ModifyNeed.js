@@ -224,12 +224,6 @@ const ModifyNeed = props => {
                                         <label>Entity Name</label>
                                         {<span>{data.entity.name ? data.entity.name : ''} </span>}
                                     </div>
-                                    {/* Platform */}
-                                    { status == 'Approved' && <div className="itemNInfo">
-                                            <label>Platform</label>
-                                            {!modify && <span>Google Meet</span>}
-                                            {modify && <input type="text" name="softwarePlatform" value={softwarePlatform} onChange={changeDelivDetails}/>}
-                                    </div> }
                                 </div>  
 
                                 <div className="needInfoTopRight col-sm-6">
@@ -238,19 +232,19 @@ const ModifyNeed = props => {
                                         <label>Need Type</label>
                                         {<span>{data.needType.name ? data.needType.name : ''}</span>}
                                     </div>
+                                     {/* Need Status */}
+                                     <div className="itemNInfo">
+                                        <label>Need Status</label>
+                                        {<span>{data.need.status ? data.need.status : ''}</span>}
+                                    </div>  
                                     {/* Need Description */}                                
                                     <div className="itemDescripInfo">
                                         <label>Need Description</label>
                                         {!modify && <span>{data.need.description ? data.need.description.slice(3,-4) : '-'}</span>}
                                         {modify && status == 'Approved' && <span>{data.need.description ? data.need.description.slice(3,-4) : '-'}</span>}
                                         {modify && status != 'Approved' && <input type="text" name="name" value={description} onChange={changeHandler}/>}
-                                    </div>                                    
-                                    {/* Link */}
-                                    { status == 'Approved' && <div className="itemNInfo">
-                                        <label>Link</label>
-                                        {!modify && <span> meet.google.com/xyz-abcd-pqr </span>}
-                                        {modify && <input type="text" name="inputUrl" value={inputUrl} onChange={changeDelivDetails} />}
-                                    </div>}
+                                    </div>                                  
+                                   
                                 </div>                      
                             </div>   
                             <div className="catergoryNInfo">SESSION DETAILS</div>

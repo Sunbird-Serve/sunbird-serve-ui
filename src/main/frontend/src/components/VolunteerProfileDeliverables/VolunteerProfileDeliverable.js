@@ -291,7 +291,7 @@ const VolunteerProfileDeliverable = props => {
                         </div>
                       </div>
                       { index === selectedIndex && clickMarker && <div ref={divRef} className="status-ticker">
-                        <button className="delstat-complete" onClick={()=>handleCompleted(item, index+1)}>Mark as Fulfilled</button>
+                        <button className="delstat-complete" onClick={()=>handleCompleted(item, index+1)}>Mark as Completed</button>
                         <button className="delstat-cancel" onClick={()=>handleCancel(item, index+1)}>Cancel Plan</button>
                       </div> }
 
@@ -364,7 +364,7 @@ const VolunteerProfileDeliverable = props => {
                 </div>
             </div>
             <div className="listDNVPbox">
-              <button className="completedDNVP">Fulfilled</button>
+              <button className="completedDNVP">Completed</button>
               <div>
                 {completedDeliverables && completedDeliverables.map((item, index) => (
                     <div key={index} className="deliverable-container">

@@ -11,6 +11,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
 import NominationSuccess from '../../assets/nominationSuccess.png';
 
+
 const configData = require('../../configure.js');
 
 function NeedPopup({ open, onClose, need }) {
@@ -61,10 +62,11 @@ function NeedPopup({ open, onClose, need }) {
     history.push("/vregistration")
   }
 
+  const historyNom = useHistory();
   const gotoHome = (e) => {
     e.preventDefault();
     setNominationStatus(false)
-    onClose()
+    historyNom.push("/vprofile/vpnominations");
   }
 
   const formatTime = (timeString) => {

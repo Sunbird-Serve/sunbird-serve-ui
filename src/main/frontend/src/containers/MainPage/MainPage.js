@@ -35,7 +35,7 @@ const MainPage = () => {
                         </div>
                         <div className="wrapContent row mt-5 mt-sm-0 pl-5">
                             <Switch>     
-                                <Route exact path="/" component={Dashboard} />
+                                <Route exact path="/" component={Needs} />
                                 <Route path="/needs" component={Needs} />
                                 <Route path="/raiseneed" component={RaiseNeed} />
                                 <Route path="/needPlans" component={NeedPlans} />

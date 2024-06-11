@@ -27,14 +27,9 @@ function SideNav() {
       </div>
       {/* Navigation Menu options */}
       {userRole && userRole.includes('nCoordinator') && <div className="navMenu">
-        {/* switch to dashboard page*/}
-        <NavLink to="/" exact className="sideNavItem row" activeClassName="active">
-          <i><DashboardOutlinedIcon /></i>  
-          <span>Dashboard</span>
-        </NavLink>
 
         {/* switch to needs page */}
-        <NavLink to="/needs" exact className="sideNavItem row">
+        <NavLink to="/needs" exact className="sideNavItem row" activeClassName="active">
           <i><StickyNote2OutlinedIcon /></i>
           <span>Needs</span>
         </NavLink>

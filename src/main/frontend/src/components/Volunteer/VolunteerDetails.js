@@ -12,6 +12,7 @@ const VolunteerDetails = props => {
     const dispatch = useDispatch()
     const userDetails = props.data.userDetails;
     const userProfile = props.data.userProfile;
+    const [showDetails, setShowDetails] = useState(true); 
     // console.log(props.data)
 
     const handleVStatus = (newStatus) => {
@@ -28,12 +29,18 @@ const VolunteerDetails = props => {
         axios.put(`https://serve-v1.evean.net/api/v1/serve-volunteering/user/${userDetails.osid}`, userToPost)
         .then(response => {
             console.log('API response:', response.data);
-            dispatch(fetchUserList())
+            dispatch(fetchUserList());
+            setShowDetails(false);
         })
         .catch(error => {
             console.error('API error:', error);
         });
     }
+
+     // If showDetails is false, return null to not render the VolunteerDetails component
+  if (!showDetails) {
+    return null;
+  }
 
     return (
     <div className="wrapVolunteerDetails">
@@ -56,8 +63,8 @@ const VolunteerDetails = props => {
                         <div className="vInfo-value">{userDetails.identityDetails.name}</div>
                     </div>
                     <div className="vInfo-item">
-                        <div className="vInfo-key">Email ID</div>
-                        <div className="vInfo-value">{userDetails.contactDetails.email}</div>
+                        <div className="vInfo-key">Phone Number</div>
+                        <div className="vInfo-value">{userDetails.contactDetails.mobile}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Gender</div>
@@ -78,12 +85,12 @@ const VolunteerDetails = props => {
                         <div className="vInfo-value">{userProfile.genericDetails.affiliation}</div>
                     </div>
                     <div className="vInfo-item">
-                        <div className="vInfo-key">Years of Experience</div>
-                        <div className="vInfo-value">{userProfile.genericDetails.yearsOfExperience}</div>
+                        <div className="vInfo-key">Email ID</div>
+                        <div className="vInfo-value">{userDetails.contactDetails.email}</div>
                     </div>
                     <div className="vInfo-item">
-                        <div className="vInfo-key">Reference Channel</div>
-                        <div className="vInfo-value">{userProfile.referenceChannelId}</div>
+                        <div className="vInfo-key">Years of Experience</div>
+                        <div className="vInfo-value">{userProfile.genericDetails.yearsOfExperience}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Skills</div>
@@ -98,7 +105,7 @@ const VolunteerDetails = props => {
             <div className="recommend-voluteer">
                 {userDetails.status === 'Registered' && <button onClick={()=>handleVStatus('Recommended')}>Recommend</button>}
                 {userDetails.status === 'Registered' && <button onClick={()=>handleVStatus('OnHold')}>On Hold</button>}
-                {userDetails.status === 'Recommended' && <button onClick={()=>handleVStatus('OnBoarded')}>On Boarded</button>}
+                {userDetails.status === 'Recommended' && <button onClick={()=>handleVStatus('Active')}>Mark Active</button>}
                 {userDetails.status === 'OnBoarded' && <button onClick={()=>handleVStatus('Active')}> Make Active</button>}
                 {userDetails.status === 'Register' && <button onClick={()=>handleVStatus('Registered')}>Register</button>}
             </div>
