@@ -26,6 +26,10 @@
     padding: 2px 6px;
     margin: 0px 4px;
 }
+.required-label::after {
+    content: " *";
+    color: red;
+}
 .raiseNeed {
     background-color: white;
     height: 80%;

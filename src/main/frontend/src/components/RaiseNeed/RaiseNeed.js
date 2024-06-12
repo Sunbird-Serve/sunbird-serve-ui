@@ -233,7 +233,7 @@ const RaiseNeed = props => {
                 {/* top bar of raise need page */}
                 <div className="raiseNeedBar">
                     <div className="wrapNameNeed">
-                        <div className="needName">Untitled Need </div>
+                        <div className="needName"> Need </div>
                         <div className="tagNeedName"> A detailed description about the Need</div>
                     </div>
                     <button className="btnRaiseNeed" type="submit" form="myForm"> Raise Need </button>
@@ -247,18 +247,18 @@ const RaiseNeed = props => {
                         <div className="formLeft col-sm-6">
                             {/* Need Name */}
                             <div className="itemFormNeed">
-                                <label>Need Name</label>
-                                <input type="text" placeholder='Ex: Avila Beach Cleaning' name="name" value={name} onChange={changeHandler} />
+                                <label>Need Name <span class="required-label"></span></label>
+                                <input type="text" placeholder='Ex: Avila Beach Cleaning' name="name" value={name} onChange={changeHandler} required />
                             </div>
                             {/* Need Purpose */}
                             <div className="itemFormNeed">
-                                <label>Need Purpose</label>
-                                <input type="text" placeholder='Provide the impact or purpose of this Need' name="needPurpose" value={needPurpose} onChange={changeHandler} />
+                                <label>Need Purpose<span class="required-label"></span></label>
+                                <input type="text" placeholder='Provide the impact or purpose of this Need' name="needPurpose" required value={needPurpose} onChange={changeHandler} />
                             </div>
                             {/* Need Type */}
                             <div className="itemFormNeed">
-                                <label>Need Type</label>
-                                <select className="selectMenu" name="needTypeId" value={needTypeId} onChange={changeHandler}>
+                                <label>Need Type<span class="required-label"></span></label>
+                                <select className="selectMenu" name="needTypeId" value={needTypeId} required onChange={changeHandler}>
                                     <option value="" defaultValue>Select Need type</option>
                                     {
                                         needTypes.map(
@@ -272,8 +272,8 @@ const RaiseNeed = props => {
                         <div className="formRight col-sm-6">
                             {/* Entity Name */}
                             <div className="itemFormNeed">
-                                <label>Entity Name</label>
-                                <select className="selectMenu" name="entityId" value={entityId} onChange={changeHandler}>
+                                <label>Entity Name<span class="required-label"></span></label>
+                                <select className="selectMenu" name="entityId" value={entityId} required onChange={changeHandler}>
                                     <option value="" defaultValue>Select Entity</option>
                                     {
                                         entities && entities.map(
@@ -297,12 +297,12 @@ const RaiseNeed = props => {
                     {/* Date */}
                     <div className="itemWrapDate">
                         <div className="itemDate">
-                            <label>Start Date </label>
-                            <input type="date" name="startYMD" value={startYMD} onChange={handleStartDate} />
+                            <label>Start Date <span class="required-label"></span></label>
+                            <input type="date" name="startYMD" value={startYMD} required onChange={handleStartDate} />
                         </div>
                         <div className="itemDate">
-                            <label>End Date </label>
-                            <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
+                            <label>End Date <span class="required-label"></span></label>
+                            <input type="date" name="endYMD" value={endYMD} required onChange={handleEndDate} />
                         </div>
                         <div className="itemDate">
                             <label>Recurrence </label>

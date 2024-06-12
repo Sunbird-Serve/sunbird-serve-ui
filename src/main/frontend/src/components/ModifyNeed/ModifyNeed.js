@@ -253,13 +253,13 @@ const ModifyNeed = props => {
                                 {!modify && <div className="itemDateInfo">
                                     <div className="wrap-itemDateMN">
                                         <div className="itemDate-modified">
-                                            <label>Start Date</label>
+                                            <label>Start Date (yyyy-mm-dd)</label>
                                             <span>{data.occurrence ? data.occurrence.startDate.substr(0,10) : '-'}</span>
                                         </div>  
                                     </div>
                                     <div className="wrap-itemDateMN">
                                         <div className="itemDate-modified">
-                                            <label>End Date</label>
+                                            <label>End Date (yyyy-mm-dd)</label>
                                             <span>{data.occurrence ? data.occurrence.endDate.substr(0,10) : '-'}</span>
                                         </div>
                                     </div>
