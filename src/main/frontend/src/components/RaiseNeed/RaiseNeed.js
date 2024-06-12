@@ -76,8 +76,8 @@ const RaiseNeed = props => {
     };
 
     //get from input in YearMonthDay format then convert to datetime before updating
-    const [startYMD, setStartYMD] = useState('2024-04-30')
-    const [endYMD, setEndYMD] = useState('2024-05-07')
+    const [startYMD, setStartYMD] = useState('2024-05-30')
+    const [endYMD, setEndYMD] = useState('2024-07-31')
     const handleEndDate = e => {
         setDataOccurrence({ ...dataOccurrence, endDate: (e.target.value + 'T17:00:00.000Z') })
         setEndYMD(e.target.value)
@@ -198,8 +198,21 @@ const RaiseNeed = props => {
     }, [dataOccurrence])
 
     useEffect(() => {
-        setDataOccurrence({ ...dataOccurrence, timeSlots: selectedDays, days: selectedDays.map((obj) => obj.day).join(', ') })
-    }, [selectedDays])
+        setDataOccurrence(prevState => ({
+            ...prevState,
+            startDate: startYMD + 'T09:00:00.000Z',
+            endDate: endYMD + 'T09:00:00.000Z'
+        }));
+    }, [startYMD, endYMD]);
+    
+    useEffect(() => {
+        setDataOccurrence(prevState => ({
+            ...prevState,
+            timeSlots: selectedDays,
+            days: selectedDays.map(day => day.day).join(',')
+        }));
+    }, [selectedDays]);
+    
     useEffect(() => {
         setDataOther(dataOther => ({
             ...dataOther,
