@@ -11,6 +11,7 @@ import SBLogo from '../../assets/sunbirdlogo.png';
 import randomColor from 'randomcolor'
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchUserByEmail } from '../../state/userSlice'
+import { useHistory } from 'react-router-dom';
 
 function Header({ toggleSideNav }) { // Receive toggleSideNav function as prop
   const [open,setOpen] = useState(false);
@@ -18,11 +19,13 @@ function Header({ toggleSideNav }) { // Receive toggleSideNav function as prop
   const currentUser = auth.currentUser;
   const dispatch = useDispatch()
   const userData = useSelector((state)=> state.user.data)
+  const history = useHistory();
 
   const handleLogout = () => {
     auth.signOut()
     dispatch(fetchUserByEmail(''))
     console.log(userData)
+    history.push("/");
     //window.location.reload()
   }
   const userRole = userData.role;
