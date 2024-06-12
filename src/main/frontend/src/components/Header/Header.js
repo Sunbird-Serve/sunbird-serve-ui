@@ -25,8 +25,8 @@ function Header({ toggleSideNav }) { // Receive toggleSideNav function as prop
     auth.signOut()
     dispatch(fetchUserByEmail(''))
     console.log(userData)
-    history.push("/");
-    window.location.reload()
+    //history.push("/");
+    //window.location.reload()
   }
   const userRole = userData.role;
   

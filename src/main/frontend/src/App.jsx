@@ -1,4 +1,3 @@
-import "./App.css";
 import React, { useEffect, useState } from "react";
 import LoginPage from "./containers/LoginPage/LoginPage";
 import MainPage from "./containers/MainPage/MainPage";
@@ -74,27 +73,29 @@ function App() {
   }, [dispatch]);
 
   const [volunteer, setVolunteer] = useState(false);
+
   const handleVolunteer = (value) => {
-    setVolunteer(value);    // explore button on-click
+    setVolunteer(value);
   };
 
-  if (presentUser === null) {
-    // User is not logged in
-    return <LoginPage getVolunteerStatus={handleVolunteer} />;
-  }
-
-  if (userDetails === undefined) {
-    // User details are being fetched
-    return <div>Loading...</div>;
-  }
-
-  if (volunteer || (userDetails.role && userDetails.role.includes('Volunteer'))) {
-    // User is a volunteer or clicked explore
+  // Handle explore button click
+  if (volunteer) {
     return <ExplorePage />;
   }
 
-  // Default: render MainPage for other roles
-  return <MainPage />;
+  // If user is logged in and userDetails are available
+  if (presentUser !== null && userDetails !== undefined) {
+    if (userDetails.role && userDetails.role.includes('Volunteer')) {
+      // User is a volunteer
+      return <ExplorePage />;
+    } else {
+      // Default: render MainPage for other roles
+      return <MainPage />;
+    }
+  }
+
+  // Default: render LoginPage if user is not logged in or userDetails are being fetched
+  return <LoginPage getVolunteerStatus={handleVolunteer} />;
 }
 
 export default App;
