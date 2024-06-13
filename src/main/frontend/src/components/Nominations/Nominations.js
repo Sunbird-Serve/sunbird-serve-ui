@@ -145,6 +145,14 @@ const Nominations = ({ needData, openPopup }) => {
         setDeliverables(response.data.needDeliverable)
         setInParas(response.data.inputParameters)
         console.log(response.data)
+        if (response.data.inputParameters.length > 0) {
+          setPlanData({
+            planPlatform: '',
+            planLink: '',
+            planStartTime: response.data.inputParameters[0].startTime || '',
+            planEndTime: response.data.inputParameters[0].endTime || ''
+          });
+        }
      })
       .catch((error)=> {
         console.log('error'); 
@@ -251,8 +259,8 @@ const Nominations = ({ needData, openPopup }) => {
   const [planData, setPlanData] = useState({
     planPlatform: '',
     planLink: '',
-    planStartTime: "2024-06-07T10:30:25.176Z",
-    planEndTime: "2024-06-07T11:30:25.176Z"
+    planStartTime: inParas[0]?.startTime || '',
+    planEndTime: inParas[0]?.endTime || ''
   });
   const {planPlatform, planLink, planStartTime, planEndTime} = planData;
   const handleComnInfo = e => {
