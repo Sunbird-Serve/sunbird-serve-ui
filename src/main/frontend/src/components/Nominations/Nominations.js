@@ -390,11 +390,21 @@ const Nominations = ({ needData, openPopup }) => {
       {data.startTime ? data.startTime.slice(11, 16) : ''} - {data.endTime ? data.endTime.slice(11, 16) : ''}
     </div>
     <div className="deliv-url">
-      {index === editIndex ? 
-        <input type="text" value={data.inputUrl} onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')} />
-        : <a href={data.inputUrl} target="_blank" rel="noopener noreferrer">Class Link</a>
-      }
-    </div>
+  {index === editIndex ? (
+    <input
+      type="text"
+      value={data.inputUrl}
+      onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')}
+    />
+  ) : (
+    data.inputUrl.toLowerCase() === "to be added soon".toLowerCase() ? (
+      <span>To be Added</span>
+    ) : (
+      <a href={data.inputUrl} target="_blank" rel="noopener noreferrer">Class Link</a>
+    )
+  )}
+</div>
+
     <div className="deliv-status">
       {index === editIndex ? 
         <input type="text" value={data.status} onChange={(e) => handleDeliverableChange(e, index, 'status')} />
