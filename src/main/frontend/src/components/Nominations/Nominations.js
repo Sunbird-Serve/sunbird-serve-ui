@@ -137,6 +137,7 @@ const Nominations = ({ needData, openPopup }) => {
     }
   },[fulfillment])
 
+  const [ isSubmit, setIsSubmit ] = useState(false)
   useEffect(()=>{
     if(planId){
       axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/${planId}`)
@@ -149,7 +150,7 @@ const Nominations = ({ needData, openPopup }) => {
         console.log('error'); 
       })
     }
-  },[planId])
+  },[planId,isSubmit])
 
   const userList = useSelector((state) => state.userlist.data);
   const [tableData, setTableData] = useState([]);
@@ -267,11 +268,12 @@ const Nominations = ({ needData, openPopup }) => {
     axios.put(`https://serve-v1.evean.net/api/v1/serve-need/all-deliverable-details/update/${planId}`,{
       "inputUrl": planData.planLink,
       "softwarePlatform": planData.planPlatform,
-      "startTime": "2024-06-07T21:37:25.176Z",
-      "endTime": "2024-06-07T23:37:25.176Z"
+      "startTime": planData.planStartTime,
+      "endTime": planData.planEndTime
     })
     .then((response) => {
-      console.log(response.data)
+      setIsSubmit(!isSubmit)
+      setPlanData({...planData, planPlatform:'', planLink:''})
    })
     .catch((error)=> {
       console.log(error); 
