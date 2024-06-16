@@ -178,12 +178,11 @@ const VolunteerDetails = props => {
                 <div className="status-vInfo"></div>
             </div>
             <div className='switch-vdetail-vdeliv'>
-                <div className={`${activeTab === 'tDetails' ? 'selVinfoTab' : 'vinfoTab'}`} onClick={() => handleTabClick('tDetails')}>Volunteer Info</div>
-                <div className={`${activeTab === 'tDelivs' ? 'selVinfoTab' : 'vinfoTab'}`} onClick={() => handleTabClick('tDelivs')}>Need Plan Deliverables</div>
+                <div className={`tab ${activeTab === 'tDetails' ? 'selVinfoTab' : 'vinfoTab'}`} onClick={() => handleTabClick('tDetails')}>Volunteer Info</div>
+                <div className={`tab ${activeTab === 'tDelivs' ? 'selVinfoTab' : 'vinfoTab'}`} onClick={() => handleTabClick('tDelivs')}>Need Assignment Info</div>
             </div>
             
             {activeTab === 'tDetails' && <div className="list-volunteers">
-                <div className="title-volunteerinfo">VOLUNTEER INFO</div>
                 <div className="volunteerInfo">
                 <div className="vInfo-half">
                     <div className="vInfo-item">
@@ -240,18 +239,22 @@ const VolunteerDetails = props => {
             </div>}
 
             {activeTab === 'tDelivs' && !viewDelivs && <div className="vcFulfils">
-                <div className="header-vcFulfils"> Need Plans </div>
-                {vfulfils.map((data, index) => (
-                    <div className="vcfulfil-list" key={index}>
-                        <div className="vcfulfil-item">
-                            <div className="vcfulfil-needname">{needById[data.needId]}</div>
-                            <div className="vcfulfil-status">{data.fulfillmentStatus}</div>
-                            <div className="vcfulfil-button">
-                                <button onClick={()=>handleViewDeliverable(data.needPlanId)}>View Deliverables</button>
-                            </div>
-                        </div>
-                        
-                    </div> ))}
+            {vfulfils.length > 0 ? (
+    vfulfils.map((data, index) => (
+        <div className="vcfulfil-list" key={index}>
+            <div className="vcfulfil-item">
+                <div className="vcfulfil-needname">{needById[data.needId]}</div>
+                <div className="vcfulfil-status">{data.fulfillmentStatus}</div>
+                <div className="vcfulfil-button">
+                    <button onClick={() => handleViewDeliverable(data.needPlanId)}>View Deliverables</button>
+                </div>
+            </div>
+        </div>
+    ))
+) : (
+    <div className="no-need-assigned">Need is not yet assigned</div>
+)}
+
             </div>}
 
             {activeTab === 'tDelivs'  && viewDelivs && <div className="vcDeliverables">

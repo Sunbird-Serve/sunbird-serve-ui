@@ -262,6 +262,7 @@ const Registration = (props) => {
     "Punjabi",
     "Romanian",
     "Russian",
+    "Sanskrit",
     "Sindhi",
     "Serbo-Croatian",
     "Spanish",
@@ -303,6 +304,7 @@ const Registration = (props) => {
     "Business Analysis",
     "Business Consulting",
     "Business Intelligence",
+    "Career Guidance",
     "Chemical Engineering",
     "Civil Engineering",
     "Clinical Psychology",
@@ -333,6 +335,7 @@ const Registration = (props) => {
     "Game Development",
     "Genetic Counseling",
     "Graphic Design",
+    "Guest Lecture",
     "Health Informatics",
     "Healthcare Administration",
     "Human Resources",
@@ -348,8 +351,10 @@ const Registration = (props) => {
     "Market Analysis",
     "Market Research",
     "Marketing Research Analysis",
+    "Mathematics",
     "Mechanical Engineering",
     "Medical Research",
+    "Mentoring",
     "Mobile App Development",
     "Music Production",
     "Neuroscience",
@@ -365,7 +370,9 @@ const Registration = (props) => {
     "Real Estate",
     "Robotics Engineering",
     "Sales Management",
+    "Science",
     "Social Media Management",
+    "Social Studies",
     "Social Work",
     "Software Development",
     "Speech Therapy",
@@ -1137,7 +1144,7 @@ const Registration = (props) => {
                 ></input>
               </div>
               <div className="formElement">
-                <label>Employment Status</label>
+                <label>Employment Status<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -1149,6 +1156,7 @@ const Registration = (props) => {
                   style={{ height: "4vh", width: "100%", textAlign: "left" }}
                   name="empStatus"
                   value={formData.empStatus ? formData.empStatus : ""}
+                  required
                   onChange={handleChange}
                 >
                   {employmentStatus.map((empStatus, index) => (

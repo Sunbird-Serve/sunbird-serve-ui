@@ -29,16 +29,49 @@
     display: flex;
     margin: 20px 70px 0px 70px;
 }
+
+.tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    margin-right: 5px;
+    transition: background-color 0.3s ease;
+    border-radius: 10px 10px 0 0;
+}
+
+.tab:hover {
+    background-color: #ddd;
+}
+
+.tab.active {
+    background-color: #fff;
+    border-top: 2px solid #007bff;
+    border-left: 2px solid #007bff;
+    border-right: 2px solid #007bff;
+    border-bottom: none;
+    font-weight: bold;
+    border-radius: 10px 10px 0 0;
+}
 .vinfoTab, .selVinfoTab {
-    width: 50%;
+    width: 30%;
     padding: 10px 15px;
 }
+
+.no-need-assigned {
+    padding: 20px;
+    text-align: left;
+    color: #666;
+    font-size: 16px;
+}
+
+
 .selVinfoTab {
     background-color: #006FA2;
     color: white;
 }
 .vinfoTab {
-    border: solid 1px;
     border-bottom: none;
 }
 .vinfoTab:hover {
@@ -47,7 +80,6 @@
 }
 
 .list-volunteers {
-    border: solid 1px;
     margin: 0px 70px;
 }
 
@@ -110,7 +142,6 @@
 }
 
 .vcFulfils, .vcDeliverables {
-    border: solid 1px;
     margin: 0px 70px;
     min-height: 300px;
     height: fit-content;
