@@ -612,7 +612,8 @@ const Registration = (props) => {
 
   const [loading, setLoading] = useState(false);
 
-  const onsubmit = () => {
+  const submitForm = e => {
+    e.preventDefault()
     setLoading(true)
     axios.post(`${configData.USER_GET}/`, dataToPost)
       .then(function(response){
@@ -667,6 +668,7 @@ const Registration = (props) => {
 
   return (
     <div>
+      {/* Loading */}
     {loading && <div className="loading-box">
       <span>Creating the user. Please wait...</span>
       <Box sx={{ width: '80%' }}>
@@ -704,15 +706,16 @@ const Registration = (props) => {
             Clear All
           </button>
           <button
-            type="button"
+            type="submit"
             className="clear-btn register-btn"
-            onClick={() => onsubmit()}
+            form="registation-form"
           >
             Register
           </button>
         </div>
       </div>
       <div className="regContainer">
+
         <div className="nav-container ">
           <span
             className={nav === 0 ? "nav-element active" : "nav-element"}
@@ -756,13 +759,15 @@ const Registration = (props) => {
             Reference & Consent
           </span>
         </div>
-        <div className="formContainer">
+
+        {/* registration form */}
+        <form className="formContainer" id="registation-form" onSubmit={submitForm}>
           <div className="form-section" id={0} ref={refArray[0]}>
             <span className="formCat">Personal Details</span>
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>First Name</label>
+                <label>First Name<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -770,10 +775,11 @@ const Registration = (props) => {
                   name="firstName"
                   value={formData.firstName ? formData.firstName : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Last Name</label>
+                <label>Last Name<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -781,10 +787,11 @@ const Registration = (props) => {
                   name="lastName"
                   value={formData.lastName ? formData.lastName : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Gender</label>
+                <label>Gender<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -795,6 +802,7 @@ const Registration = (props) => {
                   name="gender"
                   value={formData.gender ? formData.gender : ""}
                   onChange={handleChange}
+                  required
                 >
                   {genderOptions.map((gender, index) => (
                     <MenuItem key={index + gender} value={gender}>
@@ -804,7 +812,7 @@ const Registration = (props) => {
                 </Select>
               </div>
               <div className="formElement">
-                <label>Date of Birth</label>
+                <label>Date of Birth<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -813,10 +821,11 @@ const Registration = (props) => {
                   name="dob"
                   value={formData.dob ? formData.dob : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Nationality</label>
+                <label>Nationality<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -827,6 +836,7 @@ const Registration = (props) => {
                   name="nationality"
                   value={formData.nationality ? formData.nationality : ""}
                   onChange={handleChange}
+                  required
                 >
                   {countries.map((country, index) => (
                     <MenuItem key={index + country} value={country}>
@@ -837,12 +847,13 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={1} ref={refArray[1]}>
             <span className="formCat">Contact Details</span>
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>Mobile Number</label>
+                <label>Mobile Number<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -850,10 +861,11 @@ const Registration = (props) => {
                   name="mobileNumber"
                   value={formData.mobileNumber ? formData.mobileNumber : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>E-mail ID</label>
+                <label>E-mail ID<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -861,6 +873,7 @@ const Registration = (props) => {
                   name="email"
                   value={formData.email ? formData.email : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
@@ -940,6 +953,7 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={2} ref={refArray[2]}>
             <span className="formCat">Preferences</span>
             <hr className="form-line" />
@@ -1082,12 +1096,13 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={3} ref={refArray[3]}>
             <span className="formCat">Additional Details</span>
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>Qualification</label>
+                <label>Qualification<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -1100,6 +1115,7 @@ const Registration = (props) => {
                   name="qualification"
                   value={formData.qualification ? formData.qualification : ""}
                   onChange={handleChange}
+                  required
                 >
                   {qualifications.map((qualification, index) => (
                     <MenuItem key={index + qualification} value={qualification}>
@@ -1109,7 +1125,7 @@ const Registration = (props) => {
                 </Select>
               </div>
               <div className="formElement">
-                <label>Affiliation</label>
+                <label>Affiliation<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -1117,6 +1133,7 @@ const Registration = (props) => {
                   name="affiliation"
                   value={formData.affiliation ? formData.affiliation : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
@@ -1155,6 +1172,7 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={4} ref={refArray[4]}>
             <span className="formCat">Skills</span>
             <hr className="form-line" />
@@ -1219,6 +1237,7 @@ const Registration = (props) => {
               + Add skill
             </button>
           </div>
+
           <div className="form-section" id={5} ref={refArray[5]}>
             <span className="formCat">Reference & Consent</span>
             <hr className="form-line" />
@@ -1271,7 +1290,8 @@ const Registration = (props) => {
               </span>
             </div>
           </div>
-        </div>
+
+        </form>
       </div>
     </div>)
      } 
