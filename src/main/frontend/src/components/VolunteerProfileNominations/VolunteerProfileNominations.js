@@ -57,10 +57,10 @@ function VPNominations() {
      console.log(error)
     })
 
-    axios.get(`http://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/read/${userId}`)
+    axios.get(`https://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/read/${userId}`)
     .then(response => {
-      console.log(response.data)
-      setVolunteerHrs(response.data)
+      console.log(response.data.totalHours)
+      setVolunteerHrs(response.data.totalHours)
     })
     .catch(function (error) {
       console.log(error)
@@ -160,7 +160,7 @@ function VPNominations() {
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerPlansDelivered} alt="Nominated Needs" height="35px" />
-              <span>4</span>
+              <span>{volunteerHrs}</span>
             </div>
             <div className="statsVPNomsName">Total Volunteer Hrs</div>
           </div>

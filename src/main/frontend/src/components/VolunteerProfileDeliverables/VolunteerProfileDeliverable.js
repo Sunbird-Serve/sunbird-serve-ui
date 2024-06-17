@@ -46,16 +46,31 @@ const VolunteerProfileDeliverable = props => {
   // for each needPlanId in the filtered fullfilments, get deliverables and make list
 
   const userId = useSelector((state)=> state.user.data.osid)
+  const [volunteerHrs, setVolunteerHrs] = useState(0);
   const [fulfils, setFulfils] = useState([])
+
   useEffect(() => {
     axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=10`)
-    .then(response => {
-      setFulfils(response.data)
-    })
-    .catch(error => {
-      console.log(error)
-    });
-  }, []);
+      .then((response) => {
+        setFulfils(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+
+    // Fetch current volunteer hours
+    axios.get(`https://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/read/${userId}`)
+      .then((response) => {
+        console.log("Fetching Vol Hours");
+        console.log(response.data.totalHours);
+        setVolunteerHrs(response.data.totalHours);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [userId]);
+
+
   const needFulfils = fulfils ? fulfils.filter(item => item.needId === props.needId) : []
 
   const userList = useSelector((state) => state.userlist.data);
@@ -155,40 +170,48 @@ const VolunteerProfileDeliverable = props => {
     setCIndex(index)
   }
   const confirmCompleted = (item) => {
-    setRejection('')
-    setCompletePopup('')
+    setRejection('');
+    setCompletePopup('');
     console.log({
       "needDeliverableId": item.id,
       "numberOfAttendees": numBenefics,
       "submittedUrl": "",
       "remarks": notes
-    })
-    axios.post(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-output/create`,{
+    });
+  
+    axios.post(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-output/create`, {
       "needDeliverableId": item.id,
       "numberOfAttendees": numBenefics,
       "submittedUrl": "",
       "remarks": notes
-    }).then(response => {
-      console.log('Deliverable Completed')
-      setDstat(!dstat)
+    })
+    .then(response => {
+      console.log('Deliverable output created');
+      return axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`, {
+        "needPlanId": planId,
+        "comments": notes,
+        "status": "Completed",
+        "deliverableDate": currentDate
+      });
+    })
+    .then(response => {
+      console.log('Deliverable completed');
+      const newTotalHours = volunteerHrs + 1; // Assuming each completed deliverable adds 1 hour
+      return axios.put(`https://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/update/${userId}`, {
+        totalHours: newTotalHours,
+        hoursPerWeek: 0, // Adjust accordingly
+      });
+    })
+    .then(response => {
+      console.log('Volunteer hours updated');
+      setVolunteerHrs(volunteerHrs + 1); // Update local state
+      setDstat(!dstat); // Trigger re-render to reflect changes
     })
     .catch(error => {
-      console.log('Error marking deliverable completed')
+      console.log('Error completing deliverable or updating volunteer hours', error);
     });
-
-    axios.put(`${configData.NEEDPLAN_DELIVERABLES}/update/${item.id}`,{
-      "needPlanId": planId,
-      "comments": notes,
-      "status": "Completed",
-      "deliverableDate": currentDate
-    }).then(response => {
-      console.log('Deliverable Completed')
-      setDstat(!dstat)
-    })
-    .catch(error => {
-      console.log('Error marking deliverable completed')
-    });
-  }
+  };
+  
 
   const divRef = useRef(null);
   useEffect(() => {
