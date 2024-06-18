@@ -67,7 +67,7 @@ const NeedPlans = () => {
             return null;
           });
         // Fetch platform details
-        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/0e09a476-bac3-4256-8ff6-e2ba1192bd4f`)
+        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/${needPlanId}`)
           .then(response => response.data)
           .catch(error => {
             // console.error(`Error fetching platform for ${needId}:`, error);
@@ -115,9 +115,20 @@ const NeedPlans = () => {
     userContact[user.osid] = user.contactDetails.mobile;
   }
 
+  const formatTime = (timeData, timeZone) => {
+    const date = new Date(timeData);
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+      timeZone: 'UTC',
+    };
+  
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  };
 
   //make the events from start to end date
-  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId, platform, meetURL) {
+  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId, platform, meetURL, startTime, endTime) {
     const timeSlotObject = {};
     timeSlots.forEach(slot => {
       const day = slot.day.toLowerCase();
@@ -135,8 +146,8 @@ const NeedPlans = () => {
           title: needName,
           start: currentDate.toDateString(), //for session
           end: currentDate.toDateString(), //for session
-          startTime: timeSlotObject[day][0],
-          endTime: timeSlotObject[day][1],
+          startTime: formatTime(startTime, 'Asia/Kolkata'),
+          endTime: formatTime(endTime, 'Asia/Kolkata'),
           startDate: new Date(startDate).toDateString(),//for entire plan
           endDate: new Date(endDate).toDateString(),//for entire plan
           assignedUserId: assignedUserId,
@@ -158,11 +169,15 @@ const NeedPlans = () => {
         const { startDate, endDate } = item.needPlan.occurrence;
         let inputURL = "";
         let softwarePlatform = "";
+        let startTime="";
+        let endTime="";
         if(item.platform && item.platform.inputParameters.length){
           inputURL = item.platform.inputParameters[0].inputUrl;
           softwarePlatform = item.platform.inputParameters[0].softwarePlatform;
+          startTime = item.platform.inputParameters[0].startTime;
+          endTime = item.platform.inputParameters[0].endTime;
         }
-        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId, softwarePlatform, inputURL); // Use getTimeSlots function
+        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId, softwarePlatform, inputURL, startTime, endTime); // Use getTimeSlots function
         newEvents.push(...sessions);
       }
     }
@@ -261,6 +276,7 @@ const NeedPlans = () => {
     setExpandEvent(!expandEvent)
   }
 
+
   return (
       <div>
         <div className="wrapCalender">
@@ -313,7 +329,7 @@ const NeedPlans = () => {
                   <div className="wrap-timeDayEventNC">
                     <span className="timeDayEventNC">
                       <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
-                      {event.startTime}
+                      {event.startTime} - {event.endTime}
                     </span>
                   </div>
                 </div>

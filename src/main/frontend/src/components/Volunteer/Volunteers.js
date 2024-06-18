@@ -58,7 +58,6 @@ function Volunteers() {
     fetchUserDetails();
   }, []);
   
-  console.log(userDetailsList)
   const [ statReg, setReg ] = useState(null)
   const [ statRecom, setRecom ] = useState(null)
   const [ statOnHold, setOnHold ] = useState(null)
