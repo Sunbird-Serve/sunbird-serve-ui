@@ -17,7 +17,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import axios from 'axios'
 import SearchIcon from '@mui/icons-material/Search';
 import { BrowserRouter, Switch, Route} from 'react-router-dom'
-
+const configData = require('../../configure.js');
 
 function Volunteers() {
 
@@ -31,7 +31,7 @@ function Volunteers() {
   useEffect(() => {
     const fetchUserDetails = () => {
       const promises = volunteerList.map(user =>
-        axios.get(`https://serve-v1.evean.net/api/v1/serve-volunteering/user/user-profile/userId/${user.osid}`)
+        axios.get(`${configData.SERVE_VOLUNTEERING}/user/user-profile/userId/${user.osid}`)
           .then(response => ({
             userDetails: user,
             userProfile: response.data,

@@ -50,7 +50,7 @@ const VolunteerProfileDeliverable = props => {
   const [fulfils, setFulfils] = useState([])
 
   useEffect(() => {
-    axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=10`)
+    axios.get(`${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${userId}?page=0&size=10`)
       .then((response) => {
         setFulfils(response.data);
       })
@@ -59,7 +59,7 @@ const VolunteerProfileDeliverable = props => {
       });
 
     // Fetch current volunteer hours
-    axios.get(`https://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/read/${userId}`)
+    axios.get(`${configData.SERVE_VOLUNTEERING}/volunteer/volunteer-hours/read/${userId}`)
       .then((response) => {
         console.log("Fetching Vol Hours");
         console.log(response.data.totalHours);
@@ -179,7 +179,7 @@ const VolunteerProfileDeliverable = props => {
       "remarks": notes
     });
   
-    axios.post(`https://serve-v1.evean.net/api/v1/serve-need/deliverable-output/create`, {
+    axios.post(`${configData.SERVE_NEED}/deliverable-output/create`, {
       "needDeliverableId": item.id,
       "numberOfAttendees": numBenefics,
       "submittedUrl": "",
@@ -197,7 +197,7 @@ const VolunteerProfileDeliverable = props => {
     .then(response => {
       console.log('Deliverable completed');
       const newTotalHours = volunteerHrs + 1; // Assuming each completed deliverable adds 1 hour
-      return axios.put(`https://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/update/${userId}`, {
+      return axios.put(`${configData.SERVE_VOLUNTEERING}/volunteer/volunteer-hours/update/${userId}`, {
         totalHours: newTotalHours,
         hoursPerWeek: 0, // Adjust accordingly
       });

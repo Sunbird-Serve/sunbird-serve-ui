@@ -57,7 +57,7 @@ function VPNominations() {
      console.log(error)
     })
 
-    axios.get(`https://serve-v1.evean.net/api/v1/serve-volunteering/volunteer/volunteer-hours/read/${userId}`)
+    axios.get(`${configData.SERVE_VOLUNTEERING}/volunteer/volunteer-hours/read/${userId}`)
     .then(response => {
       console.log(response.data.totalHours)
       setVolunteerHrs(response.data.totalHours)

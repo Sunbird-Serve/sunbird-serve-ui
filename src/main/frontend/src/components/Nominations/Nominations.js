@@ -97,7 +97,7 @@ const Nominations = ({ needData, openPopup }) => {
         const viewDeliverable = () => {
           console.log(row.original)
           setRowData(row.original)
-          axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`)
+          axios.get(`${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`)
           .then((response) => {
             setFulfillment(response.data)
             console.log(response.data)
@@ -140,7 +140,7 @@ const Nominations = ({ needData, openPopup }) => {
   const [ isSubmit, setIsSubmit ] = useState(false)
   useEffect(()=>{
     if(planId){
-      axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/${planId}`)
+      axios.get(`${configData.SERVE_NEED}/need-deliverable/${planId}`)
       .then((response) => {
         setDeliverables(response.data.needDeliverable)
         setInParas(response.data.inputParameters)
@@ -224,7 +224,7 @@ const Nominations = ({ needData, openPopup }) => {
       "startTime": formData[index].startTime,
       "endTime": formData[index].endTime
     })
-    axios.put(`http://serve-v1.evean.net/api/v1/serve-need/deliverable-details/update/${formData[index].deliverableId}`,{
+    axios.put(`${configData.SERVE_NEED}/deliverable-details/update/${formData[index].deliverableId}`,{
       "inputUrl": formData[index].inputUrl,
       "softwarePlatform": formData[index].softwarePlatform,
       "startTime": formData[index].startTime,
@@ -273,7 +273,7 @@ const Nominations = ({ needData, openPopup }) => {
       "startTime": planData.planStartTime,
       "endTime": planData.planEndTime
     })
-    axios.put(`https://serve-v1.evean.net/api/v1/serve-need/all-deliverable-details/update/${planId}`,{
+    axios.put(`${configData.SERVE_NEED}/all-deliverable-details/update/${planId}`,{
       "inputUrl": planData.planLink,
       "softwarePlatform": planData.planPlatform,
       "startTime": planData.planStartTime,

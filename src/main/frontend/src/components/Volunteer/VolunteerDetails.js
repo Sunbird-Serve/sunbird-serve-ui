@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import DoneIcon from '@mui/icons-material/Done';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-
+const configData = require('../../configure.js');
 const VolunteerDetails = props => {
     const dispatch = useDispatch()
     const userDetails = props.data.userDetails;
@@ -42,7 +42,7 @@ const VolunteerDetails = props => {
         userToPost.status = newStatus
         console.log(userDetails.osid)
         console.log(userToPost)
-        axios.put(`https://serve-v1.evean.net/api/v1/serve-volunteering/user/${userDetails.osid}`, userToPost)
+        axios.put(`${configData.SERVE_VOLUNTEERING}/user/${userDetails.osid}`, userToPost)
         .then(response => {
             console.log('API response:', response.data);
             dispatch(fetchUserList());
@@ -55,7 +55,7 @@ const VolunteerDetails = props => {
     //get needplans for volunteer
     const [vfulfils, setVfulfils] = useState([])
     useEffect(()=>{
-        axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/volunteer-read/${userDetails.osid}`)
+        axios.get(`${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${userDetails.osid}`)
         .then(response => {
             console.log(response.data);
             setVfulfils(response.data)
@@ -71,7 +71,7 @@ const VolunteerDetails = props => {
     const [ inParas, setInParas ] = useState([])
     const [planId, setPlanId] = useState('')
     const handleViewDeliverable = (planId) => {
-        axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/${planId}`)
+        axios.get(`${configData.SERVE_NEED}/need-deliverable/${planId}`)
         .then(response => {
             setDeliverables(response.data.needDeliverable)
             setInParas(response.data.inputParameters)
@@ -123,7 +123,7 @@ const VolunteerDetails = props => {
           "startTime": formData[index].startTime,
           "endTime": formData[index].endTime
         })
-        axios.put(`http://serve-v1.evean.net/api/v1/serve-need/deliverable-details/update/${formData[index].deliverableId}`,{
+        axios.put(`${configData.SERVE_NEED}/deliverable-details/update/${formData[index].deliverableId}`,{
           "inputUrl": formData[index].inputUrl,
           "softwarePlatform": formData[index].softwarePlatform,
           "startTime": formData[index].startTime,
@@ -149,7 +149,7 @@ const VolunteerDetails = props => {
           "startTime": planData.planStartTime,
           "endTime": planData.planEndTime
         })
-        axios.put(`https://serve-v1.evean.net/api/v1/serve-need/all-deliverable-details/update/${planId}`,{
+        axios.put(`${configData.SERVE_NEED}/all-deliverable-details/update/${planId}`,{
           "inputUrl": planData.planLink,
           "softwarePlatform": planData.planPlatform,
           "startTime": "2024-06-07T21:37:25.176Z",

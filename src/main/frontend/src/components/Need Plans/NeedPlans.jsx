@@ -30,7 +30,7 @@ const NeedPlans = () => {
   const [fulfillments, setFulfillments] = useState([])
   useEffect(()=>{
     if(userId){
-      axios.get(`https://serve-v1.evean.net/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=10`)
+      axios.get(`${configData.SERVE_FULFILL}/fulfillment/coordinator-read/${userId}?page=0&size=10`)
       .then(response => {
           setFulfillments(response.data)
       })
@@ -52,7 +52,7 @@ const NeedPlans = () => {
 
 
       // Fetch needPlan details
-        const fetchNeedPlan = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-plan/read/${needPlanId}`)
+        const fetchNeedPlan = axios.get(`${configData.SERVE_NEED}/need-plan/read/${needPlanId}`)
           .then(response => response.data)
           .catch(error => {
             console.error(`Error fetching needPlan for ${needPlanId}:`, error);
@@ -60,14 +60,14 @@ const NeedPlans = () => {
           });
 
         // Fetch need details
-        const fetchNeed = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need/${needId}`)
+        const fetchNeed = axios.get(`${configData.SERVE_NEED}/need/${needId}`)
           .then(response => response.data)
           .catch(error => {
             console.error(`Error fetching need for ${needId}:`, error);
             return null;
           });
         // Fetch platform details
-        const fetchPlatform = axios.get(`https://serve-v1.evean.net/api/v1/serve-need/need-deliverable/${needPlanId}`)
+        const fetchPlatform = axios.get(`${configData.SERVE_NEED}/need-deliverable/${needPlanId}`)
           .then(response => response.data)
           .catch(error => {
             // console.error(`Error fetching platform for ${needId}:`, error);

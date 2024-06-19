@@ -98,7 +98,7 @@ function VolunteerProfileEdit() {
     
 
 
-    axios.put(`https://serve-v1.evean.net/api/v1/serve-volunteering/user/${userData.osid}`, editedUserData)
+    axios.put(`${configData.SERVE_VOLUNTEERING}/user/${userData.osid}`, editedUserData)
       .then(response=>{
         console.log('user edit sucessful');
         dispatch(fetchUserByEmail(userEmail))
