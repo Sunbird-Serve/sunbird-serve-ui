@@ -261,7 +261,7 @@ const RaiseNeed = props => {
                             {/* Need Name */}
                             <div className="itemFormNeed">
                                 <label>Need Name <span class="required-label"></span></label>
-                                <input type="text" placeholder='Ex: Avila Beach Cleaning' name="name" value={name} onChange={changeHandler} required />
+                                <input type="text" placeholder='Format: Grade Subject, Ex: Grade 5 Science' name="name" value={name} onChange={changeHandler} required />
                             </div>
                             {/* Need Purpose */}
                             <div className="itemFormNeed">

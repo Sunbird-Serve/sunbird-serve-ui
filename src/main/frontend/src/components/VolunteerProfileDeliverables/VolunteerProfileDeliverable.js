@@ -195,14 +195,6 @@ const VolunteerProfileDeliverable = props => {
       });
     })
     .then(response => {
-      console.log('Deliverable completed');
-      const newTotalHours = volunteerHrs + 1; // Assuming each completed deliverable adds 1 hour
-      return axios.put(`${configData.SERVE_VOLUNTEERING}/volunteer/volunteer-hours/update/${userId}`, {
-        totalHours: newTotalHours,
-        hoursPerWeek: 0, // Adjust accordingly
-      });
-    })
-    .then(response => {
       console.log('Volunteer hours updated');
       setVolunteerHrs(volunteerHrs + 1); // Update local state
       setDstat(!dstat); // Trigger re-render to reflect changes
