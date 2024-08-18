@@ -134,9 +134,13 @@ export const VolunteerNeeds = props => {
                   <div class="h3-container">{truncateString(item.need.name,20)}</div>
                   <i class="heart-icon"><FavoriteIcon/></i>
                 </div>
+                <div className="location-container gray-text">
+                    <LocationOnOutlinedIcon style={{ fontSize: 15 }} />
+                    <span>{(item.entity && item.entity.name) ? item.entity.name : ''}</span>
+                    {/* <span>{(item.entity && item.entity.district) ? item.entity.district : ''}</span> */}
+                  </div>
                 <div className="location-vrequired">
                   <div className="location-container gray-text">
-                    <LocationOnOutlinedIcon style={{ fontSize: 15 }} />
                     <span>{(item.need && item.need.status) ? item.need.status : ''}</span>
                     {/* <span>{(item.entity && item.entity.district) ? item.entity.district : ''}</span> */}
                   </div>

@@ -75,10 +75,12 @@
 .nav-element {
     display: block;
     padding: 5%;
+    font-size: 16px; 
 }
 
 .active {
     color:#0080BC;
+    font-size: 16px; 
 }
 .nav-element:hover {
     color:#0080BC;

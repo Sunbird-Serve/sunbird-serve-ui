@@ -104,7 +104,7 @@ const VolunteerSignup = ({ loginState, onClose }) => {
               <hr />
             </div> */}
             {/* Social Media Login*/}
-            {/* <div className="btnSLogin">
+            { <div className="btnSLogin">
               <button type="login" onClick={signInWithGoogle}>
                 {" "}
                 <i>
@@ -120,7 +120,7 @@ const VolunteerSignup = ({ loginState, onClose }) => {
                 </i>
                 Facebook
               </button>
-            </div> */}
+            </div> }
             {/* Error message when credentials are wrong*/}
             {error && <div className="signupError">{error.slice(5)}</div>}
           </form>
