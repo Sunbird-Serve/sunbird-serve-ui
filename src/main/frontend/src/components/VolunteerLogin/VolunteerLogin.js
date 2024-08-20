@@ -24,14 +24,14 @@ const VolunteerLogin = ({loginState, onClose}) => {
             user => console.log('Login Success')
         ).catch(err => setError(err.code) )
     }
-    /*const signInWithGoogle = e => {
+    const signInWithGoogle = e => {
         e.preventDefault();
         signInWithPopup(auth, gprovider)
     }
     const signInWithFacebook = e => {
         e.preventDefault();
         signInWithPopup(auth, fprovider)
-    }*/
+    }
     const userId = useSelector((state)=> state.user.data.osid)
     const [ alertRegister, setAlertRegister ] = useState(false)
     useEffect(()=>{
