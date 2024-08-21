@@ -9,22 +9,27 @@ import PeopleIcon from "@mui/icons-material/People";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined"; 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import DateRangeIcon from '@mui/icons-material/DateRange';
 
 export const VolunteerNeeds = props => {
   const needList = useSelector((state) => state.need.data);
-  const dataNeeds = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId && (item.need.status === 'Approved' || item.need.status === 'Nominated'))
-  const [searchQueryNeed, setSearchQueryNeed] = useState('')
+  const dataNeeds = needList.filter(item => item && item.need && item.need.needTypeId === props.needTypeId && (item.need.status === 'Approved' || item.need.status === 'Nominated'));
+  const [searchQueryNeed, setSearchQueryNeed] = useState('');
+  
   const handleSearchChange = (event) => {
-    setSearchQueryNeed(event.target.value)
-  }
-  const dataNotSorted =  dataNeeds.filter(item => {
-    return item.need.name.toLowerCase().includes(searchQueryNeed.toLowerCase())
-  })
+    setSearchQueryNeed(event.target.value);
+  };
+  
+  const dataNotSorted = dataNeeds.filter(item => {
+    const needNameMatches = item.need.name.toLowerCase().includes(searchQueryNeed.toLowerCase());
+    const entityNameMatches = item.entity && item.entity.name && item.entity.name.toLowerCase().includes(searchQueryNeed.toLowerCase());
+    return needNameMatches || entityNameMatches;
+  });
 
   const [sortingOrder, setSortingOrder] = useState('ascending');
-  const [data, setData ] = useState([])
+  const [data, setData] = useState([]);
+  
   useEffect(() => {
     // Clone the needList to avoid modifying the original array
     const sortedList = [...dataNotSorted];
@@ -48,10 +53,9 @@ export const VolunteerNeeds = props => {
       finalSortedList = itemsWithNullOccurrence.concat(itemsWithOccurrence);
     }
 
-    setData(finalSortedList)
-
+    setData(finalSortedList);
   }, [sortingOrder, searchQueryNeed]);
-  
+
   const [view, setView] = useState(true);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedNeed, setSelectedNeed] = useState(null); // State to store the selected need
@@ -62,6 +66,7 @@ export const VolunteerNeeds = props => {
     setView(true);
     setNeedBoxesPerRow(3);
   };
+  
   const handleToggleList = () => {
     setView(false);
     setNeedBoxesPerRow(4);
@@ -77,8 +82,8 @@ export const VolunteerNeeds = props => {
   };
 
   const handleBackButton = () => {
-    props.updateNeedList(false)
-  }
+    props.updateNeedList(false);
+  };
 
   const truncateString = (str, num) => {
     if (str.length > num) {
@@ -87,7 +92,6 @@ export const VolunteerNeeds = props => {
       return str;
     }
   };
-
 
   return (
     <div className="wrapvolunteerNeeds">
@@ -110,7 +114,7 @@ export const VolunteerNeeds = props => {
           <div className="vSearchNeed">
               <i><SearchIcon /></i>
               <input type="text" name="searchQueryNeed" placeholder="Search needs" value={searchQueryNeed} onChange={handleSearchChange} ></input>
-            </div>
+          </div>
           <div className="toggleNeedView">  
               <button className={`${view ? "blueText" : "grayText"}`} onClick={handleToggleGrid}> 
                 <i><GridOnIcon style={{fontSize:"19px"}}/></i>
@@ -131,18 +135,16 @@ export const VolunteerNeeds = props => {
             {data.map((item) => (
               <div key={item.need.id} className="needBox" onClick={() => handlePopupOpen(item)} >
                 <div className="need-container-volunteer">
-                  <div class="h3-container">{truncateString(item.need.name,20)}</div>
-                  <i class="heart-icon"><FavoriteIcon/></i>
+                  <div className="h3-container">{truncateString(item.need.name,20)}</div>
+                  <i className="heart-icon"><FavoriteIcon/></i>
                 </div>
                 <div className="location-container gray-text">
                     <LocationOnOutlinedIcon style={{ fontSize: 15 }} />
                     <span>{(item.entity && item.entity.name) ? item.entity.name : ''}</span>
-                    {/* <span>{(item.entity && item.entity.district) ? item.entity.district : ''}</span> */}
-                  </div>
+                </div>
                 <div className="location-vrequired">
                   <div className="location-container gray-text">
                     <span>{(item.need && item.need.status) ? item.need.status : ''}</span>
-                    {/* <span>{(item.entity && item.entity.district) ? item.entity.district : ''}</span> */}
                   </div>
                   <div className="required-container gray-text">
                     <PeopleIcon style={{ fontSize: 15 }} />
@@ -165,7 +167,7 @@ export const VolunteerNeeds = props => {
             need={selectedNeed}
           />
         )}
-        </div>
+      </div>
     </div>
   );
 }

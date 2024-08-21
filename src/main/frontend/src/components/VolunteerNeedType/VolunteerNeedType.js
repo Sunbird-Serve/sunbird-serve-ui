@@ -152,7 +152,7 @@ function VolunteerNeedType() {
                     <div className="numNeedsNT">
                       <i><StickyNote2Icon style={{height:"12px"}} /></i>
                       <span>
-                        {needList.filter(need => need && need.need && need.need.needTypeId === item.id).length } Needs
+                        {needList.filter(need => need && need.need && need.need.needTypeId === item.id && (need.need.status === 'Approved' || need.need.status === 'Nominated')).length } Needs
                       </span>
                     </div>
                   </div>
