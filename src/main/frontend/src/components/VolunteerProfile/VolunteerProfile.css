@@ -65,3 +65,30 @@
 .vpContent {
     margin: 10px 150px;
 }
+.wrap-status {
+    display: flex;
+    padding: 10px 0px;
+    gap: 10px;
+}
+.volunteerStatus {
+    color: white;
+    margin-top: 3px;
+}
+.vtooltip {
+    background-color: inherit;
+    width: fit-content;
+    border: solid 1px;
+    border-radius: 50%;
+    color: white;
+    font-weight: bold;
+    padding: 0px 5px;
+    font-size: 10px;
+}
+.register-vprofile {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 3px 10px;
+    border-radius: 3px;
+    margin-top: 5px;
+}

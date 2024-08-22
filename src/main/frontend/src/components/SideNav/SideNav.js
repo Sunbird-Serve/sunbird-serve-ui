@@ -7,8 +7,12 @@ import CalendarTodayOutlinedIcon from '@mui/icons-material/CalendarTodayOutlined
 import VolunteerActivismOutlinedIcon from '@mui/icons-material/VolunteerActivismOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import { useSelector } from 'react-redux'
 
 function SideNav() {
+  //get userInfo from store
+  const userRole = useSelector((state)=> state.user.data.role)
+  console.log(userRole)
   return ( 
     <div className="sideNav row">
       {/* Logo in Side navigation*/}
@@ -18,19 +22,14 @@ function SideNav() {
         </div>
         <div className="logotext">
           <div className="logotitle">SUNBIRD SERVE</div>
-          <div className="usertag">NCoordinator Management</div>
+          {/* <div className="usertag">NCoordinator Management</div> */}
         </div>
       </div>
       {/* Navigation Menu options */}
-      <div className="navMenu">
-        {/* switch to dashboard page*/}
-        <NavLink to="/" exact className="sideNavItem row" activeClassName="active">
-          <i><DashboardOutlinedIcon /></i>  
-          <span>Dashboard</span>
-        </NavLink>
+      {userRole && userRole.includes('nCoordinator') && <div className="navMenu">
 
         {/* switch to needs page */}
-        <NavLink to="/needs" exact className="sideNavItem row">
+        <NavLink to="/needs" exact className="sideNavItem row" activeClassName="active">
           <i><StickyNote2OutlinedIcon /></i>
           <span>Needs</span>
         </NavLink>
@@ -40,20 +39,17 @@ function SideNav() {
           <i><CalendarTodayOutlinedIcon /></i>
           <span>Needs Schedule</span>
         </NavLink>
+      </div>}
 
+      {/* switch to vCoordinator page */}
+      {userRole && userRole.includes('vCoordinator') && <div className="navMenu">
         <NavLink to="/volunteers" exact className="sideNavItem row">
               <i><VolunteerActivismOutlinedIcon /></i> 
               <span>Volunteers</span>
         </NavLink>
+      </div>}
 
-        {/* switch to volunteers page */}
-        {/* 
-        <NavLink to="/volunteer" exact className="sideNavItem row">
-              <i><VolunteerActivismOutlinedIcon /></i> 
-              <span>Volunteer</span>
-        </NavLink>  
-        */}
-        <div></div>
+      <div className="navMenu">
         <NavLink to="/settings" exact className="sideNavItem row">
               <i><SettingsOutlinedIcon /> </i>
               <span>Settings</span>

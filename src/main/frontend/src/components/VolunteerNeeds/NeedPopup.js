@@ -11,9 +11,11 @@ import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
 import NominationSuccess from '../../assets/nominationSuccess.png';
 
+
 const configData = require('../../configure.js');
 
 function NeedPopup({ open, onClose, need }) {
+  console.log(need)
   const userId = useSelector((state)=> state.user.data.osid)
   const [alertLogin, setAlertLogin] = useState(false)
   const [notifyRegister, setNotifyRegister] = useState(false)
@@ -60,10 +62,17 @@ function NeedPopup({ open, onClose, need }) {
     history.push("/vregistration")
   }
 
+  const historyNom = useHistory();
   const gotoHome = (e) => {
     e.preventDefault();
     setNominationStatus(false)
-    onClose()
+    historyNom.push("/vprofile/vpnominations");
+  }
+
+  const formatTime = (timeString) => {
+    const [hourString, minute] = timeString.split(":");
+    const hour = +hourString % 24;
+    return (hour % 12 || 12) + ":" + minute + (hour < 12 ? "AM" : "PM");
   }
 
   return (
@@ -74,13 +83,14 @@ function NeedPopup({ open, onClose, need }) {
         <CloseIcon />
       </div>
       <div className="contentNeedPopup">
+        <div>
         <div className="needPTitle">{need.need.name}</div>
         <br/>
         <button className="nominate-button" onClick={nominateNeed}>
           Nominate
         </button>
         <p className="notification-needpopup">Hurry! Nominations will be closed soon</p>
-        <div className="aboutHeading">About</div>
+        {/* <div className="aboutHeading">About</div> */}
         <p className="popupNKey">About the Need </p>
         <p className="popupNValue">{ (need.need && need.need.description) ? need.need.description.slice(3,-4) : '' }</p>
         <p className="popupNKey">Need Type </p>
@@ -95,12 +105,18 @@ function NeedPopup({ open, onClose, need }) {
             <p>{ (need.occurrence && need.occurrence.endDate)? need.occurrence.endDate.substr(0,10) : '' }</p>
           </div>
         </div>
+
+        <div className="itemDaysTime">
+          <p className="popupNKey">Need timings</p>
+          {need.timeSlots.map((slot, index) => (
+            <p className="popupNValue" key={index}> {slot.day} {formatTime(slot.startTime.substr(11,5))} - {formatTime(slot.endTime.substr(11,5))} </p>
+          ))}
+        </div>
         <p className="popupNKey">Entity Name </p>
         <p>{ need.entity.name }</p>
         <p className="popupNKey">Skills Required</p>
         <p className="popupNValue">{ (need.needRequirement && need.needRequirement.skillDetails)? need.needRequirement.skillDetails : '' }</p>
-        <p className="popupNKey">Volunteers Required</p>
-        <p className="popupNValue">{ (need.needRequirement && need.needRequirement.volunteersRequired)? need.needRequirement.volunteersRequired : '' }</p>
+        </div>
         <div className="inviteToEvent">
             <ShareIcon style={{ fontSize: "15px" }} />
             <p style={{ margin: "0 10px", fontSize: "15px", width: "400px" }}>Invite your friends to this event</p>

@@ -1,23 +1,35 @@
 .container-multiselect {
   display: flex;
+  flex-direction: column;
+}
+.wrap-add-button {
+  display: flex;
+  gap: 10px;
+}
+.wrap-add-button span{
+  vertical-align: middle;
 }
 .container-daysTime {
-  gap: 5px;
   display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
+  gap: 50px;
+  margin-bottom: 5px;
 }
-.day-container {
-  display: flex;
-  justify-content: space-between;
+.wrap-remove-button {
+  border: none;
+}
+.day-item {
+  border: none;
+}
+.time-item {
+  border: none;
 }
 .days-label {
   height: 30px;
   width: 120px;
+  padding: 28px 0px;
 }
 .add-button {
   height: 30px;
-  width: 30px;
   border-radius: 50%;
   color: green;
   border: none;
@@ -39,14 +51,7 @@
   font-size: 24px;
   margin-top: -8px;
 }
-.button-save {
-  margin-top: 10px;
-}
-.custom-time-picker {
+
+/* .custom-time-picker {
   width: 120px;
-}
-.time-container {
-  display: flex;
-  margin-top: -5px;
-  gap: 5px
-}
+} */

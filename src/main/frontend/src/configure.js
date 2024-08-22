@@ -1,16 +1,21 @@
 //const baseDomain = "https://serve-v1.evean.net"; //https://ekal.evean.net
-const baseDomain = "https://serve-v1.evean.net";
+// const baseDomain = "https://serve-v1.evean.net";
 const baseDomainNeed = "https://serve-v1.evean.net"
 const baseDomainFulfill = "https://serve-v1.evean.net"
 const baseDomainVolunteering = "https://serve-v1.evean.net"
 
 const configData = {
     "USER_GET" : `${baseDomainVolunteering}/api/v1/serve-volunteering/user`,
+    "USER_PROFILE":`${baseDomainVolunteering}/api/v1/serve-volunteering/user/user-profile`,
     "NEED_GET": `${baseDomainNeed}/api/v1/serve-need/need`,
+    "SERVE_FULFILL":`${baseDomainFulfill}/api/v1/serve-fulfill`,
+    "SERVE_NEED":`${baseDomainNeed}/api/v1/serve-need`,
+    "SERVE_VOLUNTEERING":`${baseDomainVolunteering}/api/v1/serve-volunteering`,
     "NEED_SEARCH": `${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEED_FULFILL":`${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEEDTYPE_GET": `${baseDomainNeed}/api/v1/serve-need/needtype`,
-    "ENTITY_GET": `https://serve-v1.evean.net/api/v1/entity`,
+    "DELIVERABLE":`${baseDomainNeed}/api/v1/serve-need/deliverable-details`,
+    "ENTITY_GET": `${baseDomainNeed}/api/v1/serve-need/entity`,
     "NEED_POST" : `${baseDomainNeed}/api/v1/serve-need/need/raise`,
     "NEED_BY_TYPE" : `${baseDomainNeed}/api/v1/need/serve-need/need-type/create`,
     "NOMINATED_USER_FETCH" : `${baseDomainVolunteering}/api/v1/serve-volunteering/user`,

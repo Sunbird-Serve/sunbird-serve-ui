@@ -16,7 +16,6 @@ import { useHistory } from 'react-router'
 
 function VProfile() {
   const dispatch = useDispatch()
-  const history = useHistory()
 
   const userData = useSelector((state)=> state.user.data)
   const [user, setUser] = useState(false)
@@ -34,22 +33,45 @@ function VProfile() {
     history.push('/')
     window.location.reload()
   }
+  const history = useHistory();
+
+  const handleRegisterClick = (e) => {
+    e.preventDefault();
+    history.push("/vregistration")
+  }
+  const statusInfo = {
+    'Recommended': 'You have been endorsed for fulfilling the need',
+    'Not Recommended': 'Your involvement is not advised at this time',
+    'On Hold': 'Your status is temporarily pending further review',
+    'Registered': 'You have recently joined our program. Please Nominate a need',
+    'Active': 'You are currently engaged and participating',
+    'Inactive': 'You are currently not engaged and inactive in the program'
+  }
+
 
   return (
     <div className="wrapVProfile col">
         <div className="vProfileBanner">
             <div className="wrapUserInfo">
-                <div className="profVIcon"> 
-                  <Avatar style={{height:'64px',width:'64px',fontSize:'32px',backgroundColor:avatarColor}}>
-                  </Avatar>
-                </div>
-            
-                    <div className="userInfo">
+              <div className="profVIcon"> 
+                <Avatar style={{height:'64px',width:'64px',fontSize:'32px',backgroundColor:avatarColor}}>
+                </Avatar>
+              </div>
+                <div className="userInfo">
                     <div className="vName"> { (user && userData.identityDetails) ? userData.identityDetails.fullname : 'Unregistered User' }</div>
                     <div className="vContact">
                         <div className="vEmail">{ (user && userData.identityDetails) ? userData.contactDetails.email : 'Complete registration to create profile' }</div>
                         <span>.</span>
                         <div className="vMobile">{ (user && userData.identityDetails) ? userData.contactDetails.mobile : '' }</div>
+                    </div>
+                    {user && userData.identityDetails ? <></> : <div>
+                      <button className="register-vprofile" onClick={handleRegisterClick}>Click here to Register</button>
+                    </div>}
+                    <div className="wrap-status">
+                      <div className="volunteerStatus"> Status: { (user && userData.status) ? userData.status : 'Unknow' }</div>
+                      { (user && userData.status) && <div>
+                        <button className="vtooltip" title={statusInfo[userData.status]}>i</button>
+                      </div>}
                     </div>
                 </div>
             </div>

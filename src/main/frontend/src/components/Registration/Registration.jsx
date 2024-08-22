@@ -13,12 +13,18 @@ import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import axios from 'axios'
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
+import { useSelector, useDispatch } from 'react-redux'
+import { fetchUserList } from "../../state/userListSlice";
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+
 
 const configData = require('../../configure.js');
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Registration = (props) => {
+  const dispatch = useDispatch()
   //constants
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
@@ -256,6 +262,7 @@ const Registration = (props) => {
     "Punjabi",
     "Romanian",
     "Russian",
+    "Sanskrit",
     "Sindhi",
     "Serbo-Croatian",
     "Spanish",
@@ -297,6 +304,7 @@ const Registration = (props) => {
     "Business Analysis",
     "Business Consulting",
     "Business Intelligence",
+    "Career Guidance",
     "Chemical Engineering",
     "Civil Engineering",
     "Clinical Psychology",
@@ -327,6 +335,7 @@ const Registration = (props) => {
     "Game Development",
     "Genetic Counseling",
     "Graphic Design",
+    "Guest Lecture",
     "Health Informatics",
     "Healthcare Administration",
     "Human Resources",
@@ -342,8 +351,10 @@ const Registration = (props) => {
     "Market Analysis",
     "Market Research",
     "Marketing Research Analysis",
+    "Mathematics",
     "Mechanical Engineering",
     "Medical Research",
+    "Mentoring",
     "Mobile App Development",
     "Music Production",
     "Neuroscience",
@@ -359,7 +370,9 @@ const Registration = (props) => {
     "Real Estate",
     "Robotics Engineering",
     "Sales Management",
+    "Science",
     "Social Media Management",
+    "Social Studies",
     "Social Work",
     "Software Development",
     "Speech Therapy",
@@ -374,16 +387,23 @@ const Registration = (props) => {
   ];
 
   const qualifications = [
-    "No Formal Education",
-    "Primary Education",
-    "Secondary Education",
-    "Vocational Qualification",
-    "Bachelor's Degree",
-    "Master's Degree",
-    "Doctorate or Higher",
+    "High School", 
+    "Pre University", 
+    "Graduate", 
+    "Post Graduate", 
+    "Professional Degree"
   ];
 
-  const employmentStatus = ["Full Time", "Part Time", "Unemployed"];
+  const employmentStatus = [
+    "Full Time", 
+    "Part Time", 
+    "Self Employed", 
+    "Homemaker", 
+    "Student", 
+    "Retired", 
+    "Not Employed", 
+    "Others"
+  ];
 
   const skillLevel = [
     "Beginner",
@@ -412,7 +432,7 @@ const Registration = (props) => {
     city: "",
     district: "",
     state: "",
-    landmark: "",
+    country: "",
     pincode: "",
     languages: [],
     prefDays: [],
@@ -442,7 +462,7 @@ const Registration = (props) => {
     if (name === "skillName" || name === "skillLevel") {
       const updatedSkills = [...formData.skills];
       updatedSkills[count][name] = value;
-      console.log("updated skills", updatedSkills);
+      // console.log("updated skills", updatedSkills);
       setFormData({
         ...formData,
         skills: updatedSkills,
@@ -490,10 +510,6 @@ const Registration = (props) => {
     return true;
   };
 
-  // useEffect(() => {
-  //   console.log(formData, "inside useEffect");
-  // }, [formData]);
-
   const dataToPost = {
       "identityDetails": {
         "fullname": formData.firstName,
@@ -508,11 +524,11 @@ const Registration = (props) => {
         "address": {
           "city": formData.city,
           "state": formData.state,
-          "country": 'India'
+          "country": formData.country
         }
       },
-      "agencyId": "123",
-      "status": "Active",
+      "agencyId": "",
+      "status": "Registered",
       "role": [
         "Volunteer"
       ]
@@ -520,24 +536,122 @@ const Registration = (props) => {
 
   const [ regStatus, setRegStatus ] = useState('')
 
-  const onsubmit = () => {
-    // if (validateFields()) {
-    //   window.alert("Form submitted");
-    //   return;
-    // }
-    // window.alert("Please enter all the details");
+  const [userId, setUserId] = useState('')
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0'); 
+  const day = String(today.getDate()).padStart(2, '0');
 
-    console.log(dataToPost)
+  const currentDate = `${year}-${month}-${day}`;
+  // const currentDate = new Date().toLocaleDateString();
+
+  const onboradingInfo = {
+    "onboardStatus": [
+        {
+            "onboardStep": "Discussion",
+            "status": "completed"
+         }
+     ],
+     "refreshPeriod": "2 years",
+     "profileCompletion": "50"
+    }
+
+  const [dataProfile, setDataProfile] = useState({
+    "skills": formData.skills,
+    "genericDetails": {
+      "qualification": formData.qualification,
+      "affiliation": formData.affiliation,
+      "yearsOfExperience": formData.yoe,
+      "employmentStatus": formData.empStatus,
+    },
+    "userPreference": {
+      "timePreferred": formData.prefTime,
+      "dayPreferred": formData.prefDays,
+      "interestArea": formData.interests,
+      "language": formData.languages
+    },
+    "agencyId": "",
+    "userId": userId,
+    "onboardDetails": onboradingInfo,
+    "consentDetails": {
+      "consentGiven": true,
+      "consentDate": currentDate,
+      "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+    },
+    "referenceChannelId": "",
+    "volunteeringHours": {
+      "totalHours": 0,
+      "hoursPerWeek": 0
+    }
+  })
+
+  useEffect(()=>{
+    setDataProfile(prev => ({
+      ...prev,  
+      "skills": formData.skills,
+      "genericDetails": {
+        "qualification": formData.qualification,
+        "affiliation": formData.affiliation,
+        "yearsOfExperience": formData.yoe,
+        "employmentStatus": formData.empStatus,
+      },
+      "userPreference": {
+        "timePreferred": formData.prefTime,
+        "dayPreferred": formData.prefDays,
+        "interestArea": formData.interests,
+        "language": formData.languages
+      },
+      "agencyId": "",
+      "userId": userId,
+      "onboardDetails": onboradingInfo,
+      "consentDetails": {
+        "consentGiven": true,
+        "consentDate": currentDate,
+        "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+      },
+      "referenceChannelId": "",
+      "volunteeringHours": {
+        "totalHours": 0,
+        "hoursPerWeek": 0
+      }
+    }))
+  },[userId, formData])
+
+  const [loading, setLoading] = useState(false);
+
+  const submitForm = e => {
+    e.preventDefault()
+    setLoading(true)
     axios.post(`${configData.USER_GET}/`, dataToPost)
       .then(function(response){
+        setUserId(response.data.result.Users.osid)
+        console.log(response.data)
+      })
+      .catch(function (error) {
+        setLoading(false)
+        console.log(error); 
+      }) 
+  }  
+
+  useEffect(()=>{
+    if(dataProfile.userId){
+      console.log(userId)
+      console.log(dataProfile)
+      axios.post(`${configData.USER_PROFILE}`, dataProfile)
+      .then(function(response){
+        console.log(response.data)
         console.log('user created sucessfully',response);
         setRegStatus('success');
       })
       .catch(function (error) {
         console.log(error); 
         setRegStatus('failure');
-    }) 
-  };
+      }) 
+      .finally(() => {
+        setLoading(false)
+      }); 
+    }
+  },[userId, dataProfile])
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
@@ -549,8 +663,26 @@ const Registration = (props) => {
     setNav(key);
   };
 
+  const retryReg = () => {
+    setRegStatus('')
+  }
+
+  useEffect(()=>{
+    dispatch(fetchUserList())
+  },[regStatus])
+
+ 
+
   return (
     <div>
+      {/* Loading */}
+    {loading && <div className="loading-box">
+      <span>Creating the user. Please wait...</span>
+      <Box sx={{ width: '80%' }}>
+        <LinearProgress />
+      </Box>
+    </div>}
+
     { (!regStatus) &&
     (<div className="reg-main">
       <div className="title-container">
@@ -581,15 +713,16 @@ const Registration = (props) => {
             Clear All
           </button>
           <button
-            type="button"
+            type="submit"
             className="clear-btn register-btn"
-            onClick={() => onsubmit()}
+            form="registation-form"
           >
             Register
           </button>
         </div>
       </div>
       <div className="regContainer">
+
         <div className="nav-container ">
           <span
             className={nav === 0 ? "nav-element active" : "nav-element"}
@@ -633,13 +766,15 @@ const Registration = (props) => {
             Reference & Consent
           </span>
         </div>
-        <div className="formContainer">
+
+        {/* registration form */}
+        <form className="formContainer" id="registation-form" onSubmit={submitForm}>
           <div className="form-section" id={0} ref={refArray[0]}>
             <span className="formCat">Personal Details</span>
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>First Name</label>
+                <label>First Name<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -647,10 +782,11 @@ const Registration = (props) => {
                   name="firstName"
                   value={formData.firstName ? formData.firstName : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Last Name</label>
+                <label>Last Name<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -658,10 +794,11 @@ const Registration = (props) => {
                   name="lastName"
                   value={formData.lastName ? formData.lastName : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Gender</label>
+                <label>Gender<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -672,6 +809,7 @@ const Registration = (props) => {
                   name="gender"
                   value={formData.gender ? formData.gender : ""}
                   onChange={handleChange}
+                  required
                 >
                   {genderOptions.map((gender, index) => (
                     <MenuItem key={index + gender} value={gender}>
@@ -681,7 +819,7 @@ const Registration = (props) => {
                 </Select>
               </div>
               <div className="formElement">
-                <label>Date of Birth</label>
+                <label>Date of Birth<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -690,10 +828,11 @@ const Registration = (props) => {
                   name="dob"
                   value={formData.dob ? formData.dob : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Nationality</label>
+                <label>Nationality<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -704,6 +843,7 @@ const Registration = (props) => {
                   name="nationality"
                   value={formData.nationality ? formData.nationality : ""}
                   onChange={handleChange}
+                  required
                 >
                   {countries.map((country, index) => (
                     <MenuItem key={index + country} value={country}>
@@ -714,12 +854,13 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={1} ref={refArray[1]}>
             <span className="formCat">Contact Details</span>
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>Mobile Number</label>
+                <label>Mobile Number<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -727,10 +868,11 @@ const Registration = (props) => {
                   name="mobileNumber"
                   value={formData.mobileNumber ? formData.mobileNumber : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>E-mail ID</label>
+                <label>E-mail ID<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -738,6 +880,7 @@ const Registration = (props) => {
                   name="email"
                   value={formData.email ? formData.email : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
@@ -785,15 +928,24 @@ const Registration = (props) => {
                 ></input>
               </div>
               <div className="formElement">
-                <label>Landmark</label>
+                <label>Country</label>
                 <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter nearest landmark"
-                  name="landmark"
-                  value={formData.landmark ? formData.landmark : ""}
+                <Select
+                  displayEmpty
+                  renderValue={
+                    formData.country !== "" ? undefined : () => "Select"
+                  }
+                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
+                  name="country"
+                  value={formData.country ? formData.country : ""}
                   onChange={handleChange}
-                ></input>
+                >
+                  {countries.map((country, index) => (
+                    <MenuItem key={index + country} value={country}>
+                      {country}
+                    </MenuItem>
+                  ))}
+                </Select>
               </div>
               <div className="formElement">
                 <label>Pincode</label>
@@ -808,6 +960,7 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={2} ref={refArray[2]}>
             <span className="formCat">Preferences</span>
             <hr className="form-line" />
@@ -950,12 +1103,13 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={3} ref={refArray[3]}>
             <span className="formCat">Additional Details</span>
             <hr className="form-line" />
             <div className="formEntries">
               <div className="formElement">
-                <label>Qualification</label>
+                <label>Qualification<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -968,6 +1122,7 @@ const Registration = (props) => {
                   name="qualification"
                   value={formData.qualification ? formData.qualification : ""}
                   onChange={handleChange}
+                  required
                 >
                   {qualifications.map((qualification, index) => (
                     <MenuItem key={index + qualification} value={qualification}>
@@ -977,7 +1132,7 @@ const Registration = (props) => {
                 </Select>
               </div>
               <div className="formElement">
-                <label>Affiliation</label>
+                <label>Affiliation<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
@@ -985,10 +1140,11 @@ const Registration = (props) => {
                   name="affiliation"
                   value={formData.affiliation ? formData.affiliation : ""}
                   onChange={handleChange}
+                  required
                 ></input>
               </div>
               <div className="formElement">
-                <label>Employment Status</label>
+                <label>Employment Status<span className='req-mark'>*</span></label>
                 <br />
                 <Select
                   displayEmpty
@@ -1000,6 +1156,7 @@ const Registration = (props) => {
                   style={{ height: "4vh", width: "100%", textAlign: "left" }}
                   name="empStatus"
                   value={formData.empStatus ? formData.empStatus : ""}
+                  required
                   onChange={handleChange}
                 >
                   {employmentStatus.map((empStatus, index) => (
@@ -1023,6 +1180,7 @@ const Registration = (props) => {
               </div>
             </div>
           </div>
+
           <div className="form-section" id={4} ref={refArray[4]}>
             <span className="formCat">Skills</span>
             <hr className="form-line" />
@@ -1087,6 +1245,7 @@ const Registration = (props) => {
               + Add skill
             </button>
           </div>
+
           <div className="form-section" id={5} ref={refArray[5]}>
             <span className="formCat">Reference & Consent</span>
             <hr className="form-line" />
@@ -1139,17 +1298,16 @@ const Registration = (props) => {
               </span>
             </div>
           </div>
-        </div>
+
+        </form>
       </div>
-    </div>)}
-
-    {(regStatus === 'success') && <RegFormSuccess />}
-    {(regStatus === 'failure') && <RegFormFailure />}
-
-
-
+    </div>)
+     } 
+    
+    {(regStatus === 'success') && userId && <RegFormSuccess />}
+    {(regStatus === 'failure') && userId && <RegFormFailure retryReg={retryReg} />}
     </div>
   );
 };
 
-export default Registration;
+export default Registration

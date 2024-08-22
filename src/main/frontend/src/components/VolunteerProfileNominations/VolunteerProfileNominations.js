@@ -16,17 +16,7 @@ import { useSelector, useDispatch } from 'react-redux'
 const configData = require('../../configure.js');
 
 function VPNominations() {
-  //get userId
-  const userId = useSelector((state)=> state.user.data.osid)
-  //get nominations by nominated userId
-  const [nominations,setNominations] = useState([])
-  useEffect(()=> {
-    axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=10`).then(
-    response => setNominations(Object.values(response.data))
-   ).catch(function (error) {
-     console.log(error)
-  })
-  },[userId])
+
   //create needId maps to get data from need
   const needTypes = useSelector((state)=> state.needtype.data.content)
   const mapNType = {}
@@ -37,6 +27,7 @@ function VPNominations() {
   const needById = {};
   const dateById = {};
   const typeById = {};
+  console.log(needsList)
   needsList.forEach(item => {
     if (item && item.need) {
       const { id, name } = item.need;
@@ -49,16 +40,35 @@ function VPNominations() {
       typeById[id] = item.need.needTypeId
     }
   })
-  
-  //hadle view nomination details
-  const [fullDetails, setFullDetails] = useState(false)
-  const [needId, setNeedId ] = useState(null)
-  const handleDetail = (needid) => {
-    setFullDetails(!fullDetails)
-    setNeedId(needid)
-  }
 
-  //filter by tabs of nomination status
+  //get userId
+  const userId = useSelector((state)=> state.user.data.osid)
+  console.log(userId)
+
+  //get nominations by nominated userId
+  const [nominations,setNominations] = useState([])
+  const [volunteerHrs, setVolunteerHrs] = useState(null)
+  useEffect(()=> {
+    axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=100`)
+    .then(response => {
+      setNominations(Object.values(response.data))
+    })
+    .catch(function (error) {
+     console.log(error)
+    })
+
+    axios.get(`${configData.SERVE_VOLUNTEERING}/volunteer/volunteer-hours/read/${userId}`)
+    .then(response => {
+      console.log(response.data.totalHours)
+      setVolunteerHrs(response.data.totalHours)
+    })
+    .catch(function (error) {
+      console.log(error)
+    })
+
+  },[userId])
+
+  //filter nominations by tabs @ nomination status
   const [activeTab, setActiveTab] = useState('tabN');
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -80,7 +90,6 @@ function VPNominations() {
   }, [nominations,activeTab])
 
   const [sortingOrder, setSortingOrder] = useState('ascending');
-
   const [nomsByDate, setNomsByDate ] = useState([])
   useEffect(() => {
     // Clone the needList to avoid modifying the original array
@@ -93,8 +102,9 @@ function VPNominations() {
     setNomsByDate(sortedList)
   }, [sortingOrder, nomsByTab]);
 
+  console.log(nomsByDate)
 
-  //nomsFiltered is the final displayed list
+  //nomsFiltered is the final displayed Nominations after filter by needType
   const [nomsFiltered, setNomsFiltered] = useState(null)
   const [needTypeId, setNeedTypeId] = useState('')
   const handleNeedTypeFilter = e => {
@@ -103,12 +113,23 @@ function VPNominations() {
   useEffect(()=>{
     let filtered = nomsByDate
     if(needTypeId){
+      console.log(needTypeId)
       const filtered = nomsByDate.filter(item => typeById[item.needId] === needTypeId)
       setNomsFiltered(filtered)
     } else {
       setNomsFiltered(filtered)
     }
   },[needTypeId, nomsByDate])
+
+  console.log(nomsFiltered)
+
+    //hadle view nomination details
+    const [fullDetails, setFullDetails] = useState(false)
+    const [needId, setNeedId ] = useState(null)
+    const handleDetail = (needid) => {
+      setFullDetails(!fullDetails)
+      setNeedId(needid)
+    }
  
 
   return (
@@ -136,33 +157,26 @@ function VPNominations() {
             </div>
             <div className="statsVPNomsName">Needs Approved</div>
           </div>
-          {/* <div className="statsVPNomsItem">
-            <div className="statsVPNomsCount">
-              <img src={VolunteerNeedsInProgress} alt="Needs In Progress" height="35px" />
-              <span>00</span>
-            </div>
-            <div className="statsVPNomsName">Needs In Progress</div>
-          </div> */}
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerPlansDelivered} alt="Nominated Needs" height="35px" />
-              <span>00</span>
+              <span>{volunteerHrs}</span>
             </div>
             <div className="statsVPNomsName">Total Volunteer Hrs</div>
           </div>
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerHrs} alt="Nominated Needs" height="35px" />
-              <span>00</span>
+              <span>2</span>
             </div>
             <div className="statsVPNomsName">Total Plans Delivered</div>
           </div>
         </div>
+
         <div className="vNomFilters">
           {/* Tabs */}
           <div className="vnomTabs">
             <div className={`${activeTab === 'tabN' ? 'VNomTabN selectedVNomTab' : 'VNomTabN'}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
-            <div className={`${activeTab === 'tabP' ? 'VNomTabP selectedVNomTab' : 'VNomTabP'}`} onClick={() => handleTabClick('tabP')}>In Progress</div>
             <div className={`${activeTab === 'tabA' ? 'VNomTabA selectedVNomTab' : 'VNomTabA'}`} onClick={() => handleTabClick('tabA')}>Approved</div>
           </div>
     
@@ -196,7 +210,7 @@ function VPNominations() {
               <div className="needItemVolunteer">
                 <img src={NeedsImage} alt="Nominated Needs" width="20px" />
                 <p className="needNameVP">{needById[nomination.needId]}</p> 
-                <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View full details</button>
+                <button className="viewFull" onClick={() => handleDetail(nomination.needId)}>View Full Details</button>
               </div>
             </div>
           ))}

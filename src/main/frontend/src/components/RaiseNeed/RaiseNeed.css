@@ -26,6 +26,10 @@
     padding: 2px 6px;
     margin: 0px 4px;
 }
+.required-label::after {
+    content: " *";
+    color: red;
+}
 .raiseNeed {
     background-color: white;
     height: 80%;
@@ -128,12 +132,12 @@
 }
 .itemWrapDate {
     display: flex;
-    justify-content: space-between;
+    gap: 20px;
     padding: 5px;
     margin-bottom: 5px;
 }
 .itemDate {
-    width: 35%;
+    width: 25%;
     margin-top: 10px;
 }
 .itemDate label {
@@ -159,7 +163,7 @@
     border: solid 1px #DBDBDB;
 }
 .itemDescriptionNeedLabel {
-    margin-bottom: 10px;
+    margin-top: 10px;
     font-weight: 600;
     font-size: 14px;
 }
@@ -180,6 +184,26 @@
 .addSkillsInput {
     margin-top: 10px;
 }
+
+
+.itemFormTime {
+    width: 80%;
+    padding: 5px;
+    font-size: 14px;
+}
 .label-eventdaytime {
     display: flex;
+    gap: 50px;
+}
+.day-label {
+    width: 120px;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
+}
+.time-label {
+    width: 230px;
+    font-size: 14px;
+    color: #1F1F1F;
+    font-weight: 600;
 }

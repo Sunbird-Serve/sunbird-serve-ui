@@ -7,6 +7,7 @@ import './VolunteerHeader.css'
 import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import VolunterLogin from '../VolunteerLogin/VolunteerLogin'
+import VolunterSignup from '../VolunteerSignup/VolunteerSignup'
 import { useHistory } from "react-router";
 
 
@@ -18,8 +19,14 @@ function VHeader({ activeComponent, onToggle }) {
     const currentUser = auth.currentUser;
 
     const [vlogin, setVlogin ] = useState(false)
+    const [vsignup, setVsignup ] = useState(false)
+
     const loginVolunteer = () => {
       setVlogin(!vlogin)
+    };
+
+    const signupVolunteer = () => {
+      setVsignup(!vsignup)
     };
     
     const handleProfileClick = () => {
@@ -37,9 +44,10 @@ function VHeader({ activeComponent, onToggle }) {
               <img src={SBLogo} alt="SunBirdLogo" height="50px" />
             </button>
         </div>
-        {!currentUser && 
+        {!currentUser && <div>
+          <button className="btnSignupVolunteer" onClick={signupVolunteer}>Signup</button>
           <button className="btnLoginVolunteer" onClick={loginVolunteer}>Login</button>
-        }
+        </div>}
         {currentUser && <div className="vhProfile">
           <div className="notification">
             <Badge variant="dot" color="secondary">
@@ -54,6 +62,7 @@ function VHeader({ activeComponent, onToggle }) {
           </button>
         </div>}
         {vlogin && <VolunterLogin onClose={loginVolunteer}/> }
+        {vsignup && <VolunterSignup onClose={signupVolunteer}/> }
     </div>
   )
 }

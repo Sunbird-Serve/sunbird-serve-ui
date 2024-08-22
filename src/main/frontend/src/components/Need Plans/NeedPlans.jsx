@@ -24,7 +24,89 @@ const configData = require('../../configure.js');
 const localizer = momentLocalizer(moment);
 
 const NeedPlans = () => {
-  const userId = useSelector((state)=> state.user.data.osid)
+  const userId = useSelector((state)=> state.user.data.osid) //For current user
+
+  //get all fulfillments corresponding to an user
+  const [fulfillments, setFulfillments] = useState([])
+  useEffect(()=>{
+    if(userId){
+      axios.get(`${configData.SERVE_FULFILL}/fulfillment/coordinator-read/${userId}?page=0&size=10`)
+      .then(response => {
+          setFulfillments(response.data)
+      })
+      .catch(error => {
+          console.log(error)
+      });
+    }
+  },[userId])
+  console.log(fulfillments)
+
+  //fetch all plans: plans created by joining needs, plans and platforms 
+  const [needPlans, setNeedPlans] = useState([]);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchData = () => {
+      
+      const fetchRequests = fulfillments.map(obj => {
+        const { needId, needPlanId } = obj;
+
+
+      // Fetch needPlan details
+        const fetchNeedPlan = axios.get(`${configData.SERVE_NEED}/need-plan/read/${needPlanId}`)
+          .then(response => response.data)
+          .catch(error => {
+            console.error(`Error fetching needPlan for ${needPlanId}:`, error);
+            return null;
+          });
+
+        // Fetch need details
+        const fetchNeed = axios.get(`${configData.SERVE_NEED}/need/${needId}`)
+          .then(response => response.data)
+          .catch(error => {
+            console.error(`Error fetching need for ${needId}:`, error);
+            return null;
+          });
+        // Fetch platform details
+        const fetchPlatform = axios.get(`${configData.SERVE_NEED}/need-deliverable/${needPlanId}`)
+          .then(response => response.data)
+          .catch(error => {
+            // console.error(`Error fetching platform for ${needId}:`, error);
+            return null;
+          });
+          return Promise.all([fetchNeedPlan, fetchNeed, fetchPlatform])
+          .then(([needPlan, need, platform]) => ({
+            ...obj,
+            needPlan,
+            need,
+            platform
+          }));
+      });
+
+      Promise.all(fetchRequests)
+        .then(results => {
+          setNeedPlans(results.filter(result => result !== null));
+        })
+        .catch(error => {
+          setError(error.message);
+        });
+    };
+
+    fetchData();
+  }, [fulfillments]);
+  console.log(needPlans)
+
+  //counts
+  // Extract needId and assignedUserId arrays
+  const needIds = needPlans.map(item => item.needId);
+  const assignedUserIds = needPlans.map(item => item.assignedUserId);
+  // Create sets to get unique values
+  const uniqueNeedIds = new Set(needIds);
+  const uniqueAssignedUserIds = new Set(assignedUserIds);
+  // Get the count of unique values
+  const needIdCount = uniqueNeedIds.size;
+  const assignedUserIdCount = uniqueAssignedUserIds.size;
+
+  //this is for showing alloted voluteer details
   const userList = useSelector((state) => state.userlist.data);
   const userMap = {}
   const userContact = {}
@@ -33,60 +115,20 @@ const NeedPlans = () => {
     userContact[user.osid] = user.contactDetails.mobile;
   }
 
-  //get needs raised by nCoordinator
-  const needList = useSelector((state) => state.need.data);
-  const needsByUser = needList.filter(item => item && item.need && item.need.userId === userId)
-
-  //see if needIds by user have need plans and save if they
-  const [nomNeedMap, setNomNeedMap] = useState([])
-  useEffect(() => {
-  async function fetchNoms() {
-    const promises = needsByUser.map(item => axios.get(`${configData.NEED_FULFILL}/${item.need.id}/nominate/Approved`));
-
-    try {
-      const responses = await Promise.all(promises);
-
-      // const nomedNeeds = responses.map(response => response.data).filter(item => item.length).map(item => item[0].needId);
-      const nomedNeeds = responses.map(response => response.data).filter(item => item.length)
-      const filterNomNeed = nomedNeeds.reduce((acc, elementArray) => {
-        elementArray.forEach(obj => {
-          const { needId, nominatedUserId } = obj;
-          if (!acc[needId]) {
-            acc[needId] = [];
-          }
-          acc[needId].push(nominatedUserId);
-        });
-        return acc;
-      }, {});
-      setNomNeedMap(filterNomNeed)
-    } catch (error) {
-      console.error("Error fetching plans for: ",promises);
-    }
-    }
-    fetchNoms();
-  }, [userId]);
-
-  const [needPlans, setNeedPlans] = useState([]);
-  useEffect(() => {
-    const newResultArray = [];
-    for (const needId in nomNeedMap) {
-      const matchingNeed = needList.filter(needItem => needItem && needItem.need).find(needItem => needItem.need.id === needId);
-      if (matchingNeed) {
-        const resultObject = {
-          needId: matchingNeed.need.id,
-          assignedUserId: nomNeedMap[needId],
-          needInfo: matchingNeed,
-        };
-
-        newResultArray.push(resultObject);
-      }
-    }
-    setNeedPlans(newResultArray);
-  }, [nomNeedMap, needList]);
-  const totalAssignedUsers = needPlans.reduce((acc, plan) => acc + plan.assignedUserId.length, 0);
+  const formatTime = (timeData, timeZone) => {
+    const date = new Date(timeData);
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+      timeZone: 'UTC',
+    };
+  
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  };
 
   //make the events from start to end date
-  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId) {
+  function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId, platform, meetURL, startTime, endTime) {
     const timeSlotObject = {};
     timeSlots.forEach(slot => {
       const day = slot.day.toLowerCase();
@@ -102,13 +144,16 @@ const NeedPlans = () => {
       if (timeSlotObject[day]) {
         dateWithTimeSlots.push({
           title: needName,
-          start: currentDate.toDateString(),
-          end: currentDate.toDateString(),
-          startTime: timeSlotObject[day][0],
-          endTime: timeSlotObject[day][1],
-          startDate: new Date(startDate).toDateString(),
-          endDate: new Date(endDate).toDateString(),
-          assignedUsers: assignedUserId
+          start: currentDate.toDateString(), //for session
+          end: currentDate.toDateString(), //for session
+          startTime: formatTime(startTime, 'Asia/Kolkata'),
+          endTime: formatTime(endTime, 'Asia/Kolkata'),
+          startDate: new Date(startDate).toDateString(),//for entire plan
+          endDate: new Date(endDate).toDateString(),//for entire plan
+          assignedUserId: assignedUserId,
+          needId: needId,
+          softwarePlatform: platform,
+          inputUrl: meetURL
         });
       }
       currentDate.setDate(currentDate.getDate() + 1);
@@ -120,14 +165,50 @@ const NeedPlans = () => {
   useEffect(() => {
     const newEvents = [];
     for (const item of needPlans) {
-      if (item.needInfo.occurrence !== null) {
-        const { startDate, endDate } = item.needInfo.occurrence;
-        const sessions = getTimeSlots(item.needInfo.need.name, startDate, endDate, item.needInfo.timeSlots, item.assignedUserId); // Use getTimeSlots function
+      if (item.needPlan.occurrence !== null) {
+        const { startDate, endDate } = item.needPlan.occurrence;
+        let inputURL = "";
+        let softwarePlatform = "";
+        let startTime="";
+        let endTime="";
+        if(item.platform && item.platform.inputParameters.length){
+          inputURL = item.platform.inputParameters[0].inputUrl;
+          softwarePlatform = item.platform.inputParameters[0].softwarePlatform;
+          startTime = item.platform.inputParameters[0].startTime;
+          endTime = item.platform.inputParameters[0].endTime;
+        }
+        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId, softwarePlatform, inputURL, startTime, endTime); // Use getTimeSlots function
         newEvents.push(...sessions);
       }
     }
     setEvents(newEvents);
   }, [needPlans]);
+  console.log(events) //in format of calender
+
+  const grouped = events.reduce((acc, plan) => {
+    const key = `${plan.start}-${plan.needId}`;
+    if (!acc[key]) {
+        acc[key] = {
+            needId: plan.needId,
+            start: plan.start,
+            end: plan.end,
+            startTime: plan.startTime,
+            endTime: plan.endTime,
+            startDate: plan.startDate,
+            endDate: plan.endDate,
+            title: plan.title,
+            inputUrl: plan.inputUrl,
+            softwarePlatform: plan.softwarePlatform,
+            assignedUsers: []
+        };
+    }
+
+    acc[key].assignedUsers.push(plan.assignedUserId);
+
+    return acc;
+  }, {});
+  const schedules = Object.values(grouped)
+  // console.log(schedules)  //for navigation on right
 
   //view of calender: to show monthwise
   const views = {
@@ -180,8 +261,6 @@ const NeedPlans = () => {
     setSelectedDate(selectedDateString); 
   };
 
-
-
   // to show selection of date on calender
   const customDayPropGetter = (date) => {
     const isSelectedDate = moment(date).format('YYYY-MM-DD') === selectedDate;
@@ -190,6 +269,13 @@ const NeedPlans = () => {
   };
   
   const [expandEvent, setExpandEvent] = useState(false)
+  const [clickedEvent, setClickedEvent] = useState(null)
+  const handleEventClick = Index => {
+    console.log(Index)
+    setClickedEvent(Index)
+    setExpandEvent(!expandEvent)
+  }
+
 
   return (
       <div>
@@ -212,38 +298,55 @@ const NeedPlans = () => {
           
           {/* Side List showing list of events */}
           { selectedDate && ( <div className="event-list-nc">
-          {/* Selected Event Date */}
-          <div className="headEventListNC">{moment(selectedDate).format('MMMM D, YYYY')}</div>
           {/* Need and Volunteer Stats */}
           <div className="stats-need-volunteer">
               <div className="needCountNC">
                 <i><StickyNote2Icon /></i> 
-                <span>{needPlans.length} Needs</span>
+                <span>{needIdCount} Needs</span>
               </div>
               <div className="volunteerCountNC">
                 <i><PeopleAltIcon /></i> 
-                <span>{totalAssignedUsers} Volunteers</span>
+                <span>{assignedUserIdCount} Volunteers</span>
               </div>
           </div>
+          {/* Selected Event Date */}
+          <div className="headEventListNC">{moment(selectedDate).format('MMMM D, YYYY')}</div>
           {/* EVENTS LIST when selected date falls within date range of any event */}
-          { events.filter((event) => {
+          { schedules.filter((event) => {
             const startDate = moment(event.start);
             const endDate = moment(event.end)
             const selected = moment(selectedDate)
             return selected.isSameOrAfter(startDate) && selected.isSameOrBefore(endDate);
             })
-            .map((event) => (
-            <button className="dayEventListNC" key={event.title} onClick={() => setExpandEvent(!expandEvent)}>
-              <div className="dayEventTitleNC">
-                <i> { expandEvent ? <ExpandMoreIcon/> : <ChevronRightIcon /> }</i>
-                <span className="nameDayEventNC">{event.title}</span>
-                <span className="timeDayEventNC">
-                  <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
-                  {event.startTime}
-                </span> 
-              </div>
-              <div className="dayEventDateNC"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
-              { expandEvent && 
+            .map((event, index) => (
+            <div className="dayEventListNC" key={event.start} >
+              <button className="dayEventItemNC" onClick={()=>handleEventClick(index)}>
+                <div className="dayEventTitleNC" >
+                  <div className="wrap-nameDayEventNC">
+                    <i> { expandEvent ? <ExpandMoreIcon/> : <ChevronRightIcon /> } </i>
+                    <span className="nameDayEventNC">{event.title}</span>
+                  </div>
+                  <div className="wrap-timeDayEventNC">
+                    <span className="timeDayEventNC">
+                      <i><AccessTimeIcon style={{fontSize:"18px",color:'grey',paddingBottom:"2px"}}/></i>
+                      {event.startTime} - {event.endTime}
+                    </span>
+                  </div>
+                </div>
+                <div className="dayEventDateNC"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
+              </button>
+              { expandEvent && ( index === clickedEvent ) && <div className="platformInfoNC">
+                <div className="vplan-platform"> 
+                    <span>Software platform:</span> {event.softwarePlatform}
+                  </div>
+                  <div className="vplan-url"> 
+                    <span>Link :</span> {event.inputUrl}
+                  </div>
+                  <div className="vplan-url"> 
+                    <span>Volunteers :</span> 
+                  </div>
+              </div>}
+              { expandEvent && ( index === clickedEvent ) &&
                 event.assignedUsers.map((user) => <div className="user-boxNC">
                   <div className="userNameNC">
                     <div><Avatar style={{padding:'5px',height:'24px',width:'24px',fontSize:'16px',backgroundColor:randomColor()}}></Avatar></div>
@@ -252,7 +355,7 @@ const NeedPlans = () => {
                   <div className="userContact-eventList">{userContact[user]}</div>
                 </div>)
               }
-            </button>
+            </div>
           )) }
 
 

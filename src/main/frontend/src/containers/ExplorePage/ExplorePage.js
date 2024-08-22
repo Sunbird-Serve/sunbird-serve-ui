@@ -18,10 +18,12 @@ function ExplorePage() {
       </div>
       <div className="wrapContent row mt-5 mt-sm-0 pl-5">
         <div>
+          <Switch>
             <Route exact path="/vneedtypes" component={VolunteerNeedType} />
             <Route path="/vregistration" component={Registration} />
             <Route path="/vprofile" component={VolunteerProfile} />
-            <Redirect from="/" to="/vneedtypes" />
+            <Route path="/" component={VolunteerNeedType} />
+          </Switch>
          </div>
       </div>
       <div>

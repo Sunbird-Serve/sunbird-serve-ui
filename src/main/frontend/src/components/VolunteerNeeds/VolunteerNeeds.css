@@ -62,25 +62,64 @@
 
 .needContainer {
   width: 100%;
-  grid-template-columns: repeat(4, 1fr);
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: 0px;
   flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start; /* Left-align items */
+  padding: 0;
+  gap: 20px; /* Add consistent spacing between items */
 }
+
 .needBox {
-  width: 30%;
-  height: 130px;
-  border: 1px solid #ccc;
-  padding: 16px;
+  width: 40%;
+  height: 180px;
+  padding: 20px;
   margin: 15px;
   border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Softer, more pronounced shadow */
   border: 1px solid rgba(219, 219, 219, 1);
-  gap: 12px;
-  position: relative; /* Add position relative for absolute positioning */
+  background-color: #fff; /* White background */
+  transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for hover effects */
+  overflow: hidden;
 }
+
+.needBox:hover {
+  transform: translateY(-5px); /* Lift the box slightly on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Darker shadow on hover */
+}
+
+.needBox h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.needBox p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.needBox .location-container,
+.needBox .calendar-container,
+.needBox .required-container {
+  font-size: 13px;
+  color: #999;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.needBox .location-container i,
+.needBox .calendar-container i,
+.needBox .required-container i {
+  margin-right: 5px;
+  color: #666; /* Icon color */
+}
+
+
+
+
 .needBox:hover {
   cursor: pointer;
 }

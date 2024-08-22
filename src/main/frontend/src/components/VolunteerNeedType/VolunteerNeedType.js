@@ -10,6 +10,7 @@ import ntypeImage01 from '../../assets/content_development.png'
 import ntypeImage02 from '../../assets/field_activity.png'
 import ntypeImage03 from '../../assets/mentoring.png'
 import ntypeImage04 from '../../assets/online_teaching.png'
+import ntypeImage05 from '../../assets/guest_lecture.png'
 import { useSelector, useDispatch } from 'react-redux'
 import SortIcon from "@mui/icons-material/Sort";
 
@@ -98,7 +99,8 @@ function VolunteerNeedType() {
     'Content Development': ntypeImage01,
     'Field Activity': ntypeImage02,
     'Mentoring': ntypeImage03,
-    'Online Teaching': ntypeImage04
+    'Online Teaching': ntypeImage04,
+    'Guest Lecture': ntypeImage05
   }
  
   return (
@@ -150,7 +152,7 @@ function VolunteerNeedType() {
                     <div className="numNeedsNT">
                       <i><StickyNote2Icon style={{height:"12px"}} /></i>
                       <span>
-                        {needList.filter(need => need && need.need && need.need.needTypeId === item.id).length } Needs
+                        {needList.filter(need => need && need.need && need.need.needTypeId === item.id && (need.need.status === 'Approved' || need.need.status === 'Nominated')).length } Needs
                       </span>
                     </div>
                   </div>

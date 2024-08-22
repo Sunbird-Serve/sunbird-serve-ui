@@ -1,101 +1,101 @@
-import "./App.css";
 import React, { useEffect, useState } from "react";
 import LoginPage from "./containers/LoginPage/LoginPage";
 import MainPage from "./containers/MainPage/MainPage";
-import ExplorePage from "./containers/ExplorePage/ExplorePage"
+import ExplorePage from "./containers/ExplorePage/ExplorePage";
 import { auth } from "./firebase";
-import { useSelector, useDispatch } from 'react-redux'
-import { fetchUserByEmail } from './state/userSlice'
-import { fetchNeeds } from './state/needSlice'
-import { fetchNeedtypes } from './state/needtypeSlice'
+import { useSelector, useDispatch } from 'react-redux';
+import { fetchUserByEmail } from './state/userSlice';
+import { fetchNeeds } from './state/needSlice';
+import { fetchNeedtypes } from './state/needtypeSlice';
 import { fetchNeedsByUid } from "./state/needByUidSlice";
 import { fetchEntities } from "./state/entitySlice";
 import { fetchUserList } from "./state/userListSlice";
 
-
 function App() {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  //AUTHENTICATION using firebase
+  // AUTHENTICATION using firebase
   const [presentUser, setPresentUser] = useState(null);
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setPresentUser({
-          uid: user.uid,    //this is firebase userId
-          email: user.email
+          uid: user.uid,    // this is firebase userId
+          email: user.email,
         });
       } else {
         setPresentUser(null);
       }
     });
-  }, []); 
 
-  //UPDATE USER STATE based on authenticated email
-  const userDetails = useSelector((state)=> state.user.data)
-  console.log(userDetails)
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, []);
 
-  
-  //dispatch the user to store
+  // UPDATE USER STATE based on authenticated email
+  const userDetails = useSelector((state) => state.user.data);
+  console.log(userDetails);
+
+  // Dispatch the user to store
   useEffect(() => {
-    if(presentUser){
-    const userEmail = presentUser.email.replace(/@/g, "%40") || '';
-    console.log(userEmail)
-    dispatch(fetchUserByEmail(userEmail))
+    if (presentUser) {
+      const userEmail = presentUser.email.replace(/@/g, "%40") || '';
+      console.log(userEmail);
+      dispatch(fetchUserByEmail(userEmail));
     }
   }, [dispatch, presentUser]);
 
-   //UPDATE USERLIST
-  useEffect(()=>{
-    dispatch(fetchUserList())
-  },[dispatch])
+  // UPDATE USERLIST
+  useEffect(() => {
+    dispatch(fetchUserList());
+  }, [dispatch]);
 
-  //UPDATE NEEDSBYID
-  useEffect(()=>{
-    dispatch(fetchNeedsByUid(userDetails.osid))
-  },[dispatch, userDetails])
+  // UPDATE NEEDSBYID
+  useEffect(() => {
+    if (userDetails.osid) {
+      dispatch(fetchNeedsByUid(userDetails.osid));
+    }
+  }, [dispatch, userDetails]);
 
-  //UPDATE NEEDS
-  useEffect(()=>{
-    dispatch(fetchNeeds())
-  },[dispatch])
+  // UPDATE NEEDS
+  useEffect(() => {
+    dispatch(fetchNeeds());
+  }, [dispatch]);
 
-  //UPDATE NEEDTYPES
-  useEffect(()=>{
-    dispatch(fetchNeedtypes())
-  },[dispatch])
-  //UPDATE ENTITIES
-  useEffect(()=>{
-    dispatch(fetchEntities())
-  },[dispatch])
+  // UPDATE NEEDTYPES
+  useEffect(() => {
+    dispatch(fetchNeedtypes());
+  }, [dispatch]);
 
+  // UPDATE ENTITIES
+  useEffect(() => {
+    dispatch(fetchEntities());
+  }, [dispatch]);
 
-  const [volunteer,setVolunteer] = useState(false)
+  const [volunteer, setVolunteer] = useState(false);
+
   const handleVolunteer = (value) => {
-    setVolunteer(value);    //explore button on-click
-    console.log('button-clicked')
+    setVolunteer(value);
   };
 
+  // Handle explore button click
+  if (volunteer) {
+    return <ExplorePage />;
+  }
 
+  // If user is logged in and userDetails are available
+  if (presentUser !== null && userDetails !== undefined) {
+    if (userDetails.role && userDetails.role.includes('Volunteer')) {
+      // User is a volunteer
+      return <ExplorePage />;
+    } else {
+      // Default: render MainPage for other roles
+      return <MainPage />;
+    }
+  }
 
-  return (
-      <div className="App row">
-        { /* Load page depending on user login */}
-        { /* when clicks explore button, volunteer will be true*/}
-        { /* if not volunteer and logins, go to nCoordinator screen */}
-        { !volunteer && (<>
-          { (presentUser && userDetails ) ? 
-               (userDetails.role && userDetails.role.includes('nCoordinator')) ?
-                  <MainPage /> 
-                :
-                  <ExplorePage />
-            : 
-            <LoginPage getVolunteerStatus={handleVolunteer}/>
-          }</>)}
-        { /* if volunteer, go to volunteer screen */ }
-        { volunteer && <ExplorePage />  }    
-      </div>
-  );
+  // Default: render LoginPage if user is not logged in or userDetails are being fetched
+  return <LoginPage getVolunteerStatus={handleVolunteer} />;
 }
 
 export default App;

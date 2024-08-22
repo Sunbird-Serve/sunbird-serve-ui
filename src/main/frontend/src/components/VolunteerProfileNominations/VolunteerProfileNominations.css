@@ -67,25 +67,33 @@
 }
 .VNomTabN {
   display: flex;
-  padding: 3px 12px;
+  justify-content: center;
+  width: 150px;
+  padding: 5px 15px;
   font-size: 14px;
-  background-color: #F7F8F9;
-  border: solid #D3D4D5;
-  border-top-left-radius: 5px;
-  border-bottom-left-radius: 5px;
+  border: solid 2px #D3D4D5;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  margin-right: -2px; /* Overlap borders */
+  cursor: pointer;
+  background-color: #E1E1E1; 
 }
 .VNomTabA {
   display: flex;
-  padding: 3px 12px;
+  justify-content: center;
+  padding: 5px 15px;
   font-size: 14px;
-  background-color: #F7F8F9;
-  border: solid #D3D4D5;
-  border-top-right-radius: 5px;
-  border-bottom-right-radius: 5px;
-  border-left: none;
+  border: solid 2px #D3D4D5;
+  background-color: #E1E1E1; 
+  border-radius: 5px 5px 0 0;
+  margin-right: -2px; /* Overlap borders */
+  cursor: pointer;
+  width: 150px;
+  border-bottom: none;
 }
 .selectedVNomTab {
   background-color: white;
+  color: #006FA2;
 }
 .selectDateAndNeed {
   display: flex;
@@ -116,7 +124,7 @@
 .nomination-grid {
   margin-top: 40px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 columns with equal width */
+  grid-template-columns: repeat(4, 1fr); /* 4 columns with equal width */
   gap: 30px; /* spacing between items */
 }
 .nomination-item {
@@ -124,8 +132,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
-  height: 100px;
+  height: 120px;
   width: 210px;
+  padding: 10px;
+  border-radius: 8px;
+  border: solid 1px #DBDBDB;
 }
 .needItemVolunteer {
   display: flex;

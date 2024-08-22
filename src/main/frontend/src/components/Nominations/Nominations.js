@@ -6,6 +6,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useSelector, useDispatch } from 'react-redux'
+import ModeEditIcon from '@mui/icons-material/ModeEdit';
+import DoneIcon from '@mui/icons-material/Done';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const configData = require('../../configure.js');
 
@@ -23,13 +26,11 @@ const Nominations = ({ needData, openPopup }) => {
   useEffect(()=>{
       axios.get(`${configData.NEED_SEARCH}/${needId}/nominate`)
       .then((response) => {
-        console.log('dispatched')
         setNomsList(response.data) 
       })
   },[dispatch, activeTab, acceptPopup, rejectPopup, openPopup, responseFlag])
 
   // const nomsList = useSelector((state) => state.nominationbynid.data);
-  console.log(nomsList)
   //filter nominations as per active tab
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -74,12 +75,15 @@ const Nominations = ({ needData, openPopup }) => {
     }) 
   }
 
+  const [gotoDelivs, setGotoDelivs] = useState(false)
+  const [fulfillment, setFulfillment] = useState([])
+
   const COLUMNS = [
-    {Header:'Volunteer Name',accessor:'userInfo.identityDetails.fullname'}, 
+    {Header:'Volunteer Name',accessor:'userInfo.identityDetails.fullname', width: 150}, 
     {Header:'Location',accessor:'userInfo.contactDetails.address.city'},
-    {Header:'Date of Birth',accessor:'userInfo.identityDetails.dob'},
-    {Header:'Contact Info',accessor:'userInfo.contactDetails.mobile'},
-    {Header:'Skills'},
+    {Header:'Phone Number',accessor:'userInfo.contactDetails.mobile'},
+    {Header:'Email',accessor:'userInfo.contactDetails.email'},
+    {Header:'Status', accessor:'userInfo.status'},
     {Header:'Actions',
       Cell : ({ row }) => {
         const handleAccept = () => {
@@ -90,18 +94,71 @@ const Nominations = ({ needData, openPopup }) => {
           setRejectPopup(true)
           setRowData(row.original)
         }
+        const viewDeliverable = () => {
+          console.log(row.original)
+          setRowData(row.original)
+          axios.get(`${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`)
+          .then((response) => {
+            setFulfillment(response.data)
+            console.log(response.data)
+          })
+          .catch((error)=> {
+            console.log('error'); 
+          })
+          setGotoDelivs(true)
+        }
         return (
           <div className="actionsCell">
-            <button className="acceptNomin" onClick={handleAccept}>
-              <CheckIcon style={{height:"20px",width:"20px",marginLeft:"-5px",marginBottom:"3px",color:"green"}}/></button>
-            <button className="rejectNomin" onClick={handleReject}>
-              <ClearIcon style={{height:"20px",width:"20px",marginLeft:"-4.5px",marginBottom:"3px",color:"red"}}/></button>
+            { activeTab === 'tabN' && <button className="acceptNomin" onClick={handleAccept}>
+              <CheckIcon style={{height:"20px",width:"20px",marginLeft:"-5px",marginBottom:"3px",color:"green"}}/>
+            </button> }
+            { activeTab === 'tabN' && <button className="rejectNomin" onClick={handleReject}>
+              <ClearIcon style={{height:"20px",width:"20px",marginLeft:"-4.5px",marginBottom:"3px",color:"red"}}/>
+            </button> }
+            { activeTab === 'tabA' && <button className="styled-button" onClick={viewDeliverable}>
+              View Deliverables
+            </button> }
           </div>
         )
     }
-    },
+    , width: 250 },
   ] 
   const columns = useMemo(() => COLUMNS, [activeTab])
+
+  const [planId, setPlanId] = useState('')
+  const [ deliverables, setDeliverables ] = useState([])
+  const [ inParas, setInParas ] = useState([])
+  useEffect(()=>{
+    if(fulfillment.length > 0) {
+      const selectedFulfil = fulfillment.filter(item => item.needId === rowData.needId)[0]
+      if(selectedFulfil) {
+        setPlanId(selectedFulfil.needPlanId)
+      }
+    }
+  },[fulfillment])
+
+  const [ isSubmit, setIsSubmit ] = useState(false)
+  useEffect(()=>{
+    if(planId){
+      axios.get(`${configData.SERVE_NEED}/need-deliverable/${planId}`)
+      .then((response) => {
+        setDeliverables(response.data.needDeliverable)
+        setInParas(response.data.inputParameters)
+        console.log(response.data)
+        if (response.data.inputParameters.length > 0) {
+          setPlanData({
+            planPlatform: '',
+            planLink: '',
+            planStartTime: response.data.inputParameters[0].startTime || '',
+            planEndTime: response.data.inputParameters[0].endTime || ''
+          });
+        }
+     })
+      .catch((error)=> {
+        console.log('error'); 
+      })
+    }
+  },[planId,isSubmit])
 
   const userList = useSelector((state) => state.userlist.data);
   const [tableData, setTableData] = useState([]);
@@ -148,9 +205,92 @@ const Nominations = ({ needData, openPopup }) => {
     setReason(e.target.value)
   }
 
+  const handleRowClick = (rowData) => {
+    // setRowData(rowData);
+    // setShowPopup(!showPopup);
+  };
+
+  const [editIndex, setEditIndex] = useState('')
+  const handleEditDeliverable = (item, index) => {
+    console.log(item)
+    setEditIndex(index)
+  }
+  const handleDoneDeliverable = (index) => {
+    setEditIndex('')
+    console.log(formData[index].deliverableId)
+    console.log({
+      "inputUrl": formData[index].inputUrl,
+      "softwarePlatform": formData[index].softwarePlatform,
+      "startTime": formData[index].startTime,
+      "endTime": formData[index].endTime
+    })
+    axios.put(`${configData.SERVE_NEED}/deliverable-details/update/${formData[index].deliverableId}`,{
+      "inputUrl": formData[index].inputUrl,
+      "softwarePlatform": formData[index].softwarePlatform,
+      "startTime": formData[index].startTime,
+      "endTime": formData[index].endTime
+    })
+  }
+
+
+  const [formData, setFormData] = useState([]);
+
+  useEffect(() => {
+    const initialFormData = deliverables.map((item, index) => ({
+      deliverableId: item.id,
+      deliverableDate: item.deliverableDate,
+      startTime: inParas.length ? inParas[index].startTime : '',
+      endTime: inParas.length ? inParas[index].endTime : '',
+      softwarePlatform: inParas.length ? inParas[index].softwarePlatform : '',
+      inputUrl: inParas.length ? inParas[index].inputUrl : '',
+      status: item.status,
+    }));
+    setFormData(initialFormData);
+  }, [deliverables, inParas]);
+
+  const handleDeliverableChange = (e, index, field) => {
+    const { value } = e.target;
+    setFormData((prevFormData) => {
+      const newFormData = [...prevFormData];
+      newFormData[index][field] = value;
+      return newFormData;
+    });
+  };
+  const [planData, setPlanData] = useState({
+    planPlatform: '',
+    planLink: '',
+    planStartTime: inParas[0]?.startTime || '',
+    planEndTime: inParas[0]?.endTime || ''
+  });
+  const {planPlatform, planLink, planStartTime, planEndTime} = planData;
+  const handleComnInfo = e => {
+    setPlanData({...planData, [e.target.name]:e.target.value})
+  }
+  const submitComnInfo = () => {
+    console.log({
+      "inputUrl": planData.planLink,
+      "softwarePlatform": planData.planPlatform,
+      "startTime": planData.planStartTime,
+      "endTime": planData.planEndTime
+    })
+    axios.put(`${configData.SERVE_NEED}/all-deliverable-details/update/${planId}`,{
+      "inputUrl": planData.planLink,
+      "softwarePlatform": planData.planPlatform,
+      "startTime": planData.planStartTime,
+      "endTime": planData.planEndTime
+    })
+    .then((response) => {
+      setIsSubmit(!isSubmit)
+      setPlanData({...planData, planPlatform:'', planLink:''})
+   })
+    .catch((error)=> {
+      console.log(error); 
+    })
+  }
+ 
   return (
     <div className="wrapNominations">
-      <div className="wrapTopbarNominations">
+      {!gotoDelivs && <div className="wrapTopbarNominations">
         <div className="topbarNominations">
           <div className="leftBarNomination">
             <div className={`${activeTab === 'tabN' ? 'selectNomin' : ''}`} onClick={() => handleTabClick('tabN')}>Nominated</div>
@@ -167,9 +307,9 @@ const Nominations = ({ needData, openPopup }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div>}
       {/* table for reading list of nominations*/}
-      <table className="tableNominations">
+      {!gotoDelivs && <table className="tableNominations">
         <thead>
           {headerGroups.map((headerGroup)=>(
             <tr {...headerGroup.getHeaderGroupProps()}>
@@ -185,16 +325,16 @@ const Nominations = ({ needData, openPopup }) => {
           {page.map((row) => {
             prepareRow(row)
               return (
-                <tr {...row.getRowProps()} >
+                <tr {...row.getRowProps()} onClick={() => handleRowClick(row.original)} >
                   {row.cells.map((cell)=>{
-                    return <td {...cell.getCellProps()}> {cell.render('Cell')}</td>
+                    return <td {...cell.getCellProps()} style={{ width: cell.column.width }}> {cell.render('Cell')}</td>
                   })}
                 </tr>
               )
           })}
         </tbody>
-      </table>
-      {/*reject pop-up*/}
+      </table>}
+      {/* reject pop-up */}
       {rejectPopup && 
         <div className="popupReject">
           <div className="rejectBox">
@@ -218,6 +358,80 @@ const Nominations = ({ needData, openPopup }) => {
           </div>
         </div> 
       }
+
+      { /*  */}
+      {gotoDelivs && <div className="wrap-NCDeliverables">
+        <div className="backToNoms">
+          <span> Need Deliverable Details</span>
+          <button onClick={()=>setGotoDelivs(false)} ><ArrowBackIcon/></button>
+        </div>
+        <div className="table-NCDeliverables">
+        <div className="common-info-section">
+          <div className="title-common-info">Common Details For All Deliverables</div>  
+          <div className="common-info-delivs">
+          <div>
+            <span>Platform</span>
+            <input type="text" name="planPlatform" value={planPlatform} onChange={handleComnInfo} />
+          </div>
+          <div>
+            <span>Link</span>
+            <input type="text" name="planLink" value={planLink} onChange={handleComnInfo} />
+          </div>
+          <div>
+            <button onClick={submitComnInfo}>Submit</button>
+          </div>
+        </div>
+        </div>
+        <div className="deliverable-head">
+  <div className="deliv-serial">S.No.</div>
+  <div className="deliv-date">Date</div>
+  <div className="deliv-time">Time</div>
+  <div className="deliv-url">Link</div>
+  <div className="deliv-status">Status</div>
+  {!!inParas.length && <div className="deliv-action">Action</div>}
+</div>
+{formData.length && formData.map((data, index) => (
+  <div className="deliverable-item" key={index}>
+    <div className="deliv-serial">{index + 1}</div>
+    <div className="deliv-date">
+      {data.deliverableDate}
+    </div>
+    <div className="deliv-time">
+      {data.startTime ? data.startTime.slice(11, 16) : ''} - {data.endTime ? data.endTime.slice(11, 16) : ''}
+    </div>
+    <div className="deliv-url">
+  {index === editIndex ? (
+    <input
+      type="text"
+      value={data.inputUrl}
+      onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')}
+    />
+  ) : (
+    data.inputUrl.toLowerCase() === "to be added soon".toLowerCase() ? (
+      <span>To be Added</span>
+    ) : (
+      <a href={data.inputUrl} target="_blank" rel="noopener noreferrer">Class Link</a>
+    )
+  )}
+</div>
+
+    <div className="deliv-status">
+      {index === editIndex ? 
+        <input type="text" value={data.status} onChange={(e) => handleDeliverableChange(e, index, 'status')} />
+        : data.status
+      }
+    </div>
+    {!!inParas.length && <div className="deliv-action">
+      {index === editIndex ? 
+        <button onClick={() => handleDoneDeliverable(index)}><DoneIcon className="done-icon" /></button>
+        : <button onClick={() => handleEditDeliverable(data, index)}><ModeEditIcon className="edit-icon" /></button>
+      }
+    </div>}
+  </div>
+))}
+
+        </div>
+      </div>}
     </div>
   )
 }

@@ -24,6 +24,7 @@ export const NeedsTable = props => {
   //get list of needs raised by user
   const needList = useSelector((state) => state.need.data);
   const needsByUser = needList.filter(item => item && item.need && item.need.userId === uid)
+
   //needtype filter
   const needTypes = useSelector((state)=> state.needtype.data.content)
   const [needTypeId, setNeedTypeId] = useState('')
@@ -70,7 +71,7 @@ export const NeedsTable = props => {
   function VolunteerByNeedId({ needId }) {
     const [volunteerList, setVolunteerList] = useState(null);
     const [volunteerNames, setVolunteerNames] = useState([]);
-     useEffect(() => {
+    useEffect(() => {
        axios
          .get(`${configData.NEED_FULFILL}/${needId}/nominate`)
          .then((response) => {
@@ -79,19 +80,17 @@ export const NeedsTable = props => {
          .catch((error) => {
            console.error("Fetching Entity failed:", error);
          });
-     }, [needId]);
-     console.log(volunteerList)
+    }, [needId]);
+    //  console.log(volunteerList)
      
-     useEffect(() => {
+    useEffect(() => {
       if (volunteerList) {
         const volunteerIds = volunteerList.map((item) => item['nominatedUserId']);
-        console.log(volunteerIds)
-
         // Function to fetch volunteer details by volunteerId
         const fetchVolunteerDetails = async (volunteerId) => {
           try {
             const response = await axios.get(`${configData.USER_GET}/${volunteerId}`); 
-            console.log(response.data)
+            // console.log(response.data)
             return response.data.identityDetails.fullname; // Assuming your API returns a name field
           } catch (error) {
             console.error(`Error fetching volunteer details for ID ${volunteerId}:`, error);
@@ -108,14 +107,14 @@ export const NeedsTable = props => {
   
         fetchDataForAllVolunteers();
       }
-      console.log(volunteerNames)
 
     }, [volunteerList]);
 
     const truncateAndDots = (names, maxNamesToShow) => {
-        const firstLetters = names.map((element) => 
+        const firstLetters = names.map((element, index) => 
         element === null ? null : (
-          <Avatar className="avatar" style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
+          <Avatar className="avatar" key={index}
+            style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
             {element.charAt(0)}
           </Avatar>
         )
@@ -134,12 +133,13 @@ export const NeedsTable = props => {
     if (volunteerNames.length > 0) {
       const maxNamesToShow = 3; // Adjust the number of names to show
       const truncatedVolunteerNames = truncateAndDots(volunteerNames, maxNamesToShow);
+
       if(volunteerNames.length > maxNamesToShow){
         return <span>{truncatedVolunteerNames}
+          
           <Avatar className="avatar" style={{display:'inline',padding:'5px',marginLeft:'-10px',height:'30px',width:'30px',fontSize:'16px',backgroundColor:randomColor()}}>
           {'+'}{volunteerNames.length-maxNamesToShow}
           </Avatar>
-        
         </span>;
       } else {
         return <span>{truncatedVolunteerNames}</span>;
@@ -147,8 +147,9 @@ export const NeedsTable = props => {
     } else {
       return <span>No volunteers</span>;
     }
-
   }
+  
+
   const {
     getTableProps,
     getTableBodyProps,
@@ -185,8 +186,14 @@ export const NeedsTable = props => {
     if (activeTab === 'approved') {
       setFilter('need.status', 'Approved')
     }
-    else if (activeTab == 'requested') {
-      setFilter('need.status', 'New')
+    else if (activeTab == 'nominated') {
+      setFilter('need.status', 'Nominated')
+    }
+    else if (activeTab == 'assigned') {
+      setFilter('need.status', 'Assigned')
+    }
+    else if (activeTab == 'fulfilled') {
+      setFilter('need.status', 'fulfilled')
     }
     else {
       setFilter('need.status','')
@@ -214,7 +221,9 @@ export const NeedsTable = props => {
         <div className="needMenu">
           <div className={`tabNeed ${activeTab === 'all' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('all')}>All</div>
           <div className={`tabNeed ${activeTab === 'approved' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('approved')}>Approved</div>
-          <div className={`tabNeed ${activeTab === 'requested' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('requested')}>Requested</div>
+          <div className={`tabNeed ${activeTab === 'nominated' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('nominated')}>Nominated</div>
+          <div className={`tabNeed ${activeTab === 'assigned' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('assigned')}>Assigned</div>
+          <div className={`tabNeed ${activeTab === 'fulfilled' ? 'activeNTab' : ''}`} onClick={() => handleTabClick('fulfilled')}>Fulfilled</div>
         </div>
         {/* Raise Need Button */}
         <button onClick={gotoRaiseNeed}>Raise Need</button>
@@ -227,12 +236,12 @@ export const NeedsTable = props => {
           <div className="needCount">
             <i><StickyNote2Icon /></i>
             <span>{filteredData.length}</span>
-            <label>Needs</label>
+            <label className="count-label"> Needs </label>
           </div>
           <div className="volunteerCount">
             <i><PeopleAltIcon /></i>
             <span> </span>
-            <label>Volunteers</label>
+            <label className="count-label">Volunteers</label>
           </div>
         </div>
         {/*Filters*/}
@@ -251,7 +260,7 @@ export const NeedsTable = props => {
             <option value="" defaultValue>All Need Types</option>
             {
               needTypes.map(
-                  (ntype) => <option key={ntype.osid} value={ntype.id}>{ntype.name}</option>
+                  (ntype, index) => <option key={index} value={ntype.id}>{ntype.name}</option>
                 )
               }
           </select>
@@ -287,12 +296,13 @@ export const NeedsTable = props => {
             })}
         </tbody>
       </table>
+      
       <div className="pageNav">
         <div className="needsPerPage">
           <span>Rows per page:</span>
           <select value={pageSize} onChange={(e)=>setPageSize(Number(e.target.value))}>
-            {[10, 15, 25].map((pageSize) => (
-              <option key={pageSize} value={pageSize}>{pageSize}</option>
+            {[10, 15, 25].map((pageSize, index) => (
+              <option key={index} value={pageSize}>{pageSize}</option>
             ))}
           </select>
         </div>

@@ -10,17 +10,17 @@ import MultiSelect from './MultiSelect';
 import MonoSelect from './MonoSelect';
 import { useSelector, useDispatch } from 'react-redux'
 import { fetchNeedsByUid } from '../../state/needByUidSlice'
+import dayjs from 'dayjs';
 
 const configData = require('../../configure.js');
 
 const RaiseNeed = props => {
     const dispatch = useDispatch();
+    
     const history = useHistory()
     const uid = useSelector((state) => state.user.data.osid)
-    console.log(uid)
     const entities = useSelector((state) => state.entity.data.content)
     const needTypes = useSelector((state) => state.needtype.data.content)
-    console.log(needTypes)
 
     // fields to enter in the raise need form
     const [timeslotsArray, setTimeslotsArray] = useState([])
@@ -76,30 +76,36 @@ const RaiseNeed = props => {
     };
 
     //get from input in YearMonthDay format then convert to datetime before updating
-    const [startYMD, setStartYMD] = useState('')
-    const [endYMD, setEndYMD] = useState('')
+    const [startYMD, setStartYMD] = useState('2024-05-30')
+    const [endYMD, setEndYMD] = useState('2024-07-31')
     const handleEndDate = e => {
-        setDataOccurrence({ ...dataOccurrence, endDate: (e.target.value + 'T08:57:00.000Z') })
+        setDataOccurrence({ ...dataOccurrence, endDate: (e.target.value + 'T17:00:00.000Z') })
         setEndYMD(e.target.value)
     }
     const handleStartDate = e => {
-        setDataOccurrence({ ...dataOccurrence, startDate: (e.target.value + 'T08:57:00.000Z') })
+        setDataOccurrence({ ...dataOccurrence, startDate: (e.target.value + 'T09:00:00.000Z') })
         setStartYMD(e.target.value)
     }
     // Handler to update selected event days
+    //selected dayTime passed back in object format and convert to UTC
+    const objToUTC = (timeObj) => {
+        const timeValue = timeObj.format('YYYY-MM-DDTHH:mm:ss.SSSZ')
+        return timeValue.substr(0,16)+':00.000Z'
+    }
     const handleSelectedDaysChange = (selected) => {
-        setSelectedDays(selected);
-    };
-    const handleSelectedDaysChangeMulti = (selected) => {
-        setSelectedDays(selected.map((obj) => ({
-            ...obj,
-            startTime: `2023-10-02T${obj.startTime}:21.937Z`,
-            endTime: `2023-10-02T${obj.endTime}:21.937Z`,
-          })));
-    };
+        setSelectedDays(selected && selected.map(item => ({
+            day: item.day,
+            startTime: objToUTC(item.startTime),
+            endTime: objToUTC(item.endTime)
+        })))
+    }
+    //initialising day and time selection in obj format and pass to select
+    const scheduleTime = [{ 
+        day:'Sunday', 
+        startTime: dayjs('2024-04-30T09:30:00.000Z'), 
+        endTime: dayjs('2024-04-30T17:00:00.000Z') 
+    }]
     
-
-
     // get skills for all need types
     const [skillMap, setSkillMap] = useState([]);
     useEffect(() => {
@@ -132,7 +138,6 @@ const RaiseNeed = props => {
     useEffect(() => {
         setOptions(skillMap[needTypeId])
     }, [needTypeId]); 
-    console.log(options)
 
     const [manualSkill, setManualSkill] = useState("");
     const handleManualSkillAdd = (e) => {
@@ -193,8 +198,21 @@ const RaiseNeed = props => {
     }, [dataOccurrence])
 
     useEffect(() => {
-        setDataOccurrence({ ...dataOccurrence, timeSlots: selectedDays, days: selectedDays.map((obj) => obj.day).join(', ') })
-    }, [selectedDays])
+        setDataOccurrence(prevState => ({
+            ...prevState,
+            startDate: startYMD + 'T09:00:00.000Z',
+            endDate: endYMD + 'T09:00:00.000Z'
+        }));
+    }, [startYMD, endYMD]);
+    
+    useEffect(() => {
+        setDataOccurrence(prevState => ({
+            ...prevState,
+            timeSlots: selectedDays,
+            days: selectedDays.map(day => day.day).join(',')
+        }));
+    }, [selectedDays]);
+    
     useEffect(() => {
         setDataOther(dataOther => ({
             ...dataOther,
@@ -202,9 +220,6 @@ const RaiseNeed = props => {
         }))
     
     }, [selectedOptions])
-   
-
-    
 
     // raise the need
     const submitHandler = e => {
@@ -231,7 +246,7 @@ const RaiseNeed = props => {
                 {/* top bar of raise need page */}
                 <div className="raiseNeedBar">
                     <div className="wrapNameNeed">
-                        <div className="needName">Untitled Need </div>
+                        <div className="needName"> Need </div>
                         <div className="tagNeedName"> A detailed description about the Need</div>
                     </div>
                     <button className="btnRaiseNeed" type="submit" form="myForm"> Raise Need </button>
@@ -245,18 +260,18 @@ const RaiseNeed = props => {
                         <div className="formLeft col-sm-6">
                             {/* Need Name */}
                             <div className="itemFormNeed">
-                                <label>Need Name</label>
-                                <input type="text" placeholder='Ex: Avila Beach Cleaning' name="name" value={name} onChange={changeHandler} />
+                                <label>Need Name <span class="required-label"></span></label>
+                                <input type="text" placeholder='Format: Grade Subject, Ex: Grade 5 Science' name="name" value={name} onChange={changeHandler} required />
                             </div>
                             {/* Need Purpose */}
                             <div className="itemFormNeed">
-                                <label>Need Purpose</label>
-                                <input type="text" placeholder='Provide the impact or purpose of this Need' name="needPurpose" value={needPurpose} onChange={changeHandler} />
+                                <label>Need Purpose<span class="required-label"></span></label>
+                                <input type="text" placeholder='Provide the impact or purpose of this Need' name="needPurpose" required value={needPurpose} onChange={changeHandler} />
                             </div>
                             {/* Need Type */}
                             <div className="itemFormNeed">
-                                <label>Need Type</label>
-                                <select className="selectMenu" name="needTypeId" value={needTypeId} onChange={changeHandler}>
+                                <label>Need Type<span class="required-label"></span></label>
+                                <select className="selectMenu" name="needTypeId" value={needTypeId} required onChange={changeHandler}>
                                     <option value="" defaultValue>Select Need type</option>
                                     {
                                         needTypes.map(
@@ -265,21 +280,21 @@ const RaiseNeed = props => {
                                     }
                                 </select>
                             </div>
+                        </div>
+                        {/* right half of upper side */}
+                        <div className="formRight col-sm-6">
                             {/* Entity Name */}
                             <div className="itemFormNeed">
-                                <label>Entity Name</label>
-                                <select className="selectMenu" name="entityId" value={entityId} onChange={changeHandler}>
+                                <label>Entity Name<span class="required-label"></span></label>
+                                <select className="selectMenu" name="entityId" value={entityId} required onChange={changeHandler}>
                                     <option value="" defaultValue>Select Entity</option>
                                     {
-                                        entities.map(
+                                        entities && entities.map(
                                             (entype) => <option key={entype.osid} value={entype.id}>{entype.name}</option>
                                         )
                                     }
                                 </select>
-                            </div>
-                        </div>
-                        {/* right half of upper side */}
-                        <div className="formRight col-sm-6">
+                            </div>                            
                             {/* Need Description */}
                             <label className="itemDescriptionNeedLabel">Need Description</label>
                             <div className="itemDescriptionNeed">
@@ -287,51 +302,47 @@ const RaiseNeed = props => {
                                     placeholder='Write a small brief about the Need' onChange={handleQuillEdit}
                                 />
                             </div>
-                            {/* Date */}
-                            <div className="itemWrapDate">
-                                <div className="itemDate">
-                                    <label>Start Date </label>
-                                    <input type="date" name="startYMD" value={startYMD} onChange={handleStartDate} />
-                                </div>
-                                <div className="itemDate">
-                                    <label>End Date </label>
-                                    <input type="date" name="endYMD" value={endYMD} onChange={handleEndDate} />
-                                </div>
-                                <div className="itemDate">
-                                    <label>Recurrence </label>
-                                    <select className="selectFrequency" name="frequency" value={frequency} onChange={changeFrequency}>
-                                        <option value="off" defaultValue>Off</option>
-                                        <option value="weekdays">Every Weekday</option>
-                                        <option value="weekend">Every Weekend</option>
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div className="itemFormNeed">
-                                <div className="label-eventdaytime">
-                                    <label>Event Days</label>
-                                    <label>Start Time</label>
-                                    <label>End Time</label>
-                                </div>
-                                <div className="itemFormNeedDays">
-                                    {frequency === 'off' ? 
-                                        <MultiSelect onAdd={handleSelectedDaysChange} /> 
-                                        : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} />}
-                                </div>
-                            </div>
-
-                            {/* Time */}
-
-                            {/*}
-                        <div className="itemForm">
-                            <label>Time</label>
-                            <input type="time" name="timeSlot" value={timeSlot} onChange={changeHandlerOther} />
-                        </div> 
-                            */}
-
                         </div>
                     </div>
+
+                    <div className="formRNcatergory">SESSION DETAILS</div>
+                    <div className="wrap-sessionDetails"></div>
+                    {/* Date */}
+                    <div className="itemWrapDate">
+                        <div className="itemDate">
+                            <label>Start Date <span class="required-label"></span></label>
+                            <input type="date" name="startYMD" value={startYMD} required onChange={handleStartDate} />
+                        </div>
+                        <div className="itemDate">
+                            <label>End Date <span class="required-label"></span></label>
+                            <input type="date" name="endYMD" value={endYMD} required onChange={handleEndDate} />
+                        </div>
+                        <div className="itemDate">
+                            <label>Recurrence </label>
+                            <select className="selectFrequency" name="frequency" value={frequency} onChange={changeFrequency}>
+                                <option value="off" defaultValue>Off</option>
+                                <option value="weekdays">Every Weekday</option>
+                                <option value="weekend">Every Weekend</option>
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    {/* Time */}
+                    <div className="itemFormTime">
+                        <div className="label-eventdaytime">
+                            <label className="day-label">Event Days</label>
+                            <label className="time-label">Start Time</label>
+                            <label className="time-label">End Time</label>
+                        </div>
+                        <div className="itemSelectSlots">
+                            {frequency === 'off' ? 
+                                <MultiSelect onAdd={handleSelectedDaysChange} scheduleTime={scheduleTime}/> 
+                                : <MonoSelect onAdd={handleSelectedDaysChange} frequency={reccurrence} scheduleTime={scheduleTime} />}
+                        </div>
+                    </div>
+
                     {/* lower side of form : prerequisites */}
                     <div className="formRNcatergory">VOLUNTEER PREREQUISITE</div>
                     <div className="formBottom row">

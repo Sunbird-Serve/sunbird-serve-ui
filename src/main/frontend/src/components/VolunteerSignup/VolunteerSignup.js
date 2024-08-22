@@ -24,10 +24,11 @@ const VolunteerSignup = ({ loginState, onClose }) => {
   const signUp = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
-      .then(
+      .then(user => {
         // user => console.log('User created')
+        onClose()
         navigate.push("/vregistration")
-      )
+      })
       .catch((err) => setError(err.code));
   };
   const signInWithGoogle = (e) => {
@@ -103,7 +104,7 @@ const VolunteerSignup = ({ loginState, onClose }) => {
               <hr />
             </div> */}
             {/* Social Media Login*/}
-            {/* <div className="btnSLogin">
+            { <div className="btnSLogin">
               <button type="login" onClick={signInWithGoogle}>
                 {" "}
                 <i>
@@ -119,7 +120,7 @@ const VolunteerSignup = ({ loginState, onClose }) => {
                 </i>
                 Facebook
               </button>
-            </div> */}
+            </div> }
             {/* Error message when credentials are wrong*/}
             {error && <div className="signupError">{error.slice(5)}</div>}
           </form>

@@ -9,10 +9,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import { auth } from "../../firebase";
 import { fetchUserByEmail } from '../../state/userSlice'
+import axios from 'axios'
+
+const configData = require('../../configure.js');
 
 function VolunteerProfileEdit() {
   const userData = useSelector((state) => state.user.data);
-  console.log(userData.role);
+  console.log(userData);
   const history = useHistory();
   const dispatch = useDispatch()
 
@@ -21,11 +24,11 @@ function VolunteerProfileEdit() {
   };
 
   const [identityDetailsData, setIdentityDetailsData] = useState({
-    fullname: userData.identityDetails.fullname,
-    name: userData.identityDetails.name,
-    gender: userData.identityDetails.gender,
-    dob: userData.identityDetails.dob,
-    Nationality: userData.identityDetails.nationality,
+    fullname: userData.identityDetails.fullname || '',
+    name: userData.identityDetails.name || '',
+    gender: userData.identityDetails.gender || '',
+    dob: userData.identityDetails.dob || '',
+    Nationality: userData.identityDetails.Nationality || '',
   })
   const { fullname, name, gender, dob, Nationality } = identityDetailsData
 
@@ -92,16 +95,18 @@ function VolunteerProfileEdit() {
     const userEmail = auth.currentUser.email.replace(/@/g, "%40") || '';
     console.log(userEmail)
 
-    {/* 
-    axios.post(`${configData.NEED_GET}`, editedUserData)
-      .then(
-        console.log('user edit sucessful'),
+    
+
+
+    axios.put(`${configData.SERVE_VOLUNTEERING}/user/${userData.osid}`, editedUserData)
+      .then(response=>{
+        console.log('user edit sucessful');
         dispatch(fetchUserByEmail(userEmail))
-      )
+        handleDiscordClick()
+      })
       .catch(function (error) {
         console.log(error); 
     }) 
-    */}
   };
 
 
@@ -155,20 +160,14 @@ function VolunteerProfileEdit() {
             <div className="info-item1">
               <p className="info-label1">Date of Birth</p>
               <div className="input-with-icon">
-                <input className="editProfileDOB" type="date" name="dob" value={dob} onChange={handleChangeIdentityDetails} />
+                <input className="editProfileDOB" type="date" name="dob" value={dob} onChange={handleChangeIdentityDetails}/>
               </div>
             </div>
 
             <div className="info-item1">
               <p className="info-label1">Nationality</p>
               <div className="custom-dropdown">
-                <input
-                  className="info-input1"
-                  type="text"
-                  value={Nationality}
-                  name="Nationality"
-                  onChange={handleChangeIdentityDetails}
-                />
+                <input className="info-input1" type="text" name="Nationality" value={Nationality} onChange={handleChangeIdentityDetails}/>
               </div>
             </div>
           </div>
@@ -204,7 +203,7 @@ function VolunteerProfileEdit() {
 
           {/* Address */}
           <div className="info-row">
-            <div className="info-item1">
+            {/* <div className="info-item1">
               <p className="info-label1">Address</p>
               <input
                 className="info-input1"
@@ -213,7 +212,7 @@ function VolunteerProfileEdit() {
                 value={location}
                 onChange={handleChangeAddress}
               />
-            </div>
+            </div> */}
           {/* City */}
             <div className="info-item1">
               <p className="info-label1">City</p>

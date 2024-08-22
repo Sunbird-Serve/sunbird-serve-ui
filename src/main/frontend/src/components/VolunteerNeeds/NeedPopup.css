@@ -17,6 +17,8 @@
   width: 25%;
   height: 100%;
   margin-left: 75%;
+  overflow: scroll;
+  background-color: white;
 }
 .close-button {
   position: absolute;
@@ -39,6 +41,7 @@
   margin-left: 30px;  
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   font-size: 15px;
 }
 .needPTitle {
@@ -86,14 +89,12 @@
   width: 50%;
 }
 .inviteToEvent {
-  margin: 0px 0px 0px -20px;
+  width: 100%;
   background-color: #F1FDFD;
   display: flex;
   align-items: center;
   padding: 20px 15px;
-  position: absolute;
-  bottom: 0;
-  width: calc( 25% - 30px) ;
+  margin: 0px -20px;
 }
 .nominationSuccess {
   position: relative;

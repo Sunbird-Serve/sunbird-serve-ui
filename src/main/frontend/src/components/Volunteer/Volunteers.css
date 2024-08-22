@@ -1,3 +1,9 @@
+.headerVolunteers {
+    background-color: yellow;
+    margin-right: 10px;
+    padding: 10px 0px;
+    background-color: white;
+}
 .title-vHeader {
     font-size: 32px;
     color: #006FA2;
@@ -6,22 +12,51 @@
     font-size: 14px;
     color: #99999F;
 }
+
+.wrap-tabs-search {
+   display: flex; 
+   justify-content: space-between;
+   padding: 5px;
+   margin-right: 5px;
+   background-color: white;
+}
+
 .wrap-tabs-vCoord {
-    margin-top: 10px;
     display: flex;
-    height: 40px;
     align-items: center;
+    background-color: white;
+    border-radius: 5px;
 }
-.stats-vCoord {
+
+.search-vCoord {
+    border: solid 0.5px;
+    border-radius: 2px;
+    margin-right: 10px;
+}
+.search-vCoord input {
+    border: none;
+    padding: 3px;
+}
+.search-vCoord i {
+    margin: 0px 10px;
+}
+
+/* .stats-vCoord {
     display: flex;
-    height: 64px;
     align-items: center;
-}
+} */
 .tabs-vCoord {
     padding: 5px 15px;
     display: flex;
     align-items: center;
     gap: 3px;
+}
+.tabs-vCoord icon { 
+    color: #006FA2;
+}
+.tabs-vCoord:hover {
+    cursor: pointer;
+    background-color: #edf4f8;
 }
 .count-vCoord {
     display: flex;
@@ -32,9 +67,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 5px 20px;
+    padding: 5px 10px;
 }
 .filters-vCoord {
     display: flex;
     gap: 5px
 }
+.activeVTab {
+    color: #006FA2;
+}
+.wrap-vtable {
+    margin: 10px 20px 10px 0px;
+}
+
