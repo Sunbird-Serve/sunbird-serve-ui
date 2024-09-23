@@ -7,6 +7,10 @@
     margin: 10px 20px 10px 10px;
     background-color: white;
     overflow: scroll;
+
+    @media (max-width: 600px) {
+        margin: 10px 0 10px 10px;
+    }
 }
 .vNtypesHeader {
     padding: 10px 10px;

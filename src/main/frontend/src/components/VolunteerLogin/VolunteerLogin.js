@@ -33,18 +33,21 @@ const VolunteerLogin = ({loginState, onClose}) => {
         signInWithPopup(auth, fprovider)
     }
     const userId = useSelector((state)=> state.user.data.osid)
+    const status = useSelector((state)=> state.user.status)
     const [ alertRegister, setAlertRegister ] = useState(false)
     useEffect(()=>{
         if(auth.currentUser){
             console.log(auth.currentUser)
             if(userId){
+                setAlertRegister(false)
                 onClose()
             }
             else {
-                setAlertRegister(true)
+                if(status === 'succeeded')
+                    setAlertRegister(true)
             }
         }
-    },[auth.currentUser, userId])
+    },[auth.currentUser, userId, status])
     const history = useHistory();
     const handleRegisterClick = (e) => {
         e.preventDefault();

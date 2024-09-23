@@ -23,6 +23,10 @@
 .vNeedFilters {
   display: flex;
   justify-content: space-between;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+}
 }
 .vSortNeed {
   display: flex;
@@ -32,6 +36,12 @@
   border-radius: 5px;
   margin-left: 100px;
   background-color: white;
+
+  @media (max-width: 600px) {
+    margin-left: 0;
+    width: 90%;
+    margin-left: 2rem;
+}
   }
 .vSortNeed select {
   padding: 3px;
@@ -46,6 +56,12 @@
   margin-right:100px;
   padding: 2px;
   background-color: #F7F8F9;
+
+
+  @media (max-width: 600px) {
+    width: 90%;
+    margin-left: 2rem;
+  }
 }
 .toggleNeedView button {
   border: none;
@@ -58,6 +74,9 @@
   display: flex;
   justify-content: center;
   margin: 10px 85px;
+  @media (max-width: 600px) {
+    margin: 0;
+  }
 }
 
 .needContainer {
@@ -81,6 +100,10 @@
   background-color: #fff; /* White background */
   transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for hover effects */
   overflow: hidden;
+
+  @media (max-width: 600px) {
+    height: 275px;
+  }
 }
 
 .needBox:hover {
@@ -198,6 +221,12 @@
   padding: 3px 5px;
   border-radius: 5px;
   background-color: #FFFFFF;
+
+  @media (max-width: 600px) {
+    display: flex;
+    width: 90%;
+    margin-left: 2rem;
+}
 }
 .vSearchNeed input {
   border: none;

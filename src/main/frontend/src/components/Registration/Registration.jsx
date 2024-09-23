@@ -883,7 +883,7 @@ const Registration = (props) => {
                   required
                 ></input>
               </div>
-              <div className="formElement">
+              {/* <div className="formElement">
                 <label>Address</label>
                 <br />
                 <input
@@ -957,11 +957,11 @@ const Registration = (props) => {
                   value={formData.pincode ? formData.pincode : ""}
                   onChange={handleChange}
                 ></input>
-              </div>
+              </div> */}
             </div>
           </div>
 
-          <div className="form-section" id={2} ref={refArray[2]}>
+          {/* <div className="form-section" id={2} ref={refArray[2]}>
             <span className="formCat">Preferences</span>
             <hr className="form-line" />
             <div className="formEntries">
@@ -1102,7 +1102,7 @@ const Registration = (props) => {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className="form-section" id={3} ref={refArray[3]}>
             <span className="formCat">Additional Details</span>
@@ -1166,7 +1166,7 @@ const Registration = (props) => {
                   ))}
                 </Select>
               </div>
-              <div className="formElement">
+              {/* <div className="formElement">
                 <label>Years of Experience</label>
                 <br />
                 <input
@@ -1177,11 +1177,11 @@ const Registration = (props) => {
                   value={formData.yoe ? formData.yoe : ""}
                   onChange={handleChange}
                 ></input>
-              </div>
+              </div> */}
             </div>
           </div>
 
-          <div className="form-section" id={4} ref={refArray[4]}>
+          {/* <div className="form-section" id={4} ref={refArray[4]}>
             <span className="formCat">Skills</span>
             <hr className="form-line" />
             {formData.skills.map((skillData, index) => (
@@ -1244,7 +1244,7 @@ const Registration = (props) => {
             <button className='addSkillButton' type="button" onClick={() => addSkill()}>
               + Add skill
             </button>
-          </div>
+          </div> */}
 
           <div className="form-section" id={5} ref={refArray[5]}>
             <span className="formCat">Reference & Consent</span>

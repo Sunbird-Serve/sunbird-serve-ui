@@ -6,6 +6,11 @@
     padding: 60px 80px;
     color: white;
     border: none;
+
+    @media (max-width: 600px) {
+        height: fit-content;
+        padding: 30px 30px;
+      }
 }
 .contentFooter p {
     font-size: 12px;
@@ -14,10 +19,18 @@
 }
 .wrapFooterTabs {
     display: flex;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+    }
 }
 .footerTab {
     font-size: 15px;
     margin: 15px 30px 5px 0px;
+
+    @media (max-width: 600px) {
+        margin: 20px 0px 5px 0px;
+    }
 }
 .footerIcons {
     margin-top: 30px;

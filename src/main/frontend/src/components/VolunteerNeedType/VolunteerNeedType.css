@@ -35,6 +35,11 @@
     display: flex;
     justify-content: space-between;
     margin-bottom: 20px;
+
+    @media (max-width: 600px) {
+        display: flex;
+        flex-direction: column;
+    }
 }
 .vSearchNT {
     border: solid #DBDBDB;
@@ -42,6 +47,12 @@
     padding: 2px;
     border-radius: 5px;
     background-color: #FFFFFF;
+
+    @media (max-width: 600px) {
+        display: flex;
+        margin-left: 0.5rem;
+        width: 90%;
+    }
 }
 .vSearchNT i {
     color: #99999F;
@@ -60,6 +71,10 @@
     border-radius: 5px;
     background-color: white;
     margin-left: 10px;
+
+    @media (max-width: 600px) {
+        width: 90%;
+    }
 }
 .vSortNT select {
     border: none;
@@ -77,6 +92,10 @@
     border: solid  1px #DBDBDB;
     border-radius: 3px;
     background-color: #F7F8F9;
+
+    @media (max-width: 600px) {
+        width: 90%;
+    }
 }
 .toggleView button {
     padding: 2px;
@@ -95,6 +114,11 @@
     display: grid;
   grid-template-columns: repeat(3, 1fr); /* Create three equal columns */
   gap: 16px; 
+  @media (max-width: 600px) {
+    display: flex;
+    flex-direction: column;
+    margin-left: 3rem;
+}
 }
 .wrapGrid {
     padding: 10px ;

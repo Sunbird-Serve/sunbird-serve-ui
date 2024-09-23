@@ -12,6 +12,11 @@
 .volunteerLogin {
     width: 30%;
     margin-left: 35%;
+
+    @media (max-width: 600px) {
+        width: 70%;
+        margin-left: 15%;
+    }
 }
 
 .vloginForm {
