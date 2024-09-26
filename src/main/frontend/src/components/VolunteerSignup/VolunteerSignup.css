@@ -12,6 +12,11 @@
 .volunteerSignup1 {
     width: 30%;
     margin-left: 35%;
+    
+    @media (max-width: 600px) {
+        width: 80%;
+        margin-left: 10%;
+    }
 }
 
 .signupForm1 {

@@ -13,6 +13,17 @@
     align-items: center;
     justify-content: space-between;
     padding: 90px 150px;
+
+    @media (max-width: 600px) {
+        padding: 0;
+    }
+}
+
+.logoutButton {
+    @media (max-width: 600px) {
+        margin-top: 5rem;
+        margin-left: -4rem
+    } 
 }
 .btnVLogout {
     background-color: #0080BC;
@@ -47,6 +58,10 @@
 .vProfNav {
     margin: 10px 150px;
     padding: 12px 5px 8px 5px;
+
+    @media (max-width: 600px) {
+        margin: 0;
+    }
 }
 .vpNavItem {
     text-decoration: none;
@@ -64,6 +79,10 @@
 } 
 .vpContent {
     margin: 10px 150px;
+
+    @media (max-width: 600px) {
+        margin: 0;
+    }
 }
 .wrap-status {
     display: flex;
