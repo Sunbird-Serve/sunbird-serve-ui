@@ -96,6 +96,11 @@
   border-left: 1px solid white;
   border-right: 1px solid white;
   padding: 8px;
+
+  @media (max-width: 600px) {
+    font-size: 9px;
+    padding: 0;
+}
 }
 .tableNeedList th span {
   color: #B8B8B8;
@@ -105,6 +110,11 @@
   border: 1px solid #F7F8F9;
   padding: 8px;
   font-size: 14px;
+
+  @media (max-width: 600px) {
+    font-size: 9px;
+    padding: 0;
+}
 } 
 .tableNeedList tr:hover {
   background-color: #F0FAFF;
@@ -119,6 +129,10 @@
   display: flex;
   justify-content: space-evenly;
   font-size: 14px;
+
+  @media (max-width: 600px) {
+    font-size: 12px;
+}
 }
 .pageNav button {
   border: none;

@@ -233,6 +233,12 @@
   width: 500px;
   padding: 30px;
   align-items: center;
+
+  @media (max-width: 600px) {
+    left: 0;
+    width: 95%;
+    padding: 0;
+}
 }
 .textNomSuccess {
   color: #5D5B5B;

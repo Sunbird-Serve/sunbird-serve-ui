@@ -84,6 +84,10 @@
 }
 .needIFormTop {
     display: flex;
+
+    @media (max-width: 600px) {
+        display: block;
+    }
 }
 
 .needIName {
@@ -270,6 +274,10 @@
     margin-bottom: 10px; 
     width: 75%; 
     gap: 20px;
+
+    @media (max-width: 600px) {
+        display: block;
+    }
 }
 .itemNInfoDate-modify label {
     width: 100%;

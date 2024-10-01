@@ -8,11 +8,19 @@
     border-top: solid 2px #F0EFEF;
     align-items: center;
     padding: 20px 26px;
+
+    @media (max-width: 600px) {
+      padding: 0;
+  }
 }
 .topbarNominations {
   height: 32px;
   display: flex;
   justify-content: space-between;
+
+  @media (max-width: 600px) {
+    display: block;
+}
 }
 .leftBarNomination {
   display: flex;
