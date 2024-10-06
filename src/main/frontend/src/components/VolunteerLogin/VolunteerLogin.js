@@ -35,8 +35,16 @@ const VolunteerLogin = ({loginState, onClose}) => {
     }
     const userId = useSelector((state)=> state.user.data.osid)
     const status = useSelector((state)=> state.user.status)
+    const identityDetails = useSelector((state)=> state.user.data.identityDetails)
     const [ alertRegister, setAlertRegister ] = useState(false)
     const [ showLoader, setShowLoader ] = useState(false)
+    const [ routeToRegister, setRouteToRegister ] = useState(false)
+
+    const routeRegisteration = () => {
+        onClose()
+        history.push('/vregistration')
+    }
+
     useEffect(()=>{
         if(status === 'loading') {
             setShowLoader(true)
@@ -50,11 +58,20 @@ const VolunteerLogin = ({loginState, onClose}) => {
                 onClose()
             }
             else {
-                if(status === 'succeeded')
+                if(status === 'failed' || ((!identityDetails || (identityDetails && Object.keys(identityDetails).length === 0)) && status === 'succeeded'))
+                    setRouteToRegister(true)
+                else if(status === 'succeeded')
                     setAlertRegister(true)
+                    
             }
         }
-    },[auth.currentUser, userId, status])
+    },[auth.currentUser, userId, status, identityDetails])
+
+    useEffect(() => {
+        if(routeToRegister === true)
+            routeRegisteration()
+    }, [routeToRegister])
+
     const history = useHistory();
     const handleRegisterClick = (e) => {
         e.preventDefault();
