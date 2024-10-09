@@ -15,7 +15,8 @@
     padding: 90px 150px;
 
     @media (max-width: 600px) {
-        padding: 0;
+        padding: 1rem;
+        height: 150px;
     }
 }
 
@@ -34,21 +35,33 @@
 .wrapUserInfo {
     display: flex;
     align-items: center;
-
-    @media (max-width: 600px) {
-        display: block;
-    }
 }
 .userInfo {
     display: flex;
     flex-direction: column;
+
+    @media (max-width: 600px) {
+        margin-left: 1rem;
+    }
 }
 .profVIcon {
     margin: 24px;
+
+
+    @media (max-width: 600px) {
+        margin: 8px;
+        height: 50px;
+        width: 50px;
+        margin-bottom: 1rem;
+    }
 }
 .vName {
     font-size: 32px;
     color: white;
+
+    @media (max-width: 600px) {
+        font-size: 20px;
+    }
 }
 .vContact {
     display: flex;
@@ -96,6 +109,10 @@
 .volunteerStatus {
     color: white;
     margin-top: 3px;
+
+    @media (max-width: 600px) {
+        font-size: 12px;
+    }
 }
 .vtooltip {
     background-color: inherit;

@@ -98,6 +98,10 @@
   border-collapse: collapse;
   width: 100%;
   border: 1.5px solid #F0EFEF;
+
+  @media (max-width: 600px) {
+    margin-left: 0.5rem;
+}
 }
 .tableNeedList th {
   height: 40px;
