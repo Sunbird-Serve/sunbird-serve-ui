@@ -14,6 +14,10 @@
   padding-left: 100px;
   background-color: #FAFAFA;
   margin-bottom: 20px;
+  @media (max-width: 600px) {
+    height: 50px;
+    font-size: 14px;
+}
 }
 .vHeaderBack button {
   margin-right: 10px ; 
@@ -26,6 +30,7 @@
 
   @media (max-width: 600px) {
     flex-direction: column;
+    margin-bottom: 15px;
 }
 }
 .vSortNeed {
@@ -39,8 +44,11 @@
 
   @media (max-width: 600px) {
     margin-left: 0;
-    width: 90%;
+    width: 85%;
+    margin-bottom: 10px;
     margin-left: 2rem;
+    font-size: 10px;
+    height: 30px;
 }
   }
 .vSortNeed select {
@@ -59,8 +67,10 @@
 
 
   @media (max-width: 600px) {
-    width: 90%;
+    width: 85%;
     margin-left: 2rem;
+    font-size: 10px;
+    height: 30px;
   }
 }
 .toggleNeedView button {
@@ -68,6 +78,7 @@
   display: flex;
   gap: 5px;
   align-items: center;
+  
 }
 
 .needs {
@@ -102,8 +113,12 @@
   overflow: hidden;
 
   @media (max-width: 600px) {
-    height: 275px;
-  }
+    display: flex;
+    flex-direction: column;
+    margin-left: 2rem;
+    width: 85%;
+    height: 100px;
+}
 }
 
 .needBox:hover {
@@ -115,6 +130,8 @@
   font-size: 18px;
   color: #333;
   margin-bottom: 10px;
+
+  
 }
 
 .needBox p {
@@ -131,6 +148,12 @@
   margin-top: 8px;
   display: flex;
   align-items: center;
+  @media (max-width: 600px) {
+    font-size: 11px;
+  color: #999;
+  margin-top: 0px;
+  display: flex;
+}
 }
 
 .needBox .location-container i,
@@ -152,16 +175,25 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 15px;
+  @media (max-width: 600px) {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
 } 
 .heart-icon {
   color: rgba(200, 199, 198, 1);
   width: 30px; /* Adjust this value to resize the icon */
+  @media (max-width: 600px) {
+    width: 10px;
+    margin-right: 20px;
+}
 } 
 .location-vrequired {
   display: flex;
   justify-content: space-between;
   padding: 3px;
   margin-bottom: 5px;
+ 
 }
 .location-container {
   display: flex;
@@ -181,6 +213,7 @@
   border: solid 1px #DBDBDB;
   font-size: 12px;
   padding: 2px 5px;
+ 
 }
 .calendar-container {
   display: flex;
@@ -224,8 +257,11 @@
 
   @media (max-width: 600px) {
     display: flex;
-    width: 90%;
+    width: 85%;
+    margin-bottom: 10px;
     margin-left: 2rem;
+    height: 30px;
+    font-size: 10px;
 }
 }
 .vSearchNeed input {

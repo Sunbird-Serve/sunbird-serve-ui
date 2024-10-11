@@ -17,6 +17,13 @@
     height: 200px;
     background-color: #FAFAFA;
     margin-bottom: 10px;
+
+    @media (max-width: 600px) {
+        display: flex;
+        margin-left: 0.5rem;
+        height: 100px;
+        width: 90%;
+    }
 }
 
 .vGreetNT {
@@ -26,10 +33,16 @@
     font-size: 32px;
     color: #00405E;
     font-weight: 600;
+    @media (max-width: 600px) {
+        font-size: 20px;
+    }
 }
 .vCaptionNT {
     font-size: 15px;
     color: #99999F;
+    @media (max-width: 600px) {
+        font-size: 12px;
+    }
 }
 .vfilterHeader {
     display: flex;
@@ -51,17 +64,31 @@
     @media (max-width: 600px) {
         display: flex;
         margin-left: 0.5rem;
-        width: 90%;
+        width: 85%;
+        margin-bottom: 10px;
+        font-size: 12px;
+        height: 25px;
     }
 }
 .vSearchNT i {
     color: #99999F;
     margin: 0px 8px;
+    @media (max-width: 600px) {
+        width: 10px;
+        height: 10px;
+    }
 }
 .vSearchNT input {
     border: none;
     background-color: inherit;
     width: 400px;
+}
+
+.vSortNTicon{
+    width: 30px;
+    @media (max-width: 600px) {
+        width: 15px;
+    }
 }
 .vSortNT {
     display: flex;
@@ -73,7 +100,10 @@
     margin-left: 10px;
 
     @media (max-width: 600px) {
-        width: 90%;
+        width: 85%;
+        margin-bottom: 10px;
+        font-size: 12px;
+        height: 25px;
     }
 }
 .vSortNT select {
@@ -94,7 +124,10 @@
     background-color: #F7F8F9;
 
     @media (max-width: 600px) {
-        width: 90%;
+        width: 85%;
+        margin-left: 0.5rem;
+        font-size: 12px;
+        height: 25px;
     }
 }
 .toggleView button {
@@ -135,9 +168,15 @@
     font-size: 15px;
     z-index: 10;
     width: 300px;
+    justify-items: center; /* Center items horizontally */
+    align-items: center; 
     background-color: white;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(219, 219, 219, 1);
+    @media (max-width: 600px) {
+        justify-items: center; /* Center items horizontally */
+        align-items: center; 
+    }
 }
 .gridItem:hover {
     cursor: pointer;
@@ -154,6 +193,7 @@
     display: flex;
     justify-content: center;
     border: none;
+    
 }
 .alphabetNT {
     font-size: 18px;
