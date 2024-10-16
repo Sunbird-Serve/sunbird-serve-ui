@@ -1,6 +1,10 @@
 .sideNav {
     height: 100%;
     display: block;
+
+    @media (max-width: 600px) {
+        height: fit-content;
+    }
 }
 .wrapSideLogo {
     height: 59px;

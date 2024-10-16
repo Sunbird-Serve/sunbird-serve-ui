@@ -7,6 +7,7 @@ import { FcGoogle } from "react-icons/fc"
 import FacebookRoundedIcon from '@mui/icons-material/FacebookRounded';
 import { useSelector, useDispatch } from 'react-redux'
 import { Redirect, useHistory } from "react-router-dom";
+import CircularProgress from '@mui/material/CircularProgress';
 
 const VolunteerLogin = ({loginState, onClose}) => {
     const [error,setError]= useState('');
@@ -33,18 +34,44 @@ const VolunteerLogin = ({loginState, onClose}) => {
         signInWithPopup(auth, fprovider)
     }
     const userId = useSelector((state)=> state.user.data.osid)
+    const status = useSelector((state)=> state.user.status)
+    const identityDetails = useSelector((state)=> state.user.data.identityDetails)
     const [ alertRegister, setAlertRegister ] = useState(false)
+    const [ showLoader, setShowLoader ] = useState(false)
+    const [ routeToRegister, setRouteToRegister ] = useState(false)
+
+    const routeRegisteration = () => {
+        onClose()
+        history.push('/vregistration')
+    }
+
     useEffect(()=>{
+        if(status === 'loading') {
+            setShowLoader(true)
+        } else {
+            setShowLoader(false)
+        }
         if(auth.currentUser){
             console.log(auth.currentUser)
             if(userId){
+                setAlertRegister(false)
                 onClose()
             }
             else {
-                setAlertRegister(true)
+                if(status === 'failed' || ((!identityDetails || (identityDetails && Object.keys(identityDetails).length === 0)) && status === 'succeeded'))
+                    setRouteToRegister(true)
+                else if(status === 'succeeded')
+                    setAlertRegister(true)
+                    
             }
         }
-    },[auth.currentUser, userId])
+    },[auth.currentUser, userId, status, identityDetails])
+
+    useEffect(() => {
+        if(routeToRegister === true)
+            routeRegisteration()
+    }, [routeToRegister])
+
     const history = useHistory();
     const handleRegisterClick = (e) => {
         e.preventDefault();
@@ -58,10 +85,10 @@ const VolunteerLogin = ({loginState, onClose}) => {
         <div className="volunteerLogin">
         <button className="btnCloseVLogin" onClick={onClose}>x</button>
         
-        <div className="vloginForm row">
+        {<div className="vloginForm row">
 
             {/* Add Login Form */}
-            {!alertRegister && 
+            {!showLoader && !alertRegister && 
             <form className="vmenuLogin col-12 col-sm-10 offset-sm-1 mt-sm-5">
                 <div className="vloginFormHead">
                     <div>
@@ -100,13 +127,17 @@ const VolunteerLogin = ({loginState, onClose}) => {
             </form>
             }
 
-            {alertRegister && <div className="alertRegister">
+            {!showLoader && alertRegister && <div className="alertRegister">
             <p>You are logged in with email id <span>{auth.currentUser.email}</span>.</p> 
             <p>Complete registration to create account or nominate a need.</p>
             <button onClick={handleRegisterClick}>Click to Register</button>
-            </div>} 
-        </div>
-
+            </div>}
+            {
+                   showLoader &&  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                        <CircularProgress color="secondary" />
+                      </div>
+            } 
+        </div>}
        
         </div>
         </div>

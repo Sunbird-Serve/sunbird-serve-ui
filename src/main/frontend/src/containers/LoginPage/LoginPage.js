@@ -18,11 +18,11 @@ const LoginPage = ({getVolunteerStatus}) => {
     return(
         //login page
         <div className="wrapLogin row">
-            <div className="col-12 col-sm-6 order-sm-2 sideLogin">
+            <div className="col-12 col-sm-6 order-sm-1 sideLogin">
                 {/* form reading login credentials */}
                 {signupUser ? <SignUp loginState={handleSignup} /> : <LoginForm loginState={handleSignup}/>}
             </div>
-            <div className="col-12 col-sm-6 order-sm-1 sideBanner">
+            <div className="col-12 col-sm-6 order-sm-2 sideBanner">
                 {/* sunbird banner */}
                 <LoginBanner volunteerStatus={handleVolunteer}/> 
             </div>

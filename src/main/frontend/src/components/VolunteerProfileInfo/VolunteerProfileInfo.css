@@ -1,11 +1,19 @@
 .main-content {
   width: 800px;
+
+  @media (max-width: 600px) {
+    width: 0;
+}
 }
 .pro {
   display: flex;
   margin: 10px 0px 30px 0px;
   justify-content: space-between;
   align-items: center;
+
+  @media (max-width: 600px) {
+    width: 25rem;
+}
 }
 .main-header {
   color: rgba(60, 64, 68, 1);
@@ -29,6 +37,10 @@
   margin-bottom: 30px;
   border: 1px solid #dbdbdb;
   border-radius: 8px;
+
+  @media (max-width: 600px) {
+    width: 24rem;
+}
 }
 .box-header {
   color: rgba(104, 108, 115, 1);

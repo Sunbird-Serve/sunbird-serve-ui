@@ -16,7 +16,7 @@ function ExplorePage() {
       <div className="vHeader">
         <VolunteerHeader/>
       </div>
-      <div className="wrapContent row mt-5 mt-sm-0 pl-5">
+      <div className="wrapContent row mt-5 mt-sm-8 pl-5">
         <div>
           <Switch>
             <Route exact path="/vneedtypes" component={VolunteerNeedType} />

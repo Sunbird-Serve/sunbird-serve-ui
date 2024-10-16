@@ -25,6 +25,10 @@
     font-size: 14px;
     color: #686C73;
     font-weight: 400;
+
+    @media (max-width: 600px) {
+        padding: 16px 0px 8px 16px;
+    }
 }
 .tabNeed:hover {
     border-bottom: solid #006FA2;

@@ -16,6 +16,10 @@
 .statsVPNoms {
   display: flex;
   margin: 10px 0px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+ }
 }
 .statsVPNomsItem {
   width: 200px;
@@ -49,6 +53,10 @@
   display: flex;
   justify-content: space-between;
   margin-top: 30px;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+ }
 }
 .vnomTabs {
   display: flex;
@@ -126,6 +134,10 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr); /* 4 columns with equal width */
   gap: 30px; /* spacing between items */
+
+  @media (max-width: 600px) {
+    display: unset;
+ }
 }
 .nomination-item {
   display: flex;
@@ -137,6 +149,11 @@
   padding: 10px;
   border-radius: 8px;
   border: solid 1px #DBDBDB;
+
+  @media (max-width: 600px) {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+ }
 }
 .needItemVolunteer {
   display: flex;

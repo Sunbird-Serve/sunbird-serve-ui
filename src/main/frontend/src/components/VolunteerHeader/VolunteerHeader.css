@@ -4,6 +4,12 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    @media (max-width: 600px) {
+        height: 40px;
+        margin-top: 20px;
+        margin-bottom: -20px;
+    }
+    
 }
 .vhProfile {
     width: 240px;
@@ -15,6 +21,7 @@
 .vhLogo {
     margin: 0px 30px;
 }
+
 .logobutton {
     border: none;
     background-color: inherit;
