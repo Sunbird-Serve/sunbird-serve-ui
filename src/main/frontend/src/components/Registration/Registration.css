@@ -7,6 +7,10 @@
     padding: 1% 7% 3% 25%;
     gap: 1%;
     align-items: start;
+
+    @media (max-width: 600px) {
+        padding: 0;
+     }
 }
 
 .seperator {
@@ -70,6 +74,10 @@
 	left: 7%;
 	z-index: 1;
 	width: 17%;
+
+    @media (max-width: 600px) {
+       display: none;
+    }
 }
 
 .nav-element {

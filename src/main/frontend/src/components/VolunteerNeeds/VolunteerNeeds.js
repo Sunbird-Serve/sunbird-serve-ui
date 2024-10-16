@@ -117,7 +117,7 @@ export const VolunteerNeeds = props => {
           </div>
           <div className="toggleNeedView">  
               <button className={`${view ? "blueText" : "grayText"}`} onClick={handleToggleGrid}> 
-                <i><GridOnIcon style={{fontSize:"19px"}}/></i>
+                <i><GridOnIcon style={{fontSize:"14px"}}/></i>
                 Grid view 
               </button>
               

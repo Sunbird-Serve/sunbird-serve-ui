@@ -18,6 +18,11 @@
     height: 80%;
     padding: 0px;
     margin-top: -5px;
+
+    @media (max-width: 600px) {
+        margin-top: -5px;
+        height: 100%;
+    }
 }
 .btnCloseNomination button {
     font-size: 12px;
@@ -34,6 +39,11 @@
     height: 80%;
     background-color: white;
     overflow: scroll;
+
+    @media (max-width: 600px) {
+        width: 100%;
+        height: 100%;
+    }
 }
 .wrapTabs {
     height: 64px;
@@ -84,6 +94,10 @@
 }
 .needIFormTop {
     display: flex;
+
+    @media (max-width: 600px) {
+        display: block;
+    }
 }
 
 .needIName {
@@ -270,6 +284,10 @@
     margin-bottom: 10px; 
     width: 75%; 
     gap: 20px;
+
+    @media (max-width: 600px) {
+        display: block;
+    }
 }
 .itemNInfoDate-modify label {
     width: 100%;

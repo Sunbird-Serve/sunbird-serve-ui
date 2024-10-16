@@ -6,6 +6,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NeedsImage from '../../assets/fileIcon.png'
 import { format } from 'date-fns';
 import CloseIcon from '@mui/icons-material/Close';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 const configData = require('../../configure.js');
 const currentDate = format(new Date(), 'yyyy-MM-dd');
@@ -48,6 +49,7 @@ const VolunteerProfileDeliverable = props => {
   const userId = useSelector((state)=> state.user.data.osid)
   const [volunteerHrs, setVolunteerHrs] = useState(0);
   const [fulfils, setFulfils] = useState([])
+  const [selectedMonth, setSelectedMonth] = useState('');
 
   useEffect(() => {
     axios.get(`${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${userId}?page=0&size=10`)
@@ -95,6 +97,14 @@ const VolunteerProfileDeliverable = props => {
   const [cancelledDeliverables, setCancelledDeliverables] = useState(null)
   const [dstat, setDstat ] = useState(false)
 
+  const filterDeliverablesByMonth = (deliverables, month) => {
+    if (!month) return deliverables;
+    return deliverables.filter(item => {
+      const deliverableMonth = new Date(item.deliverableDate).getMonth();
+      return deliverableMonth === parseInt(month, 10);
+    });
+  };
+
   useEffect(()=>{
     const fetchData = async () => {
         try {
@@ -109,15 +119,26 @@ const VolunteerProfileDeliverable = props => {
 
   },[planId, clickMarker, rejection, cancelPopup, dstat])
 
-  // const todoDeliverables = deliverables && deliverables.filter(item => item.status === 'NotStarted')
-  // const completedDeliverables = deliverables && deliverables.filter(item => item.status === 'Completed')
-  // const cancelledDeliverables = deliverables && deliverables.filter(item => item.status === 'Cancelled')
+ 
+  useEffect(() => {
+    const filteredDeliverables = filterDeliverablesByMonth(deliverables, selectedMonth);
+    setTodoDeliverables(filteredDeliverables && filteredDeliverables.filter(item => item.status === 'NotStarted'));
+    setCompletedDeliverables(filteredDeliverables && filteredDeliverables.filter(item => item.status === 'Completed'));
+    setCancelledDeliverables(filteredDeliverables && filteredDeliverables.filter(item => item.status === 'Cancelled'));
+  }, [deliverables, selectedMonth,dstat]); // Depend on both deliverables and selectedMonth
 
-  useEffect(()=>{
-    setTodoDeliverables(deliverables && deliverables.filter(item => item.status === 'NotStarted'))
-    setCompletedDeliverables(deliverables && deliverables.filter(item => item.status === 'Completed'))
-    setCancelledDeliverables(deliverables && deliverables.filter(item => item.status === 'Cancelled'))
-  },[deliverables, dstat])
+
+  const handleMonthFilter = (e) => {
+    setSelectedMonth(e.target.value);
+  };
+
+  const monthOptions = Array.from({ length: 12 }, (_, i) => (
+    <option key={i} value={i}>
+      {new Date(0, i).toLocaleString('default', { month: 'long' })}
+    </option>
+  ));
+
+
 
   const [cindex, setCIndex] = useState('') //display on popup
   const handleCancel = (item, index) => {
@@ -272,7 +293,9 @@ const VolunteerProfileDeliverable = props => {
                     <span>Platform :</span> {inParas.length ? inParas[0].softwarePlatform : ''}
                 </div> 
                 <div className="itemNVP"> 
-                    <span>URL: </span>  <a href='https://meet.google.com/zsm-uvwd-hry'> Session Link  </a>
+                    {/* <span>URL: </span>  <a > Session Link  </a> */}
+                    <span>URL: </span>  {inParas.length ? inParas[0].inputUrl : ''}
+
                 </div> 
             </div>
         </div>
@@ -280,7 +303,23 @@ const VolunteerProfileDeliverable = props => {
         {/* NEED PLAN DELIVERABLES*/}
         <div className="deliverablesNeedVolunteerProfile"> 
             {/*DNVP refer to Need Plan Deliverables from Volunteer Profile*/}
-            <div className="headDNVP">Need Plan Deliverables</div>
+            <div className="headDNVP">Need Plan Deliverables
+            <div className="monthFilterContainer">
+            <div className="selectMonth">
+              <i className="nSortDateIcon">
+                <CalendarTodayIcon style={{ fontSize: "18px", margin: "0px 3px" }} />
+              </i>
+              <select
+                className="selectMonthType"
+                value={selectedMonth}
+                onChange={handleMonthFilter}
+              >
+                <option value="">All Months</option>
+                {monthOptions}
+              </select>
+            </div>
+          </div>
+          </div>
         </div>
         {deliverables.length ? <div className="listDNVP">
             <div className="listDNVPbox">

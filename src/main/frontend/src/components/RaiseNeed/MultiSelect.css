@@ -13,6 +13,10 @@
   display: flex;
   gap: 50px;
   margin-bottom: 5px;
+
+  @media (max-width: 600px) {
+    display: block;
+}
 }
 .wrap-remove-button {
   border: none;

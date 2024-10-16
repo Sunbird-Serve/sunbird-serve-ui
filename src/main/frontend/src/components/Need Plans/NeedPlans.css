@@ -8,6 +8,10 @@
   border: none;
   background-color: white;
   border: solid 1px #DBDBDB;
+
+  @media (max-width: 600px) {
+    width: 100% !important;
+}
 }
 .event-list-nc {
   border: solid 1px;
@@ -15,6 +19,10 @@
   width: 450px;
   border: solid 1px #EBEBEB;
   background-color: white;
+
+  @media (max-width: 600px) {
+    width: 100%;
+}
 }
 .headEventListNC {
   height: 60px;

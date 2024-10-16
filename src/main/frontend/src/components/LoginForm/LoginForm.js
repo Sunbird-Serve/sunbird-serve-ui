@@ -37,14 +37,11 @@ const LoginForm = ({loginState}) => {
     return(
         // adds user login form
         <div className="loginForm row">
-            {/* Logo */}
-            <div className="sbLogo col-12 col-sm-7 offset-sm-1 mt-sm-5">
-                <img src={SBLogo} alt="BlueBirdLogo" width="150px" />
-            </div>
+            
             {/* Add Login Form */}
             <form className="menuLogin col-12 col-sm-7 offset-sm-1 mt-sm-5">
-                <div className="greetLogin " >Welcome Back!</div>
-                <div className="titleLogin" >Login</div>   
+                <div className="greetLogin " >Are you a Coordinator?</div>
+                <div className="titleLogin" >SERVE Login</div>   
                 {/* user credentials */}
                 <div className="unameLogin">
                     <label className="label" >Email Id</label>
@@ -58,11 +55,7 @@ const LoginForm = ({loginState}) => {
                 <div className="btnLogin">
                     <button type="login" onClick={logIn}>Login</button>
                 </div> 
-                {/* goto Signup */}  
-                <div className="gotoSignup">
-                    <span>Don't have an account?</span>
-                    <button onClick={handleGoto}>Sign Up! </button>
-                </div>
+               
                 <div className="hline">
                     <hr /> <span>or login with</span> <hr/>
                 </div>

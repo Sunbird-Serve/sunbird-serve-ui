@@ -8,11 +8,19 @@
     border-top: solid 2px #F0EFEF;
     align-items: center;
     padding: 20px 26px;
+
+    @media (max-width: 600px) {
+      padding: 0;
+  }
 }
 .topbarNominations {
   height: 32px;
   display: flex;
   justify-content: space-between;
+
+  @media (max-width: 600px) {
+    display: block;
+}
 }
 .leftBarNomination {
   display: flex;
@@ -38,6 +46,10 @@
   padding: 2px 5px;
   border-radius: 5px;
   margin-right: 15px;
+
+  @media (max-width: 600px) {
+    font-size: 10px;
+}
 }
 .boxSearchNomins i {
   color: #DBDBDB;
@@ -47,6 +59,10 @@
   border-radius: 5px;
   font-size: 14px;
   padding: 3px 8px;
+
+  @media (max-width: 600px) {
+    font-size: 10px;
+}
 }
 .rightBarNomination {
   display: flex;
@@ -77,6 +93,11 @@
     border-left: 1px solid white;
     border-right: 1px solid white;
     padding: 8px;
+
+    @media (max-width: 600px) {
+      padding: unset;
+      font-size: 8px;
+  }
   }
   .tableNominations th span {
     color: #B8B8B8;
@@ -86,6 +107,11 @@
     border: 1px solid #F7F8F9;
     padding: 8px;
     font-size: 14px;
+
+    @media (max-width: 600px) {
+      padding: unset;
+      font-size: 8px;
+  }
   } 
   .tableNominations tr:hover {
     background-color: #F0FAFF;
@@ -118,6 +144,10 @@
     border-radius: 5px; /* Rounded corners */
     cursor: pointer; /* Pointer cursor on hover */
     transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+    @media (max-width: 600px) {
+      padding: unset;
+      font-size: 8px;
+  }
   }
   
   .styled-button:hover {
@@ -277,6 +307,10 @@
   border-radius: 8px; /* Rounded corners */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
   margin: 10px;
+
+  @media (max-width: 600px) {
+    padding: unset;
+}
 }
 
 .common-info-section {
@@ -319,6 +353,10 @@
   border: 1px solid #d3d4d5; /* Border color */
   border-radius: 5px; /* Rounded corners */
   font-size: 14px; /* Font size for input text */
+
+  @media (max-width: 600px) {
+    font-size: 7px;
+}
 }
 
 .common-info-delivs button {
@@ -331,6 +369,9 @@
   cursor: pointer; /* Pointer cursor on hover */
   transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
   margin-top: 20px;
+  /* @media (max-width: 600px) {
+    width: 7rem; */
+/* } */
 }
 
 .common-info-delivs button:hover {
@@ -361,6 +402,10 @@
   background-color: #f9f9f9;
   border-radius: 5px;
   margin-bottom: 10px;
+
+  @media (max-width: 600px) {
+    padding: unset;
+}
 }
 
 
@@ -375,22 +420,44 @@
   padding: 8px 10px;
   text-align: center;
   flex: 1;
+
+  input[type="text"] {
+    @media (max-width: 600px) {
+      width: 3.5rem;
+  }
+  }
+
+  @media (max-width: 600px) {
+    padding: 8px 8px;
+    font-size: 10px;
+}
 }
 
 .deliv-serial {
   flex: 0 0 60px;
   text-align: right;
   border-right: solid 1px #d3d3d3;
+
+  @media (max-width: 600px) {
+    flex: unset;
+}
 }
 
 .deliv-date {
   flex: 0 0 210px;
   border-right: solid 1px #d3d3d3;
+
+  @media (max-width: 600px) {
+    flex: unset;
+}
 }
 
 .deliv-time {
   flex: 0 0 150px;
   border-right: solid 1px #d3d3d3;
+  @media (max-width: 600px) {
+    flex: unset;
+}
 }
 
 .deliv-platform,
@@ -398,10 +465,17 @@
 .deliv-status {
   flex: 0 0 150px;
   border-right: solid 1px #d3d3d3;
+
+  @media (max-width: 600px) {
+    flex: unset;
+}
 }
 
 .deliv-action {
   flex: 0 0 60px;
+  @media (max-width: 600px) {
+    flex: unset;
+}
 }
 
 .deliv-action button {
