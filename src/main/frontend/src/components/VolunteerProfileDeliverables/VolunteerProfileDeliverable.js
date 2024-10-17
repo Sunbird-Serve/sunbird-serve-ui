@@ -284,19 +284,24 @@ const VolunteerProfileDeliverable = props => {
                 <div className="itemNVP">
                     <span>Time :</span> { inParas.length ? formatTime(inParas[0].startTime)+' - '+formatTime(inParas[0].endTime) : ''}
                 </div> 
-                {/* <div className="itemNVP">
-                    <span>Mode</span> : Online
-                </div> */}
+                <div className="itemNVP"> 
+                   <span>Content Resources: </span>  <a href="https://serve-jcms.evean.net/home/view_course/"> View  </a>
+                  
+                </div> 
             </div>
             <div className="rowNVP">
                 <div className="itemNVP">
                     <span>Platform :</span> {inParas.length ? inParas[0].softwarePlatform : ''}
                 </div> 
                 <div className="itemNVP"> 
-                    {/* <span>URL: </span>  <a > Session Link  </a> */}
-                    <span>URL: </span>  {inParas.length ? inParas[0].inputUrl : ''}
-
-                </div> 
+  <span>URL: </span> 
+  {inParas.length ? (
+    <a href={inParas[0].inputUrl} target="_blank" rel="noopener noreferrer">
+     
+      Session Link
+    </a>
+  ) : ''}
+</div>
             </div>
         </div>
 

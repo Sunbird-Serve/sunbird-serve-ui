@@ -28,11 +28,18 @@
     font-size: 15px;
     color: #99999F;
     margin-right: 10px;
+    @media (max-width: 600px) {
+        font-size: 12px;
+    }
 }
 .itemNVP {
     font-size: 15px;
     color: #4D4D4D;
-    width: 320px;
+    width: 100%;
+    @media (max-width: 600px) {
+        font-size: 12px;
+    }
+
 }
 .deliverablesNeedVolunteerProfile {
     margin-top: 30px;
@@ -46,6 +53,9 @@
 .listDNVP {
     display: flex;
     gap: 20px;
+    @media (max-width: 600px) {
+        flex-direction: column;
+    }
 }
 .listDNVPbox {
     width: 400px;

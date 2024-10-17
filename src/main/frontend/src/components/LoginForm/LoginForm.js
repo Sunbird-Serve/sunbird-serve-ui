@@ -40,8 +40,8 @@ const LoginForm = ({loginState}) => {
             
             {/* Add Login Form */}
             <form className="menuLogin col-12 col-sm-7 offset-sm-1 mt-sm-5">
-                <div className="greetLogin " >Are you a Coordinator?</div>
-                <div className="titleLogin" >SERVE Login</div>   
+                {/*<div className="greetLogin " >Are you a Coordinator?</div>*/}
+                <div className="titleLogin" >SERVE - Coordinator Login</div>   
                 {/* user credentials */}
                 <div className="unameLogin">
                     <label className="label" >Email Id</label>
