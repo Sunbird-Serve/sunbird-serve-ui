@@ -56,14 +56,14 @@ const LoginForm = ({loginState}) => {
                     <button type="login" onClick={logIn}>Login</button>
                 </div> 
                
-                <div className="hline">
+                {/* <div className="hline">
                     <hr /> <span>or login with</span> <hr/>
-                </div>
+                </div> */}
                 {/* Social Media Login*/}
-                <div className="btnSLogin">
+                {/*<div className="btnSLogin">
                     <button type="login" onClick={signInWithGoogle}> <i><FcGoogle /></i>Google</button>
                     <button type="login" onClick={signInWithFacebook} > <i style={{color:'#1877F2'}}> <FacebookRoundedIcon /></i>Facebook</button>
-                </div>    
+                </div>    */}
                 {/* Error message when credentials are wrong*/}     
                 {error&&<div className="loginError">{error.slice(5,)}</div>}  
             </form>
