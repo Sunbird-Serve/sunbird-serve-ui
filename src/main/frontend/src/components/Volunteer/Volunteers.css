@@ -22,6 +22,7 @@
 
    @media (max-width: 600px) {
     font-size: 10px;
+    display: block;
 }
 }
 

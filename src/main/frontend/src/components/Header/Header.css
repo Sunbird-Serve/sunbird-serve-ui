@@ -106,4 +106,9 @@
     font-size: 22px;
     font-weight: 600;
     color: #006FA2;
+    @media (max-width: 600px) {
+        font-size: 16px;
+        margin-top: 30px;;
+        
+    }
 }
