@@ -7,10 +7,12 @@ const baseDomainVolunteering = "https://serve-v1.evean.net"
 const configData = {
     "USER_GET" : `${baseDomainVolunteering}/api/v1/serve-volunteering/user`,
     "USER_PROFILE":`${baseDomainVolunteering}/api/v1/serve-volunteering/user/user-profile`,
+    "USER_PROFILE_BY_ID": `${baseDomainVolunteering}/api/v1/serve-volunteering/user/user-profile/userId`,
     "NEED_GET": `${baseDomainNeed}/api/v1/serve-need/need`,
     "SERVE_FULFILL":`${baseDomainFulfill}/api/v1/serve-fulfill`,
     "SERVE_NEED":`${baseDomainNeed}/api/v1/serve-need`,
-    "SERVE_VOLUNTEERING":`${baseDomainVolunteering}/api/v1/serve-volunteering`,
+    "SERVE_VOLUNTEERING":`${baseDomainVolunteering}/api/v1/serve-volunteering/volunteer-hours`,
+    "VOLUNTEER_HOURS": `${baseDomainVolunteering}/api/v1/serve-volunteering/volunteer-hours`,
     "NEED_SEARCH": `${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEED_FULFILL":`${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEEDTYPE_GET": `${baseDomainNeed}/api/v1/serve-need/needtype`,
@@ -24,7 +26,9 @@ const configData = {
     "NEED_REQUIREMENT_GET": `${baseDomainNeed}/api/v1/serve-need/need-requirement`,
     "NOMINATIONS_GET": `${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEEDPLAN_GET": `${baseDomainNeed}/api/v1/serve-need/need-plan`,
-    "NEEDPLAN_DELIVERABLES": `${baseDomainNeed}/api/v1/serve-need/need-deliverable`
+    "NEEDPLAN_DELIVERABLES": `${baseDomainNeed}/api/v1/serve-need/need-deliverable`,
+    "SKILL_DETAILS": `${baseDomainNeed}/api/v1/serve-need/need-requirement/skilldetails`
+
 }
 
 module.exports = configData;

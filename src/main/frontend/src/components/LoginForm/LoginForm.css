@@ -12,14 +12,16 @@
 .menuLogin {
     padding: 0px 15px;
 }
+.resetPasswordForm{
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+}
 .greetLogin {
     font-size: 16px;
     color: #5F6367; 
     height: fit-content;
     font-weight: 400;
-    @media (max-width: 600px) {
-        font-size: 12px;
-    }
 }
 .titleLogin {
     height: fit-content;
@@ -28,24 +30,15 @@
     color:  #0080BC;
     margin-top: 60px;
     margin-bottom: 24px;
-    @media (max-width: 600px) {
-        font-size: 16px;
-    }
 }
 .unameLogin, .pwdLogin {
     width: 100%;
-    @media (max-width: 600px) {
-        width: 80%;
-    }
 }
 .unameLogin label,.pwdLogin label {
     font-size: 14px;
     color: #1F1F1F;
     border: none;
     padding-left: 0;
-    @media (max-width: 600px) {
-        font-size: 10px;
-    }
 }
 .unameLogin input,.pwdLogin input {
     width: 100%;
@@ -55,17 +48,13 @@
     border-radius: 3px;
     border-width: 1px;
     background-color: #FFFFFF;
-    @media (max-width: 600px) {
-        width: 60%;
-        font-size: 10px;
-    }
 } 
 .btnLogin {
     margin-top: 15px;
     display: flex;
     align-items: center;
 }
-.btnLogin button {
+.btnLogin button  {
     padding: 10px;
     background-color: #0080BC;
     color: white;
@@ -73,11 +62,6 @@
     border-radius: 6px;
     border: none;
     width: 100%;
-    @media (max-width: 600px) {
-        width: 60%;
-        margin-right: 30px;
-        margin-left: 30px;
-    }
 }
 .gotoSignup {
     display: flex;
@@ -138,4 +122,28 @@
     font-size: 14px;
     margin-top: 14px;
     text-align: center;
+}
+.resetPasswordForm{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 100px;
+}
+.backToLogin{
+    margin-top: 20px;
+}
+.resetPassword, .backToLogin {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.resetPassword a, .backToLogin a {
+    color: #0080BC;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.resetPassword a:hover, .backToLogin a:hover {
+    text-decoration: underline;
 }
