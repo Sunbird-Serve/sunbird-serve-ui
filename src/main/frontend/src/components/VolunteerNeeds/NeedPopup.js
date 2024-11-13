@@ -10,9 +10,41 @@ import VolunteerLogin from '../VolunteerLogin/VolunteerLogin';
 import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
 import NominationSuccess from '../../assets/nominationSuccess.png';
+import telemetryConfig from '../../telemetryConfig.js';
+import TelemetryService from '@project-sunbird/telemetry-sdk';
 
+
+const user = auth.currentUser;
+const userId = user ? user.uid : 'Unregistered User';
 
 const configData = require('../../configure.js');
+
+// Function to emit telemetry event
+const emitTelemetryEvent = async (eventData) => {
+  const telemetryEvent = {
+    sid: '', // Set this dynamically based on the current session
+    event: eventData.event,   // e.g., "Session URL Clicked"
+    type: 'Click',
+    subtype: 'Nominate',
+    pageid: 'Nominate Button Click',
+    target: eventData,
+  };
+
+  const telemetryOptions = {
+    //uid: userId, // Set this dynamically based on the logged-in user
+    actor:{
+      id: userId,
+      type: 'Volunteer'
+    }
+  };
+
+  try {
+    TelemetryService.interact(telemetryEvent,telemetryOptions);
+    console.log('Telemetry event sent successfully:', telemetryEvent);
+  } catch (error) {
+    console.error('Error sending telemetry event:', error);
+  }
+};
 
 function NeedPopup({ open, onClose, need }) {
   console.log(need)
@@ -24,6 +56,7 @@ function NeedPopup({ open, onClose, need }) {
     const needId = need.need.id; //  the need.id represents the needId
     console.log(needId)
     console.log(userId)
+    emitTelemetryEvent({ event: 'Nominate Click' });
     if(userId){
     axios.post(`${configData.NEED_SEARCH}/${needId}/nominate/${userId}`)
       .then((response) => {

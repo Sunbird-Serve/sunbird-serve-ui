@@ -13,6 +13,15 @@ import ntypeImage04 from '../../assets/online_teaching.png'
 import ntypeImage05 from '../../assets/guest_lecture.png'
 import { useSelector, useDispatch } from 'react-redux'
 import SortIcon from "@mui/icons-material/Sort";
+import telemetryConfig from '../../telemetryConfig.js';
+import TelemetryService from '@project-sunbird/telemetry-sdk';
+
+import { getAuth } from 'firebase/auth';
+
+const auth = getAuth();
+const user = auth.currentUser;
+
+const userId = user ? user.uid : 'Unregistered User';
 
 const configData = require('../../configure.js');
 
@@ -33,6 +42,7 @@ function VolunteerNeedType() {
       }
     };
     fetchData();
+    emitTelemetryEvent({ event: 'NeedType Discovery Page' });
   },[]);
 
   //sort the fetched need types
@@ -80,6 +90,7 @@ function VolunteerNeedType() {
   const [ selectedNeedTypeId, setSelectedNeedTypeId ] = useState(null)
   const [ nTypeName, setNTypeName ] = useState('')
 
+
   const handleNTClick = (typeId, typeName) => {
     setNeedsList(true)
     setSelectedNeedTypeId(typeId)
@@ -94,6 +105,34 @@ function VolunteerNeedType() {
   const handleView = (tab) => {
     setActiveView(tab);
   }
+
+  // Function to emit telemetry event
+const emitTelemetryEvent = async (eventData) => {
+  const telemetryEvent = {
+    sid: '', // Set this dynamically based on the current session
+    event: eventData.event,   // e.g., "Session URL Clicked"
+    type: 'List',
+    subtype: 'Load',
+    pageid: 'Need Type Explore',
+    target: 'Need Types List',
+  };
+
+  const telemetryOptions = {
+    //uid: userId, // Set this dynamically based on the logged-in user
+    actor:{
+      id: userId,
+      type: 'Volunteer'
+    }
+  };
+
+  try {
+    TelemetryService.impression(telemetryEvent,telemetryOptions);
+    console.log('Telemetry event sent successfully:', telemetryEvent);
+  } catch (error) {
+    console.error('Error sending telemetry event:', error);
+  }
+};
+
 
   const imageMap = {
     'Content Development': ntypeImage01,

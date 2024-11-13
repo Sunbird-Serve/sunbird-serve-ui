@@ -10,6 +10,8 @@ import { fetchNeedtypes } from './state/needtypeSlice';
 import { fetchNeedsByUid } from "./state/needByUidSlice";
 import { fetchEntities } from "./state/entitySlice";
 import { fetchUserList } from "./state/userListSlice";
+import TelemetryService from '@project-sunbird/telemetry-sdk';
+import telemetryConfig from './telemetryConfig';
 
 function App() {
   const dispatch = useDispatch();
@@ -23,6 +25,9 @@ function App() {
           uid: user.uid,    // this is firebase userId
           email: user.email,
         });
+        // Set user ID and session ID for telemetry after user logs in
+        telemetryConfig.uid = user.uid; // Set the logged-in user's ID
+        telemetryConfig.sid = user.refreshToken; // You may want to generate or set a proper session ID
       } else {
         setPresentUser(null);
       }
@@ -31,6 +36,14 @@ function App() {
     // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
+
+   // Initialize Telemetry in the component
+   //useEffect(() => {
+    //init(telemetryConfig); // Initialize telemetry with the config
+  //}, []);
+  
+  // Initialize Telemetry
+  TelemetryService.initialize(telemetryConfig);
 
   // UPDATE USER STATE based on authenticated email
   const userDetails = useSelector((state) => state.user.data);

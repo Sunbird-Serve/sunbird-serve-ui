@@ -11,6 +11,13 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSelector } from 'react-redux'
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import telemetryConfig from '../../telemetryConfig.js';
+import TelemetryService from '@project-sunbird/telemetry-sdk';
+import { getAuth } from 'firebase/auth';
+
+const auth = getAuth();
+const user = auth.currentUser;
+const userId = user ? user.uid : 'Unregistered User';
 
 export const VolunteerNeeds = props => {
   const needList = useSelector((state) => state.need.data);
@@ -29,6 +36,7 @@ export const VolunteerNeeds = props => {
 
   const [sortingOrder, setSortingOrder] = useState('ascending');
   const [data, setData] = useState([]);
+  
   
   useEffect(() => {
     // Clone the needList to avoid modifying the original array
@@ -74,6 +82,7 @@ export const VolunteerNeeds = props => {
 
   const handlePopupOpen = (need) => {
     setSelectedNeed(need); 
+    emitTelemetryEvent({ event: need.name+' Need Details Page' });
     setShowPopup(true);
   };
 
@@ -92,6 +101,33 @@ export const VolunteerNeeds = props => {
       return str;
     }
   };
+
+    // Function to emit telemetry event
+const emitTelemetryEvent = async (eventData) => {
+  const telemetryEvent = {
+    sid: '', // Set this dynamically based on the current session
+    event: eventData.event,   // e.g., "Session URL Clicked"
+    type: 'Click',
+    subtype: 'Details',
+    pageid: 'Need Details Page',
+    target: eventData,
+  };
+
+  const telemetryOptions = {
+    //uid: userId, // Set this dynamically based on the logged-in user
+    actor:{
+      id: userId,
+      type: 'Volunteer'
+    }
+  };
+
+  try {
+    TelemetryService.interact(telemetryEvent,telemetryOptions);
+    console.log('Telemetry event sent successfully:', telemetryEvent);
+  } catch (error) {
+    console.error('Error sending telemetry event:', error);
+  }
+};
 
   return (
     <div className="wrapvolunteerNeeds">

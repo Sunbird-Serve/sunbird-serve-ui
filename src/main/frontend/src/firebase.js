@@ -2,13 +2,16 @@ import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider, FacebookAuthProvider } from 'firebase/auth'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDfCZlKwxq2QaZFwqPhezTLxsyReOGCdFo",
-  authDomain: "vidyaloka-40f2c.firebaseapp.com",
-  projectId: "vidyaloka-40f2c",
-  storageBucket: "vidyaloka-40f2c.appspot.com",
-  messagingSenderId: "657062679030",
-  appId: "1:657062679030:web:759dd0df4895c1882cf7d7"
+  apiKey: "AIzaSyCx1gTUeV3HNHqG8b4PiL-GYz1fwfK4lOA",
+  authDomain: "serve-sandbox.firebaseapp.com",
+  projectId: "serve-sandbox",
+  storageBucket: "serve-sandbox.appspot.com",
+  messagingSenderId: "753259028832",
+  appId: "1:753259028832:web:bc8331c33997e0fdcdfe05",
+  measurementId: "G-NLWWQ8YFDQ"
 };
+
+
   
 const app = initializeApp(firebaseConfig);  //initialize firebase app at server
 

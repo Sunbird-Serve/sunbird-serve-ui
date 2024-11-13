@@ -20,7 +20,7 @@ const configData = {
     "NEED_BY_TYPE" : `${baseDomainNeed}/api/v1/need/serve-need/need-type/create`,
     "NOMINATED_USER_FETCH" : `${baseDomainVolunteering}/api/v1/serve-volunteering/user`,
     "NEED_BY_USER" : `${baseDomainNeed}/api/v1/serve-need/need/user`,
-    "NOMINATION_CONFIRM" : `${baseDomainFulfill}/api/v1/serve-fulfill/nomination/{needId}/nominate`,
+    "NOMINATION_CONFIRM" : `${baseDomainFulfill}/api/v1/serve-fulfill/nomination/nominate`,
     "NEED_REQUIREMENT_GET": `${baseDomainNeed}/api/v1/serve-need/need-requirement`,
     "NOMINATIONS_GET": `${baseDomainFulfill}/api/v1/serve-fulfill/nomination`,
     "NEEDPLAN_GET": `${baseDomainNeed}/api/v1/serve-need/need-plan`,

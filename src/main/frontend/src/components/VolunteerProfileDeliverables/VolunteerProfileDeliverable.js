@@ -6,6 +6,8 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import NeedsImage from '../../assets/fileIcon.png'
 import { format } from 'date-fns';
 import CloseIcon from '@mui/icons-material/Close';
+import telemetryConfig from '../../telemetryConfig.js';
+import TelemetryService from '@project-sunbird/telemetry-sdk';
 
 const configData = require('../../configure.js');
 const currentDate = format(new Date(), 'yyyy-MM-dd');
@@ -14,6 +16,39 @@ const VolunteerProfileDeliverable = props => {
   // For need section, fetch needId wise information
   const needsList = useSelector((state) => state.need.data);
 
+  // Function to emit telemetry event
+const emitTelemetryEvent = async (eventData, userId) => {
+  const telemetryEvent = {
+    sid: '', // Set this dynamically based on the current session
+    event: eventData.event,   // e.g., "Session URL Clicked"
+    type: 'CLICK',
+    subtype: 'Session Click',
+    pageid: 'Volunteer Deliverables Page',
+    target: 'session-link',
+  };
+
+  const telemetryOptions = {
+    //uid: userId, // Set this dynamically based on the logged-in user
+    actor:{
+      id: userId,
+      type: 'Volunteer'
+    }
+  };
+
+
+   // Dispatch the telemetry event
+   //TelemetryService.interact(telemetryEvent);
+
+
+  try {
+    //const response = await axios.post(telemetryConfig.endpoint, telemetryEvent);
+    //console.log('Telemetry event sent successfully:', response.data);
+    TelemetryService.interact(telemetryEvent,telemetryOptions);
+    console.log('Telemetry event sent successfully:', telemetryEvent);
+  } catch (error) {
+    console.error('Error sending telemetry event:', error);
+  }
+};
   //maps of need, entity, occurance by needId
   const needById = {};
   const entityById = {};
@@ -272,7 +307,11 @@ const VolunteerProfileDeliverable = props => {
                     <span>Platform :</span> {inParas.length ? inParas[0].softwarePlatform : ''}
                 </div> 
                 <div className="itemNVP"> 
-                    <span>URL: </span>  <a href='https://meet.google.com/zsm-uvwd-hry'> Session Link  </a>
+                    <span>URL: </span>  <a href='https://meet.google.com/zsm-uvwd-hry' onClick={(event) => {
+      event.preventDefault(); // Prevent the default link behavior
+      emitTelemetryEvent({ event: 'Session URL Clicked' }, userId); // Emit telemetry event
+      window.open('https://meet.google.com/zsm-uvwd-hry', '_blank'); // Open the session URL in a new tab
+    }}> Session Link  </a>
                 </div> 
             </div>
         </div>
