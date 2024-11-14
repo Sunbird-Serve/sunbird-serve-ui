@@ -21,18 +21,21 @@ function NeedPopup({ open, onClose, need }) {
   const [notifyRegister, setNotifyRegister] = useState(false)
   //NOMINATION to a need on Nominate button click
   const nominateNeed = () => {
-    const needId = need.need.id; //  the need.id represents the needId
-    console.log(needId)
-    console.log(userId)
+    const needId = need.need.id;
     if(userId){
-    axios.post(`${configData.NEED_SEARCH}/${needId}/nominate/${userId}`)
-      .then((response) => {
-        console.log("Nomination successful!");
-        setNominationStatus(true)
-      })
-      .catch((error) => {
-        console.error("Nomination failed:", error);
-      });
+      setIsNominating(true); // Start loading
+      axios.post(`${configData.NEED_SEARCH}/${needId}/nominate/${userId}`)
+        .then((response) => {
+          console.log("Nomination successful!");
+          setNominationStatus(true)
+        })
+        .catch((error) => {
+          console.error("Nomination failed:", error);
+          // You might want to show an error message to the user here
+        })
+        .finally(() => {
+          setIsNominating(false); // Stop loading regardless of success or failure
+        });
     } else {
       if(auth.currentUser){
         setNotifyRegister(true)
@@ -43,6 +46,7 @@ function NeedPopup({ open, onClose, need }) {
   };
 
   const [nominationStatus, setNominationStatus] = useState(false)
+  const [isNominating, setIsNominating] = useState(false) // New state for tracking nomination progress
 
   const [vlogin, setVlogin ] = useState(false)
   const handleVolunteerLogin = () => {
@@ -85,10 +89,15 @@ function NeedPopup({ open, onClose, need }) {
       <div className="contentNeedPopup">
         <div>
         <div className="needPTitle">{need.need.name}</div>
-        <br/>
-        <button className="nominate-button" onClick={nominateNeed}>
-          Nominate
-        </button>
+            <br/>
+            <button 
+              className={`nominate-button ${isNominating ? 'nominating' : ''}`} 
+              onClick={nominateNeed}
+              disabled={isNominating}
+            >
+              {isNominating ? 'Nominating...' : 'Nominate'}
+            </button>
+            {isNominating && <div className="nomination-loader"></div>}
         <p className="notification-needpopup">Hurry! Nominations will be closed soon</p>
         {/* <div className="aboutHeading">About</div> */}
         <p className="popupNKey">About the Need </p>

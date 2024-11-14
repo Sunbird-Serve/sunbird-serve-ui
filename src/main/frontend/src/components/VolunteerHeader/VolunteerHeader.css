@@ -34,6 +34,9 @@
     margin-right: 20px;
     color: white;
     border-radius: 5px;
+    @media (max-width: 600px) {
+        font-size: 10px;
+    }
 }
 .btnSignupVolunteer {
     background-color: green;
@@ -42,4 +45,7 @@
     margin-right: 20px;
     color: white;
     border-radius: 5px;
+    @media (max-width: 600px) {
+        font-size: 10px;
+    }
 }

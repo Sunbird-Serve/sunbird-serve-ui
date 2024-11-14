@@ -13,10 +13,14 @@
 }
 .volunteerDetails {
     background-color: white;
-    width: 80%;
+    width: 70%;
     height: 80%;
     border-radius: 8px;
     overflow: scroll;
+    @media (max-width: 600px) {
+        width: 100%;
+        margin: 5px;
+    }
 }
 .header-volunteerDetails {
     height: 100px;
@@ -28,6 +32,10 @@
 .switch-vdetail-vdeliv {
     display: flex;
     margin: 20px 70px 0px 70px;
+    font-size: 14px;
+    @media (max-width: 600px) {
+        display: block;
+     }
 }
 
 .tab {
@@ -39,6 +47,9 @@
     margin-right: 5px;
     transition: background-color 0.3s ease;
     border-radius: 10px 10px 0 0;
+    @media (max-width: 600px) {
+        border-radius: 0 0 0 0;
+     }
 }
 
 .tab:hover {
@@ -57,19 +68,28 @@
 .vinfoTab, .selVinfoTab {
     width: 30%;
     padding: 10px 15px;
+    @media (max-width: 600px) {
+        font-size: 10px;
+        width: 100%;
+        margin: 10px;
+     }
 }
 
 .no-need-assigned {
     padding: 20px;
     text-align: left;
     color: #666;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 
 .selVinfoTab {
     background-color: #006FA2;
     color: white;
+    @media (max-width: 600px) {
+        width: 100%;
+        height: 50%;
+     }
 }
 .vinfoTab {
     border-bottom: none;
@@ -84,33 +104,53 @@
 }
 
 .volunteer-name {
-    font-size: 32px;
+    font-size: 28px;
     color: #006FA2;
+    @media (max-width: 600px) {
+       font-size:16px;
+    }
 }
 .volunteer-email {
     color: #5D5B5B;
+    @media (max-width: 600px) {
+        font-size:12px;
+     }
 }
 .title-volunteerinfo {
     color: #A2A5A9;
     padding: 10px 15px 0px 10px;
     border-top: solid 1px #DBDBDB;
+    @media (max-width: 600px) {
+        font-size: 12px;
+     }
 }
 .volunteerInfo {
     display: flex;
     border-bottom: solid 1px  #DBDBDB;
+    @media (max-width: 600px) {
+       
+     }
 }
 .vInfo-half {
     width: 50%;
     padding: 15px;
 }
 .vInfo-item {
-    padding: 5px;
+    padding: 8px;
 }
 .vInfo-key {
     color: #686C73;
+    font-size: 14px;
+    @media (max-width: 600px) {
+        font-size: 10px;
+    }
 }
 .vInfo-value {
     color: #3C4044;
+    font-size: 14px;
+    @media (max-width: 600px) {
+        font-size: 10px;
+    }
 }
 .recommend-voluteer {
     height: 68px;
@@ -118,12 +158,20 @@
     align-items: center;
     gap: 20px;
     padding: 20px;
+    @media (max-width: 600px) {
+        font-size: 10px;
+        display: block;
+    }
 }
 .recommend-voluteer button {
     border: solid 1px #DBDBDB;
     background-color: white;
     padding: 5px 20px;
     border-radius: 5px;
+    @media (max-width: 600px) {
+        width: 100%;
+        margin: 5px;
+    }
 }
 .recommend-voluteer button:hover {
     border: none;
@@ -154,7 +202,7 @@
     margin-bottom: 20px;
     padding: 12px 20px;
     background-color:#f7f8f9 ;
-    font-weight: 600;
+    font-weight: 400;
 }
 
 .vcfulfil-list {
@@ -168,6 +216,12 @@
     padding: 8px 20px;
     margin: 5px;
     border-radius: 5px;
+    font-size: 14px;
+    @media (max-width: 600px) {
+        display: block;
+        width: 100%;
+        font-size: 10px;
+    }
 }
 
 .vcfulfil-item:hover {

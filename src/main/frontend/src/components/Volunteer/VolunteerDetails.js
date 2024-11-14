@@ -198,8 +198,8 @@ const VolunteerDetails = props => {
                         <div className="vInfo-value">{userDetails.identityDetails.gender}</div>
                     </div>
                     <div className="vInfo-item">
-                        <div className="vInfo-key">City</div>
-                        <div className="vInfo-value">{userDetails.contactDetails.address.city}</div>
+                        <div className="vInfo-key">Years of Experience</div>
+                        <div className="vInfo-value">{userProfile.genericDetails.yearsOfExperience}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Qualifications</div>
@@ -216,12 +216,12 @@ const VolunteerDetails = props => {
                         <div className="vInfo-value">{userDetails.contactDetails.email}</div>
                     </div>
                     <div className="vInfo-item">
-                        <div className="vInfo-key">Years of Experience</div>
-                        <div className="vInfo-value">{userProfile.genericDetails.yearsOfExperience}</div>
+                        <div className="vInfo-key">City</div>
+                        <div className="vInfo-value">{userDetails.contactDetails.address.city}</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Skills</div>
-                        <div className="vInfo-value">Cleanig, Leadership</div>
+                        <div className="vInfo-value">Teaching</div>
                     </div>
                     <div className="vInfo-item">
                         <div className="vInfo-key">Consent</div>
@@ -263,22 +263,7 @@ const VolunteerDetails = props => {
                     <button onClick={()=>setViewDelivs(false)} ><ArrowBackIcon/></button>
                 </div>
 
-                <div className="common-info-section">
-                    <div className="title-common-info">Common Details For All Deliverables</div>  
-                    <div className="common-info-delivs">
-                        <div>
-                            <span>Platform</span>
-                            <input type="text" name="planPlatform" value={planPlatform} onChange={handleComnInfo} />
-                        </div>
-                        <div>
-                            <span>Link</span>
-                            <input type="text" name="planLink" value={planLink} onChange={handleComnInfo} />
-                        </div>
-                        <div>
-                            <button onClick={submitComnInfo}>Submit</button>
-                        </div>
-                    </div>
-                </div>
+                
 
                 <div className="deliverable-head">
                     <div className="deliv-serial">S.No.</div>

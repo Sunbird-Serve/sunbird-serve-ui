@@ -4,3 +4,13 @@
 .sideBanner {
     background-color: rgb(76,98,128);
 }
+
+/* Apply this for mobile view */
+@media (max-width: 768px) {
+    .sideLogin {
+        order: 2;
+    }
+    .sideBanner {
+        order: 1;
+    }
+}

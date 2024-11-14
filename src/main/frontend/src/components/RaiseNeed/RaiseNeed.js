@@ -56,8 +56,10 @@ const RaiseNeed = props => {
     //need name and purpose updated by change handler
     //default Handlers to update input fields //
     const changeHandler = e => {
-        setData({ ...data, [e.target.name]: e.target.value })
-    }
+        setData({ ...data, [e.target.name]: e.target.value });
+        if (e.target.name === "needTypeId") {
+            console.log('Selected Need Type ID:', e.target.value);
+        }    }
     const changeHandlerOther = e => {
         setDataOther({ ...dataOther, [e.target.name]: e.target.value })
     }
@@ -108,36 +110,44 @@ const RaiseNeed = props => {
     
     // get skills for all need types
     const [skillMap, setSkillMap] = useState([]);
-    useEffect(() => {
-        async function getReq(requirementId) {
-          try {
-            // Replace with your API endpoint and configuration
-            const response = await axios.get(`${configData.NEED_REQUIREMENT_GET}/${requirementId}`);
-            return response.data.skillDetails;
-          } catch (error) {
-            return null
-          }
-        }
-        async function fetchNeedRequirements() {
-            const responseMap = {}
-            await Promise.all(
-                needTypes.map(async (needType) => {
-                    const skillsReq = await getReq(needType.requirementId);
-                    responseMap[needType.id]= skillsReq ? skillsReq.split(',').map(item => ({
-                        label: item,
-                        value: item
-                    })) : []
-                })
+    async function getReq(needTypeId) {
+        try {
+            // Use the configData constant for the skill details API
+            const response = await axios.get(
+                `${configData.SKILL_DETAILS}/${needTypeId}?page=0&size=10`
             );
-            setSkillMap(responseMap);
+            
+            // Extract skills from the API response
+            const skillData = response.data.content;
+    
+            // Map skillName to label and value for react-select
+            return skillData.map(skill => ({
+                label: skill.skillName,
+                value: skill.skillName
+            }));
+        } catch (error) {
+            console.error("Error fetching skills:", error);
+            return [];
         }
-        fetchNeedRequirements();
-    }, [needTypes]); 
+    }
+        useEffect(() => {
+            async function fetchNeedRequirements() {
+                const responseMap = {};
+                await Promise.all(
+                    needTypes.map(async (needType) => {
+                        const skillsReq = await getReq(needType.id);  // Update to use needType.id
+                        responseMap[needType.id] = skillsReq || [];
+                    })
+                );
+                setSkillMap(responseMap);
+            }
+            fetchNeedRequirements();
+        }, [needTypes]);
     //when needType is set, fetch curresponding requirements ans set to options
     const [options, setOptions ] = useState([])
     useEffect(() => {
-        setOptions(skillMap[needTypeId])
-    }, [needTypeId]); 
+        setOptions(skillMap[needTypeId]);  // Update options when needTypeId changes
+    }, [needTypeId]);
 
     const [manualSkill, setManualSkill] = useState("");
     const handleManualSkillAdd = (e) => {

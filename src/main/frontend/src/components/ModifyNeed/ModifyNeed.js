@@ -146,26 +146,26 @@ const ModifyNeed = props => {
     const handleDone = (e) => {
         setModify(!modify)
         const needId = data.need.id
-        // axios.put(`${configData.NEED_GET}/update/${needId}`, dataToPost)
-        // .then(response => {
-        //     console.log(response.data)
-        // })
-        // .catch(error => {
-        //     console.log(error)
-        // });
+         axios.put(`${configData.NEED_GET}/update/${needId}`, dataToPost)
+         .then(response => {
+             console.log(response.data)
+         })
+         .catch(error => {
+             console.log(error)
+         });
 
         // console.log(dataToPost)
         console.log(delivDetails)
 
-        if(status == 'Approved'){
-            axios.put(`${configData.DELIVERABLE}/update/${needId}`, delivDetails)
-            .then(response => {
-                console.log(response.data)
-            })
-            .catch(error => {
-                console.log(error)
-            });
-        }
+        //if(status == 'Approved'){
+          //  axios.put(`${configData.DELIVERABLE}/update/${needId}`, delivDetails)
+           // .then(response => {
+             //   console.log(response.data)
+            //})
+            //.catch(error => {
+              //  console.log(error)
+            //});
+       // }
     }
     const formatTime = (timeString) => {
         const [hourString, minute] = timeString.split(":");
@@ -196,7 +196,7 @@ const ModifyNeed = props => {
                                 <div className="needITag">{data.need.description ? data.need.description.slice(3,-4) : '-'}</div>
                             </div>
                             <div className="wrap-modify-button">
-                                {!modify && <button className="modify-button" onClick={handleModify}>Modify</button>}
+                                {status === 'Approved' && !modify && <button className="modify-button" onClick={handleModify}>Modify</button>}
                                 {modify && <button className="modify-button" onClick={handleDone}>Done</button>}
                             </div>
                         </div>

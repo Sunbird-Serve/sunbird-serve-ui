@@ -57,10 +57,14 @@ function VPNominations() {
      console.log(error)
     })
 
-    axios.get(`${configData.SERVE_VOLUNTEERING}/volunteer/volunteer-hours/read/${userId}`)
+    axios.get(`${configData.SERVE_VOLUNTEERING}/${userId}`)
     .then(response => {
-      console.log(response.data.totalHours)
-      setVolunteerHrs(response.data.totalHours)
+      console.log(response.data);
+      // Extract the numerical value from the response string
+      const hrsMatch = response.data.match(/Total volunteer hours for .+ is (\d+(\.\d+)?)/);
+      if (hrsMatch) {
+        setVolunteerHrs(hrsMatch[1]); // Set only the matched number part, e.g., 1.0
+      }
     })
     .catch(function (error) {
       console.log(error)
