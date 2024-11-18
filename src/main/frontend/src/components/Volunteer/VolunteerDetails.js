@@ -42,7 +42,7 @@ const VolunteerDetails = props => {
         userToPost.status = newStatus
         console.log(userDetails.osid)
         console.log(userToPost)
-        axios.put(`${configData.SERVE_VOLUNTEERING}/user/${userDetails.osid}`, userToPost)
+        axios.put(`${configData.USER_GET}/${userDetails.osid}`, userToPost)
         .then(response => {
             console.log('API response:', response.data);
             dispatch(fetchUserList());

@@ -31,7 +31,7 @@ function Volunteers() {
   useEffect(() => {
     const fetchUserDetails = () => {
       const promises = volunteerList.map(user =>
-        axios.get(`${configData.SERVE_VOLUNTEERING}/user/user-profile/userId/${user.osid}`)
+        axios.get(`${configData.USER_PROFILE_BY_ID}/${user.osid}`)
           .then(response => ({
             userDetails: user,
             userProfile: response.data,
