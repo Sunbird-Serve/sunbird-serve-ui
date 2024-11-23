@@ -9,8 +9,10 @@ import { useSelector, useDispatch } from 'react-redux'
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 import DoneIcon from '@mui/icons-material/Done';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { format } from 'date-fns';
 
 const configData = require('../../configure.js');
+
 
 const Nominations = ({ needData, openPopup }) => {
   const dispatch = useDispatch()
@@ -200,6 +202,7 @@ const Nominations = ({ needData, openPopup }) => {
 
   const { globalFilter, pageIndex, pageSize } = state;  
   const [filterValue, setFilterValue] = useState('')
+  const currentDate = format(new Date(), 'yyyy-MM-dd');
 
   const handleReason = e => {
     setReason(e.target.value)
@@ -214,6 +217,7 @@ const Nominations = ({ needData, openPopup }) => {
   const handleEditDeliverable = (item, index) => {
     console.log(item)
     setEditIndex(index)
+    
   }
   const handleDoneDeliverable = (index) => {
     setEditIndex('')
@@ -230,6 +234,21 @@ const Nominations = ({ needData, openPopup }) => {
       "startTime": formData[index].startTime,
       "endTime": formData[index].endTime
     })
+    axios.put(
+      `${configData.NEEDPLAN_DELIVERABLES}/update/${formData[index].deliverableId}`, 
+      { 
+        "needPlanId":planId,
+        "comments":'',
+        "status": formData[index].status,
+        "deliverableDate":currentDate
+      }
+    )
+    .then((response) => {
+      console.log("Status updated successfully:", response.data);
+    })
+    .catch((error) => {
+      console.error("Error updating status:", error);
+    });
   }
 
 

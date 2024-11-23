@@ -23,6 +23,25 @@ function VolunteerProfileEdit() {
     history.push("/vprofile/vpinfo");
   };
 
+  //get user profile for volunteer
+  const [userProfile, setUserProfile] = useState({});
+
+useEffect(() => {
+    axios.get(`${configData.USER_PROFILE_BY_ID}/${userData.osid}`)
+        .then(response => {
+            console.log(response.data);
+            setUserProfile(response.data);
+        })
+        .catch(error => {
+            console.error("Error fetching user profile:", error);
+        });
+}, []);
+
+const language = userProfile?.userPreference?.language || " ";
+const dayPreferred = userProfile?.userPreference?.dayPreferred || " ";
+const timePreferred = userProfile?.userPreference?.timePreferred || " ";
+
+
   const [identityDetailsData, setIdentityDetailsData] = useState({
     fullname: userData.identityDetails.fullname || '',
     name: userData.identityDetails.name || '',
@@ -94,9 +113,6 @@ function VolunteerProfileEdit() {
     console.log(editedUserData)
     const userEmail = auth.currentUser.email.replace(/@/g, "%40") || '';
     console.log(userEmail)
-
-    
-
 
     axios.put(`${configData.SERVE_VOLUNTEERING}/user/${userData.osid}`, editedUserData)
       .then(response=>{
@@ -280,17 +296,42 @@ function VolunteerProfileEdit() {
           */}
           
         {/* Password Info */}
-          <h4 className="box-header1">Password Info</h4>
-          <div className="info-box">
-            <p className="info-label">Password</p>
-            <input
-              className="info-input1"
-              type="password"
-              value="******"
-              name="password"
-              onChange={handleChange}  
-            />
+          <h4 className="box-header1">Preference Info</h4>
+          <div className="info-row">
+            <div className="info-item1">
+              <p className="info-label1">Language</p>
+              <input
+                className="info-input1"
+                type="text"
+                name="language"
+                value={language}
+                onChange={handleChangeContactDetails}
+              />
+            </div>
+          {/* Mobile Number */}
+            <div className="info-item1">
+              <p className="info-label1">Day Preferred</p>
+              <input
+                className="info-input1"
+                type="text"
+                name="dayPreferred"
+                value={dayPreferred}
+                onChange={handleChangeContactDetails}
+              />
+            </div>
           </div>
+          <div className="info-row">
+            <div className="info-item1">
+              <p className="info-label1">Time Preferred</p>
+              <input
+                className="info-input1"
+                type="text"
+                name="timePreferred"
+                value={timePreferred}
+                onChange={handleChangeAddress}
+              />
+            </div>
+            </div>
           
       </div>
     </div>

@@ -103,18 +103,18 @@ const LoginForm = ({ loginState }) => {
             <a href="#" onClick={toggleResetForm}>Forgot Password?</a>
           </div>
 
-          <div className="hline">
+           {/*<div className="hline">
             <hr /> <span>or login with</span> <hr/>
-          </div>
+          </div>*/}
           
-          <div className="btnSLogin">
+          {/*<div className="btnSLogin">
             <button type="button" onClick={signInWithGoogle}>
               <i><FcGoogle /></i>Google
             </button>
             <button type="button" onClick={signInWithFacebook}>
               <i style={{color:'#1877F2'}}><FacebookRoundedIcon /></i>Facebook
             </button>
-          </div>
+          </div>*/}
           
           {error && <div className="loginError">{error.slice(5)}</div>}
         </form>
