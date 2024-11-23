@@ -219,6 +219,15 @@ const VolunteerProfileDeliverable = props => {
       console.log('Volunteer hours updated');
       setVolunteerHrs(volunteerHrs + 1); // Update local state
       setDstat(!dstat); // Trigger re-render to reflect changes
+      return axios.put(`${configData.VOLUNTEER_HOURS}/${userId}/needDeliverableId/${item.id}`, {
+        "deliveryHours": 1,
+        "deliveryDate": new Date().toISOString() // Use current date and time in ISO format
+      }, {
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
     })
     .catch(error => {
       console.log('Error completing deliverable or updating volunteer hours', error);
@@ -295,17 +304,23 @@ const VolunteerProfileDeliverable = props => {
                 </div> 
             </div>
             <div className="rowNVP">
-                <div className="itemNVP">
-                    <span>Platform :</span> {inParas.length ? inParas[0].softwarePlatform : ''}
-                </div> 
+            <div className="itemNVP">
+  <span>Platform :</span> 
+  {inParas.length && inParas[0].softwarePlatform 
+    ? (inParas[0].inputUrl === "To be added soon" 
+        ? "Available Shortly" 
+        : inParas[0].softwarePlatform)
+    : ""}
+</div>
                 <div className="itemNVP"> 
   <span>URL: </span> 
-  {inParas.length ? (
-    <a href={inParas[0].inputUrl} target="_blank" rel="noopener noreferrer">
-     
-      Session Link
-    </a>
-  ) : ''}
+  {inParas.length && inParas[0].inputUrl && inParas[0].inputUrl !== "To be added soon" ? (
+  <a href={inParas[0].inputUrl} target="_blank" rel="noopener noreferrer">
+    Session Link
+  </a>
+) : (
+  <span>Available Shortly</span>
+)}
 </div>
             </div>
         </div>

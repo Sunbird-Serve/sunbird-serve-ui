@@ -2,6 +2,9 @@ import React, {useEffect, useState} from 'react';
 import './VolunteerProfileInfo.css';
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
+import axios from 'axios'
+const configData = require('../../configure.js');
+
 
 function VolunteerProfileInfoView() {
   //get userData from redux store
@@ -13,6 +16,20 @@ function VolunteerProfileInfoView() {
     }
   },[userData])
   console.log(userData)
+
+  //get user profile for volunteer
+  const [userProfile, setUserProfile] = useState([])
+  useEffect(()=>{
+      axios.get(`${configData.USER_PROFILE_BY_ID}/${userData.osid}`)
+      .then(response => {
+          console.log(response.data);
+          setUserProfile(response.data)
+      })
+      .catch(error => {
+          console.error(error);
+      });
+  },[])
+
   const history = useHistory()
   const handleEditClick = () => {
     history.push('/vprofile/vpedit')
@@ -78,13 +95,27 @@ function VolunteerProfileInfoView() {
             </div>
           </div> }
 
-          <div className="profile-info-box">
-            <div className="box-header">Password Info</div>
-            <div className="info-box">
-              <p className="info-label">Password</p>
-              <p className="info-data">********</p>
+          {<div className="profile-info-box">
+            <div className="box-header">Preferences</div>
+            <div className="info-group">
+              <div className="info-box">
+                <p className="info-label">Language</p>
+                <p className="info-data">{userProfile.userPreference ? userProfile.userPreference.language : ''}</p>
+              </div>
+              {<div className="info-box">
+                <p className="info-label">Day Preferred</p>
+                <p className="info-data">{userProfile.userPreference ? userProfile.userPreference.dayPreferred : ''}</p>
+              </div> }
+              { <div className="info-box">
+                <p className="info-label">Time Preferred</p>
+                <p className="info-data">
+                  {`${userProfile.userPreference ? userProfile.userPreference.timePreferred : ''}`}
+                  {/* {`${userData.contactDetails.address.plot}, ${userData.contactDetails.address.street}, ${userData.contactDetails.address.landmark}, ${userData.contactDetails.address.locality}, ${userData.contactDetails.address.state}, ${userData.contactDetails.address.district}, ${userData.contactDetails.address.village}, ${userData.contactDetails.address.pincode}`} */}
+                </p>
+              </div> }
             </div>
-          </div>
+          </div> }
+         
         </div>
       ) }
     </div>

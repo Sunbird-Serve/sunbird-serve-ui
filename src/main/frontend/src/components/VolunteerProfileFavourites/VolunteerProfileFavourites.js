@@ -2,7 +2,7 @@ import React from 'react'
 
 function VolunteerProfileFavourites() {
   return (
-    <div>VolunteerProfileFavourites</div>
+    <div>Available Shortly</div>
   )
 }
 
