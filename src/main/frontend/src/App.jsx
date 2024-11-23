@@ -211,6 +211,7 @@ function App() {
     dispatch(fetchEntities());
   }, [dispatch]);
 
+  
   // Handle volunteer status change
   const handleVolunteer = (value) => {
     setVolunteer(value);
@@ -220,7 +221,10 @@ function App() {
   if (loading) {
     return <div>Loading...</div>;
   }
-
+ // Handle explore button click
+ if (volunteer) {
+  return <ExplorePage />;
+}
   if (presentUser === null) {
     return <LoginPage getVolunteerStatus={handleVolunteer} />;
   }
