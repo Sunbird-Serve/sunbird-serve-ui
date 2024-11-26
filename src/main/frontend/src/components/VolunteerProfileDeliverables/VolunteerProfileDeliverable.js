@@ -215,12 +215,18 @@ const VolunteerProfileDeliverable = props => {
         "deliverableDate": currentDate
       });
     })
-    .then(response => {
+    .then(async response => {
         setVolunteerHrs(volunteerHrs + 1); // Update local state
         setDstat(!dstat); // Trigger re-render to reflect changes
-        return axios.post(`${configData.VOLUNTEER_HOURS}`, {
+       
+        const needPlanResponse = await axios.get(
+            `${configData.SERVE_NEED}/need-plan/read/${item.needPlanId}`
+          );
+          const needPlanData = needPlanResponse.data;
+        
+        return axios.post(`${configData.VOLUNTEER_HOURS}/`, {
           "userId": userId,
-          "needId": item.needId,
+          "needId": needPlanData.plan.needId,
           "deliveryHours": 1,
           "deliveryDate": new Date().toISOString(),
           "needDeliverableId": item.id
