@@ -45,6 +45,49 @@ function VPNominations() {
   const userId = useSelector((state)=> state.user.data.osid)
   console.log(userId)
 
+  const [totalCompletedSessions, setTotalCompletedSessions] = useState(0);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchCompletedSessions = async () => {
+      //setLoading(true);
+      try {
+        // Fetch fulfillments to get needPlanIds
+        const fulfillmentResponse = await axios.get(
+          `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${userId}?page=0&size=10`
+        );
+        const fulfillments = fulfillmentResponse.data;
+
+        // Extract needPlanIds
+        const needPlanIds = fulfillments.map(item => item.needPlanId);
+
+        // Fetch need deliverables for each needPlanId
+        const deliverablePromises = needPlanIds.map(needPlanId =>
+          axios.get(`${configData.SERVE_NEED}/need-deliverable/${needPlanId}`)
+        );
+
+        const deliverableResponses = await Promise.all(deliverablePromises);
+
+        // Count completed statuses from needDeliverable
+        let completedCount = 0;
+        deliverableResponses.forEach(response => {
+          const needDeliverables = response.data.needDeliverable || [];
+          completedCount += needDeliverables.filter(deliverable => deliverable.status === "Completed").length;
+        });
+
+        // Step 4: Update state with the total completed sessions
+        setTotalCompletedSessions(completedCount);
+      } catch (err) {
+        setError("Error fetching data");
+      } finally {
+        //setLoading(false);
+      }
+    };
+
+    fetchCompletedSessions();
+  }, [userId]);
+  
+
   //get nominations by nominated userId
   const [nominations,setNominations] = useState([])
   const [volunteerHrs, setVolunteerHrs] = useState(null)
@@ -57,7 +100,7 @@ function VPNominations() {
      console.log(error)
     })
 
-    axios.get(`${configData.SERVE_VOLUNTEERING}/${userId}`)
+    axios.get(`${configData.VOLUNTEER_HOURS}/${userId}`)
     .then(response => {
       console.log(response.data);
       // Extract the numerical value from the response string
@@ -171,9 +214,9 @@ function VPNominations() {
           <div className="statsVPNomsItem">
             <div className="statsVPNomsCount">
               <img src={VolunteerHrs} alt="Nominated Needs" height="35px" />
-              <span>2</span>
+              <span>{totalCompletedSessions}</span>
             </div>
-            <div className="statsVPNomsName">Total Plans Delivered</div>
+            <div className="statsVPNomsName">Sessions Delivered</div>
           </div>
         </div>
 
