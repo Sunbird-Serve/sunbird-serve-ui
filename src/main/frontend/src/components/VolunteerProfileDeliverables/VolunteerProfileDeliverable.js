@@ -61,7 +61,7 @@ const VolunteerProfileDeliverable = props => {
       });
 
     // Fetch current volunteer hours
-    axios.get(`${configData.SERVE_VOLUNTEERING}/volunteer/volunteer-hours/read/${userId}`)
+    axios.get(`${configData.VOLUNTEER_HOURS}/${userId}`)
       .then((response) => {
         console.log("Fetching Vol Hours");
         console.log(response.data.totalHours);
@@ -215,23 +215,26 @@ const VolunteerProfileDeliverable = props => {
         "deliverableDate": currentDate
       });
     })
-    .then(response => {
-      console.log('Volunteer hours updated');
-      setVolunteerHrs(volunteerHrs + 1); // Update local state
-      setDstat(!dstat); // Trigger re-render to reflect changes
-      return axios.put(`${configData.VOLUNTEER_HOURS}/${userId}/needDeliverableId/${item.id}`, {
-        "deliveryHours": 1,
-        "deliveryDate": new Date().toISOString() // Use current date and time in ISO format
-      }, {
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
+    .then(async response => {
+        setVolunteerHrs(volunteerHrs + 1); // Update local state
+        setDstat(!dstat); // Trigger re-render to reflect changes
+       
+        const needPlanResponse = await axios.get(
+            `${configData.SERVE_NEED}/need-plan/read/${item.needPlanId}`
+          );
+          const needPlanData = needPlanResponse.data;
+        
+        return axios.post(`${configData.VOLUNTEER_HOURS}/`, {
+          "userId": userId,
+          "needId": needPlanData.plan.needId,
+          "deliveryHours": 1,
+          "deliveryDate": new Date().toISOString(),
+          "needDeliverableId": item.id
+        });
     })
     .catch(error => {
       console.log('Error completing deliverable or updating volunteer hours', error);
-    });
+    });    
   };
   
 
