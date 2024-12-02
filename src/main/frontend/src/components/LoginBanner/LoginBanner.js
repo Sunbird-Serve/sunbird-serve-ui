@@ -13,7 +13,11 @@ const BannerLogin = ({volunteerStatus}) => {
   const [vsignup, setVsignup] = useState(false);
 
   const loginVolunteer = () => setVlogin(!vlogin);
-  const signupVolunteer = () => setVsignup(!vsignup);
+  const signupVolunteer = () => {
+    volunteerStatus(true); // Set the volunteer status to true
+    setVsignup(!vsignup); // Toggle the signup modal
+};
+
 
     return(
         // Banner part in the login screen
