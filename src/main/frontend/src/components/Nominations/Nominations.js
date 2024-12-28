@@ -234,11 +234,17 @@ const Nominations = ({ needData, openPopup }) => {
       "startTime": formData[index].startTime,
       "endTime": formData[index].endTime
     })
+    axios.post(`${configData.SERVE_NEED}/deliverable-output/create`, {
+      "needDeliverableId": formData[index].deliverableId,
+      "numberOfAttendees": formData[index].numStudents,
+      "submittedUrl": "",
+      "remarks": ""
+    })
     axios.put(
       `${configData.NEEDPLAN_DELIVERABLES}/update/${formData[index].deliverableId}`, 
       { 
         "needPlanId":planId,
-        "comments":'',
+        "comments":formData[index].comments,
         "status": formData[index].status,
         "deliverableDate":currentDate
       }
@@ -263,6 +269,7 @@ const Nominations = ({ needData, openPopup }) => {
       softwarePlatform: inParas.length ? inParas[index].softwarePlatform : '',
       inputUrl: inParas.length ? inParas[index].inputUrl : '',
       status: item.status,
+      comments: item.comments,
     }));
     setFormData(initialFormData);
   }, [deliverables, inParas]);
@@ -424,6 +431,7 @@ const Nominations = ({ needData, openPopup }) => {
       type="text"
       value={data.inputUrl}
       onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')}
+      className="link-input"
     />
   ) : (
     data.inputUrl.toLowerCase() === "to be added soon".toLowerCase() ? (
@@ -434,12 +442,47 @@ const Nominations = ({ needData, openPopup }) => {
   )}
 </div>
 
-    <div className="deliv-status">
-      {index === editIndex ? 
-        <input type="text" value={data.status} onChange={(e) => handleDeliverableChange(e, index, 'status')} />
-        : data.status
-      }
-    </div>
+<div className="deliv-status">
+    {index === editIndex ? (
+      <>
+        <div className="field-group">
+          <select
+            id={`status-${index}`}
+            value={data.status}
+            onChange={(e) => handleDeliverableChange(e, index, 'status')}
+            className="link-input"
+          >
+            <option value="Planned">Planned</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div className="field-group">
+          <input
+            id={`comments-${index}`}
+            value={data.comments || ''}
+            onChange={(e) => handleDeliverableChange(e, index, 'comments')}
+            className="link-input"
+            placeholder="Add comments"
+          />
+        </div>
+        <div className="field-group">
+          <input
+            id={`students-${index}`}
+            type="number"
+            value={data.numStudents || ''}
+            onChange={(e) => handleDeliverableChange(e, index, 'numStudents')}
+            className="link-input"
+            placeholder="Students Number"
+          />
+        </div>
+      </>
+    ) : (
+      <div>
+         {data.status}
+      </div>
+    )}
+  </div>
     {!!inParas.length && <div className="deliv-action">
       {index === editIndex ? 
         <button onClick={() => handleDoneDeliverable(index)}><DoneIcon className="done-icon" /></button>
