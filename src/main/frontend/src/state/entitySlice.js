@@ -12,7 +12,7 @@ const initialState = {
 export const fetchEntities = createAsyncThunk('needtypes/fetchEntities', 
     async ()=> {
     try {
-        const response = await axios.get(`${configData.ENTITY_GET}/?page=0&size=100&status=Active`)
+        const response = await axios.get(`${configData.ENTITY_GET}/?page=0&size=200&status=Active`)
         return response.data
     } catch(error){
         throw error

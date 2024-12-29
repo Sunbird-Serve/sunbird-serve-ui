@@ -277,6 +277,16 @@
   color: #333; /* Dark text color */
 }
 
+.link-input {
+  width: 120px; /* Set a fixed width */
+  max-width: 100%; /* Ensure it doesn't overflow */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 2px;
+  font-size: 14px;
+}
+
 .backToNoms button {
   background-color: #0080BC; /* Green background */
   color: white; /* White icon color */

@@ -122,7 +122,7 @@ const VolunteerProfileDeliverable = props => {
  
   useEffect(() => {
     const filteredDeliverables = filterDeliverablesByMonth(deliverables, selectedMonth);
-    setTodoDeliverables(filteredDeliverables && filteredDeliverables.filter(item => item.status === 'NotStarted'));
+    setTodoDeliverables(filteredDeliverables && filteredDeliverables.filter(item => item.status === 'NotStarted' || item.status === 'Planned'));
     setCompletedDeliverables(filteredDeliverables && filteredDeliverables.filter(item => item.status === 'Completed'));
     setCancelledDeliverables(filteredDeliverables && filteredDeliverables.filter(item => item.status === 'Cancelled'));
   }, [deliverables, selectedMonth,dstat]); // Depend on both deliverables and selectedMonth
