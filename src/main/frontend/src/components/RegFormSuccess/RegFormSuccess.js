@@ -7,6 +7,7 @@ const RegFormSuccess = () => {
   const navigate = useHistory();
   const gotoHome = () => {
     navigate.push("/vneedtypes")
+    window.location.reload();
   }
   const delayTime = 3000;
   useEffect(() => {
