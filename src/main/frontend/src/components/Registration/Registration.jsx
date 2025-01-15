@@ -739,24 +739,10 @@ const Registration = (props) => {
           </span>
           <hr className="nav-line" />
           <span
-            className={nav === 2 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(2)}
-          >
-            Preferences
-          </span>
-          <hr className="nav-line" />
-          <span
             className={nav === 3 ? "nav-element active" : "nav-element"}
             onClick={() => onNavClick(3)}
           >
             Additional Details
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 4 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(4)}
-          >
-            Skills
           </span>
           <hr className="nav-line" />
           <span
@@ -1132,7 +1118,7 @@ const Registration = (props) => {
                 </Select>
               </div>
               <div className="formElement">
-                <label>Affiliation<span className='req-mark'>*</span></label>
+                <label>Affiliation(Workplace/Instituition)<span className='req-mark'>*</span></label>
                 <br />
                 <input
                   className="form-input"
