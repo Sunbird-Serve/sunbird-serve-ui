@@ -246,7 +246,7 @@ const Nominations = ({ needData, openPopup }) => {
         "needPlanId":planId,
         "comments":formData[index].comments,
         "status": formData[index].status,
-        "deliverableDate":currentDate
+        "deliverableDate": formData[index].deliverableDate,
       }
     )
     .then((response) => {
@@ -396,9 +396,15 @@ const Nominations = ({ needData, openPopup }) => {
           <div className="title-common-info">Common Details For All Deliverables</div>  
           <div className="common-info-delivs">
           <div>
-            <span>Platform</span>
-            <input type="text" name="planPlatform" value={planPlatform} onChange={handleComnInfo} />
-          </div>
+  <span>Platform</span>
+  <select name="planPlatform" value={planPlatform} onChange={handleComnInfo}>
+    <option value="">Select Platform</option>
+    <option value="GMEET">GMEET</option>
+    <option value="SKYPE">SKYPE</option>
+    <option value="WEBEX">WEBEX</option>
+    <option value="TEAMS">TEAMS</option>
+  </select>
+</div>
           <div>
             <span>Link</span>
             <input type="text" name="planLink" value={planLink} onChange={handleComnInfo} />
