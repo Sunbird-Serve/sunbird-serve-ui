@@ -358,7 +358,8 @@
   margin-bottom: 5px; /* Space below labels */
 }
 
-.common-info-delivs input[type="text"] {
+.common-info-delivs input[type="text"],
+.common-info-delivs select {
   padding: 8px; /* Padding inside the input */
   border: 1px solid #d3d4d5; /* Border color */
   border-radius: 5px; /* Rounded corners */

@@ -340,8 +340,11 @@ const NeedPlans = () => {
                     <span>Software platform:</span> {event.softwarePlatform}
                   </div>
                   <div className="vplan-url"> 
-                    <span>Link :</span> {event.inputUrl}
-                  </div>
+  <span>Link :</span> 
+  <a href={event.inputUrl} target="_blank" rel="noopener noreferrer">
+    Session Link
+  </a>
+</div>
                   <div className="vplan-url"> 
                     <span>Volunteers :</span> 
                   </div>
