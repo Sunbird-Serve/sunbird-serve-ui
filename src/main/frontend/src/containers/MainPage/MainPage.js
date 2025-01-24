@@ -59,7 +59,7 @@ const MainPage = () => {
                       return <Redirect to="/needs" />;
                     } else if (role === undefined) {
                       return <Redirect to="/no-role" />;
-                    } else if (role === "volunteer") {
+                    } else if (role) {
                       return <Redirect to="/volunteers" />;
                     }
                   }}
