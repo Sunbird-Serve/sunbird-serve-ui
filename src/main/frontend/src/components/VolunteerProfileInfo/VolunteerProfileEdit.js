@@ -10,7 +10,6 @@ import { useHistory } from "react-router";
 import { auth } from "../../firebase";
 import { fetchUserByEmail } from "../../state/userSlice";
 import axios from "axios";
-import LoginForm from "../LoginForm/LoginForm";
 const configData = require("../../configure.js");
 
 function VolunteerProfileEdit() {
@@ -19,7 +18,6 @@ function VolunteerProfileEdit() {
   const dispatch = useDispatch();
 
   const [userProfile, setUserProfile] = useState({});
-  const [changePassword, setChangePassword] = useState(false);
   const [identityDetailsData, setIdentityDetailsData] = useState({
     fullname: userData.identityDetails.fullname || "",
     name: userData.identityDetails.name || "",
@@ -218,122 +216,116 @@ function VolunteerProfileEdit() {
     }
   };
 
-  const redirectToLogin = () => {
-    setChangePassword(true);
-  };
-
   return (
     <div className="main-content1">
-      {!changePassword ? (
+      <div className="pro1">
         <div>
-          <div className="pro1">
-            <div>
-              <div className="main-header1">Profile Info</div>
-              <p className="gray-text1">Info about you and your preferences</p>
+          <div className="main-header1">Profile Info</div>
+          <p className="gray-text1">Info about you and your preferences</p>
+        </div>
+        <div className="button-group1">
+          <button className="discord-profile1" onClick={handleDiscordClick}>
+            Discard
+          </button>
+          <button className="save-profile1" onClick={handleSaveClick}>
+            Save
+          </button>
+        </div>
+      </div>
+
+      <div className="profile-info-box1">
+        {/* Basic Info */}
+        <div className="box-header1">Basic Info</div>
+        <div className="info-group1">
+          {/* Name and Gender rows*/}
+          <div className="info-row">
+            <div className="info-item1">
+              <p className="info-label1">Name</p>
+              <input
+                className="info-input1"
+                type="text"
+                value={fullname}
+                name="fullname"
+                onChange={handleChangeIdentityDetails}
+              />
             </div>
-            <div className="button-group1">
-              <button className="discord-profile1" onClick={handleDiscordClick}>
-                Discard
-              </button>
-              <button className="save-profile1" onClick={handleSaveClick}>
-                Save
-              </button>
+
+            <div className="info-item1">
+              <p className="info-label1">Gender</p>
+              <div className="custom-dropdown">
+                <select
+                  className="info-input3"
+                  name="gender"
+                  value={gender}
+                  onChange={handleChangeIdentityDetails}
+                >
+                  <option value="Female">Female</option>
+                  <option value="Male">Male</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <div className="profile-info-box1">
-            {/* Basic Info */}
-            <div className="box-header1">Basic Info</div>
-            <div className="info-group1">
-              {/* Name and Gender rows*/}
-              <div className="info-row">
-                <div className="info-item1">
-                  <p className="info-label1">Name</p>
-                  <input
-                    className="info-input1"
-                    type="text"
-                    value={fullname}
-                    name="fullname"
-                    onChange={handleChangeIdentityDetails}
-                  />
-                </div>
-
-                <div className="info-item1">
-                  <p className="info-label1">Gender</p>
-                  <div className="custom-dropdown">
-                    <select
-                      className="info-input3"
-                      name="gender"
-                      value={gender}
-                      onChange={handleChangeIdentityDetails}
-                    >
-                      <option value="Female">Female</option>
-                      <option value="Male">Male</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* DOB and Nationality */}
-              <div className="info-row">
-                <div className="info-item1">
-                  <p className="info-label1">Date of Birth</p>
-                  <div className="input-with-icon">
-                    <input
-                      className="editProfileDOB"
-                      type="date"
-                      name="dob"
-                      value={dob}
-                      onChange={handleChangeIdentityDetails}
-                    />
-                  </div>
-                </div>
-
-                <div className="info-item1">
-                  <p className="info-label1">Nationality</p>
-                  <div className="custom-dropdown">
-                    <input
-                      className="info-input1"
-                      type="text"
-                      name="Nationality"
-                      value={Nationality}
-                      onChange={handleChangeIdentityDetails}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Info */}
-            <div className="box-header1">Contact Info</div>
-            {/* Email-ID */}
-            <div className="info-row">
-              <div className="info-item1">
-                <p className="info-label1">E-mail ID</p>
+          {/* DOB and Nationality */}
+          <div className="info-row">
+            <div className="info-item1">
+              <p className="info-label1">Date of Birth</p>
+              <div className="input-with-icon">
                 <input
-                  className="info-input1"
-                  type="text"
-                  name="email"
-                  value={email}
-                  onChange={handleChangeContactDetails}
-                />
-              </div>
-              {/* Mobile Number */}
-              <div className="info-item1">
-                <p className="info-label1">Mobile Number</p>
-                <input
-                  className="info-input1"
-                  type="text"
-                  name="mobile"
-                  value={mobile}
-                  onChange={handleChangeContactDetails}
+                  className="editProfileDOB"
+                  type="date"
+                  name="dob"
+                  value={dob}
+                  onChange={handleChangeIdentityDetails}
                 />
               </div>
             </div>
 
-            {/* Address */}
-            <div className="info-row">
-              {/* <div className="info-item1">
+            <div className="info-item1">
+              <p className="info-label1">Nationality</p>
+              <div className="custom-dropdown">
+                <input
+                  className="info-input1"
+                  type="text"
+                  name="Nationality"
+                  value={Nationality}
+                  onChange={handleChangeIdentityDetails}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Info */}
+        <div className="box-header1">Contact Info</div>
+        {/* Email-ID */}
+        <div className="info-row">
+          <div className="info-item1">
+            <p className="info-label1">E-mail ID</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="email"
+              value={email}
+              onChange={handleChangeContactDetails}
+            />
+          </div>
+          {/* Mobile Number */}
+          <div className="info-item1">
+            <p className="info-label1">Mobile Number</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="mobile"
+              value={mobile}
+              onChange={handleChangeContactDetails}
+            />
+          </div>
+        </div>
+
+        {/* Address */}
+        <div className="info-row">
+          {/* <div className="info-item1">
               <p className="info-label1">Address</p>
               <input
                 className="info-input1"
@@ -343,46 +335,46 @@ function VolunteerProfileEdit() {
                 onChange={handleChangeAddress}
               />
             </div> */}
-              {/* City */}
-              <div className="info-item1">
-                <p className="info-label1">City</p>
-                <input
-                  className="info-input1"
-                  type="text"
-                  name="city"
-                  value={city}
-                  placeholder="Eg. Koramangala"
-                  onChange={handleChangeAddress}
-                />
-              </div>
-            </div>
+          {/* City */}
+          <div className="info-item1">
+            <p className="info-label1">City</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="city"
+              value={city}
+              placeholder="Eg. Koramangala"
+              onChange={handleChangeAddress}
+            />
+          </div>
+        </div>
 
-            {/* State */}
-            <div className="info-row">
-              <div className="info-item1">
-                <p className="info-label1">State</p>
-                <input
-                  className="info-input1"
-                  type="text"
-                  name="state"
-                  value={state}
-                  onChange={handleChangeAddress}
-                />
-              </div>
-              {/* Country */}
-              <div className="info-item1">
-                <p className="info-label1">Country</p>
-                <input
-                  className="info-input1"
-                  type="text"
-                  name="country"
-                  value={country}
-                  onChange={handleChangeAddress}
-                />
-              </div>
-            </div>
+        {/* State */}
+        <div className="info-row">
+          <div className="info-item1">
+            <p className="info-label1">State</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="state"
+              value={state}
+              onChange={handleChangeAddress}
+            />
+          </div>
+          {/* Country */}
+          <div className="info-item1">
+            <p className="info-label1">Country</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="country"
+              value={country}
+              onChange={handleChangeAddress}
+            />
+          </div>
+        </div>
 
-            {/*
+        {/*
           <div className="info-row">
             <div className="info-item1">
               <p className="info-label1">Landmark</p>
@@ -409,59 +401,44 @@ function VolunteerProfileEdit() {
           </div>
           */}
 
-            {/* Password Info */}
-            <h4 className="box-header1">Preference Info</h4>
-            <div className="info-row">
-              <div className="info-item1">
-                <p className="info-label1">Language</p>
-                <input
-                  className="info-input1"
-                  type="text"
-                  name="language"
-                  value={preferencesDetailsData?.language}
-                  onChange={handleChangePreferenceDetails}
-                />
-              </div>
-              {/* Mobile Number */}
-              <div className="info-item1">
-                <p className="info-label1">Day Preferred</p>
-                <input
-                  className="info-input1"
-                  type="text"
-                  name="dayPreferred"
-                  value={preferencesDetailsData?.dayPreferred}
-                  onChange={handleChangePreferenceDetails}
-                />
-              </div>
-            </div>
-            <div className="info-row">
-              <div className="info-item1">
-                <p className="info-label1">Time Preferred</p>
-                <input
-                  className="info-input1"
-                  type="text"
-                  name="timePreferred"
-                  value={preferencesDetailsData?.timePreferred}
-                  onChange={handleChangePreferenceDetails}
-                />
-              </div>
-            </div>
-
-            <h4 className="box-header1">Change Password</h4>
-            <div className="textInfo p-3">
-              To change Password click
-              <span>
-                {" "}
-                <a href="#" onClick={redirectToLogin}>
-                  here{" "}
-                </a>
-              </span>
-            </div>
+        {/* Password Info */}
+        <h4 className="box-header1">Preference Info</h4>
+        <div className="info-row">
+          <div className="info-item1">
+            <p className="info-label1">Language</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="language"
+              value={preferencesDetailsData?.language}
+              onChange={handleChangePreferenceDetails}
+            />
+          </div>
+          {/* Mobile Number */}
+          <div className="info-item1">
+            <p className="info-label1">Day Preferred</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="dayPreferred"
+              value={preferencesDetailsData?.dayPreferred}
+              onChange={handleChangePreferenceDetails}
+            />
           </div>
         </div>
-      ) : (
-        <LoginForm loginState={false} changePasswordRequest={true} />
-      )}
+        <div className="info-row">
+          <div className="info-item1">
+            <p className="info-label1">Time Preferred</p>
+            <input
+              className="info-input1"
+              type="text"
+              name="timePreferred"
+              value={preferencesDetailsData?.timePreferred}
+              onChange={handleChangePreferenceDetails}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

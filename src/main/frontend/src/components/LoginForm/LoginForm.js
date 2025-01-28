@@ -10,7 +10,7 @@ import SBLogo from "../../assets/sunbirdlogo.png";
 import { FcGoogle } from "react-icons/fc";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 
-const LoginForm = ({ loginState, changePasswordRequest }) => {
+const LoginForm = ({ loginState, changePasswordRequest, passwordChanged }) => {
   const [error, setError] = useState("");
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
@@ -68,6 +68,12 @@ const LoginForm = ({ loginState, changePasswordRequest }) => {
     setError("");
   };
 
+  const handlePasswordChange = () => {
+    // Call the passwordChanged callback
+    if (passwordChanged) {
+      passwordChanged();
+    }
+  };
   return (
     <div className="loginForm row">
       {!showResetForm ? (
@@ -164,13 +170,13 @@ const LoginForm = ({ loginState, changePasswordRequest }) => {
             </div>
           )}
 
-          {!changePasswordRequest && (
-            //   (<div className="backToLogin">
-            //     <a href="#" onClick={redirectToProfile}>
-            //       Back to Profile
-            //     </a>
-            //   </div>
-            // ) : (
+          {changePasswordRequest ? (
+            <div className="backToLogin">
+              <a href="#" onClick={handlePasswordChange}>
+                Back to Profile
+              </a>
+            </div>
+          ) : (
             <div className="backToLogin">
               <a href="#" onClick={toggleResetForm}>
                 Back to Login
