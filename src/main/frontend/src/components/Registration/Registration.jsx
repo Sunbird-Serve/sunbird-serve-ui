@@ -10,21 +10,20 @@ import {
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
-import axios from 'axios'
+import axios from "axios";
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from "react-redux";
 import { fetchUserList } from "../../state/userListSlice";
-import Box from '@mui/material/Box';
-import LinearProgress from '@mui/material/LinearProgress';
+import Box from "@mui/material/Box";
+import LinearProgress from "@mui/material/LinearProgress";
 
-
-const configData = require('../../configure.js');
+const configData = require("../../configure.js");
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Registration = (props) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   //constants
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
@@ -387,22 +386,22 @@ const Registration = (props) => {
   ];
 
   const qualifications = [
-    "High School", 
-    "Pre University", 
-    "Graduate", 
-    "Post Graduate", 
-    "Professional Degree"
+    "High School",
+    "Pre University",
+    "Graduate",
+    "Post Graduate",
+    "Professional Degree",
   ];
 
   const employmentStatus = [
-    "Full Time", 
-    "Part Time", 
-    "Self Employed", 
-    "Homemaker", 
-    "Student", 
-    "Retired", 
-    "Not Employed", 
-    "Others"
+    "Full Time",
+    "Part Time",
+    "Self-Employed",
+    "Homemaker",
+    "Student",
+    "Retired",
+    "Not Employed",
+    "Others",
   ];
 
   const skillLevel = [
@@ -511,147 +510,149 @@ const Registration = (props) => {
   };
 
   const dataToPost = {
-      "identityDetails": {
-        "fullname": formData.firstName,
-        "name": formData.lastName,
-        "gender": formData.gender,
-        "dob": formData.dob,
-        "Nationality": formData.nationality
+    identityDetails: {
+      fullname: formData.firstName,
+      name: formData.lastName,
+      gender: formData.gender,
+      dob: formData.dob,
+      Nationality: formData.nationality,
+    },
+    contactDetails: {
+      email: formData.email,
+      mobile: formData.mobileNumber,
+      address: {
+        city: formData.city,
+        state: formData.state,
+        country: formData.country,
       },
-      "contactDetails": {
-        "email": formData.email,
-        "mobile": formData.mobileNumber,
-        "address": {
-          "city": formData.city,
-          "state": formData.state,
-          "country": formData.country
-        }
-      },
-      "agencyId": "",
-      "status": "Registered",
-      "role": [
-        "Volunteer"
-      ]
-    }
+    },
+    agencyId: "",
+    status: "Registered",
+    role: ["Volunteer"],
+  };
 
-  const [ regStatus, setRegStatus ] = useState('')
+  const [regStatus, setRegStatus] = useState("");
 
-  const [userId, setUserId] = useState('')
+  const [userId, setUserId] = useState("");
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0'); 
-  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
 
   const currentDate = `${year}-${month}-${day}`;
   // const currentDate = new Date().toLocaleDateString();
 
   const onboradingInfo = {
-    "onboardStatus": [
-        {
-            "onboardStep": "Discussion",
-            "status": "completed"
-         }
-     ],
-     "refreshPeriod": "2 years",
-     "profileCompletion": "50"
-    }
+    onboardStatus: [
+      {
+        onboardStep: "Discussion",
+        status: "completed",
+      },
+    ],
+    refreshPeriod: "2 years",
+    profileCompletion: "50",
+  };
 
   const [dataProfile, setDataProfile] = useState({
-    "skills": formData.skills,
-    "genericDetails": {
-      "qualification": formData.qualification,
-      "affiliation": formData.affiliation,
-      "yearsOfExperience": formData.yoe,
-      "employmentStatus": formData.empStatus,
+    skills: formData.skills,
+    genericDetails: {
+      qualification: formData.qualification,
+      affiliation: formData.affiliation,
+      yearsOfExperience: formData.yoe,
+      employmentStatus: formData.empStatus,
     },
-    "userPreference": {
-      "timePreferred": formData.prefTime,
-      "dayPreferred": formData.prefDays,
-      "interestArea": formData.interests,
-      "language": formData.languages
+    userPreference: {
+      timePreferred: formData.prefTime,
+      dayPreferred: formData.prefDays,
+      interestArea: formData.interests,
+      language: formData.languages,
     },
-    "agencyId": "",
-    "userId": userId,
-    "onboardDetails": onboradingInfo,
-    "consentDetails": {
-      "consentGiven": true,
-      "consentDate": currentDate,
-      "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+    agencyId: "",
+    userId: userId,
+    onboardDetails: onboradingInfo,
+    consentDetails: {
+      consentGiven: true,
+      consentDate: currentDate,
+      consentDescription:
+        "Consent given for sharing preference to other volunteer agency through secure network",
     },
-    "referenceChannelId": "",
-    "volunteeringHours": {
-      "totalHours": 0,
-      "hoursPerWeek": 0
-    }
-  })
+    referenceChannelId: "",
+    volunteeringHours: {
+      totalHours: 0,
+      hoursPerWeek: 0,
+    },
+  });
 
-  useEffect(()=>{
-    setDataProfile(prev => ({
-      ...prev,  
-      "skills": formData.skills,
-      "genericDetails": {
-        "qualification": formData.qualification,
-        "affiliation": formData.affiliation,
-        "yearsOfExperience": formData.yoe,
-        "employmentStatus": formData.empStatus,
+  useEffect(() => {
+    setDataProfile((prev) => ({
+      ...prev,
+      skills: formData.skills,
+      genericDetails: {
+        qualification: formData.qualification,
+        affiliation: formData.affiliation,
+        yearsOfExperience: formData.yoe,
+        employmentStatus: formData.empStatus,
       },
-      "userPreference": {
-        "timePreferred": formData.prefTime,
-        "dayPreferred": formData.prefDays,
-        "interestArea": formData.interests,
-        "language": formData.languages
+      userPreference: {
+        timePreferred: formData.prefTime,
+        dayPreferred: formData.prefDays,
+        interestArea: formData.interests,
+        language: formData.languages,
       },
-      "agencyId": "",
-      "userId": userId,
-      "onboardDetails": onboradingInfo,
-      "consentDetails": {
-        "consentGiven": true,
-        "consentDate": currentDate,
-        "consentDescription": "Consent given for sharing preference to other volunteer agency through secure network"
+      agencyId: "",
+      userId: userId,
+      onboardDetails: onboradingInfo,
+      consentDetails: {
+        consentGiven: true,
+        consentDate: currentDate,
+        consentDescription:
+          "Consent given for sharing preference to other volunteer agency through secure network",
       },
-      "referenceChannelId": "",
-      "volunteeringHours": {
-        "totalHours": 0,
-        "hoursPerWeek": 0
-      }
-    }))
-  },[userId, formData])
+      referenceChannelId: "",
+      volunteeringHours: {
+        totalHours: 0,
+        hoursPerWeek: 0,
+      },
+    }));
+  }, [userId, formData]);
 
   const [loading, setLoading] = useState(false);
 
-  const submitForm = e => {
-    e.preventDefault()
-    setLoading(true)
-    axios.post(`${configData.USER_GET}/`, dataToPost)
-      .then(function(response){
-        setUserId(response.data.result.Users.osid)
-        console.log(response.data)
+  const submitForm = (e) => {
+    e.preventDefault();
+    setLoading(true);
+    axios
+      .post(`${configData.USER_GET}/`, dataToPost)
+      .then(function (response) {
+        setUserId(response.data.result.Users.osid);
+        console.log(response.data);
       })
       .catch(function (error) {
-        setLoading(false)
-        console.log(error); 
-      }) 
-  }  
+        setLoading(false);
+        console.log(error);
+      });
+  };
 
-  useEffect(()=>{
-    if(dataProfile.userId){
-      console.log(userId)
-      console.log(dataProfile)
-      axios.post(`${configData.USER_PROFILE}`, dataProfile)
-      .then(function(response){
-        console.log(response.data)
-        console.log('user created sucessfully',response);
-        setRegStatus('success');
-      })
-      .catch(function (error) {
-        console.log(error); 
-        setRegStatus('failure');
-      }) 
-      .finally(() => {
-        setLoading(false)
-      }); 
+  useEffect(() => {
+    if (dataProfile.userId) {
+      console.log(userId);
+      console.log(dataProfile);
+      axios
+        .post(`${configData.USER_PROFILE}`, dataProfile)
+        .then(function (response) {
+          console.log(response.data);
+          console.log("user created sucessfully", response);
+          setRegStatus("success");
+        })
+        .catch(function (error) {
+          console.log(error);
+          setRegStatus("failure");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
-  },[userId, dataProfile])
+  }, [userId, dataProfile]);
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
@@ -664,212 +665,237 @@ const Registration = (props) => {
   };
 
   const retryReg = () => {
-    setRegStatus('')
-  }
+    setRegStatus("");
+  };
 
-  useEffect(()=>{
-    dispatch(fetchUserList())
-  },[regStatus])
-
- 
+  useEffect(() => {
+    dispatch(fetchUserList());
+  }, [regStatus]);
 
   return (
     <div>
       {/* Loading */}
-    {loading && <div className="loading-box">
-      <span>Creating the user. Please wait...</span>
-      <Box sx={{ width: '80%' }}>
-        <LinearProgress />
-      </Box>
-    </div>}
-
-    { (!regStatus) &&
-    (<div className="reg-main">
-      <div className="title-container">
-        <span className="title">User Registration</span>
-        <div className="info-card">
-          <span>Online</span>
-          <FiberManualRecordIcon
-            style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
-          />
-          <span>July 10 - July 24</span>
-          <FiberManualRecordIcon
-            style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
-          />
-          <span>Starts @10 AM</span>
+      {loading && (
+        <div className="loading-box">
+          <span>Creating the user. Please wait...</span>
+          <Box sx={{ width: "80%" }}>
+            <LinearProgress />
+          </Box>
         </div>
-      </div>
-      <hr className="seperator" />
-      <div className="button-container">
-        <span style={{ float: "left" }}>
-          Fill all the details below and be a Volunteer
-        </span>
-        <div style={{ textAlign: "right" }}>
-          <button
-            type="button"
-            className="clear-btn"
-            onClick={() => setFormData(initFormData)}
-          >
-            Clear All
-          </button>
-          <button
-            type="submit"
-            className="clear-btn register-btn"
-            form="registation-form"
-          >
-            Register
-          </button>
-        </div>
-      </div>
-      <div className="regContainer">
+      )}
 
-        <div className="nav-container ">
-          <span
-            className={nav === 0 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(0)}
-          >
-            Personal Details
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 1 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(1)}
-          >
-            Contact Details
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 3 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(3)}
-          >
-            Additional Details
-          </span>
-          <hr className="nav-line" />
-          <span
-            className={nav === 5 ? "nav-element active" : "nav-element"}
-            onClick={() => onNavClick(5)}
-          >
-            Reference & Consent
-          </span>
-        </div>
-
-        {/* registration form */}
-        <form className="formContainer" id="registation-form" onSubmit={submitForm}>
-          <div className="form-section" id={0} ref={refArray[0]}>
-            <span className="formCat">Personal Details</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>First Name<span className='req-mark'>*</span></label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter your first name"
-                  name="firstName"
-                  value={formData.firstName ? formData.firstName : ""}
-                  onChange={handleChange}
-                  required
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Last Name<span className='req-mark'>*</span></label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter your last name"
-                  name="lastName"
-                  value={formData.lastName ? formData.lastName : ""}
-                  onChange={handleChange}
-                  required
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Gender<span className='req-mark'>*</span></label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.gender !== "" ? undefined : () => "Select"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="gender"
-                  value={formData.gender ? formData.gender : ""}
-                  onChange={handleChange}
-                  required
-                >
-                  {genderOptions.map((gender, index) => (
-                    <MenuItem key={index + gender} value={gender}>
-                      {gender}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="formElement">
-                <label>Date of Birth<span className='req-mark'>*</span></label>
-                <br />
-                <input
-                  className="form-input"
-                  label="DD/MM/YYYY"
-                  type="Date"
-                  name="dob"
-                  value={formData.dob ? formData.dob : ""}
-                  onChange={handleChange}
-                  required
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Nationality<span className='req-mark'>*</span></label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.nationality !== "" ? undefined : () => "Select"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="nationality"
-                  value={formData.nationality ? formData.nationality : ""}
-                  onChange={handleChange}
-                  required
-                >
-                  {countries.map((country, index) => (
-                    <MenuItem key={index + country} value={country}>
-                      {country}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
+      {!regStatus && (
+        <div className="reg-main">
+          <div className="title-container">
+            <span className="title">User Registration</span>
+            <div className="info-card">
+              <span>Online</span>
+              <FiberManualRecordIcon
+                style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
+              />
+              <span>July 10 - July 24</span>
+              <FiberManualRecordIcon
+                style={{ fontSize: "1vh", color: "#5D5B5B", margin: "0 0.5vw" }}
+              />
+              <span>Starts @10 AM</span>
             </div>
           </div>
+          <hr className="seperator" />
+          <div className="button-container">
+            <span style={{ float: "left" }}>
+              Fill all the details below and be a Volunteer
+            </span>
+            <div style={{ textAlign: "right" }}>
+              <button
+                type="button"
+                className="clear-btn"
+                onClick={() => setFormData(initFormData)}
+              >
+                Clear All
+              </button>
+              <button
+                type="submit"
+                className="clear-btn register-btn"
+                form="registation-form"
+              >
+                Register
+              </button>
+            </div>
+          </div>
+          <div className="regContainer">
+            <div className="nav-container ">
+              <span
+                className={nav === 0 ? "nav-element active" : "nav-element"}
+                onClick={() => onNavClick(0)}
+              >
+                Personal Details
+              </span>
+              <hr className="nav-line" />
+              <span
+                className={nav === 1 ? "nav-element active" : "nav-element"}
+                onClick={() => onNavClick(1)}
+              >
+                Contact Details
+              </span>
+              <hr className="nav-line" />
+              <span
+                className={nav === 3 ? "nav-element active" : "nav-element"}
+                onClick={() => onNavClick(3)}
+              >
+                Additional Details
+              </span>
+              <hr className="nav-line" />
+              <span
+                className={nav === 5 ? "nav-element active" : "nav-element"}
+                onClick={() => onNavClick(5)}
+              >
+                Reference & Consent
+              </span>
+            </div>
 
-          <div className="form-section" id={1} ref={refArray[1]}>
-            <span className="formCat">Contact Details</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>Mobile Number<span className='req-mark'>*</span></label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Add your mobile number"
-                  name="mobileNumber"
-                  value={formData.mobileNumber ? formData.mobileNumber : ""}
-                  onChange={handleChange}
-                  required
-                ></input>
+            {/* registration form */}
+            <form
+              className="formContainer"
+              id="registation-form"
+              onSubmit={submitForm}
+            >
+              <div className="form-section" id={0} ref={refArray[0]}>
+                <span className="formCat">Personal Details</span>
+                <hr className="form-line" />
+                <div className="formEntries">
+                  <div className="formElement">
+                    <label>
+                      First Name<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <input
+                      className="form-input"
+                      placeholder="Enter your first name"
+                      name="firstName"
+                      value={formData.firstName ? formData.firstName : ""}
+                      onChange={handleChange}
+                      required
+                    ></input>
+                  </div>
+                  <div className="formElement">
+                    <label>
+                      Last Name<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <input
+                      className="form-input"
+                      placeholder="Enter your last name"
+                      name="lastName"
+                      value={formData.lastName ? formData.lastName : ""}
+                      onChange={handleChange}
+                      required
+                    ></input>
+                  </div>
+                  <div className="formElement">
+                    <label>
+                      Gender<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <Select
+                      displayEmpty
+                      renderValue={
+                        formData.gender !== "" ? undefined : () => "Select"
+                      }
+                      style={{
+                        height: "4vh",
+                        width: "100%",
+                        textAlign: "left",
+                      }}
+                      name="gender"
+                      value={formData.gender ? formData.gender : ""}
+                      onChange={handleChange}
+                      required
+                    >
+                      {genderOptions.map((gender, index) => (
+                        <MenuItem key={index + gender} value={gender}>
+                          {gender}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </div>
+                  <div className="formElement">
+                    <label>
+                      Date of Birth<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <input
+                      className="form-input"
+                      label="DD/MM/YYYY"
+                      type="Date"
+                      name="dob"
+                      value={formData.dob ? formData.dob : ""}
+                      onChange={handleChange}
+                      required
+                    ></input>
+                  </div>
+                  <div className="formElement">
+                    <label>
+                      Nationality<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <Select
+                      displayEmpty
+                      renderValue={
+                        formData.nationality !== "" ? undefined : () => "Select"
+                      }
+                      style={{
+                        height: "4vh",
+                        width: "100%",
+                        textAlign: "left",
+                      }}
+                      name="nationality"
+                      value={formData.nationality ? formData.nationality : ""}
+                      onChange={handleChange}
+                      required
+                    >
+                      {countries.map((country, index) => (
+                        <MenuItem key={index + country} value={country}>
+                          {country}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </div>
+                </div>
               </div>
-              <div className="formElement">
-                <label>E-mail ID<span className='req-mark'>*</span></label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="chandlerBing@gmail.com"
-                  name="email"
-                  value={formData.email ? formData.email : ""}
-                  onChange={handleChange}
-                  required
-                ></input>
-              </div>
-              {/* <div className="formElement">
+
+              <div className="form-section" id={1} ref={refArray[1]}>
+                <span className="formCat">Contact Details</span>
+                <hr className="form-line" />
+                <div className="formEntries">
+                  <div className="formElement">
+                    <label>
+                      Mobile Number<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <input
+                      className="form-input"
+                      placeholder="Add your mobile number"
+                      name="mobileNumber"
+                      value={formData.mobileNumber ? formData.mobileNumber : ""}
+                      onChange={handleChange}
+                      required
+                    ></input>
+                  </div>
+                  <div className="formElement">
+                    <label>
+                      E-mail ID<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <input
+                      className="form-input"
+                      placeholder="chandlerBing@gmail.com"
+                      name="email"
+                      value={formData.email ? formData.email : ""}
+                      onChange={handleChange}
+                      required
+                    ></input>
+                  </div>
+                  {/* <div className="formElement">
                 <label>Address</label>
                 <br />
                 <input
@@ -944,10 +970,10 @@ const Registration = (props) => {
                   onChange={handleChange}
                 ></input>
               </div> */}
-            </div>
-          </div>
+                </div>
+              </div>
 
-          {/* <div className="form-section" id={2} ref={refArray[2]}>
+              {/* <div className="form-section" id={2} ref={refArray[2]}>
             <span className="formCat">Preferences</span>
             <hr className="form-line" />
             <div className="formEntries">
@@ -1090,69 +1116,89 @@ const Registration = (props) => {
             </div>
           </div> */}
 
-          <div className="form-section" id={3} ref={refArray[3]}>
-            <span className="formCat">Additional Details</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>Qualification<span className='req-mark'>*</span></label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.qualification !== ""
-                      ? undefined
-                      : () => "Choose your Qualification"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="qualification"
-                  value={formData.qualification ? formData.qualification : ""}
-                  onChange={handleChange}
-                  required
-                >
-                  {qualifications.map((qualification, index) => (
-                    <MenuItem key={index + qualification} value={qualification}>
-                      {qualification}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-              <div className="formElement">
-                <label>Affiliation(Workplace/Instituition)<span className='req-mark'>*</span></label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Eg. Xyz Company"
-                  name="affiliation"
-                  value={formData.affiliation ? formData.affiliation : ""}
-                  onChange={handleChange}
-                  required
-                ></input>
-              </div>
-              <div className="formElement">
-                <label>Employment Status<span className='req-mark'>*</span></label>
-                <br />
-                <Select
-                  displayEmpty
-                  renderValue={
-                    formData.empStatus !== ""
-                      ? undefined
-                      : () => "Choose your employment status"
-                  }
-                  style={{ height: "4vh", width: "100%", textAlign: "left" }}
-                  name="empStatus"
-                  value={formData.empStatus ? formData.empStatus : ""}
-                  required
-                  onChange={handleChange}
-                >
-                  {employmentStatus.map((empStatus, index) => (
-                    <MenuItem key={index + empStatus} value={empStatus}>
-                      {empStatus}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </div>
-              {/* <div className="formElement">
+              <div className="form-section" id={3} ref={refArray[3]}>
+                <span className="formCat">Additional Details</span>
+                <hr className="form-line" />
+                <div className="formEntries">
+                  <div className="formElement">
+                    <label>
+                      Qualification<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <Select
+                      displayEmpty
+                      renderValue={
+                        formData.qualification !== ""
+                          ? undefined
+                          : () => "Choose your Qualification"
+                      }
+                      style={{
+                        height: "4vh",
+                        width: "100%",
+                        textAlign: "left",
+                      }}
+                      name="qualification"
+                      value={
+                        formData.qualification ? formData.qualification : ""
+                      }
+                      onChange={handleChange}
+                      required
+                    >
+                      {qualifications.map((qualification, index) => (
+                        <MenuItem
+                          key={index + qualification}
+                          value={qualification}
+                        >
+                          {qualification}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </div>
+                  <div className="formElement">
+                    <label>
+                      Affiliation(Workplace/Instituition)
+                      <span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <input
+                      className="form-input"
+                      placeholder="Eg. Xyz Company"
+                      name="affiliation"
+                      value={formData.affiliation ? formData.affiliation : ""}
+                      onChange={handleChange}
+                      required
+                    ></input>
+                  </div>
+                  <div className="formElement">
+                    <label>
+                      Employment Status<span className="req-mark">*</span>
+                    </label>
+                    <br />
+                    <Select
+                      displayEmpty
+                      renderValue={
+                        formData.empStatus !== ""
+                          ? undefined
+                          : () => "Choose your employment status"
+                      }
+                      style={{
+                        height: "4vh",
+                        width: "100%",
+                        textAlign: "left",
+                      }}
+                      name="empStatus"
+                      value={formData.empStatus ? formData.empStatus : ""}
+                      required
+                      onChange={handleChange}
+                    >
+                      {employmentStatus.map((empStatus, index) => (
+                        <MenuItem key={index + empStatus} value={empStatus}>
+                          {empStatus}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </div>
+                  {/* <div className="formElement">
                 <label>Years of Experience</label>
                 <br />
                 <input
@@ -1164,10 +1210,10 @@ const Registration = (props) => {
                   onChange={handleChange}
                 ></input>
               </div> */}
-            </div>
-          </div>
+                </div>
+              </div>
 
-          {/* <div className="form-section" id={4} ref={refArray[4]}>
+              {/* <div className="form-section" id={4} ref={refArray[4]}>
             <span className="formCat">Skills</span>
             <hr className="form-line" />
             {formData.skills.map((skillData, index) => (
@@ -1232,68 +1278,69 @@ const Registration = (props) => {
             </button>
           </div> */}
 
-          <div className="form-section" id={5} ref={refArray[5]}>
-            <span className="formCat">Reference & Consent</span>
-            <hr className="form-line" />
-            <div className="formEntries">
-              <div className="formElement">
-                <label>Reference Channel</label>
-                <br />
-                <input
-                  className="form-input"
-                  placeholder="Enter your Reference Channel"
-                  name="reference"
-                  value={formData.reference ? formData.reference : ""}
-                  onChange={handleChange}
-                ></input>
+              <div className="form-section" id={5} ref={refArray[5]}>
+                <span className="formCat">Reference & Consent</span>
+                <hr className="form-line" />
+                <div className="formEntries">
+                  <div className="formElement">
+                    <label>Reference Channel</label>
+                    <br />
+                    <input
+                      className="form-input"
+                      placeholder="Enter your Reference Channel"
+                      name="reference"
+                      value={formData.reference ? formData.reference : ""}
+                      onChange={handleChange}
+                    ></input>
+                  </div>
+                </div>
+                <div className="consent-container">
+                  <div>
+                    <input
+                      name="consent"
+                      checked={formData.consent}
+                      onChange={() =>
+                        setFormData({ ...formData, consent: !formData.consent })
+                      }
+                      type="checkbox"
+                    />
+                    <span>
+                      Consent given for sharing preference to other volunteer
+                      agency through secure network
+                    </span>
+                  </div>
+                  <span style={{ padding: "3vh 0", display: "block" }}>
+                    By submiting this form and registering yourself as a
+                    nominee, you will be agreeing to our{" "}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.google.com"
+                    >
+                      Terms & Conditions
+                    </a>{" "}
+                    and{" "}
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://www.google.com"
+                    >
+                      Privacy Policy
+                    </a>
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="consent-container">
-              <div>
-                <input
-                  name="consent"
-                  checked={formData.consent}
-                  onChange={() =>
-                    setFormData({ ...formData, consent: !formData.consent })
-                  }
-                  type="checkbox"
-                />
-                <span>
-                  Consent given for sharing preference to other volunteer agency
-                  through secure network
-                </span>
-              </div>
-              <span style={{padding: '3vh 0', display: 'block'}}>
-                By submiting this form and registering yourself as a nominee,
-                you will be agreeing to our{" "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.google.com"
-                >
-                  Terms & Conditions
-                </a>{" "}
-                and{" "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://www.google.com"
-                >
-                  Privacy Policy
-                </a>
-              </span>
-            </div>
+            </form>
           </div>
+        </div>
+      )}
 
-        </form>
-      </div>
-    </div>)
-     } 
-    
-    {(regStatus === 'success') && userId && <RegFormSuccess />}
-    {(regStatus === 'failure') && userId && <RegFormFailure retryReg={retryReg} />}
+      {regStatus === "success" && userId && <RegFormSuccess />}
+      {regStatus === "failure" && userId && (
+        <RegFormFailure retryReg={retryReg} />
+      )}
     </div>
   );
 };
 
-export default Registration
+export default Registration;
