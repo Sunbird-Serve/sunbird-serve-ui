@@ -10,7 +10,6 @@ import { useHistory } from "react-router";
 import { auth } from "../../firebase";
 import { fetchUserByEmail } from "../../state/userSlice";
 import axios from "axios";
-
 const configData = require("../../configure.js");
 
 function VolunteerProfileEdit() {
