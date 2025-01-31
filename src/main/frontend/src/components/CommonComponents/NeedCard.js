@@ -20,8 +20,9 @@ const NeedCard = ({ matrixData }) => {
         <Box
           key={index}
           sx={{
-            width: { xs: "100%", sm: "48%", md: "32%", lg: "24%" },
+            // width: { xs: "100%", sm: "48%", md: "32%", lg: "24%" },
             maxWidth: "16rem",
+            width: "100%",
           }}
         >
           <Card variant="outlined">
@@ -29,18 +30,18 @@ const NeedCard = ({ matrixData }) => {
               <Box display="flex" gap="1rem" alignItems="center">
                 <Box>
                   <img
-                    src={matrix.icon || ""}
-                    alt={matrix.status || "Nominated Needs"}
+                    src={matrix?.icon || ""}
+                    // alt={matrix?.status || ""}
                     height="30px"
                     style={{ objectFit: "contain" }}
                   />
                 </Box>
                 <Box>
                   <Typography variant="h4" component="div">
-                    {matrix.count || 0}
+                    {matrix?.count || 0}
                   </Typography>
                   <Typography sx={{ color: "text.secondary" }}>
-                    {matrix.status || "Status"}
+                    {matrix?.status || "Status"}
                   </Typography>
                 </Box>
               </Box>

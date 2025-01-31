@@ -1,16 +1,51 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import FilterBy from "../../components/CommonComponents/FilterBy";
 import { matrixData } from "../../components/CommonComponents/sampleData";
 import { Box, Typography } from "@mui/material";
 import NeedsTable from "../../components/NeedsTable/NeedsTable";
+const configData = require("../../configure");
+
 const Dashboard = () => {
   const [filteredData, setFilteredData] = useState([]);
+  const [enitities, setEnitities] = useState([]);
+
+  useEffect(() => {
+    const getEntityDetails = async () => {
+      const userId = "1-7990de17-9595-4f55-a309-715cdd3e3282";
+      try {
+        const response = await axios.get(
+          `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=10`
+        );
+        // console.log("enityDetails", response?.data?.content);
+        const entities =
+          response.data?.content
+            ?.filter((entity) => entity.status === "Active")
+            .map((entity) => ({
+              id: entity.id,
+              name: entity.name,
+            })) || [];
+        setEnitities(entities);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getEntityDetails();
+  });
 
   const handleFilterChange = (selectedFilters) => {
     console.log("Selected Filters:", selectedFilters);
     setFilteredData(selectedFilters);
   };
+
+  const EnityData = [
+    {
+      //   icon: totalNeedsCreated,
+      count: enitities?.length,
+      status: "Total Active Enities",
+    },
+  ];
 
   return (
     <Box padding={"1rem"}>
@@ -38,17 +73,29 @@ const Dashboard = () => {
           </Typography>
         </Box>
 
-        <Box width={"20%"} marginTop={"3rem"}>
+        {/* <Box width={"20%"} marginTop={"3rem"}>
           <FilterBy
             options={["All", "Option 1", "Option 2", "Option 3", "Option 4"]}
+            onFilterChange={handleFilterChange}
+          />
+        </Box> */}
+      </Box>
+      <Box padding={"1rem 0"} gap={"0.5rem"} display={"flex"}>
+        {/* <Box> */}
+        <NeedCard matrixData={EnityData} />
+        {/* </Box> */}
+        <Box paddingLeft={"3rem"} display={"flex"} alignItems={"center"}>
+          <FilterBy
+            label={"Select Enitity"}
+            options={enitities}
             onFilterChange={handleFilterChange}
           />
         </Box>
       </Box>
       <NeedCard matrixData={matrixData} />
-      <Box bgcolor={"white"}>
-        <NeedsTable />
-      </Box>
+      {/* <Box bgcolor={"white"}> */}
+      <NeedsTable showOnlyTable={true} />
+      {/* </Box> */}
     </Box>
   );
 };
