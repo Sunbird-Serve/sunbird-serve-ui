@@ -11,17 +11,42 @@ import {
   FormControl,
 } from "@mui/material";
 
-const FilterBy = ({ options, onFilterChange, label = "Filter By" }) => {
-  const [selectedValues, setSelectedValues] = useState(["All"]);
+const FilterBy = ({ options, onFilterChange, label }) => {
+  const [selectedValues, setSelectedValues] = useState([]);
+
+  const allOption = { id: "all", name: "All" };
+  const allOptionIds = options.map((option) => option.id);
 
   const handleChange = (event) => {
     const value = event.target.value;
-    setSelectedValues(value);
-    onFilterChange(value);
+
+    if (value.includes(allOption.id)) {
+      // If "All" is selected, select everything
+      if (selectedValues.includes(allOption.id)) {
+        // If "All" was already selected, unselect everything
+        setSelectedValues([]);
+        onFilterChange([]);
+      } else {
+        setSelectedValues([allOption.id, ...allOptionIds]);
+        onFilterChange([allOption.id, ...allOptionIds]);
+      }
+    } else {
+      // Remove "All" if it's selected and another option is unselected
+      const filteredValues = value.filter((id) => id !== allOption.id);
+
+      if (filteredValues.length === allOptionIds.length) {
+        // If all options are selected manually, include "All"
+        setSelectedValues([allOption.id, ...allOptionIds]);
+        onFilterChange([allOption.id, ...allOptionIds]);
+      } else {
+        setSelectedValues(filteredValues);
+        onFilterChange(filteredValues);
+      }
+    }
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box width={"16rem"}>
       <FormControl fullWidth>
         <InputLabel
           id="demo-simple-select-label"
@@ -35,30 +60,28 @@ const FilterBy = ({ options, onFilterChange, label = "Filter By" }) => {
           multiple
           value={selectedValues}
           onChange={handleChange}
-          renderValue={(selected) => selected.join(", ")}
+          renderValue={(selected) =>
+            selected
+              .filter((id) => id !== "all") // Remove "All" from display
+              .map((id) => options.find((option) => option.id === id)?.name)
+              .join(", ") || "Select Options"
+          }
         >
-          {options.map((option) => (
-            <MenuItem key={option} value={option}>
-              <Checkbox checked={selectedValues.includes(option)} />
-              <ListItemText primary={option} />
+          <MenuItem key={allOption.id} value={allOption.id}>
+            <Checkbox checked={selectedValues.includes(allOption.id)} />
+            <ListItemText primary={allOption.name} />
+          </MenuItem>
+
+          {options?.map((option) => (
+            <MenuItem key={option.id} value={option.id}>
+              <Checkbox checked={selectedValues.includes(option.id)} />
+              <ListItemText primary={option.name} />
             </MenuItem>
           ))}
         </Select>
       </FormControl>
     </Box>
   );
-};
-
-// Prop validation
-FilterBy.propTypes = {
-  options: PropTypes.arrayOf(PropTypes.string).isRequired,
-  onFilterChange: PropTypes.func.isRequired,
-  label: PropTypes.string,
-};
-
-// Default props
-FilterBy.defaultProps = {
-  label: "Filter By",
 };
 
 export default FilterBy;
