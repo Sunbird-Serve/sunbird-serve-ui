@@ -5,34 +5,38 @@ import FilterBy from "../../components/CommonComponents/FilterBy";
 import { matrixData } from "../../components/CommonComponents/sampleData";
 import { Box, Typography } from "@mui/material";
 import NeedsTable from "../../components/NeedsTable/NeedsTable";
+import SchoolIcon from "@mui/icons-material/School";
 const configData = require("../../configure");
-
 const Dashboard = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [enitities, setEnitities] = useState([]);
 
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  console.log("userDetails", userDetails);
+  const userId = userDetails?.osid;
+
   useEffect(() => {
     const getEntityDetails = async () => {
-      const userId = "1-7990de17-9595-4f55-a309-715cdd3e3282";
       try {
-        const response = await axios.get(
-          `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=10`
-        );
-        // console.log("enityDetails", response?.data?.content);
-        const entities =
-          response.data?.content
-            ?.filter((entity) => entity.status === "Active")
-            .map((entity) => ({
-              id: entity.id,
-              name: entity.name,
-            })) || [];
-        setEnitities(entities);
+        if (userId) {
+          const response = await axios.get(
+            `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=10`
+          );
+          const entities =
+            response.data?.content
+              ?.filter((entity) => entity.status === "Active")
+              .map((entity) => ({
+                id: entity.id,
+                name: entity.name,
+              })) || [];
+          setEnitities(entities);
+        }
       } catch (error) {
         console.log(error);
       }
     };
     getEntityDetails();
-  });
+  }, [userId]);
 
   const handleFilterChange = (selectedFilters) => {
     console.log("Selected Filters:", selectedFilters);
@@ -41,7 +45,7 @@ const Dashboard = () => {
 
   const EnityData = [
     {
-      //   icon: totalNeedsCreated,
+      icon: SchoolIcon,
       count: enitities?.length,
       status: "Total Active Enities",
     },
@@ -62,7 +66,7 @@ const Dashboard = () => {
               Welcome Back,
             </Typography>
             <Typography variant="body1" color="text.primary">
-              DemoAdmin!
+              {userDetails?.fullname + "!"}
             </Typography>
           </Box>
           <Typography variant="h4" color="text.primary">
