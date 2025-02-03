@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { auth } from "../../firebase.js";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import FilterBy from "../../components/CommonComponents/FilterBy";
 import { matrixData } from "../../components/CommonComponents/sampleData";
@@ -9,12 +8,13 @@ import NeedsTable from "../../components/NeedsTable/NeedsTable";
 import SchoolIcon from "@mui/icons-material/School";
 const configData = require("../../configure");
 const Dashboard = () => {
-  const currentUser = auth.currentUser;
-
   const [filteredData, setFilteredData] = useState([]);
   const [enitities, setEnitities] = useState([]);
 
-  const userId = localStorage.getItem("userId");
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  console.log("userDetails", userDetails);
+  const userId = userDetails?.osid;
+
   useEffect(() => {
     const getEntityDetails = async () => {
       try {
@@ -51,13 +51,6 @@ const Dashboard = () => {
     },
   ];
 
-  const trimEmail = (email) => {
-    const displayName = email.split(".")[0];
-    return (
-      displayName[0].toUpperCase() + displayName.slice(1, displayName.length)
-    );
-  };
-
   return (
     <Box padding={"1rem"}>
       <Box
@@ -73,7 +66,7 @@ const Dashboard = () => {
               Welcome Back,
             </Typography>
             <Typography variant="body1" color="text.primary">
-              {currentUser?.displayName || trimEmail(currentUser?.email) + "!"}
+              {userDetails?.fullname + "!"}
             </Typography>
           </Box>
           <Typography variant="h4" color="text.primary">

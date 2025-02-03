@@ -16,7 +16,10 @@ export const fetchUserByEmail = createAsyncThunk(
       const response = await axios.get(
         `${configData.USER_GET}/email?email=${email}`
       );
-      localStorage.setItem("userId", response?.data?.osid);
+      localStorage.setItem(
+        "userDetails",
+        JSON.stringify(response?.data?.identityDetails)
+      );
       return response.data;
     } catch (error) {
       throw error;
