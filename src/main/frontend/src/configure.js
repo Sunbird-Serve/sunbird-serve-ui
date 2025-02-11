@@ -29,6 +29,7 @@ const configData = {
   NEEDPLAN_DELIVERABLES: `${baseDomainNeed}/api/v1/serve-need/need-deliverable`,
   SKILL_DETAILS: `${baseDomainNeed}/api/v1/serve-need/need-requirement/skilldetails`,
   ENTITY_DETAILS_GET: `${baseDomainNeed}/api/v1/serve-need/entityDetails`,
+  ENTITY_NEEDS: `${baseDomainNeed}/api/v1/serve-need/need/entities`,
 };
 
 module.exports = configData;

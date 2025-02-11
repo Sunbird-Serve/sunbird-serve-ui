@@ -1,19 +1,32 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useSelector, useDispatch } from "react-redux";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import FilterBy from "../../components/CommonComponents/FilterBy";
 import { matrixData } from "../../components/CommonComponents/sampleData";
 import { Box, Typography } from "@mui/material";
 import NeedsTable from "../../components/NeedsTable/NeedsTable";
 import SchoolIcon from "@mui/icons-material/School";
+import { setFilteredData } from "../../state/filterSlice";
+import { fetchEntityNeeds } from "../../state/needSlice";
 const configData = require("../../configure");
+
 const Dashboard = () => {
-  const [filteredData, setFilteredData] = useState([]);
+  const dispatch = useDispatch();
+  const [filteredByEnitity, setFilteredByEnitity] = useState([]);
   const [enitities, setEnitities] = useState([]);
+  const [enititiesNeeds, setEnititiesNeeds] = useState([]);
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  console.log("userDetails", userDetails);
-  const userId = userDetails?.osid;
+  const userId = localStorage.getItem("userId");
+  console.log("userDetails", userId);
+
+  useEffect(() => {
+    if (filteredByEnitity) {
+      dispatch(fetchEntityNeeds());
+      dispatch(setFilteredData(filteredByEnitity));
+    }
+  }, [filteredByEnitity, dispatch]);
 
   useEffect(() => {
     const getEntityDetails = async () => {
@@ -40,7 +53,8 @@ const Dashboard = () => {
 
   const handleFilterChange = (selectedFilters) => {
     console.log("Selected Filters:", selectedFilters);
-    setFilteredData(selectedFilters);
+    setFilteredByEnitity(selectedFilters);
+    dispatch(setFilteredData(selectedFilters));
   };
 
   const EnityData = [
@@ -98,7 +112,11 @@ const Dashboard = () => {
       </Box>
       <NeedCard matrixData={matrixData} />
       {/* <Box bgcolor={"white"}> */}
-      <NeedsTable showOnlyTable={true} />
+      <NeedsTable
+        showOnlyTable={true}
+        enititiesNeeds={enititiesNeeds}
+        filterByEntity={true}
+      />
       {/* </Box> */}
     </Box>
   );
