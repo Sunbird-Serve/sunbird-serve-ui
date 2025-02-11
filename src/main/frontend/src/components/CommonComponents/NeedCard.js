@@ -15,13 +15,13 @@ const NeedCard = ({ matrixData }) => {
   }
 
   return (
-    <Box display="flex" flexWrap="wrap" gap="1rem">
+    <Box display="flex" flexWrap="wrap" gap="0.5rem">
       {matrixData?.map((matrix, index) => (
         <Box
           key={index}
           sx={{
             // width: { xs: "100%", sm: "48%", md: "32%", lg: "24%" },
-            maxWidth: "16rem",
+            maxWidth: "14rem",
             width: "100%",
           }}
         >
@@ -32,12 +32,12 @@ const NeedCard = ({ matrixData }) => {
                   <img
                     src={matrix?.icon || ""}
                     // alt={matrix?.status || ""}
-                    height="30px"
+                    height="20px"
                     style={{ objectFit: "contain" }}
                   />
                 </Box>
                 <Box>
-                  <Typography variant="h4" component="div">
+                  <Typography variant="h6" component="div">
                     {matrix?.count || 0}
                   </Typography>
                   <Typography sx={{ color: "text.secondary" }}>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import {
   Box,
@@ -8,19 +8,29 @@ import {
   ListItemText,
   Typography,
   InputLabel,
-  FormControl,
 } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
 
 const FilterBy = ({ options, onFilterChange, label }) => {
   const [selectedValues, setSelectedValues] = useState([]);
 
   const allOption = { id: "all", name: "All" };
+  const allOptionValues = options?.map((option) => option.name) || [];
   const allOptionIds = options.map((option) => option.id);
+  console.log("options", ...allOptionValues);
+
+  useEffect(() => {
+    if (options.length > 0) {
+      const initialSelected = [allOption.id, ...allOptionIds];
+      setSelectedValues(initialSelected);
+      onFilterChange(initialSelected);
+    }
+  }, [options]);
 
   const handleChange = (event) => {
     const value = event.target.value;
 
-    if (value.includes(allOption.id)) {
+    if (value?.includes(allOption.id)) {
       // If "All" is selected, select everything
       if (selectedValues.includes(allOption.id)) {
         // If "All" was already selected, unselect everything
@@ -34,7 +44,7 @@ const FilterBy = ({ options, onFilterChange, label }) => {
       // Remove "All" if it's selected and another option is unselected
       const filteredValues = value.filter((id) => id !== allOption.id);
 
-      if (filteredValues.length === allOptionIds.length) {
+      if (filteredValues?.length === allOptionIds.length) {
         // If all options are selected manually, include "All"
         setSelectedValues([allOption.id, ...allOptionIds]);
         onFilterChange([allOption.id, ...allOptionIds]);
@@ -59,6 +69,7 @@ const FilterBy = ({ options, onFilterChange, label }) => {
           labelId="demo-simple-select-label"
           multiple
           value={selectedValues}
+          label={label}
           onChange={handleChange}
           renderValue={(selected) =>
             selected

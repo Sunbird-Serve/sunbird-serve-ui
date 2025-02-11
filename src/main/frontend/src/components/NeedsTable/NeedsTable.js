@@ -22,14 +22,8 @@ import Avatar from "@mui/material/Avatar";
 
 const configData = require("../../configure.js");
 
-export const NeedsTable = ({
-  props,
-  showOnlyTable,
-  enititiesNeeds,
-  filterByEntity,
-}) => {
+export const NeedsTable = ({ props, showOnlyTable, filterByEntity }) => {
   const dispatch = useDispatch();
-  console.log(enititiesNeeds);
   //get userId
   const uid = useSelector((state) => state.user.data.osid);
   const entityIds = useSelector((state) => state.filter.filteredData);
