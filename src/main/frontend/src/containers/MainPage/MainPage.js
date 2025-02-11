@@ -15,6 +15,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import NoRoleAssigned from "../../components/NoRoleAssigned/NoRoleAssigned";
 import Registration from "../../components/Registration/Registration";
 import Dashboard from "../nAdmin/Dashboard";
+import SessionDetails from "../nAdmin/SessionDetails";
 const MainPage = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
   const [role, setRole] = useState("");
@@ -77,6 +78,10 @@ const MainPage = () => {
                 <Route path="/no-role" component={NoRoleAssigned} />
                 <Route path="/vregistration" component={Registration} />
                 <Route path="/nAdmin-dashboard" component={Dashboard} />
+                <Route
+                  path="/nAdmin-sessionDetails"
+                  component={SessionDetails}
+                />
               </Switch>
             </div>
           </div>

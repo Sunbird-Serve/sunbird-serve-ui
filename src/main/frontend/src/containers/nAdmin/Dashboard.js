@@ -12,7 +12,6 @@ import NeedsTable from "../../components/NeedsTable/NeedsTable";
 import { setFilteredData } from "../../state/filterSlice";
 import { fetchEntityNeeds } from "../../state/needSlice";
 import VolunteerNeedsApproved from "../../assets/needsApproved.png";
-
 const configData = require("../../configure");
 
 const Dashboard = () => {
@@ -107,7 +106,6 @@ const Dashboard = () => {
       <Box padding={"0.5rem 0"}>
         <NeedCard matrixData={matrixData} />
       </Box>
-      <NeedCard matrixData={matrixDataRow2} />
       <NeedsTable showOnlyTable={true} filterByEntity={true} />
     </Box>
   );

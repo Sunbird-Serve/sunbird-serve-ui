@@ -9,7 +9,7 @@ export const matrixData = [
   {
     icon: totalNeedsCreated,
     count: 200,
-    status: "Total Needs Created",
+    status: "Total Needs Raised",
   },
   {
     icon: VolunteerNeedsInProgress,
@@ -19,23 +19,11 @@ export const matrixData = [
   {
     icon: VolunteerNeedsNominated,
     count: 24,
-    status: "Needs Requested",
+    status: "Needs Nominated",
   },
-];
-export const matrixDataRow2 = [
   {
     icon: VolunteerNeedsApproved,
     count: 12,
     status: "Needs Approved",
-  },
-  {
-    icon: VolunteerPlansDelivered,
-    count: 280,
-    status: "Total Volunteers",
-  },
-  {
-    icon: newVolunteers,
-    count: 80,
-    status: "New Volunteers",
   },
 ];
