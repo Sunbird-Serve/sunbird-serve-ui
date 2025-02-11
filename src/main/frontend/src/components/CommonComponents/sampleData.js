@@ -2,10 +2,12 @@ import VolunteerNeedsNominated from "../../assets/needsNominated.png";
 import VolunteerNeedsInProgress from "../../assets/needsInProgress.png";
 import VolunteerNeedsApproved from "../../assets/needsApproved.png";
 import VolunteerPlansDelivered from "../../assets/plansDelivered.png";
+import totalNeedsCreated from "../../assets/totalNeedsCreated.png";
+import newVolunteers from "../../assets/newVolunteers.png";
 
 export const matrixData = [
   {
-    icon: VolunteerNeedsNominated,
+    icon: totalNeedsCreated,
     count: 200,
     status: "Total Needs Created",
   },
@@ -15,10 +17,12 @@ export const matrixData = [
     status: "Needs in Progress",
   },
   {
-    icon: VolunteerNeedsApproved,
+    icon: VolunteerNeedsNominated,
     count: 24,
     status: "Needs Requested",
   },
+];
+export const matrixDataRow2 = [
   {
     icon: VolunteerNeedsApproved,
     count: 12,
@@ -30,7 +34,7 @@ export const matrixData = [
     status: "Total Volunteers",
   },
   {
-    icon: VolunteerNeedsInProgress,
+    icon: newVolunteers,
     count: 80,
     status: "New Volunteers",
   },

@@ -3,19 +3,22 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import FilterBy from "../../components/CommonComponents/FilterBy";
-import { matrixData } from "../../components/CommonComponents/sampleData";
+import {
+  matrixData,
+  matrixDataRow2,
+} from "../../components/CommonComponents/sampleData";
 import { Box, Typography } from "@mui/material";
 import NeedsTable from "../../components/NeedsTable/NeedsTable";
-import SchoolIcon from "@mui/icons-material/School";
 import { setFilteredData } from "../../state/filterSlice";
 import { fetchEntityNeeds } from "../../state/needSlice";
+import VolunteerNeedsApproved from "../../assets/needsApproved.png";
+
 const configData = require("../../configure");
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const [filteredByEnitity, setFilteredByEnitity] = useState([]);
   const [enitities, setEnitities] = useState([]);
-  const [enititiesNeeds, setEnititiesNeeds] = useState([]);
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const userId = localStorage.getItem("userId");
@@ -59,7 +62,7 @@ const Dashboard = () => {
 
   const EnityData = [
     {
-      icon: SchoolIcon,
+      icon: VolunteerNeedsApproved,
       count: enitities?.length,
       status: "Total Active Enities",
     },
@@ -90,18 +93,9 @@ const Dashboard = () => {
             Here's your needs analytics data
           </Typography>
         </Box>
-
-        {/* <Box width={"20%"} marginTop={"3rem"}>
-          <FilterBy
-            options={["All", "Option 1", "Option 2", "Option 3", "Option 4"]}
-            onFilterChange={handleFilterChange}
-          />
-        </Box> */}
       </Box>
-      <Box padding={"1rem 0"} gap={"0.5rem"} display={"flex"}>
-        {/* <Box> */}
+      <Box padding={"0.5rem 0"} gap={"0.5rem"} display={"flex"}>
         <NeedCard matrixData={EnityData} />
-        {/* </Box> */}
         <Box paddingLeft={"3rem"} display={"flex"} alignItems={"center"}>
           <FilterBy
             label={"Select Enitity"}
@@ -110,14 +104,11 @@ const Dashboard = () => {
           />
         </Box>
       </Box>
-      <NeedCard matrixData={matrixData} />
-      {/* <Box bgcolor={"white"}> */}
-      <NeedsTable
-        showOnlyTable={true}
-        enititiesNeeds={enititiesNeeds}
-        filterByEntity={true}
-      />
-      {/* </Box> */}
+      <Box padding={"0.5rem 0"}>
+        <NeedCard matrixData={matrixData} />
+      </Box>
+      <NeedCard matrixData={matrixDataRow2} />
+      <NeedsTable showOnlyTable={true} filterByEntity={true} />
     </Box>
   );
 };
