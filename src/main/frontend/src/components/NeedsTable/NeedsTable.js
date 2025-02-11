@@ -22,26 +22,42 @@ import Avatar from "@mui/material/Avatar";
 
 const configData = require("../../configure.js");
 
-export const NeedsTable = ({ props, showOnlyTable }) => {
+export const NeedsTable = ({
+  props,
+  showOnlyTable,
+  enititiesNeeds,
+  filterByEntity,
+}) => {
   const dispatch = useDispatch();
-
+  console.log(enititiesNeeds);
   //get userId
   const uid = useSelector((state) => state.user.data.osid);
+  const entityIds = useSelector((state) => state.filter.filteredData);
+
   //get list of needs raised by user
   const needList = useSelector((state) => state.need.data);
+
   const needsByUser = needList.filter(
     (item) => item && item.need && item.need.userId === uid
   );
 
+  const needsByEntity = useMemo(() => {
+    return needList.filter(
+      (item) => item?.entity && entityIds.includes(item.entity.id)
+    );
+  }, [entityIds, needList]);
+
   //needtype filter
   const needTypes = useSelector((state) => state.needtype.data.content);
   const [needTypeId, setNeedTypeId] = useState("");
+
   const handleNeedTypeFilter = (e) => {
     setNeedTypeId(e.target.value);
   };
   const [filteredData, setFilteredData] = useState([]);
+
   useEffect(() => {
-    let filtered = needsByUser;
+    let filtered = filterByEntity ? needsByEntity : needsByUser;
     if (needTypeId) {
       const filtered = needsByUser.filter(
         (item) => item.need.needTypeId === needTypeId
@@ -50,7 +66,8 @@ export const NeedsTable = ({ props, showOnlyTable }) => {
     } else {
       setFilteredData(filtered);
     }
-  }, [needTypeId, needList]);
+  }, [needTypeId, needList, needsByEntity]);
+
   const data = useMemo(() => filteredData, [filteredData, needList]);
 
   const COLUMNS = [
@@ -69,6 +86,7 @@ export const NeedsTable = ({ props, showOnlyTable }) => {
         );
       },
     },
+    // { Header: "Co-ordinator", accessor: "" },
     {
       Header: "Timeline",
       accessor: (row) => {
