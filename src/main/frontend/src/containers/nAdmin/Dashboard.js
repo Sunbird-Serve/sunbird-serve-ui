@@ -168,7 +168,7 @@ const Dashboard = () => {
       <Box padding={"0.5rem 0"}>
         <NeedCard matrixData={matrixData} />
       </Box>
-      <NeedsTable showOnlyTable={true} filterByEntity={true} />
+      <NeedsTable filterByEntity={true} />
     </Box>
   );
 };
