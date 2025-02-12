@@ -30,13 +30,14 @@ export const NeedsTable = ({ props, showOnlyTable, filterByEntity }) => {
 
   //get list of needs raised by user
   const needList = useSelector((state) => state.need.data);
-
   const needsByUser = needList.filter(
     (item) => item && item.need && item.need.userId === uid
   );
+  const entityNeeds = useSelector((state) => state.need.entityNeedsData);
+  console.log(entityNeeds);
 
   const needsByEntity = useMemo(() => {
-    return needList.filter(
+    return needList?.filter(
       (item) => item?.entity && entityIds.includes(item.entity.id)
     );
   }, [entityIds, needList]);
@@ -53,7 +54,7 @@ export const NeedsTable = ({ props, showOnlyTable, filterByEntity }) => {
   useEffect(() => {
     let filtered = filterByEntity ? needsByEntity : needsByUser;
     if (needTypeId) {
-      const filtered = needsByUser.filter(
+      const filtered = needsByUser?.filter(
         (item) => item.need.needTypeId === needTypeId
       );
       setFilteredData(filtered);
