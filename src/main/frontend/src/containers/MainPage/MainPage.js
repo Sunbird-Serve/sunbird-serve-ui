@@ -2,7 +2,6 @@ import "./MainPage.css";
 import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
 import SideNav from "../../components/SideNav/SideNav";
 import Header from "../../components/Header/Header";
-import Dashboard from "../../components/Dashboard/Dashboard";
 import Needs from "../../components/Needs/Needs";
 import RaiseNeed from "../../components/RaiseNeed/RaiseNeed";
 import NeedPlans from "../../components/Need Plans/NeedPlans";
@@ -15,6 +14,8 @@ import { useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress";
 import NoRoleAssigned from "../../components/NoRoleAssigned/NoRoleAssigned";
 import Registration from "../../components/Registration/Registration";
+import Dashboard from "../nAdmin/Dashboard";
+import SessionDetails from "../nAdmin/SessionDetails";
 const MainPage = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
   const [role, setRole] = useState("");
@@ -57,6 +58,9 @@ const MainPage = () => {
                   render={() => {
                     if (role === "nCoordinator") {
                       return <Redirect to="/needs" />;
+                    } else if (role === "nAdmin") {
+                      return <Redirect to="/nAdmin-dashboard" />;
+                    } else if (role) {
                     } else if (role === undefined) {
                       return <Redirect to="/no-role" />;
                     } else if (role) {
@@ -73,6 +77,11 @@ const MainPage = () => {
                 <Route path="/help" component={Help} />
                 <Route path="/no-role" component={NoRoleAssigned} />
                 <Route path="/vregistration" component={Registration} />
+                <Route path="/nAdmin-dashboard" component={Dashboard} />
+                <Route
+                  path="/nAdmin-sessionDetails"
+                  component={SessionDetails}
+                />
               </Switch>
             </div>
           </div>

@@ -64,7 +64,7 @@ function Header({ toggleSideNav, role }) {
                   backgroundColor: avatarColor,
                 }}
               >
-                {currentUser.email.slice(0, 1).toUpperCase()}
+                {currentUser?.email.slice(0, 1).toUpperCase()}
               </Avatar>
             </div>
           </button>
