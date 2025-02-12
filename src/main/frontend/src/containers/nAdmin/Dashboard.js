@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import FilterBy from "../../components/CommonComponents/FilterBy";
-import {
-  matrixData,
-  matrixDataRow2,
-} from "../../components/CommonComponents/sampleData";
 import { Box, Typography } from "@mui/material";
 import NeedsTable from "../../components/NeedsTable/NeedsTable";
 import { setFilteredData } from "../../state/filterSlice";
 import { fetchEntityNeeds } from "../../state/needSlice";
+import VolunteerNeedsNominated from "../../assets/needsNominated.png";
+import VolunteerNeedsInProgress from "../../assets/needsInProgress.png";
 import VolunteerNeedsApproved from "../../assets/needsApproved.png";
+import totalNeedsCreated from "../../assets/totalNeedsCreated.png";
 const configData = require("../../configure");
-
 const Dashboard = () => {
   const dispatch = useDispatch();
   const [filteredByEnitity, setFilteredByEnitity] = useState([]);
   const [enitities, setEnitities] = useState([]);
+  const [matrixData, setMatrixData] = useState([]);
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const userId = localStorage.getItem("userId");
@@ -25,8 +24,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (filteredByEnitity) {
-      dispatch(fetchEntityNeeds());
       dispatch(setFilteredData(filteredByEnitity));
+      dispatch(fetchEntityNeeds(filteredByEnitity));
     }
   }, [filteredByEnitity, dispatch]);
 
@@ -51,6 +50,64 @@ const Dashboard = () => {
       }
     };
     getEntityDetails();
+  }, [userId]);
+
+  useEffect(() => {
+    const getNeedsCount = async () => {
+      try {
+        const response = await axios.get(
+          `${configData.ENTITY_NEED_GET}/${userId}?page=0&size=100`
+        );
+
+        const statuses = [
+          "New",
+          "Nominated",
+          "Approved",
+          "Rejected",
+          "Assigned",
+          "Fulfilled",
+        ];
+
+        const statusCounts = response?.data?.content?.reduce((acc, item) => {
+          if (statuses.includes(item.status)) {
+            acc[item.status] = (acc[item.status] || 0) + 1;
+          }
+          return acc;
+        }, {});
+
+        const matrixData = [
+          {
+            icon: totalNeedsCreated,
+            count: response?.data?.content?.length || 0,
+            status: "Total Needs Raised",
+          },
+          {
+            icon: VolunteerNeedsInProgress,
+            count: statusCounts["Assigned"] || 0,
+
+            status: "Needs in Progress",
+          },
+          {
+            icon: VolunteerNeedsNominated,
+            count: statusCounts["Nominated"] || 0,
+            status: "Needs Nominated",
+          },
+          {
+            icon: VolunteerNeedsApproved,
+            count: statusCounts["Approved"] || 0,
+            status: "Needs Approved",
+          },
+        ];
+
+        setMatrixData(matrixData);
+      } catch (error) {
+        console.error("Error fetching needs:", error);
+      }
+    };
+
+    if (userId) {
+      getNeedsCount();
+    }
   }, [userId]);
 
   const handleFilterChange = (selectedFilters) => {
