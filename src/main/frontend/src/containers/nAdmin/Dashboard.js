@@ -68,7 +68,12 @@ const Dashboard = () => {
           "Fulfilled",
         ];
 
-        const statusCounts = response?.data?.content?.reduce((acc, item) => {
+        const filteredData =
+          response?.data?.content?.filter((item) =>
+            filteredByEnitity.includes(item.entityId)
+          ) || [];
+
+        const statusCounts = filteredData.reduce((acc, item) => {
           if (statuses.includes(item.status)) {
             acc[item.status] = (acc[item.status] || 0) + 1;
           }
@@ -78,7 +83,7 @@ const Dashboard = () => {
         const matrixData = [
           {
             icon: totalNeedsCreated,
-            count: response?.data?.content?.length || 0,
+            count: filteredData?.length || 0,
             status: "Total Needs Raised",
           },
           {
@@ -108,7 +113,7 @@ const Dashboard = () => {
     if (userId) {
       getNeedsCount();
     }
-  }, [userId]);
+  }, [userId, filteredByEnitity]);
 
   const handleFilterChange = (selectedFilters) => {
     console.log("Selected Filters:", selectedFilters);
@@ -163,7 +168,7 @@ const Dashboard = () => {
       <Box padding={"0.5rem 0"}>
         <NeedCard matrixData={matrixData} />
       </Box>
-      <NeedsTable showOnlyTable={true} filterByEntity={true} />
+      <NeedsTable filterByEntity={true} />
     </Box>
   );
 };

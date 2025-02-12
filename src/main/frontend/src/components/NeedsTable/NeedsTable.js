@@ -19,15 +19,19 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { FaSort } from "react-icons/fa";
 import Avatar from "@mui/material/Avatar";
+import CoordinatorByUserId from "../../components/CommonComponents/CoordinatorByUserId.js";
 
 const configData = require("../../configure.js");
 
-export const NeedsTable = ({ props, showOnlyTable, filterByEntity }) => {
+export const NeedsTable = ({ props, filterByEntity }) => {
   const dispatch = useDispatch();
   //get userId
   const uid = useSelector((state) => state.user.data.osid);
-  const entityIds = useSelector((state) => state.filter.filteredData);
+  const userData = useSelector((state) => state.user.data);
+  const userRole = userData.role;
+  const isNAdmin = userRole?.[0] === "nAdmin" ? true : false;
 
+  const entityIds = useSelector((state) => state.filter.filteredData);
   //get list of needs raised by user
   const needList = useSelector((state) => state.need.data);
   const needsByUser = needList.filter(
@@ -81,7 +85,6 @@ export const NeedsTable = ({ props, showOnlyTable, filterByEntity }) => {
         );
       },
     },
-    // { Header: "Co-ordinator", accessor: "" },
     {
       Header: "Timeline",
       accessor: (row) => {
@@ -95,7 +98,53 @@ export const NeedsTable = ({ props, showOnlyTable, filterByEntity }) => {
     },
     { Header: "Status", accessor: "need.status" },
   ];
-  const columns = useMemo(() => COLUMNS, []);
+
+  const nAdminCOLUMNS = [
+    { Header: "Need Name", accessor: "need.name", width: 250 },
+    { Header: "Entity", accessor: "entity.name" },
+    {
+      Header: "Volunteer",
+      accessor: "need.id",
+      Cell: ({ value }) => {
+        return (
+          <div className="vAvatars-container">
+            <VolunteerByNeedId needId={value} />
+          </div>
+        );
+      },
+    },
+    {
+      Header: "Co-ordinator Name",
+      accessor: "need.userId",
+      id: "coordinatorName",
+
+      Cell: ({ value }) => {
+        return (
+          <div className="vAvatars-container">
+            <CoordinatorByUserId userId={value} showName={true} />
+          </div>
+        );
+      },
+    },
+    {
+      Header: "Contact Number",
+      accessor: "need.userId",
+      id: "coordinatorContact",
+      Cell: ({ value }) => {
+        return (
+          <div className="vAvatars-container">
+            <CoordinatorByUserId userId={value} showContact={true} />
+          </div>
+        );
+      },
+    },
+    { Header: "Status", accessor: "need.status" },
+  ];
+
+  const columns = useMemo(
+    () => (isNAdmin ? nAdminCOLUMNS : COLUMNS),
+    [isNAdmin]
+  );
 
   function VolunteerByNeedId({ needId }) {
     const [volunteerList, setVolunteerList] = useState(null);
@@ -314,11 +363,11 @@ export const NeedsTable = ({ props, showOnlyTable, filterByEntity }) => {
           </div>
         </div>
         {/* Raise Need Button */}
-        {!showOnlyTable && <button onClick={gotoRaiseNeed}>Raise Need</button>}
+        {!isNAdmin && <button onClick={gotoRaiseNeed}>Raise Need</button>}
       </div>
 
       {/* Header on top of table: stats and filters */}
-      {!showOnlyTable && (
+      {!isNAdmin && (
         <div className="topBarNeedTable">
           {/*Counts*/}
           <div className="leftTopBarNeedTable">
