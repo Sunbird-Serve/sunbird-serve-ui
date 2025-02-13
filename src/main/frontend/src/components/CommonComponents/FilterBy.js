@@ -31,26 +31,33 @@ const FilterBy = ({ options, onFilterChange, label }) => {
     const value = event.target.value;
 
     if (value?.includes(allOption.id)) {
-      // If "All" is selected, select everything
       if (selectedValues.includes(allOption.id)) {
-        // If "All" was already selected, unselect everything
-        setSelectedValues([]);
-        onFilterChange([]);
+        if (selectedValues.length > value.length) {
+          value.shift();
+          setSelectedValues([...value]);
+          onFilterChange([...value]);
+        } else {
+          setSelectedValues([]);
+          onFilterChange([]);
+        }
       } else {
         setSelectedValues([allOption.id, ...allOptionIds]);
         onFilterChange([allOption.id, ...allOptionIds]);
       }
     } else {
-      // Remove "All" if it's selected and another option is unselected
-      const filteredValues = value.filter((id) => id !== allOption.id);
-
-      if (filteredValues?.length === allOptionIds.length) {
-        // If all options are selected manually, include "All"
-        setSelectedValues([allOption.id, ...allOptionIds]);
-        onFilterChange([allOption.id, ...allOptionIds]);
+      if (selectedValues.length > value.length) {
+        setSelectedValues([]);
+        onFilterChange([]);
       } else {
-        setSelectedValues(filteredValues);
-        onFilterChange(filteredValues);
+        const filteredValues = value.filter((id) => id !== allOption.id);
+
+        if (filteredValues?.length === allOptionIds.length) {
+          setSelectedValues([allOption.id, ...allOptionIds]);
+          onFilterChange([allOption.id, ...allOptionIds]);
+        } else {
+          setSelectedValues(filteredValues);
+          onFilterChange(filteredValues);
+        }
       }
     }
   };
@@ -73,9 +80,9 @@ const FilterBy = ({ options, onFilterChange, label }) => {
           onChange={handleChange}
           renderValue={(selected) =>
             selected
-              .filter((id) => id !== "all") // Remove "All" from display
-              .map((id) => options.find((option) => option.id === id)?.name)
-              .join(", ") || "Select Options"
+              ?.filter((id) => id !== "all") // Remove "All" from display
+              ?.map((id) => options.find((option) => option.id === id)?.name)
+              ?.join(", ") || "Select Options"
           }
         >
           <MenuItem key={allOption.id} value={allOption.id}>

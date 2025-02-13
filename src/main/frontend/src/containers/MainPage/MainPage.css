@@ -1,26 +1,23 @@
 .mainPage {
-    height: 100vh;
+  height: 100vh;
 }
 .wrapSideNav {
-    border: solid;
-    height: 100%;
-    border-color: #EBEBEB;
-    z-index: 2;
+  border: solid;
+  border-color: #ebebeb;
+  z-index: 2;
 }
-.wrapDisplay {
-    height: 100%;
-}
+
 .wrapHeader {
-    border-top:solid;
-    border-bottom:solid;
-    height: 60px;
-    border-color: #EBEBEB;
-    align-items: center;
-    justify-content: center;
-    padding: 9px 20px 9px 12px;
+  border-top: solid;
+  border-bottom: solid;
+  height: 60px;
+  border-color: #ebebeb;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 20px 9px 12px;
 }
 .wrapContent {
-    height: calc( 100% - 60px);
-    background-color: #FBFBFB;
-    border-bottom: solid #EBEBEB;
+  height: calc(100% - 60px);
+  background-color: #ffffff;
+  border-bottom: solid #ebebeb;
 }
