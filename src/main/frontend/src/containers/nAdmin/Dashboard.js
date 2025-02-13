@@ -34,7 +34,7 @@ const Dashboard = () => {
       try {
         if (userId) {
           const response = await axios.get(
-            `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=10`
+            `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
           );
           const entities =
             response.data?.content
@@ -116,7 +116,7 @@ const Dashboard = () => {
   }, [userId, filteredByEnitity]);
 
   const handleFilterChange = (selectedFilters) => {
-    console.log("Selected Filters:", selectedFilters);
+    // console.log("Selected Filters:", selectedFilters);
     setFilteredByEnitity(selectedFilters);
     dispatch(setFilteredData(selectedFilters));
   };
@@ -147,11 +147,8 @@ const Dashboard = () => {
               {userDetails?.fullname + "!"}
             </Typography>
           </Box>
-          <Typography variant="h4" color="text.primary">
-            Dashboard
-          </Typography>
           <Typography variant="body1" color="text.secondary">
-            Here's your needs analytics data
+            Here's your needs data
           </Typography>
         </Box>
       </Box>
