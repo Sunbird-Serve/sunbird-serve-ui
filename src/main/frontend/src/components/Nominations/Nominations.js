@@ -458,27 +458,32 @@ const Nominations = ({ needData, openPopup }) => {
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {page.map((row) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row.getRowProps()}
-                  onClick={() => handleRowClick(row.original)}
-                >
-                  {row.cells.map((cell) => {
-                    return (
+            {page.length > 0 ? (
+              page.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row.getRowProps()}
+                    onClick={() => handleRowClick(row.original)}
+                  >
+                    {row.cells.map((cell) => (
                       <td
                         {...cell.getCellProps()}
                         style={{ width: cell.column.width }}
                       >
-                        {" "}
                         {cell.render("Cell")}
                       </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
+                    ))}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={columns.length} style={{ textAlign: "center" }}>
+                  No Data Available!
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       )}

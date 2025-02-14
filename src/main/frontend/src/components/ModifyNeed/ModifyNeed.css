@@ -1,339 +1,353 @@
 .wrapModifyNeed {
-    border: solid;
+  border: solid;
+}
+
+.modal-content {
+  width: 180% !important;
+}
+
+.modal-body {
+  height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-dialog {
+  margin-left: 15%;
+  margin-top: 5%;
 }
 .wrapNeedNominations {
-    background-color: rgba(0,0,0,0.5);
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .btnCloseNomination {
-    width: fit-content;
-    height: 80%;
-    padding: 0px;
-    margin-top: -5px;
+  width: fit-content;
+  height: 80%;
+  padding: 0px;
+  margin-top: -5px;
 
-    @media (max-width: 600px) {
-        margin-top: -5px;
-        height: 100%;
-    }
+  @media (max-width: 600px) {
+    margin-top: -5px;
+    height: 100%;
+  }
 }
 .btnCloseNomination button {
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 20%;
-    background-color: white;
-    color: black;
-    border:none;
-    padding: 2px 6px;
-    margin: 0px 4px;
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 20%;
+  background-color: white;
+  color: black;
+  border: none;
+  padding: 2px 6px;
+  margin: 0px 4px;
 }
 .needNominations {
-    width: 70%;
-    height: 80%;
-    background-color: white;
-    overflow: scroll;
+  width: 100%;
+  height: 50%;
+  background-color: white;
+  /* overflow: scroll; */
+  padding-top: 0;
 
-    @media (max-width: 600px) {
-        width: 100%;
-        height: 100%;
-    }
+  @media (max-width: 600px) {
+    width: 100%;
+    height: 100%;
+  }
 }
 .wrapTabs {
-    height: 64px;
-    display: flex;
-    align-items: flex-end;
-    background-color: white;
-    padding: 14px 24px 0px 24px;
+  height: 64px;
+  display: flex;
+  align-items: flex-end;
+  background-color: white;
+  padding: 14px 24px 0px 24px;
 }
 .wrapTabs button {
-    height: 40px;
-    border-style: none;
-    width: fit-content;
-    font-size: 14px;
-    background-color: white;
-    padding: 0px 20px 0px 5px;
+  height: 40px;
+  border-style: none;
+  width: fit-content;
+  font-size: 14px;
+  background-color: white;
+  padding: 0px 20px 0px 5px;
 }
 .ulTab {
-    border-bottom: solid 2px #006FA2;
-    padding: 6px 2px;
-    font-weight: 600;
-    color: #006FA2;
+  border-bottom: solid 2px #006fa2;
+  padding: 6px 2px;
+  font-weight: 600;
+  color: #006fa2;
 }
 .needInfoBox {
-    border: hidden;
-    height: 80%;
-    background-color: white;
+  border: hidden;
+  height: 80%;
+  background-color: white;
 }
 .needInfoBar {
-    height: 72px;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-left: 24px;
-    border-top: solid 2px #F0EFEF;
-    border-bottom: solid 1px #F0EFEF;
+  height: 72px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: 24px;
+  border-top: solid 2px #f0efef;
+  border-bottom: solid 1px #f0efef;
 }
 
 /**/
 .needInfoForm {
-    padding: 0px 24px;
+  padding: 0px 24px;
 }
 .catergoryNInfo {
-    font-size: 14px;
-    font-weight: 600;
-    color: #A2A5A9;
-    margin: 15px 0px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #a2a5a9;
+  margin: 15px 0px;
 }
 .needIFormTop {
-    display: flex;
+  display: flex;
 
-    @media (max-width: 600px) {
-        display: block;
-    }
+  @media (max-width: 600px) {
+    display: block;
+  }
 }
 
 .needIName {
-    font-size: 20px;
-    color: #0080BC;
-    font-weight: 600;
+  font-size: 20px;
+  color: #0080bc;
+  font-weight: 600;
 }
 .needITag {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .itemNInfo {
-    padding: 5px;
-    width: 90%;
-    border-bottom: 1px solid #d3d2d2; 
-    display: flex;
-    flex-direction: column;
+  padding: 5px;
+  width: 90%;
+  border-bottom: 1px solid #d3d2d2;
+  display: flex;
+  flex-direction: column;
 }
 .itemNInfo label {
-    width: 100%;
-    font-size: 14px;
-    color: #686C73;
-    font-weight: 500;
+  width: 100%;
+  font-size: 14px;
+  color: #686c73;
+  font-weight: 500;
 }
 .itemNInfo span {
-    width: 100%;
-    border-radius: 3px;
-    font-size: 14px;
-    /* padding: 3px 10px; */
-    border: none;
-    margin-bottom: 5px;
+  width: 100%;
+  border-radius: 3px;
+  font-size: 14px;
+  /* padding: 3px 10px; */
+  border: none;
+  margin-bottom: 5px;
 }
 .itemNInfo input {
-    width: 100%;
-    font-size: 14px;
-    border: solid 0.5px;
-    border-radius: 3px;
-    padding: 2px 5px;
+  width: 100%;
+  font-size: 14px;
+  border: solid 0.5px;
+  border-radius: 3px;
+  padding: 2px 5px;
 }
 .itemNInfo select {
-    width: 100%;
-    padding: 2px;
-    border-radius: 3px;
-    font-size: 14px;
+  width: 100%;
+  padding: 2px;
+  border-radius: 3px;
+  font-size: 14px;
 }
 .infoNImage {
-    height: 135px;
-    padding: 5px 10px;
+  height: 135px;
+  padding: 5px 10px;
 }
 .infoNImage label {
-    width: 100%;
-    font-size: 14px;
-    color: #686C73;
-    margin-bottom: 5px;
+  width: 100%;
+  font-size: 14px;
+  color: #686c73;
+  margin-bottom: 5px;
 }
 .itemNInfoDescrip {
-    height: 65px;
-    margin: 0px 5px;
-    border-bottom: 1px solid #d8d4d4; 
-
+  height: 65px;
+  margin: 0px 5px;
+  border-bottom: 1px solid #d8d4d4;
 }
 .itemNInfoDescrip label {
-    width: 100%;
-    font-size: 14px;
-    color: #686C73;
-    margin-bottom: 5px;
+  width: 100%;
+  font-size: 14px;
+  color: #686c73;
+  margin-bottom: 5px;
 }
-.itemNInfoDescrip span{
-    font-size: 14px;
-    margin: 10px;;
+.itemNInfoDescrip span {
+  font-size: 14px;
+  margin: 10px;
 }
 
 .alertNomin {
-    position: absolute;
-    top: 90%;
-    left: 36%;
-    z-index: 10;
-    border: solid 1px #2F9346;
-    background-color: #4D4D4D;
-    padding: 5px 10px;
-    color: white;
-    width: fit-content;
+  position: absolute;
+  top: 90%;
+  left: 36%;
+  z-index: 10;
+  border: solid 1px #2f9346;
+  background-color: #4d4d4d;
+  padding: 5px 10px;
+  color: white;
+  width: fit-content;
 }
 .alertNomin button {
-    background-color: inherit;
-    border: none;
-    cursor: pointer;
-    color: white;
-    margin-left: 10px;
-    padding-left: 15px;
-    background-color: inherit;
-    border-left: solid 1px #5D5B5B;
+  background-color: inherit;
+  border: none;
+  cursor: pointer;
+  color: white;
+  margin-left: 10px;
+  padding-left: 15px;
+  background-color: inherit;
+  border-left: solid 1px #5d5b5b;
 }
-.needIFormBottom{
-    border-bottom: 1px solid #d8d4d4; 
+.needIFormBottom {
+  border-bottom: 1px solid #d8d4d4;
 }
 .wrap-modify-button {
-    margin-right: 50px;
-    display: flex;
-    gap: 10px;
+  margin-right: 50px;
+  display: flex;
+  gap: 10px;
 }
 .modify-button {
-    border: none;
-    background-color: #4D6280;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
+  border: none;
+  background-color: #4d6280;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
 }
 .itemDaysTime {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
-.itemDaysTime span{
-    display: flex;
-    font-size: 14px;
+.itemDaysTime span {
+  display: flex;
+  font-size: 14px;
 }
 .itemNInfo-dayNtime {
-    display: flex;
-    flex-direction: column;
-    overflow: scroll;
-    border-bottom: 1px solid #d8d4d4 ;
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+  border-bottom: 1px solid #d8d4d4;
 }
 .itemNInfo-dayNtime label {
-    font-size: 14px;
-    color: #686C73;
-    font-weight: 500;
+  font-size: 14px;
+  color: #686c73;
+  font-weight: 500;
 }
 .itemNInfo-dayNtime span {
-    border-radius: 3px;
-    font-size: 14px;
-    border: none;
-    margin-bottom: 5px;
+  border-radius: 3px;
+  font-size: 14px;
+  border: none;
+  margin-bottom: 5px;
 }
 .itemDescripInfo {
-    height: 135px;
-    padding: 5px;
-    width: 90%;
-    border-bottom: 1px solid #d3d2d2; 
-    display: flex;
-    flex-direction: column;
+  height: 135px;
+  padding: 5px;
+  width: 90%;
+  border-bottom: 1px solid #d3d2d2;
+  display: flex;
+  flex-direction: column;
 }
 .itemDescripInfo label {
-    width: 100%;
-    font-size: 14px;
-    color: #686C73;
-    font-weight: 500;
+  width: 100%;
+  font-size: 14px;
+  color: #686c73;
+  font-weight: 500;
 }
 .itemDescripInfo span {
-    width: 100%;
-    border-radius: 3px;
-    font-size: 14px;
-    /* padding: 3px 10px; */
-    border: none;
-    margin-bottom: 5px;
+  width: 100%;
+  border-radius: 3px;
+  font-size: 14px;
+  /* padding: 3px 10px; */
+  border: none;
+  margin-bottom: 5px;
 }
 .itemDateInfo {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 5px;
-    margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
 }
 .wrap-itemDateMN {
-    width: 100%;
+  width: 100%;
 }
 .itemDate-modified {
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    border-bottom: 1px solid #d3d2d2;    
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #d3d2d2;
 }
 .itemDate-modified label {
-    font-size: 14px;
-    color: #686C73;
-    font-weight: 500;
+  font-size: 14px;
+  color: #686c73;
+  font-weight: 500;
 }
 .itemDate-modified span {
-    border-radius: 3px;
-    font-size: 14px;
+  border-radius: 3px;
+  font-size: 14px;
 }
 
 .itemNInfoDate {
-    display: flex;
-    padding-bottom: 5px;
-    margin-bottom: 10px; 
-    width: 75%; 
-    gap: 20px;
+  display: flex;
+  padding-bottom: 5px;
+  margin-bottom: 10px;
+  width: 75%;
+  gap: 20px;
 
-    @media (max-width: 600px) {
-        display: block;
-    }
+  @media (max-width: 600px) {
+    display: block;
+  }
 }
 .itemNInfoDate-modify label {
-    width: 100%;
-    font-size: 14px;
-    color: #686C73;
-    margin-bottom: -3px;
+  width: 100%;
+  font-size: 14px;
+  color: #686c73;
+  margin-bottom: -3px;
 }
 .itemNInfoDate-modify span {
-    width: 98%;
-    border-radius: 3px;
-    font-size: 14px;
-    padding: 3px 10px;
+  width: 98%;
+  border-radius: 3px;
+  font-size: 14px;
+  padding: 3px 10px;
 }
 .itemNInfoDate-modify input {
-    width: 98%;
-    border-radius: 3px;
-    font-size: 14px;
-    padding: 2px 10px;
-    border: solid 1px;
+  width: 98%;
+  border-radius: 3px;
+  font-size: 14px;
+  padding: 2px 10px;
+  border: solid 1px;
 }
 .itemNInfoDate-modify select {
-    width: 98%;
-    border-radius: 3px;
-    font-size: 14px;
-    padding: 3px 10px;
+  width: 98%;
+  border-radius: 3px;
+  font-size: 14px;
+  padding: 3px 10px;
 }
 /* .itemNInfoDate-modify {
     width: 48%;
 } */
 .day-labelMN {
-    width: 120px;
-    font-size: 14px;
-    color: #1F1F1F;
-    font-weight: 600;
+  width: 120px;
+  font-size: 14px;
+  color: #1f1f1f;
+  font-weight: 600;
 }
 .time-labelMN {
-    width: 230px;
-    font-size: 14px;
-    color: #1F1F1F;
-    font-weight: 600;
+  width: 230px;
+  font-size: 14px;
+  color: #1f1f1f;
+  font-weight: 600;
 }
 .label-eventdaytimeMN {
-    display: flex;
-    gap: 50px;
-    padding: 0px;
+  display: flex;
+  gap: 50px;
+  padding: 0px;
 }
 .wrap-sessionInfo {
-    padding: 0px 15px;
+  padding: 0px 15px;
 }
