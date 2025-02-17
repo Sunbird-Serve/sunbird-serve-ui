@@ -4,16 +4,29 @@
 
 .modal-content {
   width: 180% !important;
+  @media (max-width: 721px) {
+    width: 90% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .modal-dialog {
+    margin-top: 20% !important;
+  }
 }
 
 .modal-body {
   height: 70vh;
   overflow-y: auto;
+  width: -webkit-fill-available;
 }
 
 .modal-dialog {
   margin-left: 15%;
   margin-top: 5%;
+  @media (max-width: 721px) {
+    margin-left: 10%;
+  }
 }
 .wrapNeedNominations {
   background-color: rgba(0, 0, 0, 0.5);
