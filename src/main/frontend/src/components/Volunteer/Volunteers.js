@@ -131,7 +131,7 @@ function Volunteers() {
   const [activeTab, setActiveTab] = useState("");
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    setFilter("userDetails.status", tab);
+    setFilter("status", tab);
   };
 
   const [rowData, setRowData] = useState(null);

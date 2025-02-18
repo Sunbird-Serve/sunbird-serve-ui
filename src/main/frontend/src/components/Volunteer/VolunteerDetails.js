@@ -25,12 +25,10 @@ const VolunteerDetails = (props) => {
         const response = await axios.get(
           `${configData.USER_PROFILE_BY_ID}/${props?.osid}`
         );
-        console.log("response", response.data);
         setUserProfile(response.data);
         setUserDetails(props.data);
         setUserProfileFail(false);
       } catch (error) {
-        console.log(error);
         setUserProfileFail(true);
         setOpen(true);
       }
@@ -57,7 +55,6 @@ const VolunteerDetails = (props) => {
 
   //Modify the status of volunteer on button click
   const handleVStatus = (newStatus) => {
-    console.log(userDetails);
     const userToPost = { ...userDetails };
     delete userToPost?.osid;
     delete userToPost?.osCreatedAt;
@@ -66,12 +63,9 @@ const VolunteerDetails = (props) => {
     delete userToPost?.osUpdatedAt;
     delete userToPost?.osUpdatedBy;
     userToPost.status = newStatus;
-    console.log(userDetails?.osid);
-    console.log(userToPost);
     axios
       .put(`${configData.USER_GET}/${userDetails?.osid}`, userToPost)
       .then((response) => {
-        console.log("API response:", response.data);
         dispatch(fetchUserList());
       })
       .catch((error) => {
@@ -87,7 +81,6 @@ const VolunteerDetails = (props) => {
         `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${userDetails?.osid}`
       )
       .then((response) => {
-        console.log(response.data);
         setVfulfils(response.data);
       })
       .catch((error) => {
@@ -106,7 +99,6 @@ const VolunteerDetails = (props) => {
       .then((response) => {
         setDeliverables(response.data.needDeliverable);
         setInParas(response.data.inputParameters);
-        console.log(response.data);
       })
       .catch((error) => {
         console.error(error);
@@ -142,12 +134,10 @@ const VolunteerDetails = (props) => {
 
   const [editIndex, setEditIndex] = useState("");
   const handleEditDeliverable = (item, index) => {
-    console.log(item);
     setEditIndex(index);
   };
   const handleDoneDeliverable = (index) => {
     setEditIndex("");
-    console.log(formData[index].deliverableId);
     console.log({
       inputUrl: formData[index].inputUrl,
       softwarePlatform: formData[index].softwarePlatform,
@@ -294,7 +284,7 @@ const VolunteerDetails = (props) => {
                     <div className="vInfo-item">
                       <div className="vInfo-key">Language</div>
                       <div className="vInfo-value">
-                        {userProfile?.userPreference?.language}
+                        {userProfile?.userPreference?.language.join(", ")}
                       </div>
                     </div>
                   </div>
@@ -332,7 +322,7 @@ const VolunteerDetails = (props) => {
                     <div className="vInfo-item">
                       <div className="vInfo-key">Interest Area</div>
                       <div className="vInfo-value">
-                        {userProfile?.userPreference?.interestArea}
+                        {userProfile?.userPreference?.interestArea.join(", ")}
                       </div>
                     </div>
                   </div>
@@ -362,6 +352,14 @@ const VolunteerDetails = (props) => {
                   {userDetails?.status === "Register" && (
                     <button onClick={() => handleVStatus("Registered")}>
                       Register
+                    </button>
+                  )}
+                  {(userDetails?.status === "Registered" ||
+                    userDetails?.status === "Recommended" ||
+                    userDetails?.status === "OnHold" ||
+                    userDetails?.status === "OnBoarded") && (
+                    <button onClick={() => handleVStatus("Inactive")}>
+                      Mark Inactive
                     </button>
                   )}
                 </div>
