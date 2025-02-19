@@ -35,10 +35,11 @@ function Volunteers() {
 
   const [userDetailsList, setUserDetailsList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [statusUpdated, setStatusUpdated] = useState(false);
 
   useEffect(() => {
     setUserDetailsList(volunteerList);
-  }, [volunteerList]);
+  }, [volunteerList, statusUpdated]);
 
   useEffect(() => {
     setLoading(userDetailsList.length === 0);
@@ -71,7 +72,7 @@ function Volunteers() {
       userDetailsList &&
         userDetailsList.filter((item) => item?.status === "OnBoarded")
     );
-  }, [userDetailsList]);
+  }, [userDetailsList, statusUpdated]);
 
   const COLUMNS = [
     { Header: "Name", accessor: "identityDetails.fullname" },
@@ -139,6 +140,10 @@ function Volunteers() {
   const handleRowClick = (rowData) => {
     setRowData(rowData);
     setShowPopup(!showPopup);
+  };
+
+  const handleStatusUpdate = () => {
+    setStatusUpdated((prev) => !prev);
   };
 
   return (
@@ -304,6 +309,7 @@ function Volunteers() {
               handleClose={handleRowClick}
               data={rowData}
               osid={rowData.osid}
+              onStatusUpdate={handleStatusUpdate}
             />
           )}
         </div>

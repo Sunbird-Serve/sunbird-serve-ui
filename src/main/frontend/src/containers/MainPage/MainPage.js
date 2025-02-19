@@ -60,6 +60,8 @@ const MainPage = () => {
                       return <Redirect to="/needs" />;
                     } else if (role === "nAdmin") {
                       return <Redirect to="/nAdmin-dashboard" />;
+                    } else if (role === "vCoordinator") {
+                      return <Redirect to="/volunteers" />;
                     } else if (role) {
                     } else if (role === undefined) {
                       return <Redirect to="/no-role" />;
