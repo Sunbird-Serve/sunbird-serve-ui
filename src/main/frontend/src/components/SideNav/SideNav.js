@@ -9,6 +9,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import BusinessIcon from "@mui/icons-material/Business";
 import { useSelector } from "react-redux";
 
 function SideNav() {
@@ -82,6 +83,23 @@ function SideNav() {
               <CalendarMonthIcon />
             </i>
             <span>Session Details</span>
+          </NavLink>
+        </div>
+      )}
+
+      {userRole && userRole.includes("vAdmin") && (
+        <div className="navMenu">
+          <NavLink to="/volunteer-list" exact className="sideNavItem row">
+            <i>
+              <VolunteerActivismOutlinedIcon />
+            </i>
+            <span>Volunteers</span>
+          </NavLink>
+          <NavLink to="/agencies" exact className="sideNavItem row">
+            <i>
+              <BusinessIcon />
+            </i>
+            <span>Agency</span>
           </NavLink>
         </div>
       )}
