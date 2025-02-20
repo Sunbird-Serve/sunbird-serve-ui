@@ -12,12 +12,13 @@ import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
 const configData = require("../../configure.js");
-const VolunteerDetails = (props) => {
+const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
   const dispatch = useDispatch();
   const [userProfileFail, setUserProfileFail] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [open, setOpen] = useState(false);
+  const [volunteerStatusUpdated, setVolunteerStatusUpdated] = useState(false);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -54,7 +55,7 @@ const VolunteerDetails = (props) => {
   };
 
   //Modify the status of volunteer on button click
-  const handleVStatus = (newStatus) => {
+  const handleVStatus = async (newStatus) => {
     const userToPost = { ...userDetails };
     delete userToPost?.osid;
     delete userToPost?.osCreatedAt;
@@ -63,10 +64,13 @@ const VolunteerDetails = (props) => {
     delete userToPost?.osUpdatedAt;
     delete userToPost?.osUpdatedBy;
     userToPost.status = newStatus;
-    axios
+    await axios
       .put(`${configData.USER_GET}/${userDetails?.osid}`, userToPost)
       .then((response) => {
         dispatch(fetchUserList());
+        setVolunteerStatusUpdated(true);
+        onStatusUpdate();
+        if (handleClose) handleClose();
       })
       .catch((error) => {
         console.error("API error:", error);
@@ -191,20 +195,39 @@ const VolunteerDetails = (props) => {
       });
   };
 
-  const handleClose = () => {
+  const handleSnackBarClose = () => {
     setOpen(false);
+    setVolunteerStatusUpdated(false);
   };
 
   return (
     <>
-      <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+      <Snackbar
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleSnackBarClose}
+      >
         <Alert
-          onClose={handleClose}
+          onClose={handleSnackBarClose}
           severity="error"
           variant="filled"
           sx={{ width: "100%" }}
         >
           User Profile does not exist for this user, kindly contact Admin!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={volunteerStatusUpdated}
+        autoHideDuration={6000}
+        onClose={handleSnackBarClose}
+      >
+        <Alert
+          onClose={handleSnackBarClose}
+          severity="success"
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          Volunteer Status updated successfully!
         </Alert>
       </Snackbar>
       {!userProfileFail && userProfile && userDetails && (
