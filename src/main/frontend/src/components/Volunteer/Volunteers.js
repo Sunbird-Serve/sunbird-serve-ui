@@ -28,6 +28,9 @@ const configData = require("../../configure.js");
 
 function Volunteers() {
   const userList = useSelector((state) => state.userlist.data);
+  const userData = useSelector((state) => state.user.data);
+  const userRole = userData.role;
+  const isVAdmin = userRole?.[0] === "vAdmin" ? true : false;
 
   const volunteerList = useMemo(() => {
     return userList.filter((item) => item.role.includes("Volunteer"));
@@ -93,6 +96,12 @@ function Volunteers() {
     // { Header: 'Onboard Status', accessor:'nominationStatus' }
   ];
 
+  if (isVAdmin) {
+    COLUMNS.push({
+      Header: "Agency Name",
+      accessor: "",
+    });
+  }
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => userDetailsList, [userDetailsList]);
 

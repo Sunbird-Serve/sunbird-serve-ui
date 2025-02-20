@@ -31,6 +31,7 @@ const configData = {
   ENTITY_DETAILS_GET: `${baseDomainNeed}/api/v1/serve-need/entityDetails`,
   ENTITY_NEEDS: `${baseDomainNeed}/api/v1/serve-need/need/entities`,
   ENTITY_NEED_GET: `${baseDomainNeed}/api/v1/serve-need/needs`,
+  REGISTRATION_DOMAIN: `${baseDomainVolunteering}`,
 };
 
 module.exports = configData;
