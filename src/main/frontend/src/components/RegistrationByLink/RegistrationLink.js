@@ -1,7 +1,7 @@
 import { Box, Typography, IconButton, Tooltip } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useState } from "react";
-import Registration from "../../components/Registration/Registration";
+import Registration from "../Registration/Registration";
 import { Redirect, useHistory } from "react-router-dom";
 const configData = require("../../configure");
 

@@ -1,9 +1,30 @@
 import React from "react";
 import Volunteers from "../../components/Volunteer/Volunteers";
 import { Box, Typography } from "@mui/material";
-
+import FilterBy from "../../components/CommonComponents/FilterBy";
 const VolunteerList = () => {
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+
+  const agencies = [
+    {
+      id: "01",
+      name: "Tekdi",
+    },
+    {
+      id: "02",
+      name: "e-Vidyaloka",
+    },
+    {
+      id: "03",
+      name: "ekStep",
+    },
+  ];
+
+  const handleFilterChange = (selectedFilters) => {
+    console.log("Selected Filters:", selectedFilters);
+    // setFilteredByEnitity(selectedFilters);
+    // dispatch(setFilteredData(selectedFilters));
+  };
 
   return (
     <Box padding={"1rem"}>
@@ -22,6 +43,14 @@ const VolunteerList = () => {
             {userDetails?.fullname + "!"}
           </Typography>
         </Box>
+      </Box>
+
+      <Box display={"flex"} justifyContent={"center"} paddingLeft={"10rem"}>
+        <FilterBy
+          label={"Select Agency"}
+          options={agencies}
+          onFilterChange={handleFilterChange}
+        />
       </Box>
       <Volunteers />
     </Box>

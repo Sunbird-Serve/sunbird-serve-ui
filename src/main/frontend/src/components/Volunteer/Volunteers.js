@@ -24,6 +24,9 @@ import axios from "axios";
 import SearchIcon from "@mui/icons-material/Search";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Loader from "../CommonComponents/Loader.js";
+import { Button } from "@mui/material";
+import AgencyToVolunteer from "../AssignAgency/AgencyToVolunteer.js";
+import { Box } from "@material-ui/core";
 const configData = require("../../configure.js");
 
 function Volunteers() {
@@ -39,6 +42,7 @@ function Volunteers() {
   const [userDetailsList, setUserDetailsList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusUpdated, setStatusUpdated] = useState(false);
+  const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
 
   useEffect(() => {
     setUserDetailsList(volunteerList);
@@ -77,6 +81,11 @@ function Volunteers() {
     );
   }, [userDetailsList, statusUpdated]);
 
+  const handleAssignAgency = () => {
+    console.log("assignAgency");
+    setShowAssignAgencyPopup(true);
+  };
+
   const COLUMNS = [
     { Header: "Name", accessor: "identityDetails.fullname" },
     { Header: "Phone", accessor: "contactDetails.mobile" },
@@ -98,8 +107,29 @@ function Volunteers() {
 
   if (isVAdmin) {
     COLUMNS.push({
-      Header: "Agency Name",
-      accessor: "",
+      Header: "Action",
+      accessor: "agencyId",
+
+      Cell: ({ value }) => {
+        let isDisabled = false;
+        if (value == "string") {
+          isDisabled = true;
+        }
+        return (
+          <div className="vAvatars-container">
+            <Button
+              variant="contained"
+              size="small"
+              color="success"
+              sx={{ textTransform: "none", padding: "1px 8px" }}
+              disabled={isDisabled}
+              onClick={handleAssignAgency}
+            >
+              Assign Agency
+            </Button>
+          </div>
+        );
+      },
     });
   }
   const columns = useMemo(() => COLUMNS, []);
@@ -153,6 +183,10 @@ function Volunteers() {
 
   const handleStatusUpdate = () => {
     setStatusUpdated((prev) => !prev);
+  };
+
+  const handlePopupClose = () => {
+    setShowAssignAgencyPopup(false);
   };
 
   return (
@@ -320,6 +354,10 @@ function Volunteers() {
               osid={rowData.osid}
               onStatusUpdate={handleStatusUpdate}
             />
+          )}
+
+          {showAssignAgencyPopup && (
+            <AgencyToVolunteer handlePopupClose={handlePopupClose} />
           )}
         </div>
       )}

@@ -18,7 +18,7 @@ const vcoordinators = [
   { id: 3, name: "Michael Johnson" },
 ];
 
-export default function AssignAgency() {
+export default function AssignAgency({ label }) {
   const [selectedAgency, setSelectedAgency] = useState("");
   const [loading, setLoading] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -30,7 +30,7 @@ export default function AssignAgency() {
 
   const handleSubmit = async () => {
     if (!selectedAgency) {
-      setError("Please select an agency.");
+      setError(`Please ${label}.`);
       return;
     }
 
@@ -66,12 +66,8 @@ export default function AssignAgency() {
       </Typography>
 
       <FormControl fullWidth sx={{ mb: 2 }}>
-        <InputLabel>Select Coordinator</InputLabel>
-        <Select
-          value={selectedAgency}
-          onChange={handleChange}
-          label="Select Coordinator"
-        >
+        <InputLabel>{label}</InputLabel>
+        <Select value={selectedAgency} onChange={handleChange} label={label}>
           {vcoordinators.map((coordinator) => (
             <MenuItem key={coordinator.id} value={coordinator.id}>
               {coordinator.name}
@@ -102,7 +98,9 @@ export default function AssignAgency() {
         autoHideDuration={3000}
         onClose={() => setOpenSnackbar(false)}
       >
-        <Alert severity="success">Agency assigned successfully!</Alert>
+        <Alert severity="success" variant="filled">
+          Agency assigned successfully!
+        </Alert>
       </Snackbar>
     </Box>
   );
