@@ -16,10 +16,12 @@ import { FaSort } from "react-icons/fa";
 import VCoordinatorDetails from "./VCoordinatorDetails";
 import { useSelector } from "react-redux";
 import { data } from "./data";
-
+import AddAgency from "./AddAgency";
+import Registration from "../../components/Registration/Registration";
 const Agency = () => {
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [showAddAgencyPopup, setshowAddAgencyPopup] = useState(false);
   // const userList = useSelector((state) => state.userlist.data);
   // const vCoordinatorList = useMemo(() => {
   //   return userList.filter((item) => item.role.includes("vCoordinator"));
@@ -89,6 +91,10 @@ const Agency = () => {
     setShowPopup(!showPopup);
   };
 
+  const handleAddAgency = () => {
+    setshowAddAgencyPopup(!showAddAgencyPopup);
+  };
+
   return (
     <Box padding={"1rem"}>
       <Box
@@ -104,7 +110,11 @@ const Agency = () => {
           </Typography>
         </Box>
         <Box marginRight={"2rem"}>
-          <Button variant="contained" sx={{ textTransform: "none" }}>
+          <Button
+            variant="contained"
+            sx={{ textTransform: "none" }}
+            onClick={handleAddAgency}
+          >
             {" "}
             <AddIcon /> Add Agency
           </Button>
@@ -165,6 +175,8 @@ const Agency = () => {
           // onStatusUpdate={handleStatusUpdate}
         />
       )}
+      <Registration />
+      {showAddAgencyPopup && <AddAgency handlePopupClose={handleAddAgency} />}
     </Box>
   );
 };
