@@ -15,8 +15,8 @@ import {
 } from "react-table";
 import { FaSort } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import RegistrationSection from "./RegistrationLink";
-import AssignAgency from "./AssignAgency";
+import RegistrationSection from "../../components/RegistrationByLink/RegistrationLink";
+import AssignAgency from "../../components/AssignAgency/AgencyToVAdmin";
 
 const VCoordinatorDetails = ({ handlePopupClose }) => {
   const [value, setValue] = useState("1");
@@ -153,7 +153,7 @@ const VCoordinatorDetails = ({ handlePopupClose }) => {
           </TabPanel>
           <TabPanel value="2">
             <Box>
-              <AssignAgency />
+              <AssignAgency label={"select Co-ordinator"} />
             </Box>
           </TabPanel>
         </TabContext>
