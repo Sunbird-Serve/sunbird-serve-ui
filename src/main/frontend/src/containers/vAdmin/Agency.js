@@ -17,7 +17,6 @@ import VCoordinatorDetails from "./VCoordinatorDetails";
 import { useSelector } from "react-redux";
 import { data } from "./data";
 import AddAgency from "./AddAgency";
-import Registration from "../../components/Registration/Registration";
 const Agency = () => {
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -175,7 +174,6 @@ const Agency = () => {
           // onStatusUpdate={handleStatusUpdate}
         />
       )}
-      <Registration />
       {showAddAgencyPopup && <AddAgency handlePopupClose={handleAddAgency} />}
     </Box>
   );
