@@ -1,28 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Volunteers from "../../components/Volunteer/Volunteers";
 import { Box, Typography } from "@mui/material";
 import FilterBy from "../../components/CommonComponents/FilterBy";
+import axios from "axios";
+import configData from "../../configure";
 const VolunteerList = () => {
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+  const [agencies, setAgencies] = useState([]);
+  const [filteredByAgency, setFilteredByAgency] = useState([]);
 
-  const agencies = [
-    {
-      id: "01",
-      name: "Tekdi",
-    },
-    {
-      id: "02",
-      name: "e-Vidyaloka",
-    },
-    {
-      id: "03",
-      name: "ekStep",
-    },
-  ];
+  useEffect(() => {
+    const getAgencies = async () => {
+      try {
+        const response = await axios.get(
+          `${configData.SERVE_VOLUNTEERING}/agency/list`
+        );
+        const agencies =
+          response.data
+            // ?.filter((agency) => agency.status === "Active")
+            ?.map((agency) => ({
+              id: agency.osid,
+              name: agency.name,
+            })) || [];
+        console.log(agencies);
+        setAgencies(agencies);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAgencies();
+  }, []);
 
   const handleFilterChange = (selectedFilters) => {
     console.log("Selected Filters:", selectedFilters);
-    // setFilteredByEnitity(selectedFilters);
+    setFilteredByAgency(selectedFilters);
     // dispatch(setFilteredData(selectedFilters));
   };
 
@@ -52,7 +63,7 @@ const VolunteerList = () => {
           onFilterChange={handleFilterChange}
         />
       </Box>
-      <Volunteers />
+      <Volunteers agencylist={agencies} filterByAgencies={filteredByAgency} />
     </Box>
   );
 };

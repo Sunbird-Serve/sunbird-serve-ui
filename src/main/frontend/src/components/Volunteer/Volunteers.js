@@ -29,7 +29,7 @@ import AgencyToVolunteer from "../AssignAgency/AgencyToVolunteer.js";
 import { Box } from "@material-ui/core";
 const configData = require("../../configure.js");
 
-function Volunteers() {
+function Volunteers({ agencies, filterByAgencies }) {
   const userList = useSelector((state) => state.userlist.data);
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
@@ -45,8 +45,19 @@ function Volunteers() {
   const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
 
   useEffect(() => {
+    // if (isVAdmin) {
+    //   console.log("filterByAgencies", filterByAgencies);
+
+    //   const validAgencies = filterByAgencies.filter((id) => id !== "all");
+    //   const filteredUsers = volunteerList.filter((volunteer) =>
+    //     validAgencies.includes(volunteer.agencyId)
+    //   );
+    //   console.log("filteredUsers", filteredUsers);
+    //   setUserDetailsList(filteredUsers);
+    // } else {
     setUserDetailsList(volunteerList);
-  }, [volunteerList, statusUpdated]);
+    // }
+  }, [volunteerList, statusUpdated, filterByAgencies]);
 
   useEffect(() => {
     setLoading(userDetailsList.length === 0);

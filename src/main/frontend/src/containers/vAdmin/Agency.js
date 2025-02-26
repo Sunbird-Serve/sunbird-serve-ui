@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import VolunteerNeedsInProgress from "../../assets/needsInProgress.png";
@@ -15,12 +15,15 @@ import {
 import { FaSort } from "react-icons/fa";
 import VCoordinatorDetails from "./VCoordinatorDetails";
 import { useSelector } from "react-redux";
-import { data } from "./data";
 import AddAgency from "../../components/AssignAgency/AddAgency";
+import axios from "axios";
+import configData from "../../configure";
 const Agency = () => {
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [showAddAgencyPopup, setshowAddAgencyPopup] = useState(false);
+  const [agencies, setAgencies] = useState([]);
+
   // const userList = useSelector((state) => state.userlist.data);
   // const vCoordinatorList = useMemo(() => {
   //   return userList.filter((item) => item.role.includes("vCoordinator"));
@@ -46,16 +49,42 @@ const Agency = () => {
     },
   ];
 
+  useEffect(() => {
+    const getAgencies = async () => {
+      try {
+        const response = await axios.get(
+          `${configData.SERVE_VOLUNTEERING}/agency/list`
+        );
+        const agencies = response?.data;
+        console.log(agencies);
+        setAgencies(agencies);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAgencies();
+  }, []);
+
   const COLUMNS = [
     { Header: "Agency Name", accessor: "name" },
-    { Header: "Email ID", accessor: "email" },
-    { Header: "Phone", accessor: "mobile" },
-    { Header: "City", accessor: "city" },
-    { Header: "Status", accessor: "status" },
+    { Header: "Email ID", accessor: "contactDetails.email" },
+    { Header: "Phone", accessor: "contactDetails.mobile" },
+    { Header: "City", accessor: "contactDetails.address.village" },
+    {
+      Header: "Website",
+      accessor: "website",
+      Cell: ({ value }) => {
+        return (
+          <a href={value} target="blank">
+            {value}
+          </a>
+        );
+      },
+    },
   ];
 
   const columns = useMemo(() => COLUMNS, []);
-  // const data = useMemo(() => vCoordinatorList, [vCoordinatorList]);
+  const data = useMemo(() => agencies, [agencies]);
 
   const {
     getTableProps,
