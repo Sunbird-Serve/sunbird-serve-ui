@@ -14,7 +14,7 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import ListIcon from "@mui/icons-material/List";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { FaSort } from "react-icons/fa";
 import VolunteerDetails from "./VolunteerDetails";
 import VolunteersList from "./Volunteers";
@@ -22,14 +22,20 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import axios from "axios";
 import SearchIcon from "@mui/icons-material/Search";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Loader from "../CommonComponents/Loader.js";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import AgencyToVolunteer from "../AssignAgency/AgencyToVolunteer.js";
-import { Box } from "@material-ui/core";
+import { fetchUserList } from "../../state/userListSlice";
 const configData = require("../../configure.js");
 
-function Volunteers({ agencies, filterByAgencies }) {
+function Volunteers({ agencylist, filterByAgencies }) {
+  const [userDetailsList, setUserDetailsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [statusUpdated, setStatusUpdated] = useState(false);
+  const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
+  const [agencyAssignSuccess, setAgencyAssignSuccess] = useState(false);
+
+  const dispatch = useDispatch();
   const userList = useSelector((state) => state.userlist.data);
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
@@ -39,25 +45,23 @@ function Volunteers({ agencies, filterByAgencies }) {
     return userList.filter((item) => item.role.includes("Volunteer"));
   }, [userList]);
 
-  const [userDetailsList, setUserDetailsList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [statusUpdated, setStatusUpdated] = useState(false);
-  const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
+  useEffect(() => {
+    dispatch(fetchUserList()); // Replace with your actual Redux action
+  }, [agencyAssignSuccess, dispatch]);
 
   useEffect(() => {
-    // if (isVAdmin) {
-    //   console.log("filterByAgencies", filterByAgencies);
-
-    //   const validAgencies = filterByAgencies.filter((id) => id !== "all");
-    //   const filteredUsers = volunteerList.filter((volunteer) =>
-    //     validAgencies.includes(volunteer.agencyId)
-    //   );
-    //   console.log("filteredUsers", filteredUsers);
-    //   setUserDetailsList(filteredUsers);
-    // } else {
-    setUserDetailsList(volunteerList);
-    // }
-  }, [volunteerList, statusUpdated, filterByAgencies]);
+    if (isVAdmin) {
+      const validAgencies = filterByAgencies.filter((id) => id !== "all");
+      const filteredUsers = filterByAgencies.includes("all")
+        ? volunteerList
+        : volunteerList.filter((volunteer) =>
+            validAgencies.includes(volunteer.agencyId)
+          );
+      setUserDetailsList(filteredUsers);
+    } else {
+      setUserDetailsList(volunteerList);
+    }
+  }, [volunteerList, statusUpdated, filterByAgencies, agencyAssignSuccess]);
 
   useEffect(() => {
     setLoading(userDetailsList.length === 0);
@@ -92,8 +96,8 @@ function Volunteers({ agencies, filterByAgencies }) {
     );
   }, [userDetailsList, statusUpdated]);
 
-  const handleAssignAgency = () => {
-    console.log("assignAgency");
+  const handleAssignAgency = (rowData) => {
+    setRowData(rowData);
     setShowAssignAgencyPopup(true);
   };
 
@@ -118,28 +122,36 @@ function Volunteers({ agencies, filterByAgencies }) {
 
   if (isVAdmin) {
     COLUMNS.push({
-      Header: "Action",
+      Header: "Agency Name",
       accessor: "agencyId",
 
-      Cell: ({ value }) => {
-        let isDisabled = false;
-        if (value == "string") {
-          isDisabled = true;
-        }
-        return (
-          <div className="vAvatars-container">
-            <Button
-              variant="contained"
-              size="small"
-              color="success"
-              sx={{ textTransform: "none", padding: "1px 8px" }}
-              disabled={isDisabled}
-              onClick={handleAssignAgency}
-            >
-              Assign Agency
-            </Button>
-          </div>
+      Cell: ({ row }) => {
+        const { original } = row;
+
+        const agency = agencylist.find(
+          (agency) => agency.id === original.agencyId
         );
+
+        if (!agency) {
+          return (
+            <div className="vAvatars-container">
+              <Button
+                variant="contained"
+                size="small"
+                color="success"
+                sx={{ textTransform: "none", padding: "1px 8px" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAssignAgency(original);
+                }}
+              >
+                Assign Agency
+              </Button>
+            </div>
+          );
+        }
+
+        return <Box>{agency.name}</Box>;
       },
     });
   }
@@ -198,6 +210,10 @@ function Volunteers({ agencies, filterByAgencies }) {
 
   const handlePopupClose = () => {
     setShowAssignAgencyPopup(false);
+  };
+
+  const handleAgencyAssignSuccess = () => {
+    setAgencyAssignSuccess((prev) => !prev);
   };
 
   return (
@@ -362,13 +378,18 @@ function Volunteers({ agencies, filterByAgencies }) {
             <VolunteerDetails
               handleClose={handleRowClick}
               data={rowData}
-              osid={rowData.osid}
+              osid={rowData?.osid}
               onStatusUpdate={handleStatusUpdate}
             />
           )}
 
           {showAssignAgencyPopup && (
-            <AgencyToVolunteer handlePopupClose={handlePopupClose} />
+            <AgencyToVolunteer
+              handlePopupClose={handlePopupClose}
+              userId={rowData?.osid}
+              agencylist={agencylist}
+              agencyAssignSuccess={handleAgencyAssignSuccess}
+            />
           )}
         </div>
       )}

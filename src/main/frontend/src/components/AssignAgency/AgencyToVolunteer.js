@@ -8,7 +8,12 @@ import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
 
-const AgencyToVolunteer = ({ handlePopupClose }) => {
+const AgencyToVolunteer = ({
+  handlePopupClose,
+  userId,
+  agencylist,
+  agencyAssignSuccess,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // Detects mobile screens
 
@@ -17,12 +22,19 @@ const AgencyToVolunteer = ({ handlePopupClose }) => {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: isMobile ? "70%" : "400px", // 90% width on mobile, 400px on larger screens
+    width: isMobile ? "70%" : "400px",
     maxWidth: "500px",
     bgcolor: "background.paper",
     boxShadow: 24,
-    borderRadius: "12px", // More rounded for better UI
-    p: isMobile ? 2 : 3, // Less padding on mobile
+    borderRadius: "12px",
+    p: isMobile ? 2 : 3,
+  };
+
+  const handleAgencyAssignSuccess = () => {
+    setTimeout(() => {
+      handlePopupClose();
+      agencyAssignSuccess();
+    }, 1000);
   };
 
   return (
@@ -52,7 +64,7 @@ const AgencyToVolunteer = ({ handlePopupClose }) => {
           variant="h6"
           component="h2"
           textAlign="center"
-          fontSize={isMobile ? "1rem" : "1.25rem"} // Smaller text on mobile
+          fontSize={isMobile ? "1rem" : "1.25rem"}
         >
           Assign Agency to Volunteer
         </Typography>
@@ -64,7 +76,12 @@ const AgencyToVolunteer = ({ handlePopupClose }) => {
           alignItems="center"
           mt={isMobile ? 1 : 2}
         >
-          <AssignAgency label="Select Agency" />
+          <AssignAgency
+            label="Select Agency"
+            userId={userId}
+            agencylist={agencylist}
+            onAgencyAssignSuccess={handleAgencyAssignSuccess}
+          />
         </Box>
       </Box>
     </Modal>

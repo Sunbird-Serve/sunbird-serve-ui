@@ -56,7 +56,7 @@ const VolunteerList = () => {
         </Box>
       </Box>
 
-      <Box display={"flex"} justifyContent={"center"} paddingLeft={"10rem"}>
+      <Box display={"flex"} justifyContent={"start"} padding={"1rem"}>
         <FilterBy
           label={"Select Agency"}
           options={agencies}
