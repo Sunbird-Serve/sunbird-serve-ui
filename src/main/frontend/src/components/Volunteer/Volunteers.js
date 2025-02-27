@@ -23,7 +23,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import axios from "axios";
 import SearchIcon from "@mui/icons-material/Search";
 import Loader from "../CommonComponents/Loader.js";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import AgencyToVolunteer from "../AssignAgency/AgencyToVolunteer.js";
 import { fetchUserList } from "../../state/userListSlice";
 const configData = require("../../configure.js");
@@ -50,18 +50,17 @@ function Volunteers({ agencylist, filterByAgencies }) {
   }, [agencyAssignSuccess, dispatch]);
 
   useEffect(() => {
-    // if (isVAdmin) {
-    //   console.log("filterByAgencies", filterByAgencies);
-
-    //   const validAgencies = filterByAgencies.filter((id) => id !== "all");
-    //   const filteredUsers = volunteerList.filter((volunteer) =>
-    //     validAgencies.includes(volunteer.agencyId)
-    //   );
-    //   console.log("filteredUsers", filteredUsers);
-    //   setUserDetailsList(filteredUsers);
-    // } else {
-    setUserDetailsList(volunteerList);
-    // }
+    if (isVAdmin) {
+      const validAgencies = filterByAgencies.filter((id) => id !== "all");
+      const filteredUsers = filterByAgencies.includes("all")
+        ? volunteerList
+        : volunteerList.filter((volunteer) =>
+            validAgencies.includes(volunteer.agencyId)
+          );
+      setUserDetailsList(filteredUsers);
+    } else {
+      setUserDetailsList(volunteerList);
+    }
   }, [volunteerList, statusUpdated, filterByAgencies, agencyAssignSuccess]);
 
   useEffect(() => {
@@ -97,8 +96,8 @@ function Volunteers({ agencylist, filterByAgencies }) {
     );
   }, [userDetailsList, statusUpdated]);
 
-  const handleAssignAgency = () => {
-    console.log("assignAgency");
+  const handleAssignAgency = (rowData) => {
+    setRowData(rowData);
     setShowAssignAgencyPopup(true);
   };
 
@@ -123,31 +122,36 @@ function Volunteers({ agencylist, filterByAgencies }) {
 
   if (isVAdmin) {
     COLUMNS.push({
-      Header: "Action",
+      Header: "Agency Name",
       accessor: "agencyId",
 
-      Cell: ({ value }) => {
-        let isDisabled = true;
-        if (value === "") {
-          isDisabled = false;
-        }
-        return (
-          <div className="vAvatars-container">
-            <Button
-              variant="contained"
-              size="small"
-              color="success"
-              sx={{ textTransform: "none", padding: "1px 8px" }}
-              disabled={isDisabled}
-              onClick={(e) => {
-                e.stopPropagation(); // Prevents the row click event
-                handleAssignAgency();
-              }}
-            >
-              Assign Agency
-            </Button>
-          </div>
+      Cell: ({ row }) => {
+        const { original } = row;
+
+        const agency = agencylist.find(
+          (agency) => agency.id === original.agencyId
         );
+
+        if (!agency) {
+          return (
+            <div className="vAvatars-container">
+              <Button
+                variant="contained"
+                size="small"
+                color="success"
+                sx={{ textTransform: "none", padding: "1px 8px" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleAssignAgency(original);
+                }}
+              >
+                Assign Agency
+              </Button>
+            </div>
+          );
+        }
+
+        return <Box>{agency.name}</Box>;
       },
     });
   }
@@ -374,7 +378,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
             <VolunteerDetails
               handleClose={handleRowClick}
               data={rowData}
-              osid={rowData.osid}
+              osid={rowData?.osid}
               onStatusUpdate={handleStatusUpdate}
             />
           )}
@@ -382,7 +386,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
           {showAssignAgencyPopup && (
             <AgencyToVolunteer
               handlePopupClose={handlePopupClose}
-              userId={rowData.osid}
+              userId={rowData?.osid}
               agencylist={agencylist}
               agencyAssignSuccess={handleAgencyAssignSuccess}
             />
