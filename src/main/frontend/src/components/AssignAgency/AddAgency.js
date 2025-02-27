@@ -42,7 +42,10 @@ const schema = yup.object().shape({
   state: yup.string().required("State is required"),
   country: yup.string().required("Country is required"),
   pincode: yup.string().required("Pincode is required"),
-  website: yup.string().url("Enter a valid URL"),
+  website: yup
+    .string()
+    .url("Enter a valid URL")
+    .required("Website is required"),
 });
 
 const AddAgency = ({ handlePopupClose, onAgencyAdded }) => {
@@ -240,7 +243,7 @@ const AddAgency = ({ handlePopupClose, onAgencyAdded }) => {
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="Website (Optional)"
+                    label="Website"
                     fullWidth
                     margin="normal"
                     error={!!errors.website}
