@@ -91,6 +91,10 @@ const MainPage = () => {
                   path="/nAdmin-sessionDetails"
                   component={SessionDetails}
                 />
+                <Route
+                  path="/volunteer/:id/vregistration"
+                  element={<Registration />}
+                />
               </Switch>
             </div>
           </div>

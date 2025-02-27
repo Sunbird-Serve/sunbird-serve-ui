@@ -23,6 +23,7 @@ const Agency = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [showAddAgencyPopup, setshowAddAgencyPopup] = useState(false);
   const [agencies, setAgencies] = useState([]);
+  const [updateAgencyList, setUpdateAgencyList] = useState(false);
 
   // const userList = useSelector((state) => state.userlist.data);
   // const vCoordinatorList = useMemo(() => {
@@ -63,13 +64,18 @@ const Agency = () => {
       }
     };
     getAgencies();
-  }, []);
+  }, [updateAgencyList]);
+
+  const handleUpdateAgencyList = () => {
+    setUpdateAgencyList((prev) => !prev);
+  };
 
   const COLUMNS = [
     { Header: "Agency Name", accessor: "name" },
     { Header: "Email ID", accessor: "contactDetails.email" },
     { Header: "Phone", accessor: "contactDetails.mobile" },
     { Header: "City", accessor: "contactDetails.address.village" },
+    { Header: "Agency Type", accessor: "agencyType" },
     {
       Header: "Website",
       accessor: "website",
@@ -199,11 +205,16 @@ const Agency = () => {
         <VCoordinatorDetails
           handlePopupClose={handleRowClick}
           // data={rowData}
-          // osid={rowData.osid}
+          agencyId={rowData?.osid}
           // onStatusUpdate={handleStatusUpdate}
         />
       )}
-      {showAddAgencyPopup && <AddAgency handlePopupClose={handleAddAgency} />}
+      {showAddAgencyPopup && (
+        <AddAgency
+          handlePopupClose={handleAddAgency}
+          onAgencyAdded={handleUpdateAgencyList}
+        />
+      )}
     </Box>
   );
 };

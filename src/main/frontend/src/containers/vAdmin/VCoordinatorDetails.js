@@ -18,7 +18,7 @@ import { useSelector } from "react-redux";
 import RegistrationSection from "../../components/RegistrationByLink/RegistrationLink";
 import AssignAgency from "../../components/AssignAgency/AgencyToVAdmin";
 
-const VCoordinatorDetails = ({ handlePopupClose }) => {
+const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
   const [value, setValue] = useState("1");
   const [rowData, setRowData] = useState(null);
   //   const [showPopup, setShowPopup] = useState(false);
@@ -26,8 +26,6 @@ const VCoordinatorDetails = ({ handlePopupClose }) => {
   const vCoordinatorList = useMemo(() => {
     return userList.filter((item) => item.role.includes("vCoordinator"));
   }, [userList]);
-
-  const agencyId = "8668";
 
   const handleTabChange = (event, newValue) => {
     setValue(newValue);

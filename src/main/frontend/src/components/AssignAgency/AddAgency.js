@@ -45,7 +45,7 @@ const schema = yup.object().shape({
   website: yup.string().url("Enter a valid URL"),
 });
 
-const AddAgency = ({ handlePopupClose }) => {
+const AddAgency = ({ handlePopupClose, onAgencyAdded }) => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
@@ -88,6 +88,7 @@ const AddAgency = ({ handlePopupClose }) => {
       );
       console.log("res", res);
       setShowSuccess(true);
+      onAgencyAdded();
       setOpenSnackbar(true);
       setTimeout(() => {
         handlePopupClose();

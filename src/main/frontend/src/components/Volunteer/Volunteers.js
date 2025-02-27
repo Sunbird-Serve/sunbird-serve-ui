@@ -14,7 +14,7 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
 import ListIcon from "@mui/icons-material/List";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { FaSort } from "react-icons/fa";
 import VolunteerDetails from "./VolunteerDetails";
 import VolunteersList from "./Volunteers";
@@ -22,14 +22,20 @@ import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import axios from "axios";
 import SearchIcon from "@mui/icons-material/Search";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Loader from "../CommonComponents/Loader.js";
 import { Button } from "@mui/material";
 import AgencyToVolunteer from "../AssignAgency/AgencyToVolunteer.js";
-import { Box } from "@material-ui/core";
+import { fetchUserList } from "../../state/userListSlice";
 const configData = require("../../configure.js");
 
-function Volunteers({ agencies, filterByAgencies }) {
+function Volunteers({ agencylist, filterByAgencies }) {
+  const [userDetailsList, setUserDetailsList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [statusUpdated, setStatusUpdated] = useState(false);
+  const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
+  const [agencyAssignSuccess, setAgencyAssignSuccess] = useState(false);
+
+  const dispatch = useDispatch();
   const userList = useSelector((state) => state.userlist.data);
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
@@ -39,10 +45,9 @@ function Volunteers({ agencies, filterByAgencies }) {
     return userList.filter((item) => item.role.includes("Volunteer"));
   }, [userList]);
 
-  const [userDetailsList, setUserDetailsList] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [statusUpdated, setStatusUpdated] = useState(false);
-  const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
+  useEffect(() => {
+    dispatch(fetchUserList()); // Replace with your actual Redux action
+  }, [agencyAssignSuccess, dispatch]);
 
   useEffect(() => {
     // if (isVAdmin) {
@@ -57,7 +62,7 @@ function Volunteers({ agencies, filterByAgencies }) {
     // } else {
     setUserDetailsList(volunteerList);
     // }
-  }, [volunteerList, statusUpdated, filterByAgencies]);
+  }, [volunteerList, statusUpdated, filterByAgencies, agencyAssignSuccess]);
 
   useEffect(() => {
     setLoading(userDetailsList.length === 0);
@@ -122,9 +127,9 @@ function Volunteers({ agencies, filterByAgencies }) {
       accessor: "agencyId",
 
       Cell: ({ value }) => {
-        let isDisabled = false;
-        if (value == "string") {
-          isDisabled = true;
+        let isDisabled = true;
+        if (value === "") {
+          isDisabled = false;
         }
         return (
           <div className="vAvatars-container">
@@ -134,7 +139,10 @@ function Volunteers({ agencies, filterByAgencies }) {
               color="success"
               sx={{ textTransform: "none", padding: "1px 8px" }}
               disabled={isDisabled}
-              onClick={handleAssignAgency}
+              onClick={(e) => {
+                e.stopPropagation(); // Prevents the row click event
+                handleAssignAgency();
+              }}
             >
               Assign Agency
             </Button>
@@ -198,6 +206,10 @@ function Volunteers({ agencies, filterByAgencies }) {
 
   const handlePopupClose = () => {
     setShowAssignAgencyPopup(false);
+  };
+
+  const handleAgencyAssignSuccess = () => {
+    setAgencyAssignSuccess((prev) => !prev);
   };
 
   return (
@@ -368,7 +380,12 @@ function Volunteers({ agencies, filterByAgencies }) {
           )}
 
           {showAssignAgencyPopup && (
-            <AgencyToVolunteer handlePopupClose={handlePopupClose} />
+            <AgencyToVolunteer
+              handlePopupClose={handlePopupClose}
+              userId={rowData.osid}
+              agencylist={agencylist}
+              agencyAssignSuccess={handleAgencyAssignSuccess}
+            />
           )}
         </div>
       )}

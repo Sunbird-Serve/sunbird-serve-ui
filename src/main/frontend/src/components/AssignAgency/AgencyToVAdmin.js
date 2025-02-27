@@ -11,6 +11,8 @@ import {
   Snackbar,
 } from "@mui/material";
 import { Alert } from "@mui/material";
+import axios from "axios";
+import configData from "../../configure";
 
 const vcoordinators = [
   { id: 1, name: "John Doe" },
@@ -18,7 +20,12 @@ const vcoordinators = [
   { id: 3, name: "Michael Johnson" },
 ];
 
-export default function AssignAgency({ label }) {
+export default function AssignAgency({
+  label,
+  userId,
+  agencylist,
+  onAgencyAssignSuccess,
+}) {
   const [selectedAgency, setSelectedAgency] = useState("");
   const [loading, setLoading] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -32,20 +39,24 @@ export default function AssignAgency({ label }) {
     if (!selectedAgency) {
       setError(`Please ${label}.`);
       return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      // Simulating API call
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      setOpenSnackbar(true);
-    } catch (err) {
-      setError("Failed to assign agency. Please try again.");
-    } finally {
-      setLoading(false);
+    } else {
+      try {
+        console.log(userId, selectedAgency);
+        const reqBody = {
+          agencyId: selectedAgency,
+          send: true,
+        };
+        const res = await axios.put(
+          `${configData.UPDATE_USER}/${userId}`,
+          reqBody
+        );
+        console.log(res);
+        setOpenSnackbar(true);
+        onAgencyAssignSuccess();
+      } catch (error) {
+        console.log(error);
+        setError("Failed to assign agency. Please try again.");
+      }
     }
   };
 
@@ -68,9 +79,9 @@ export default function AssignAgency({ label }) {
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>{label}</InputLabel>
         <Select value={selectedAgency} onChange={handleChange} label={label}>
-          {vcoordinators.map((coordinator) => (
-            <MenuItem key={coordinator.id} value={coordinator.id}>
-              {coordinator.name}
+          {agencylist?.map((agency) => (
+            <MenuItem key={agency.id} value={agency.id}>
+              {agency.name}
             </MenuItem>
           ))}
         </Select>
