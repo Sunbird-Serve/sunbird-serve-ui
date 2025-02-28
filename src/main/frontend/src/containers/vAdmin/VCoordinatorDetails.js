@@ -1,5 +1,4 @@
-import { Typography } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Modal } from "react-bootstrap";
 import { Box } from "@mui/material";
 import Tab from "@mui/material/Tab";
@@ -17,19 +16,44 @@ import { FaSort } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import RegistrationSection from "../../components/RegistrationByLink/RegistrationLink";
 import AssignAgency from "../../components/AssignAgency/AgencyToVAdmin";
+import axios from "axios";
+import Loader from "../../components/CommonComponents/Loader";
+import configData from "../../configure";
 
 const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
   const [value, setValue] = useState("1");
   const [rowData, setRowData] = useState(null);
-  //   const [showPopup, setShowPopup] = useState(false);
+  const [vCoordinatorList, setVCoordinatorList] = useState([]);
+  const [loading, setLoading] = useState(true);
   const userList = useSelector((state) => state.userlist.data);
-  const vCoordinatorList = useMemo(() => {
+  const vCordinatorList = useMemo(() => {
     return userList.filter((item) => item.role.includes("vCoordinator"));
   }, [userList]);
 
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  useEffect(() => {
+    const getVCoordinatorList = async () => {
+      setLoading(true);
+      try {
+        const res = await axios.get(
+          `${configData.USER_GET}/agencyId?agencyId=${agencyId}`
+        );
+        setVCoordinatorList(res?.data || []);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (agencyId) getVCoordinatorList();
+  }, [agencyId]);
+
+  console.log("vCordinatorList", vCordinatorList);
+  console.log("vCoordinatorList", vCoordinatorList);
 
   const COLUMNS = [
     { Header: "VCo-ordinator Name", accessor: "identityDetails.fullname" },
@@ -40,7 +64,7 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
   ];
 
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => vCoordinatorList, [vCoordinatorList]);
+  const data = useMemo(() => vCoordinatorList || [], [vCoordinatorList]);
 
   const {
     getTableProps,
@@ -121,27 +145,44 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
                   ))}
                 </thead>
                 <tbody {...getTableBodyProps()}>
-                  {page?.map((row) => {
-                    prepareRow(row);
-                    return (
-                      <tr
-                        {...row?.getRowProps()}
-                        onClick={() => handleRowClick(row?.original)}
+                  {loading ? (
+                    <tr>
+                      <td
+                        colSpan={columns.length}
+                        style={{ textAlign: "center" }}
                       >
-                        {row?.cells.map((cell) => {
-                          return (
+                        <Loader />
+                      </td>
+                    </tr>
+                  ) : data.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={columns.length}
+                        style={{ textAlign: "center" }}
+                      >
+                        No Data Found
+                      </td>
+                    </tr>
+                  ) : (
+                    page.map((row) => {
+                      prepareRow(row);
+                      return (
+                        <tr
+                          {...row.getRowProps()}
+                          onClick={() => handleRowClick(row.original)}
+                        >
+                          {row.cells.map((cell) => (
                             <td
-                              {...cell?.getCellProps()}
-                              style={{ width: cell?.column?.width }}
+                              {...cell.getCellProps()}
+                              style={{ width: cell.column.width }}
                             >
-                              {" "}
-                              {cell?.render("Cell")}
+                              {cell.render("Cell")}
                             </td>
-                          );
-                        })}
-                      </tr>
-                    );
-                  })}
+                          ))}
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </Box>
