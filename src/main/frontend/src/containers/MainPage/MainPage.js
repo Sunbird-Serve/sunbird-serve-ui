@@ -16,6 +16,9 @@ import NoRoleAssigned from "../../components/NoRoleAssigned/NoRoleAssigned";
 import Registration from "../../components/Registration/Registration";
 import Dashboard from "../nAdmin/Dashboard";
 import SessionDetails from "../nAdmin/SessionDetails";
+import VolunteerList from "../vAdmin/VolunteerList";
+import Agency from "../vAdmin/Agency";
+
 const MainPage = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
   const [role, setRole] = useState("");
@@ -60,6 +63,10 @@ const MainPage = () => {
                       return <Redirect to="/needs" />;
                     } else if (role === "nAdmin") {
                       return <Redirect to="/nAdmin-dashboard" />;
+                    } else if (role === "vAdmin") {
+                      return <Redirect to="/volunteer-list" />;
+                    } else if (role === "vCoordinator") {
+                      return <Redirect to="/volunteers" />;
                     } else if (role) {
                     } else if (role === undefined) {
                       return <Redirect to="/no-role" />;
@@ -78,9 +85,15 @@ const MainPage = () => {
                 <Route path="/no-role" component={NoRoleAssigned} />
                 <Route path="/vregistration" component={Registration} />
                 <Route path="/nAdmin-dashboard" component={Dashboard} />
+                <Route path="/volunteer-list" component={VolunteerList} />
+                <Route path="/agencies" component={Agency} />
                 <Route
                   path="/nAdmin-sessionDetails"
                   component={SessionDetails}
+                />
+                <Route
+                  path="/volunteer/:id/vregistration"
+                  element={<Registration />}
                 />
               </Switch>
             </div>
