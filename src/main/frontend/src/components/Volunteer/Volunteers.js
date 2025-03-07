@@ -34,6 +34,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
   const [statusUpdated, setStatusUpdated] = useState(false);
   const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
   const [agencyAssignSuccess, setAgencyAssignSuccess] = useState(false);
+  const [agencyList, setAgencyList] = useState([]);
 
   const dispatch = useDispatch();
   const userList = useSelector((state) => state.userlist.data);
@@ -46,8 +47,30 @@ function Volunteers({ agencylist, filterByAgencies }) {
   }, [userList]);
 
   useEffect(() => {
-    dispatch(fetchUserList()); // Replace with your actual Redux action
+    dispatch(fetchUserList());
   }, [agencyAssignSuccess, dispatch]);
+
+  useEffect(() => {
+    const getAgencies = async () => {
+      try {
+        const response = await axios.get(
+          `${configData.SERVE_VOLUNTEERING}/agency/list`
+        );
+        const agencies =
+          response.data
+            // ?.filter((agency) => agency.status === "Active")
+            ?.map((agency) => ({
+              id: agency.osid,
+              name: agency.name,
+            })) || [];
+        console.log(agencies);
+        setAgencyList(agencies);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAgencies();
+  }, [filterByAgencies]);
 
   useEffect(() => {
     if (isVAdmin) {
@@ -127,8 +150,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
 
       Cell: ({ row }) => {
         const { original } = row;
-
-        const agency = agencylist.find(
+        const agency = agencyList?.find(
           (agency) => agency.id === original.agencyId
         );
 
