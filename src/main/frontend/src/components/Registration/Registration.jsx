@@ -17,14 +17,18 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchUserList } from "../../state/userListSlice";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-
+import { useHistory } from "react-router-dom";
+import VolunteerSignup from "../VolunteerSignup/VolunteerSignup.js";
 const configData = require("../../configure.js");
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Registration = (props) => {
   const dispatch = useDispatch();
-  //constants
+  const navigate = useHistory();
+
+  const [vsignup, setVsignup] = useState(false);
+
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
     "Afghanistan",
@@ -526,7 +530,7 @@ const Registration = (props) => {
         country: formData.country,
       },
     },
-    agencyId: "",
+    agencyId: props.agencyId || "",
     status: "Registered",
     role: ["Volunteer"],
   };
@@ -642,7 +646,11 @@ const Registration = (props) => {
         .then(function (response) {
           console.log(response.data);
           console.log("user created sucessfully", response);
-          setRegStatus("success");
+          if (props.agencyId) {
+            setVsignup(true);
+          } else {
+            setRegStatus("success");
+          }
         })
         .catch(function (error) {
           console.log(error);
@@ -653,6 +661,10 @@ const Registration = (props) => {
         });
     }
   }, [userId, dataProfile]);
+
+  const signupVolunteer = () => {
+    setVsignup(!vsignup);
+  };
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
@@ -1338,6 +1350,13 @@ const Registration = (props) => {
       {regStatus === "success" && userId && <RegFormSuccess />}
       {regStatus === "failure" && userId && (
         <RegFormFailure retryReg={retryReg} />
+      )}
+
+      {vsignup && (
+        <VolunteerSignup
+          onClose={signupVolunteer}
+          RegistrationByAgencyId={true}
+        />
       )}
     </div>
   );

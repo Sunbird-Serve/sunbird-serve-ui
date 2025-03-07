@@ -1,5 +1,10 @@
 import "./MainPage.css";
-import { BrowserRouter, Switch, Route, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  Redirect,
+} from "react-router-dom";
 import SideNav from "../../components/SideNav/SideNav";
 import Header from "../../components/Header/Header";
 import Needs from "../../components/Needs/Needs";
@@ -18,6 +23,7 @@ import Dashboard from "../nAdmin/Dashboard";
 import SessionDetails from "../nAdmin/SessionDetails";
 import VolunteerList from "../vAdmin/VolunteerList";
 import Agency from "../vAdmin/Agency";
+import VolunteerSignup from "../../components/VolunteerSignup/VolunteerSignup";
 
 const MainPage = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
@@ -37,7 +43,7 @@ const MainPage = () => {
   };
 
   return (
-    <BrowserRouter>
+    <Router>
       <div className="wrapMainPage">
         <div className="mainPage row">
           {role && (
@@ -92,15 +98,16 @@ const MainPage = () => {
                   component={SessionDetails}
                 />
                 <Route
-                  path="/volunteer/:id/vregistration"
+                  path="/volunteer/:agencyId/vregistration"
                   element={<Registration />}
                 />
+                <Route path="/signUp" component={VolunteerSignup} />
               </Switch>
             </div>
           </div>
         </div>
       </div>
-    </BrowserRouter>
+    </Router>
   );
 };
 
