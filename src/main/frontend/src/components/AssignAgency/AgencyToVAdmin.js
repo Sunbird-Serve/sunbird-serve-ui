@@ -14,19 +14,16 @@ import { Alert } from "@mui/material";
 import axios from "axios";
 import configData from "../../configure";
 
-const vcoordinators = [
-  { id: 1, name: "John Doe" },
-  { id: 2, name: "Jane Smith" },
-  { id: 3, name: "Michael Johnson" },
-];
-
 export default function AssignAgency({
   label,
   userId,
   agencylist,
   onAgencyAssignSuccess,
+  vCoordinatorList,
+  agencyId,
 }) {
   const [selectedAgency, setSelectedAgency] = useState("");
+  const [selectedvCoordinator, setSelectedvCoordinator] = useState("");
   const [loading, setLoading] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [error, setError] = useState("");
@@ -35,28 +32,46 @@ export default function AssignAgency({
     setSelectedAgency(event.target.value);
   };
 
+  const handleChangevCoordinator = (event) => {
+    setSelectedvCoordinator(event.target.value);
+  };
+
   const handleSubmit = async () => {
-    if (!selectedAgency) {
+    if (!selectedAgency && !selectedvCoordinator) {
       setError(`Please ${label}.`);
       return;
-    } else {
-      try {
-        console.log(userId, selectedAgency);
-        const reqBody = {
-          agencyId: selectedAgency,
-          send: true,
-        };
-        const res = await axios.put(
-          `${configData.UPDATE_USER}/${userId}`,
-          reqBody
-        );
-        console.log(res);
+    }
+
+    try {
+      const isCoordinator = label === "select Co-ordinator";
+      const UserId = isCoordinator ? selectedvCoordinator : userId;
+      const reqBody = {
+        agencyId: isCoordinator ? agencyId : selectedAgency,
+        send: true,
+      };
+
+      if (!UserId) {
+        setError("User ID is missing.");
+        return;
+      }
+
+      const res = await axios.put(
+        `${configData.UPDATE_USER}/${UserId}`,
+        reqBody
+      );
+
+      console.log("API Response:", res);
+
+      if (res?.status === 200 || res?.status === 204) {
         setOpenSnackbar(true);
         onAgencyAssignSuccess();
-      } catch (error) {
-        console.log(error);
-        setError("Failed to assign agency. Please try again.");
+        return;
+      } else {
+        throw new Error("Unexpected response from server.");
       }
+    } catch (error) {
+      console.log(error);
+      setError("Failed to assign agency! Try again later.");
     }
   };
 
@@ -78,13 +93,27 @@ export default function AssignAgency({
 
       <FormControl fullWidth sx={{ mb: 2 }}>
         <InputLabel>{label}</InputLabel>
-        <Select value={selectedAgency} onChange={handleChange} label={label}>
-          {agencylist?.map((agency) => (
-            <MenuItem key={agency.id} value={agency.id}>
-              {agency.name}
-            </MenuItem>
-          ))}
-        </Select>
+        {label === "select Co-ordinator" ? (
+          <Select
+            value={selectedvCoordinator}
+            onChange={handleChangevCoordinator}
+            label={label}
+          >
+            {vCoordinatorList?.map((vCoordinator) => (
+              <MenuItem key={vCoordinator.osid} value={vCoordinator.osid}>
+                {vCoordinator?.identityDetails?.fullname}
+              </MenuItem>
+            ))}
+          </Select>
+        ) : (
+          <Select value={selectedAgency} onChange={handleChange} label={label}>
+            {agencylist?.map((agency) => (
+              <MenuItem key={agency.id} value={agency.id}>
+                {agency.name}
+              </MenuItem>
+            ))}
+          </Select>
+        )}
       </FormControl>
 
       {error && (

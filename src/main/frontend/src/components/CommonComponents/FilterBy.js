@@ -17,7 +17,6 @@ const FilterBy = ({ options, onFilterChange, label }) => {
   const allOption = { id: "all", name: "All" };
   const allOptionValues = options?.map((option) => option.name) || [];
   const allOptionIds = options.map((option) => option.id);
-  console.log("options", ...allOptionValues);
 
   useEffect(() => {
     if (options.length > 0) {
