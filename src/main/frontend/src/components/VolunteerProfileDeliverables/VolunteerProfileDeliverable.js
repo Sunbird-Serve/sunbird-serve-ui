@@ -132,12 +132,16 @@ const VolunteerProfileDeliverable = (props) => {
       deliverables,
       selectedMonth
     );
-    setTodoDeliverables(
-      filteredDeliverables &&
-        filteredDeliverables.filter(
-          (item) => item.status === "NotStarted" || item.status === "Planned"
-        )
-    );
+    const sortedDeliverables = filteredDeliverables
+      ?.filter(
+        (item) => item.status === "NotStarted" || item.status === "Planned"
+      )
+      .sort(
+        (a, b) => new Date(a.deliverableDate) - new Date(b.deliverableDate)
+      );
+
+    setTodoDeliverables(sortedDeliverables);
+
     setCompletedDeliverables(
       filteredDeliverables &&
         filteredDeliverables.filter((item) => item.status === "Completed")
@@ -289,17 +293,17 @@ const VolunteerProfileDeliverable = (props) => {
     <div>
       {/* NEED INFORMATION */}
       <div className="detailsNeedVoluntProfile">
-        <div className="nameNVP">{needById[props.needId].name}</div>
+        <div className="nameNVP">{needById[props.needId]?.name}</div>
         <div className="typeNVP">
-          {needTypeById[needById[props.needId].needTypeId]}
+          {needTypeById[needById[props.needId]?.needTypeId]}
         </div>
         <div className="aboutNVP">
-          {needById[props.needId].description.slice(3, -4)}
+          {needById[props.needId]?.description.slice(3, -4)}
         </div>
         <div className="rowNVP">
           <div className="itemNVP">
             <span>Organizer :</span>{" "}
-            {ncoordInfo.length ? ncoordInfo[0].identityDetails.fullname : ""}
+            {ncoordInfo.length ? ncoordInfo[0]?.identityDetails?.fullname : ""}
           </div>
           <div className="itemNVP">
             <span>Entity :</span> {entityById[props.needId]}
@@ -309,13 +313,13 @@ const VolunteerProfileDeliverable = (props) => {
           <div className="itemNVP">
             <span>Start Date :</span>
             {occurrenceById[props.needId]
-              ? occurrenceById[props.needId].startDate.slice(0, 10)
+              ? occurrenceById[props.needId]?.startDate.slice(0, 10)
               : ""}
           </div>
           <div className="itemNVP">
             <span>End Date : </span>
             {occurrenceById[props.needId]
-              ? occurrenceById[props.needId].endDate.slice(0, 10)
+              ? occurrenceById[props.needId]?.endDate.slice(0, 10)
               : ""}
           </div>
         </div>
@@ -323,16 +327,16 @@ const VolunteerProfileDeliverable = (props) => {
           <div className="itemNVP">
             <span>Time :</span>{" "}
             {inParas.length
-              ? formatTime(inParas[0].startTime) +
+              ? formatTime(inParas[0]?.startTime) +
                 " - " +
-                formatTime(inParas[0].endTime)
+                formatTime(inParas[0]?.endTime)
               : ""}
           </div>
           <div className="itemNVP">
             <span>Content Resources: </span>
-            {inParas.length && inParas[0].resourceUrl ? (
+            {inParas.length && inParas[0]?.resourceUrl ? (
               <a
-                href={inParas[0].resourceUrl}
+                href={inParas[0]?.resourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -349,7 +353,7 @@ const VolunteerProfileDeliverable = (props) => {
         <div className="rowNVP">
           <div className="itemNVP">
             <span>Platform :</span>
-            {inParas.length && inParas[0].softwarePlatform
+            {inParas.length && inParas[0]?.softwarePlatform
               ? inParas[0].inputUrl === "To be added soon"
                 ? "Available Shortly"
                 : inParas[0].softwarePlatform
