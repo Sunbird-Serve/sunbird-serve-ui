@@ -70,7 +70,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
       }
     };
     getAgencies();
-  }, [filterByAgencies]);
+  }, [filterByAgencies, volunteerList]);
 
   useEffect(() => {
     if (isVAdmin) {
@@ -173,7 +173,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
           );
         }
 
-        return <Box>{agency.name}</Box>;
+        return <Box>{agency?.name}</Box>;
       },
     });
   }
@@ -218,9 +218,9 @@ function Volunteers({ agencylist, filterByAgencies }) {
     setActiveTab(tab);
     setFilter("status", tab);
   };
-
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+
   const handleRowClick = (rowData) => {
     setRowData(rowData);
     setShowPopup(!showPopup);
