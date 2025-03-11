@@ -28,7 +28,7 @@ const Registration = (props) => {
   const navigate = useHistory();
 
   const [vsignup, setVsignup] = useState(false);
-
+  const [prefillEmail, setPrefillEmail] = useState("");
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
     "Afghanistan",
@@ -459,6 +459,11 @@ const Registration = (props) => {
     handleChange({ target: { name: name, value: value } });
   };
 
+  useEffect(() => {
+    const regEmail = localStorage.getItem("regEmail");
+    setPrefillEmail(regEmail);
+  }, [prefillEmail]);
+
   const handleChange = (event, count = 0) => {
     // console.log(event, "check this");
     const { name, value } = event.target;
@@ -471,6 +476,9 @@ const Registration = (props) => {
         skills: updatedSkills,
       });
       return;
+    }
+    if (name === "email" && value !== "") {
+      localStorage.setItem("regEmail", value);
     }
 
     setFormData({
@@ -902,7 +910,13 @@ const Registration = (props) => {
                       className="form-input"
                       placeholder="chandlerBing@gmail.com"
                       name="email"
-                      value={formData.email ? formData.email : ""}
+                      value={
+                        props.agencyId !== ""
+                          ? prefillEmail
+                          : formData.email
+                            ? formData.email
+                            : ""
+                      }
                       onChange={handleChange}
                       required
                     ></input>

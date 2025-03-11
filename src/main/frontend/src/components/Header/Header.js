@@ -28,6 +28,7 @@ function Header({ toggleSideNav, role }) {
     dispatch(fetchUserByEmail(""));
     console.log(userData);
     window.location.href = "/";
+    localStorage.removeItem("regEmail");
   };
   const userRole = userData.role;
 

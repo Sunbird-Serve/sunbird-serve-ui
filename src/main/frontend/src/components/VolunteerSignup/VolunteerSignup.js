@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, gprovider, fprovider } from "../../firebase";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import SBLogo from "../../assets/sunbirdlogo.png";
@@ -11,14 +11,24 @@ import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId }) => {
   const [error, setError] = useState("");
   const [regStatus, setRegStatus] = useState("");
+  const [preFillEmail, setPreFillEmail] = useState("");
   const [data, setData] = useState({
     email: "",
     password: "",
   });
   const { email, password } = data;
 
+  useEffect(() => {
+    const regEmail = localStorage.getItem("regEmail");
+    setPreFillEmail(regEmail);
+  }, [preFillEmail]);
+
   const changeHandler = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
+    if (e.target.name === "email") {
+      localStorage.removeItem("regEmail");
+      localStorage.setItem("regEmail", e.target.value);
+    }
   };
 
   const navigate = useHistory();
@@ -76,14 +86,16 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId }) => {
                   className="input"
                   type="text"
                   name="email"
-                  value={email}
+                  value={RegistrationByAgencyId ? preFillEmail : email}
                   placeholder="Enter your email address"
                   onChange={changeHandler}
                   autoComplete="off"
                 />
               </div>
               <div className="pwdSignup1">
-                <label className="label">Password </label>
+                <label className="label">
+                  {RegistrationByAgencyId ? "Set Password" : "Password"}{" "}
+                </label>
                 <input
                   className="input"
                   type="password"
