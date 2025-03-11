@@ -21,12 +21,12 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId }) => {
   useEffect(() => {
     const regEmail = localStorage.getItem("regEmail");
     setPreFillEmail(regEmail);
+    setData({ email: regEmail, password: password });
   }, [preFillEmail]);
 
   const changeHandler = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
     if (e.target.name === "email") {
-      localStorage.removeItem("regEmail");
       localStorage.setItem("regEmail", e.target.value);
     }
   };

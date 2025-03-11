@@ -530,7 +530,7 @@ const Registration = (props) => {
       Nationality: formData.nationality,
     },
     contactDetails: {
-      email: formData.email,
+      email: !props.agencyId ? prefillEmail : formData.email,
       mobile: formData.mobileNumber,
       address: {
         city: formData.city,
