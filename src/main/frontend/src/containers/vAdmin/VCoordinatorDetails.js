@@ -27,17 +27,23 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
   const [rowData, setRowData] = useState(null);
   const [vCoordinatorList, setVCoordinatorList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updateUserlist, setUpdateUserlist] = useState(false);
   const userList = useSelector((state) => state.userlist.data);
-
-  const vCordinatorList = useMemo(() => {
-    return userList.filter(
-      (item) => item.role.includes("vCoordinator") && item.agencyId === ""
-    );
-  }, [userList]);
 
   useEffect(() => {
     dispatch(fetchUserList());
-  }, [dispatch]);
+  }, [dispatch, updateUserlist]);
+
+  const vCordinatorList = useMemo(() => {
+    return userList.filter(
+      (item) =>
+        item.role[0] === "vCoordinator" &&
+        !item.agencyId &&
+        !item.agencyId.trim() !== ""
+    );
+  }, [userList, dispatch, updateUserlist]);
+
+  console.log("vCordinatorList", vCordinatorList);
 
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
@@ -50,7 +56,9 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
         const res = await axios.get(
           `${configData.USER_GET}/agencyId?agencyId=${agencyId}`
         );
-        setVCoordinatorList(res?.data || []);
+        const vCoordinators =
+          res?.data?.filter((item) => item.role[0] === "vCoordinator") || [];
+        setVCoordinatorList(vCoordinators);
       } catch (error) {
         console.log(error);
       } finally {
@@ -108,6 +116,7 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
   const handleAgencyAssignSuccess = () => {
     setTimeout(() => {
       handlePopupClose();
+      setUpdateUserlist(true);
     }, 1000);
   };
 
