@@ -41,9 +41,17 @@ function Volunteers({ agencylist, filterByAgencies }) {
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
   const isVAdmin = userRole?.[0] === "vAdmin" ? true : false;
+  const vCordAgencyId = userData?.agencyId;
 
   const volunteerList = useMemo(() => {
-    return userList.filter((item) => item.role.includes("Volunteer"));
+    if (isVAdmin) {
+      return userList.filter((item) => item.role.includes("Volunteer"));
+    } else {
+      return userList.filter(
+        (item) => item.role.includes("Volunteer")
+        // && item.agencyId === vCordAgencyId
+      );
+    }
   }, [userList]);
 
   useEffect(() => {
@@ -77,9 +85,16 @@ function Volunteers({ agencylist, filterByAgencies }) {
       const validAgencies = filterByAgencies?.filter((id) => id !== "all");
       const filteredUsers = filterByAgencies?.includes("all")
         ? volunteerList
-        : volunteerList.filter((volunteer) =>
-            validAgencies.includes(volunteer.agencyId)
-          );
+        : !filterByAgencies?.includes("all") &&
+            filterByAgencies?.includes("other")
+          ? volunteerList.filter(
+              (volunteer) =>
+                !volunteer?.agencyId +
+                validAgencies.includes(volunteer.agencyId)
+            )
+          : volunteerList.filter((volunteer) =>
+              validAgencies.includes(volunteer.agencyId)
+            );
       setUserDetailsList(filteredUsers);
     } else {
       setUserDetailsList(volunteerList);

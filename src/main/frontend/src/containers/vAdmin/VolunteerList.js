@@ -61,6 +61,7 @@ const VolunteerList = () => {
           label={"Select Agency"}
           options={agencies}
           onFilterChange={handleFilterChange}
+          filterByAgencies={true}
         />
       </Box>
       <Volunteers agencylist={agencies} filterByAgencies={filteredByAgency} />
