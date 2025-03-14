@@ -48,8 +48,8 @@ function Volunteers({ agencylist, filterByAgencies }) {
       return userList.filter((item) => item.role.includes("Volunteer"));
     } else {
       return userList.filter(
-        (item) => item.role.includes("Volunteer")
-        // && item.agencyId === vCordAgencyId
+        (item) =>
+          item.role.includes("Volunteer") && item.agencyId === vCordAgencyId
       );
     }
   }, [userList]);
