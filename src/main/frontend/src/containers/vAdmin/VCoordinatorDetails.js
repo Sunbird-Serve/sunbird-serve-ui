@@ -13,22 +13,37 @@ import {
   useSortBy,
 } from "react-table";
 import { FaSort } from "react-icons/fa";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import RegistrationSection from "../../components/RegistrationByLink/RegistrationLink";
 import AssignAgency from "../../components/AssignAgency/AgencyToVAdmin";
 import axios from "axios";
 import Loader from "../../components/CommonComponents/Loader";
 import configData from "../../configure";
+import { fetchUserList } from "../../state/userListSlice";
 
 const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
+  const dispatch = useDispatch();
   const [value, setValue] = useState("1");
   const [rowData, setRowData] = useState(null);
   const [vCoordinatorList, setVCoordinatorList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [updateUserlist, setUpdateUserlist] = useState(false);
   const userList = useSelector((state) => state.userlist.data);
+
+  useEffect(() => {
+    dispatch(fetchUserList());
+  }, [dispatch, updateUserlist]);
+
   const vCordinatorList = useMemo(() => {
-    return userList.filter((item) => item.role.includes("vCoordinator"));
-  }, [userList]);
+    return userList.filter(
+      (item) =>
+        item.role[0] === "vCoordinator" &&
+        !item.agencyId &&
+        !item.agencyId.trim() !== ""
+    );
+  }, [userList, dispatch, updateUserlist]);
+
+  console.log("vCordinatorList", vCordinatorList);
 
   const handleTabChange = (event, newValue) => {
     setValue(newValue);
@@ -41,7 +56,9 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
         const res = await axios.get(
           `${configData.USER_GET}/agencyId?agencyId=${agencyId}`
         );
-        setVCoordinatorList(res?.data || []);
+        const vCoordinators =
+          res?.data?.filter((item) => item.role[0] === "vCoordinator") || [];
+        setVCoordinatorList(vCoordinators);
       } catch (error) {
         console.log(error);
       } finally {
@@ -51,9 +68,6 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
 
     if (agencyId) getVCoordinatorList();
   }, [agencyId]);
-
-  console.log("vCordinatorList", vCordinatorList);
-  console.log("vCoordinatorList", vCoordinatorList);
 
   const COLUMNS = [
     { Header: "VCo-ordinator Name", accessor: "identityDetails.fullname" },
@@ -97,6 +111,13 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
   const handleRowClick = (rowData) => {
     setRowData(rowData);
     // setShowPopup(!showPopup);
+  };
+
+  const handleAgencyAssignSuccess = () => {
+    setTimeout(() => {
+      handlePopupClose();
+      setUpdateUserlist(true);
+    }, 1000);
   };
 
   return (
@@ -192,7 +213,12 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
           </TabPanel>
           <TabPanel value="2">
             <Box>
-              <AssignAgency label={"select Co-ordinator"} />
+              <AssignAgency
+                label={"select Co-ordinator"}
+                vCoordinatorList={vCordinatorList}
+                agencyId={agencyId}
+                onAgencyAssignSuccess={handleAgencyAssignSuccess}
+              />
             </Box>
           </TabPanel>
         </TabContext>

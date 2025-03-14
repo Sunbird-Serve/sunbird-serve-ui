@@ -34,29 +34,67 @@ function Volunteers({ agencylist, filterByAgencies }) {
   const [statusUpdated, setStatusUpdated] = useState(false);
   const [showAssignAgencyPopup, setShowAssignAgencyPopup] = useState(false);
   const [agencyAssignSuccess, setAgencyAssignSuccess] = useState(false);
+  const [agencyList, setAgencyList] = useState([]);
 
   const dispatch = useDispatch();
   const userList = useSelector((state) => state.userlist.data);
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
   const isVAdmin = userRole?.[0] === "vAdmin" ? true : false;
+  const vCordAgencyId = userData?.agencyId;
 
   const volunteerList = useMemo(() => {
-    return userList.filter((item) => item.role.includes("Volunteer"));
+    if (isVAdmin) {
+      return userList.filter((item) => item.role.includes("Volunteer"));
+    } else {
+      return userList.filter(
+        (item) => item.role.includes("Volunteer")
+        // && item.agencyId === vCordAgencyId
+      );
+    }
   }, [userList]);
 
   useEffect(() => {
-    dispatch(fetchUserList()); // Replace with your actual Redux action
+    dispatch(fetchUserList());
   }, [agencyAssignSuccess, dispatch]);
 
   useEffect(() => {
+    const getAgencies = async () => {
+      try {
+        const response = await axios.get(
+          `${configData.SERVE_VOLUNTEERING}/agency/list`
+        );
+        const agencies =
+          response.data
+            // ?.filter((agency) => agency.status === "Active")
+            ?.map((agency) => ({
+              id: agency.osid,
+              name: agency.name,
+            })) || [];
+        console.log(agencies);
+        setAgencyList(agencies);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAgencies();
+  }, [filterByAgencies]);
+
+  useEffect(() => {
     if (isVAdmin) {
-      const validAgencies = filterByAgencies.filter((id) => id !== "all");
-      const filteredUsers = filterByAgencies.includes("all")
+      const validAgencies = filterByAgencies?.filter((id) => id !== "all");
+      const filteredUsers = filterByAgencies?.includes("all")
         ? volunteerList
-        : volunteerList.filter((volunteer) =>
-            validAgencies.includes(volunteer.agencyId)
-          );
+        : !filterByAgencies?.includes("all") &&
+            filterByAgencies?.includes("other")
+          ? volunteerList.filter(
+              (volunteer) =>
+                !volunteer?.agencyId +
+                validAgencies.includes(volunteer.agencyId)
+            )
+          : volunteerList.filter((volunteer) =>
+              validAgencies.includes(volunteer.agencyId)
+            );
       setUserDetailsList(filteredUsers);
     } else {
       setUserDetailsList(volunteerList);
@@ -127,8 +165,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
 
       Cell: ({ row }) => {
         const { original } = row;
-
-        const agency = agencylist.find(
+        const agency = agencyList?.find(
           (agency) => agency.id === original.agencyId
         );
 
@@ -151,11 +188,11 @@ function Volunteers({ agencylist, filterByAgencies }) {
           );
         }
 
-        return <Box>{agency.name}</Box>;
+        return <Box>{agency?.name}</Box>;
       },
     });
   }
-  const columns = useMemo(() => COLUMNS, []);
+  const columns = useMemo(() => COLUMNS, [agencyList]);
   const data = useMemo(() => userDetailsList, [userDetailsList]);
 
   const {
@@ -196,9 +233,9 @@ function Volunteers({ agencylist, filterByAgencies }) {
     setActiveTab(tab);
     setFilter("status", tab);
   };
-
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
+
   const handleRowClick = (rowData) => {
     setRowData(rowData);
     setShowPopup(!showPopup);

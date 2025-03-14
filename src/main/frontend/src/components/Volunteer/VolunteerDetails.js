@@ -90,7 +90,7 @@ const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
       .catch((error) => {
         console.error(error);
       });
-  }, []);
+  }, [userDetails]);
 
   //get deliverables
   const [viewDelivs, setViewDelivs] = useState(false);

@@ -115,148 +115,160 @@ import { fetchEntities } from "./state/entitySlice";
 import { fetchUserList } from "./state/userListSlice";
 import { redirectToOnlineTeachingPage } from "./state/redirectionToOnlineTeachingSlice";
 import "./index.css";
+import Registration from "./components/Registration/Registration";
+import { useLocation } from "react-router-dom";
 
 function App() {
-	const dispatch = useDispatch();
-	const [presentUser, setPresentUser] = useState(null); // Holds Firebase-authenticated user
-	const [loading, setLoading] = useState(true); // Global loading state
+  const dispatch = useDispatch();
+  const location = useLocation();
+  const isVolunteerRegistration = /^\/volunteer\/[^/]+\/vregistration$/.test(
+    location.pathname
+  );
+  const match = location.pathname.match(
+    /^\/volunteer\/([^/]+)\/vregistration$/
+  );
+  const agencyId = match ? match[1] : null;
 
-	// Redux state for user details
-	const userDetails = useSelector((state) => state.user.data);
-	const userStatus = useSelector((state) => state.user.status); // loading, succeeded, failed
-	const [volunteer, setVolunteer] = useState(false); // State for volunteer redirection
+  const [presentUser, setPresentUser] = useState(null); // Holds Firebase-authenticated user
+  const [loading, setLoading] = useState(true); // Global loading state
 
-	// const [countReloads, setCountReload] = useState(0);
-	// Token-Based Authentication Logic
-	useEffect(() => {
-		const params = new URLSearchParams(window.location.search);
-		const token = params.get("token");
+  // Redux state for user details
+  const userDetails = useSelector((state) => state.user.data);
+  const userStatus = useSelector((state) => state.user.status); // loading, succeeded, failed
+  const [volunteer, setVolunteer] = useState(false); // State for volunteer redirection
 
-		if (!token) {
-			dispatch(redirectToOnlineTeachingPage());
-		}
+  // const [countReloads, setCountReload] = useState(0);
+  // Token-Based Authentication Logic
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
 
-		if (token) {
-			signInWithCustomToken(auth, token)
-				.then((userCredential) => {
-					console.log(
-						"User authenticated with custom token:",
-						userCredential.user
-					);
+    if (!token) {
+      dispatch(redirectToOnlineTeachingPage());
+    }
 
-					const email = userCredential.user?.uid; // Access email from the user object
-					if (email) {
-						setPresentUser({
-							uid: userCredential.user.uid,
-							email: email,
-						});
+    if (token) {
+      signInWithCustomToken(auth, token)
+        .then((userCredential) => {
+          console.log(
+            "User authenticated with custom token:",
+            userCredential.user
+          );
 
-						// Fetch user details
-						const userEmail = email?.replace(/@/g, "%40");
-						dispatch(fetchUserByEmail(userEmail));
+          const email = userCredential.user?.uid; // Access email from the user object
+          if (email) {
+            setPresentUser({
+              uid: userCredential.user.uid,
+              email: email,
+            });
 
-						// setCountReload((prev) => prev + 1);
-						// if (countReloads > 2) {
-						// 	window.location.reload();
-						// }
-					} else {
-						console.error("Email is missing from the user object.");
-					}
-				})
-				.catch((error) => {
-					console.error(
-						"Authentication with custom token failed:",
-						error
-					);
-					setPresentUser(null);
-				})
-				.finally(() => setLoading(false));
-		} else {
-			// Handle case where no token is present
-			setLoading(false);
-		}
-	}, [dispatch]);
+            // Fetch user details
+            const userEmail = email?.replace(/@/g, "%40");
+            dispatch(fetchUserByEmail(userEmail));
 
-	// Firebase Listener-Based Authentication Logic
-	useEffect(() => {
-		const unsubscribe = auth.onAuthStateChanged((user) => {
-			if (user) {
-				setPresentUser({
-					uid: user.uid,
-					email: user.email,
-				});
+            // setCountReload((prev) => prev + 1);
+            // if (countReloads > 2) {
+            // 	window.location.reload();
+            // }
+          } else {
+            console.error("Email is missing from the user object.");
+          }
+        })
+        .catch((error) => {
+          console.error("Authentication with custom token failed:", error);
+          setPresentUser(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      // Handle case where no token is present
+      setLoading(false);
+    }
+  }, [dispatch]);
 
-				// Fetch user details for listener-based login
-				const userEmail = user.email?.replace(/@/g, "%40");
-				dispatch(fetchUserByEmail(userEmail));
-			} else {
-				setPresentUser(null);
-			}
-		});
+  // Firebase Listener-Based Authentication Logic
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setPresentUser({
+          uid: user.uid,
+          email: user.email,
+        });
 
-		// Cleanup subscription on unmount
-		return () => unsubscribe();
-	}, [dispatch]);
+        // Fetch user details for listener-based login
+        const userEmail = user.email?.replace(/@/g, "%40");
+        dispatch(fetchUserByEmail(userEmail));
+      } else {
+        setPresentUser(null);
+      }
+    });
 
-	// Fetch user list after user details are loaded
-	useEffect(() => {
-		if (userStatus === "succeeded") {
-			dispatch(fetchUserList());
-		}
-	}, [dispatch, userStatus]);
+    // Cleanup subscription on unmount
+    return () => unsubscribe();
+  }, [dispatch]);
 
-	// Fetch needs by UID when userDetails are populated
-	useEffect(() => {
-		if (userDetails.osid) {
-			dispatch(fetchNeedsByUid(userDetails.osid));
-		}
-	}, [dispatch, userDetails]);
+  // Fetch user list after user details are loaded
+  useEffect(() => {
+    if (userStatus === "succeeded") {
+      dispatch(fetchUserList());
+    }
+  }, [dispatch, userStatus]);
 
-	// Fetch global needs
-	useEffect(() => {
-		dispatch(fetchNeeds());
-	}, [dispatch]);
+  // Fetch needs by UID when userDetails are populated
+  useEffect(() => {
+    if (userDetails.osid) {
+      dispatch(fetchNeedsByUid(userDetails.osid));
+    }
+  }, [dispatch, userDetails]);
 
-	// Fetch need types
-	useEffect(() => {
-		dispatch(fetchNeedtypes());
-	}, [dispatch]);
+  // Fetch global needs
+  useEffect(() => {
+    dispatch(fetchNeeds());
+  }, [dispatch]);
 
-	// Fetch entities
-	useEffect(() => {
-		dispatch(fetchEntities());
-	}, [dispatch]);
+  // Fetch need types
+  useEffect(() => {
+    dispatch(fetchNeedtypes());
+  }, [dispatch]);
 
-	// Handle volunteer status change
-	const handleVolunteer = (value) => {
-		setVolunteer(value);
-	};
+  // Fetch entities
+  useEffect(() => {
+    dispatch(fetchEntities());
+  }, [dispatch]);
 
-	// Conditional rendering logic
-	if (loading) {
-		return <div>Loading...</div>;
-	}
-	// Handle explore button click
-	if (volunteer) {
-		return <ExplorePage />;
-	}
-	if (presentUser === null) {
-		return <LoginPage getVolunteerStatus={handleVolunteer} />;
-	}
+  // Handle volunteer status change
+  const handleVolunteer = (value) => {
+    setVolunteer(value);
+  };
 
-	if (userStatus === "loading") {
-		return (
-			<div className="loading-div">
-				<div className="spiner"></div>
-			</div>
-		);
-	}
+  // Conditional rendering logic
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  // Handle explore button click
+  if (volunteer) {
+    return <ExplorePage />;
+  }
+  if (presentUser === null) {
+    if (isVolunteerRegistration) {
+      return <Registration agencyId={agencyId} />;
+    } else {
+      return <LoginPage getVolunteerStatus={handleVolunteer} />;
+    }
+  }
 
-	if (userDetails.role && userDetails.role.includes("Volunteer")) {
-		return <ExplorePage />;
-	}
+  if (userStatus === "loading") {
+    return (
+      <div className="loading-div">
+        <div className="spiner"></div>
+      </div>
+    );
+  }
 
-	return <MainPage />;
+  if (userDetails.role && userDetails.role.includes("Volunteer")) {
+    return <ExplorePage />;
+  }
+
+  return <MainPage />;
 }
 
 export default App;

@@ -17,14 +17,18 @@ import { useSelector, useDispatch } from "react-redux";
 import { fetchUserList } from "../../state/userListSlice";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
-
+import { useHistory } from "react-router-dom";
+import VolunteerSignup from "../VolunteerSignup/VolunteerSignup.js";
 const configData = require("../../configure.js");
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Registration = (props) => {
   const dispatch = useDispatch();
-  //constants
+  const navigate = useHistory();
+
+  const [vsignup, setVsignup] = useState(false);
+  const [prefillEmail, setPrefillEmail] = useState("");
   const genderOptions = ["Male", "Female", "Transgender", "Others"];
   const countries = [
     "Afghanistan",
@@ -455,6 +459,11 @@ const Registration = (props) => {
     handleChange({ target: { name: name, value: value } });
   };
 
+  useEffect(() => {
+    const regEmail = localStorage.getItem("regEmail");
+    setPrefillEmail(regEmail);
+  }, [prefillEmail]);
+
   const handleChange = (event, count = 0) => {
     // console.log(event, "check this");
     const { name, value } = event.target;
@@ -467,6 +476,9 @@ const Registration = (props) => {
         skills: updatedSkills,
       });
       return;
+    }
+    if (name === "email" && value !== "") {
+      localStorage.setItem("regEmail", value);
     }
 
     setFormData({
@@ -518,7 +530,7 @@ const Registration = (props) => {
       Nationality: formData.nationality,
     },
     contactDetails: {
-      email: formData.email,
+      email: !props.agencyId ? prefillEmail : formData.email,
       mobile: formData.mobileNumber,
       address: {
         city: formData.city,
@@ -526,7 +538,7 @@ const Registration = (props) => {
         country: formData.country,
       },
     },
-    agencyId: "",
+    agencyId: props.agencyId || "",
     status: "Registered",
     role: ["Volunteer"],
   };
@@ -642,7 +654,11 @@ const Registration = (props) => {
         .then(function (response) {
           console.log(response.data);
           console.log("user created sucessfully", response);
-          setRegStatus("success");
+          if (props.agencyId) {
+            setVsignup(true);
+          } else {
+            setRegStatus("success");
+          }
         })
         .catch(function (error) {
           console.log(error);
@@ -653,6 +669,10 @@ const Registration = (props) => {
         });
     }
   }, [userId, dataProfile]);
+
+  const signupVolunteer = () => {
+    setVsignup(!vsignup);
+  };
 
   const onNavClick = (key) => {
     const currentRef = refArray[key];
@@ -890,7 +910,13 @@ const Registration = (props) => {
                       className="form-input"
                       placeholder="chandlerBing@gmail.com"
                       name="email"
-                      value={formData.email ? formData.email : ""}
+                      value={
+                        props.agencyId !== ""
+                          ? prefillEmail
+                          : formData.email
+                            ? formData.email
+                            : ""
+                      }
                       onChange={handleChange}
                       required
                     ></input>
@@ -1338,6 +1364,13 @@ const Registration = (props) => {
       {regStatus === "success" && userId && <RegFormSuccess />}
       {regStatus === "failure" && userId && (
         <RegFormFailure retryReg={retryReg} />
+      )}
+
+      {vsignup && (
+        <VolunteerSignup
+          onClose={signupVolunteer}
+          RegistrationByAgencyId={true}
+        />
       )}
     </div>
   );

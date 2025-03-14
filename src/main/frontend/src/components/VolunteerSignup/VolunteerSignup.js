@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { auth, gprovider, fprovider } from "../../firebase";
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import SBLogo from "../../assets/sunbirdlogo.png";
@@ -6,17 +6,29 @@ import "./VolunteerSignup.css";
 import { FcGoogle } from "react-icons/fc";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import { useHistory } from "react-router-dom";
+import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 
-const VolunteerSignup = ({ loginState, onClose }) => {
+const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId }) => {
   const [error, setError] = useState("");
+  const [regStatus, setRegStatus] = useState("");
+  const [preFillEmail, setPreFillEmail] = useState("");
   const [data, setData] = useState({
     email: "",
     password: "",
   });
   const { email, password } = data;
 
+  useEffect(() => {
+    const regEmail = localStorage.getItem("regEmail");
+    setPreFillEmail(regEmail);
+    setData({ email: regEmail, password: password });
+  }, [preFillEmail]);
+
   const changeHandler = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
+    if (e.target.name === "email") {
+      localStorage.setItem("regEmail", e.target.value);
+    }
   };
 
   const navigate = useHistory();
@@ -24,9 +36,13 @@ const VolunteerSignup = ({ loginState, onClose }) => {
   const signUp = (e) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
-      .then(user => {
-        onClose()
-        navigate.push("/vregistration")
+      .then((user) => {
+        onClose();
+        if (RegistrationByAgencyId) {
+          setRegStatus("success");
+        } else {
+          navigate.push("/vregistration");
+        }
       })
       .catch((err) => setError(err.code));
   };
@@ -43,67 +59,70 @@ const VolunteerSignup = ({ loginState, onClose }) => {
 
   return (
     // adds user login form
-    <div className="wrapVolunteerSignup">
-      <div className="volunteerSignup1">
-        <button className="btnCloseVLogin" onClick={onClose}>
-          x
-        </button>
-        <div className="signupForm1 row">
-          {/* Add Login Form */}
-          <form className="menuSignup1 col-10 offset-sm-1">
-            <div className="vsignupHead">
-              <div>
-                <div className="greetSignup1">Get Started!</div>
-                <div className="titleSignup1">Create an Account</div>
+    <>
+      <div className="wrapVolunteerSignup">
+        <div className="volunteerSignup1">
+          <button className="btnCloseVLogin" onClick={onClose}>
+            x
+          </button>
+          <div className="signupForm1 row">
+            {/* Add Login Form */}
+            <form className="menuSignup1 col-10 offset-sm-1">
+              <div className="vsignupHead">
+                <div>
+                  <div className="greetSignup1">Get Started!</div>
+                  <div className="titleSignup1">Create an Account</div>
+                </div>
+                {/* Logo */}
+                <div className="sbLogo">
+                  <img src={SBLogo} alt="BlueBirdLogo" width="120px" />
+                </div>
               </div>
-              {/* Logo */}
-              <div className="sbLogo">
-                <img src={SBLogo} alt="BlueBirdLogo" width="120px" />
-              </div>
-            </div>
 
-            {/* user credentials */}
-            <div className="unameSignup1">
-              <label className="label">Email Id</label>
-              <input
-                className="input"
-                type="text"
-                name="email"
-                value={email}
-                placeholder="Enter your email address"
-                onChange={changeHandler}
-                autoComplete="off"
-              />
-            </div>
-            <div className="pwdSignup1">
-              <label className="label">Password </label>
-              <input
-                className="input"
-                type="password"
-                name="password"
-                value={password}
-                placeholder="Enter your password"
-                onChange={changeHandler}
-                autoComplete="off"
-              />
-            </div>
-            {/* Login button*/}
-            <div className="btnSignup1">
-              <button type="signup" onClick={signUp}>
-                Sign Up
-              </button>
-            </div>
-            {/* <div className="gotoLogin"> */}
+              {/* user credentials */}
+              <div className="unameSignup1">
+                <label className="label">Email Id</label>
+                <input
+                  className="input"
+                  type="text"
+                  name="email"
+                  value={RegistrationByAgencyId ? preFillEmail : email}
+                  placeholder="Enter your email address"
+                  onChange={changeHandler}
+                  autoComplete="off"
+                />
+              </div>
+              <div className="pwdSignup1">
+                <label className="label">
+                  {RegistrationByAgencyId ? "Set Password" : "Password"}{" "}
+                </label>
+                <input
+                  className="input"
+                  type="password"
+                  name="password"
+                  value={password}
+                  placeholder="Enter your password"
+                  onChange={changeHandler}
+                  autoComplete="off"
+                />
+              </div>
+              {/* Login button*/}
+              <div className="btnSignup1">
+                <button type="signup" onClick={signUp}>
+                  Sign Up
+                </button>
+              </div>
+              {/* <div className="gotoLogin"> */}
               {/* <span>Already have an account?</span> */}
               {/* <a href="#" onClick={() => loginState(false)}>Login! </a> */}
-            {/* </div>
+              {/* </div>
             <div className="hline">
               <hr />
               <span>or login with</span>
               <hr />
             </div> */}
-            {/* Social Media Login*/}
-            {/*{ <div className="btnSLogin">
+              {/* Social Media Login*/}
+              {/*{ <div className="btnSLogin">
               <button type="login" onClick={signInWithGoogle}>
                 {" "}
                 <i>
@@ -120,12 +139,14 @@ const VolunteerSignup = ({ loginState, onClose }) => {
                 Facebook
               </button>
             </div> }*/}
-            {/* Error message when credentials are wrong*/}
-            {error && <div className="signupError">{error.slice(5)}</div>}
-          </form>
+              {/* Error message when credentials are wrong*/}
+              {error && <div className="signupError">{error.slice(5)}</div>}
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+      {regStatus === "success" && <RegFormSuccess />}
+    </>
   );
 };
 
