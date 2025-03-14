@@ -39,7 +39,7 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
       (item) =>
         item.role[0] === "vCoordinator" &&
         !item.agencyId &&
-        !item.agencyId.trim() !== ""
+        !item.agencyId?.trim() !== ""
     );
   }, [userList, dispatch, updateUserlist]);
 
