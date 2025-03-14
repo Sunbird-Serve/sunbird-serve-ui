@@ -70,12 +70,12 @@ function Volunteers({ agencylist, filterByAgencies }) {
       }
     };
     getAgencies();
-  }, [filterByAgencies, volunteerList]);
+  }, [filterByAgencies]);
 
   useEffect(() => {
     if (isVAdmin) {
-      const validAgencies = filterByAgencies.filter((id) => id !== "all");
-      const filteredUsers = filterByAgencies.includes("all")
+      const validAgencies = filterByAgencies?.filter((id) => id !== "all");
+      const filteredUsers = filterByAgencies?.includes("all")
         ? volunteerList
         : volunteerList.filter((volunteer) =>
             validAgencies.includes(volunteer.agencyId)
@@ -177,7 +177,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
       },
     });
   }
-  const columns = useMemo(() => COLUMNS, []);
+  const columns = useMemo(() => COLUMNS, [agencyList]);
   const data = useMemo(() => userDetailsList, [userDetailsList]);
 
   const {
