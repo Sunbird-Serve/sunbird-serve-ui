@@ -10,13 +10,23 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Box,
+} from "@mui/material";
 const configData = require("../../configure.js");
 const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
   const dispatch = useDispatch();
   const [userProfileFail, setUserProfileFail] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
+  const [nominationsData, setNominationsData] = useState(null);
   const [open, setOpen] = useState(false);
   const [volunteerStatusUpdated, setVolunteerStatusUpdated] = useState(false);
 
@@ -39,12 +49,31 @@ const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
     }
   }, [props.osid]);
 
+  useEffect(() => {
+    const getNominationsData = async () => {
+      try {
+        const response = await axios.get(
+          `${configData.NOMINATIONS_GET}/${props?.osid}?page=0&size=10`
+        );
+        setNominationsData(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    if (props?.osid) {
+      getNominationsData();
+    }
+  }, [props.osid]);
+
   //Need name map with its Id
   const needsList = useSelector((state) => state.need.data);
   const needById = {};
   needsList.forEach((item) => {
     if (item && item.need) {
-      needById[item.need.id] = item.need.name;
+      needById[item.need.id] = {
+        name: item.need.name,
+        entity: item.entity?.name,
+      };
     }
   });
 
@@ -268,6 +297,12 @@ const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
               >
                 Need Assignment Info
               </div>
+              <div
+                className={`tab ${activeTab === "tNomins" ? "selVinfoTab" : "vinfoTab"}`}
+                onClick={() => handleTabClick("tNomins")}
+              >
+                Nominations
+              </div>
             </div>
 
             {activeTab === "tDetails" && (
@@ -396,7 +431,7 @@ const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
                     <div className="vcfulfil-list" key={index}>
                       <div className="vcfulfil-item">
                         <div className="vcfulfil-needname">
-                          {needById[data.needId]}
+                          {needById[data.needId]?.name}{" "}
                         </div>
                         <div className="vcfulfil-status">
                           {data.fulfillmentStatus}
@@ -502,6 +537,55 @@ const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
                     </div>
                   ))}
               </div>
+            )}
+
+            {activeTab === "tNomins" && (
+              <Box className="vcFulfils">
+                <TableContainer component={Paper}>
+                  {nominationsData.length > 0 ? (
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>
+                            <strong>Need Name</strong>
+                          </TableCell>
+                          <TableCell>
+                            <strong>Entity</strong>
+                          </TableCell>
+                          <TableCell>
+                            <strong>Status</strong>
+                          </TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {nominationsData.map((data, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              {needById[data.needId]?.name || "N/A"}
+                            </TableCell>
+                            <TableCell>
+                              {needById[data.needId]?.entity || "N/A"}
+                            </TableCell>
+                            <TableCell>
+                              {data.nominationStatus || "N/A"}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  ) : (
+                    <div
+                      style={{
+                        padding: "16px",
+                        textAlign: "center",
+                        fontSize: "16px",
+                      }}
+                    >
+                      There are no Nominations yet!
+                    </div>
+                  )}
+                </TableContainer>
+              </Box>
             )}
           </div>
 
