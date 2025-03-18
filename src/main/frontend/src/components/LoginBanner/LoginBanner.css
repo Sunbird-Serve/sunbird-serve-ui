@@ -1,114 +1,120 @@
 /* General Styling for the banner */
 .loginBanner {
-    height: 100vh; /* Make sure it covers full view height */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(39, 105, 135, 0.9); /* Background Image */
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    @media (max-width: 600px) {
-      height: 70vh;
+  height: 100vh; /* Make sure it covers full view height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(39, 105, 135, 0.9); /* Background Image */
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  @media (max-width: 600px) {
+    height: 70vh;
   }
+}
+
+.blurBanner {
+  background-color: #ffffff;
+  backdrop-filter: blur(5px); /* Blur effect */
+  padding: 40px 20px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 80%; /* Adjust width as needed */
+  @media (max-width: 600px) {
+    padding: 0%;
+    width: 90%;
   }
-  
-  .blurBanner {
-    background-color: #ffffff;
-    backdrop-filter: blur(5px); /* Blur effect */
-    padding: 40px 20px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    width: 80%; /* Adjust width as needed */
-  }
-  
-  .bannerContent {
-    text-align: center;
-    color:  #0080BC;
-  }
-  
-  .headBanner {
-    color:  #0080BC;
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    margin-top: 60px;
-    @media (max-width: 600px) {
-      font-size: 1rem;
-  }
-  }
-  
-  .textBanner {
-    font-size: 0.9rem;
-    color: rgba(39, 105, 135, 0.9);
-    margin-bottom: 30px;
-    line-height: 1.6;
-    @media (max-width: 600px) {
-      font-size: 0.75rem;
-  }
-  }
-  
-  /* Volunteer Action Styling */
-  .volunteerAction {
-    text-align: center;
-  }
-  
-  .volunteerText {
-    font-size: 1.4rem;
-    margin-top: 40px;
-    margin-bottom: 15px;
-    color: rgba(39, 105, 135, 0.9);
-    font-weight: 500;
-    @media (max-width: 600px) {
-      font-size: 1rem;
-  }
-  }
-  
-  .btnExplore {
-    border: none;
-    padding: 12px 30px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    background-color: #007BFF;
-    color: white;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    margin-bottom: 15px;
-    @media (max-width: 600px) {
-      font-size: 0.75rem;
-  }
-  }
-  
-  .btnExplore:hover {
-    background-color: #0056b3; /* Darker hover effect */
-  }
-  
-  /* Style for Sign Up and Login buttons */
-  .authButtons {
-    display: flex;
-    justify-content: center;
-    gap: 10px; /* Spacing between buttons */
-  }
-  
-  .btnAction {
+}
+
+.bannerContent {
+  text-align: center;
+  color: #0080bc;
+}
+
+.headBanner {
+  color: #0080bc;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  margin-top: 60px;
+  @media (max-width: 600px) {
     font-size: 1rem;
-    padding: 10px 25px;
-    margin: 5px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    @media (max-width: 600px) {
-      font-size: 0.75rem;
+    margin-top: 0%;
   }
+}
+
+.textBanner {
+  font-size: 0.9rem;
+  color: rgba(39, 105, 135, 0.9);
+  margin-bottom: 30px;
+  line-height: 1.6;
+  @media (max-width: 600px) {
+    font-size: 0.75rem;
+    margin-bottom: 0%;
+    padding: 5px;
   }
-  
-  .btnAction:hover {
-    background-color: #218838;
+}
+
+/* Volunteer Action Styling */
+.volunteerAction {
+  text-align: center;
+}
+
+.volunteerText {
+  font-size: 1.4rem;
+  margin-top: 40px;
+  margin-bottom: 15px;
+  color: rgba(39, 105, 135, 0.9);
+  font-weight: 500;
+  @media (max-width: 600px) {
+    font-size: 1rem;
   }
-  
+}
+
+.btnExplore {
+  border: none;
+  padding: 12px 30px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  background-color: #007bff;
+  color: white;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+  margin-bottom: 15px;
+  @media (max-width: 600px) {
+    font-size: 0.75rem;
+  }
+}
+
+.btnExplore:hover {
+  background-color: #0056b3; /* Darker hover effect */
+}
+
+/* Style for Sign Up and Login buttons */
+.authButtons {
+  display: flex;
+  justify-content: center;
+  gap: 10px; /* Spacing between buttons */
+}
+
+.btnAction {
+  font-size: 1rem;
+  padding: 10px 25px;
+  margin: 5px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  @media (max-width: 600px) {
+    font-size: 0.75rem;
+  }
+}
+
+.btnAction:hover {
+  background-color: #218838;
+}
