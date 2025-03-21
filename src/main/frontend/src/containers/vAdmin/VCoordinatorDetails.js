@@ -214,6 +214,7 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyId }) => {
           <TabPanel value="2">
             <Box>
               <AssignAgency
+                title={"Assign Agency"}
                 label={"select Co-ordinator"}
                 vCoordinatorList={vCordinatorList}
                 agencyId={agencyId}
