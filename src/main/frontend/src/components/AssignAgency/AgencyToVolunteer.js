@@ -77,6 +77,7 @@ const AgencyToVolunteer = ({
           mt={isMobile ? 1 : 2}
         >
           <AssignAgency
+            title={"Assign Agency"}
             label="Select Agency"
             userId={userId}
             agencylist={agencylist}

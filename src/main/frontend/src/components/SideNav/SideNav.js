@@ -74,6 +74,12 @@ function SideNav() {
             </i>
             <span>Dashboard</span>
           </NavLink>
+          <NavLink to="/entities" exact className="sideNavItem row">
+            <i>
+              <BusinessIcon />
+            </i>
+            <span>Entity</span>
+          </NavLink>
           <NavLink
             to="/nAdmin-sessionDetails"
             exact
