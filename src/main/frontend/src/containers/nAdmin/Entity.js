@@ -16,6 +16,8 @@ import VCoordinatorDetails from "../vAdmin/VCoordinatorDetails";
 import AddEntity from "../../components/AssignEntity/AddEntity";
 import { Modal } from "react-bootstrap";
 import OnboardEntity from "../../components/AssignEntity/OnboardEntity";
+import { Snackbar, Alert } from "@mui/material";
+
 const configData = require("../../configure");
 
 const Entity = () => {
@@ -24,7 +26,9 @@ const Entity = () => {
   const [edit, setEdit] = useState(false);
   const [entityData, setEntityData] = useState(null);
   const [showAddEntity, setShowAddEntity] = useState(false);
+  const [entityId, setEntityId] = useState("");
   const [showOnbaordEntity, setShowOnbaordEntity] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const userId = localStorage.getItem("userId");
   useEffect(() => {
@@ -34,10 +38,10 @@ const Entity = () => {
           const response = await axios.get(
             `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
           );
-          const entities = response.data?.content?.filter(
+          const entitie = response.data?.content?.filter(
             (entity) => entity.status === "Active"
           );
-          setEntities(entities);
+          setEntities(entitie);
           console.log(entities);
         }
       } catch (error) {
@@ -45,7 +49,8 @@ const Entity = () => {
       }
     };
     getEntityDetails();
-  }, [userId]);
+  }, [userId, openSnackbar]);
+  console.log(entities);
 
   const COLUMNS = [
     { Header: "Entity Name", accessor: "name" },
@@ -125,7 +130,10 @@ const Entity = () => {
     console.log(entityId);
     setEdit(true);
     setShowPopup(!showPopup);
-    setEntityData(entities[entityId]);
+    const entityDetails = entities?.filter((entity) => entity.id === entityId);
+    console.log("entityDetails", entityDetails);
+    setEntityData(entityDetails);
+    setEntityId(entityId);
   };
 
   const handleAddEntity = () => {
@@ -134,6 +142,10 @@ const Entity = () => {
 
   const handleOnboardEntity = () => {
     setShowOnbaordEntity(!showOnbaordEntity);
+  };
+
+  const onEnityCreated = () => {
+    setOpenSnackbar(!openSnackbar);
   };
 
   return (
@@ -223,6 +235,9 @@ const Entity = () => {
           handlePopupClose={handleRowClick}
           data={entityData}
           isEdit={edit}
+          entityId={entityId}
+          needAdminId={userId}
+
           // onStatusUpdate={handleStatusUpdate}
         />
       )}
@@ -234,13 +249,29 @@ const Entity = () => {
             <Modal.Title>Add Entity</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <AddEntity />
+            <AddEntity
+              onEntityAdded={onEnityCreated}
+              handlePopupClose={() => setShowAddEntity(false)}
+              needAdminId={userId}
+            />
           </Modal.Body>
         </Modal>
       )}
 
       {showOnbaordEntity && (
         <OnboardEntity handlePopupClose={handleOnboardEntity} />
+      )}
+
+      {openSnackbar && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+        >
+          <Alert severity="success" variant="filled">
+            Entity Created successfully!
+          </Alert>
+        </Snackbar>
       )}
     </div>
   );
