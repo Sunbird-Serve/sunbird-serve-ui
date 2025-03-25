@@ -7,7 +7,13 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { useTheme } from "@mui/material/styles";
-const EntityModal = ({ isEdit, data, handlePopupClose }) => {
+const EntityModal = ({
+  isEdit,
+  data,
+  entityId,
+  needAdminId,
+  handlePopupClose,
+}) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -23,7 +29,7 @@ const EntityModal = ({ isEdit, data, handlePopupClose }) => {
     borderRadius: "12px",
     p: isMobile ? 2 : 3,
   };
-  console.log(data);
+  console.log("data", data);
 
   return (
     <div>
@@ -37,7 +43,12 @@ const EntityModal = ({ isEdit, data, handlePopupClose }) => {
           </Modal.Header>
           <Modal.Body>
             {/* {isEdit ? ( */}
-            <AddEntity isEdit={isEdit} />
+            <AddEntity
+              isEdit={isEdit}
+              entityDetails={data}
+              entityId={entityId}
+              needAdminId={needAdminId}
+            />
             {/* ) : (
               <Box>
                 <AssignAgency
