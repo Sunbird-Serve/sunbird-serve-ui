@@ -13,6 +13,7 @@ const EntityModal = ({
   entityId,
   needAdminId,
   handlePopupClose,
+  onEntityUpdate,
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
@@ -48,6 +49,8 @@ const EntityModal = ({
               entityDetails={data}
               entityId={entityId}
               needAdminId={needAdminId}
+              handlePopupClose={handlePopupClose}
+              onEntityUpdate={onEntityUpdate}
             />
             {/* ) : (
               <Box>

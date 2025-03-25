@@ -17,6 +17,7 @@ const configData = require("../../configure");
 
 const schema = yup.object().shape({
   name: yup.string().required("Entity name is required"),
+  status: yup.string(),
   mobile: yup.number(),
   // .matches(/^\d{10}$/, "mobile number must be 10 digits")
   // .required("mobile number is required"),
@@ -34,6 +35,7 @@ const schema = yup.object().shape({
 const AddEntity = ({
   handlePopupClose,
   onEntityAdded,
+  onEntityUpdate,
   needAdminId,
   entityDetails,
   isEdit,
@@ -60,6 +62,8 @@ const AddEntity = ({
     "Social Welfare & Support",
   ];
 
+  const statusOptions = ["New", "Verified", "Active", "Inactive"];
+
   useEffect(() => {
     if (isEdit && entityDetails.length === 0) {
       const getEntityDetails = async () => {
@@ -69,12 +73,15 @@ const AddEntity = ({
               `${configData.ENTITY_DETAILS_GET}/${needAdminId}?page=0&size=100`
             );
             const entities = response.data?.content?.filter(
-              (entity) => entity.status === "Active"
+              (entity) => entity.status !== "Inactive"
             );
             const entityDetails = entities?.filter(
               (entity) => entity.id === entityId
             );
-            reset(entityDetails[0]);
+            reset({
+              ...entityDetails[0],
+              category: entityDetails[0]?.category || "",
+            });
           }
         } catch (error) {
           console.log(error);
@@ -82,7 +89,10 @@ const AddEntity = ({
       };
       getEntityDetails();
     } else if (isEdit && entityDetails) {
-      reset(entityDetails[0]);
+      reset({
+        ...entityDetails[0],
+        category: entityDetails[0]?.category || "",
+      });
     }
   }, [isEdit, entityDetails, reset]);
 
@@ -96,26 +106,28 @@ const AddEntity = ({
       district: data?.district,
       pincode: data?.pincode,
       mobile: data?.mobile,
-      status: isEdit ? "New" : "Active",
+      status: isEdit ? data?.status : "Verified",
       website: data?.website,
     };
     try {
       let res;
       if (isEdit) {
         res = await axios.put(
-          `${configData.SERVE_NEED}/entity/edit/${needAdminId}`,
+          `${configData.SERVE_NEED}/entity/edit/${entityId}`,
           reqBody
         );
+        onEntityUpdate();
       } else {
         res = await axios.post(
           `${configData.SERVE_NEED}/entity/create`,
           reqBody
         );
+        onEntityAdded();
       }
-      const entityId = res?.data?.id;
-      console.log(entityId);
+      const entityID = res?.data?.id;
+      console.log(entityID);
       const onboardReq = {
-        entityId: entityId,
+        entityId: entityID,
         userId: needAdminId,
         userRole: "nAdmin",
       };
@@ -125,7 +137,6 @@ const AddEntity = ({
         onboardReq
       );
       handlePopupClose();
-      onEntityAdded();
     } catch (error) {
       console.log(error);
     }
@@ -225,6 +236,29 @@ const AddEntity = ({
                 )}
               />
             </Box>
+            {isEdit && (
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <FormControl
+                    margin="normal"
+                    sx={{ width: "49%" }}
+                    error={!!errors.category}
+                  >
+                    <InputLabel id="category-label">Status</InputLabel>
+                    <Select {...field} labelId="status-label" label="status">
+                      {statusOptions.map((option) => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <FormHelperText>{errors.status?.message}</FormHelperText>
+                  </FormControl>
+                )}
+              />
+            )}
             <Box display={"flex"} flexDirection={"row"} gap={"1rem"}>
               <Controller
                 name="address_line1"
