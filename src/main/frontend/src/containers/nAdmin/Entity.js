@@ -15,7 +15,7 @@ import EntityModal from "../../components/CommonComponents/EntityModal";
 import VCoordinatorDetails from "../vAdmin/VCoordinatorDetails";
 import AddEntity from "../../components/AssignEntity/AddEntity";
 import { Modal } from "react-bootstrap";
-import OnboardEntity from "../../components/AssignEntity/OnboardEntity";
+import RegisterEntity from "../../components/AssignEntity/RegisterEntity";
 import { Snackbar, Alert } from "@mui/material";
 
 const configData = require("../../configure");
@@ -26,8 +26,9 @@ const Entity = () => {
   const [edit, setEdit] = useState(false);
   const [entityData, setEntityData] = useState(null);
   const [showAddEntity, setShowAddEntity] = useState(false);
+  const [entityAssign, setEntityAssign] = useState(false);
   const [entityId, setEntityId] = useState("");
-  const [showOnbaordEntity, setShowOnbaordEntity] = useState(false);
+  const [showRegisterEntity, setShowRegisterEntity] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const userId = localStorage.getItem("userId");
@@ -39,7 +40,7 @@ const Entity = () => {
             `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
           );
           const entitie = response.data?.content?.filter(
-            (entity) => entity.status === "Active"
+            (entity) => entity.status !== "Inactive"
           );
           setEntities(entitie);
           console.log(entities);
@@ -140,12 +141,25 @@ const Entity = () => {
     setShowAddEntity(!showAddEntity);
   };
 
-  const handleOnboardEntity = () => {
-    setShowOnbaordEntity(!showOnbaordEntity);
+  const handleRegisterEntity = () => {
+    console.log(showRegisterEntity);
+    setShowRegisterEntity(true);
   };
 
   const onEnityCreated = () => {
     setOpenSnackbar(!openSnackbar);
+    setEdit(false);
+    setEntityAssign(false);
+  };
+
+  const handleEntityUpdate = () => {
+    setOpenSnackbar(!openSnackbar);
+    setEdit(true);
+    setEntityAssign(false);
+  };
+  const OnEntityAssignSuccess = () => {
+    setOpenSnackbar(!openSnackbar);
+    setEntityAssign(true);
   };
 
   return (
@@ -167,10 +181,10 @@ const Entity = () => {
             <Button
               variant="outlined"
               sx={{ textTransform: "none", marginRight: "2rem" }}
-              onClick={handleOnboardEntity}
+              onClick={handleRegisterEntity}
             >
               {" "}
-              Onboard Entity
+              Register Your Entity
             </Button>
             <Button
               variant="contained"
@@ -237,8 +251,7 @@ const Entity = () => {
           isEdit={edit}
           entityId={entityId}
           needAdminId={userId}
-
-          // onStatusUpdate={handleStatusUpdate}
+          onEntityUpdate={handleEntityUpdate}
         />
       )}
 
@@ -258,8 +271,12 @@ const Entity = () => {
         </Modal>
       )}
 
-      {showOnbaordEntity && (
-        <OnboardEntity handlePopupClose={handleOnboardEntity} />
+      {showRegisterEntity && (
+        <RegisterEntity
+          handlePopupClose={() => setShowRegisterEntity(false)}
+          needAdminId={userId}
+          entityAssignSuccess={OnEntityAssignSuccess}
+        />
       )}
 
       {openSnackbar && (
@@ -269,7 +286,11 @@ const Entity = () => {
           onClose={() => setOpenSnackbar(false)}
         >
           <Alert severity="success" variant="filled">
-            Entity Created successfully!
+            {edit
+              ? "Entity Updated successfully!"
+              : entityAssign
+                ? "Entity Assigned successfully!"
+                : "Entity Created successfully!"}
           </Alert>
         </Snackbar>
       )}
