@@ -29,6 +29,7 @@ const Entity = () => {
   const [entityAssign, setEntityAssign] = useState(false);
   const [entityId, setEntityId] = useState("");
   const [showRegisterEntity, setShowRegisterEntity] = useState(false);
+  const [assignEntityToNcord, setAssignEntityToNcord] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const userId = localStorage.getItem("userId");
@@ -51,11 +52,9 @@ const Entity = () => {
     };
     getEntityDetails();
   }, [userId, openSnackbar]);
-  console.log(entities);
 
   const COLUMNS = [
     { Header: "Entity Name", accessor: "name" },
-    { Header: "Volunteer", accessor: "" },
     { Header: "Phone", accessor: "mobile" },
     { Header: "City", accessor: "address_line1" },
     { Header: "Entity Category", accessor: "category" },
@@ -123,6 +122,7 @@ const Entity = () => {
   );
 
   const handleRowClick = (rowData) => {
+    setEntityId(rowData?.id);
     setEdit(false);
     setShowPopup(!showPopup);
   };
@@ -150,16 +150,26 @@ const Entity = () => {
     setOpenSnackbar(!openSnackbar);
     setEdit(false);
     setEntityAssign(false);
+    setAssignEntityToNcord(false);
   };
 
   const handleEntityUpdate = () => {
     setOpenSnackbar(!openSnackbar);
     setEdit(true);
     setEntityAssign(false);
+    setAssignEntityToNcord(false);
   };
   const OnEntityAssignSuccess = () => {
     setOpenSnackbar(!openSnackbar);
     setEntityAssign(true);
+    setAssignEntityToNcord(false);
+  };
+
+  const handleAssignEntityToNcord = () => {
+    setAssignEntityToNcord(true);
+    setOpenSnackbar(!openSnackbar);
+    setEdit(false);
+    setEntityAssign(false);
   };
 
   return (
@@ -252,6 +262,7 @@ const Entity = () => {
           entityId={entityId}
           needAdminId={userId}
           onEntityUpdate={handleEntityUpdate}
+          nCordAssignSuccess={handleAssignEntityToNcord}
         />
       )}
 
@@ -290,7 +301,9 @@ const Entity = () => {
               ? "Entity Updated successfully!"
               : entityAssign
                 ? "Entity Assigned successfully!"
-                : "Entity Created successfully!"}
+                : assignEntityToNcord
+                  ? "nCoordintor Assigned to Entity successfully!"
+                  : "Entity Created successfully!"}
           </Alert>
         </Snackbar>
       )}
