@@ -65,7 +65,7 @@ const AddEntity = ({
   const statusOptions = ["New", "Verified", "Active", "Inactive"];
 
   useEffect(() => {
-    if (isEdit && entityDetails?.length === 0) {
+    if (isEdit && (!entityDetails || entityDetails?.length === 0)) {
       const getEntityDetails = async () => {
         try {
           if (needAdminId) {
