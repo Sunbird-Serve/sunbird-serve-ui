@@ -17,11 +17,11 @@ const configData = require("../../configure");
 
 const schema = yup.object().shape({
   name: yup.string().required("Entity name is required"),
-  status: yup.string(),
   mobile: yup.number(),
   // .matches(/^\d{10}$/, "mobile number must be 10 digits")
   // .required("mobile number is required"),
   category: yup.string().required("Entity type is required"),
+  status: yup.string(),
   address_line1: yup.string(),
   district: yup.string().required("District is required"),
   state: yup.string().required("State is required"),
@@ -80,8 +80,10 @@ const AddEntity = ({
             );
             reset({
               ...entityDetails[0],
-              category: entityDetails[0]?.category || "",
+              category: entityDetails[0]?.category,
+              status: entityDetails[0]?.status,
             });
+            console.log(entityDetails[0].status, entityDetails[0].category);
           }
         } catch (error) {
           console.log(error);
@@ -92,9 +94,22 @@ const AddEntity = ({
       reset({
         ...entityDetails[0],
         category: entityDetails[0]?.category || "",
+        status: entityDetails[0]?.status,
       });
+      console.log(entityDetails[0].status, entityDetails[0].category);
     }
   }, [isEdit, entityDetails, reset]);
+
+  useEffect(() => {
+    if (entityDetails || entityDetails?.length > 0) {
+      reset({
+        ...entityDetails[0],
+        category: entityDetails[0]?.category || "",
+        status: entityDetails[0]?.status || "",
+      });
+      console.log(entityDetails[0].status, entityDetails[0].category);
+    }
+  }, [entityDetails, reset]);
 
   const onSubmit = async (data) => {
     console.log("submit");
@@ -224,6 +239,7 @@ const AddEntity = ({
                       {...field}
                       labelId="category-label"
                       label="Category"
+                      value={field.value || ""}
                     >
                       {categoryOptions.map((option) => (
                         <MenuItem key={option} value={option}>
@@ -247,7 +263,12 @@ const AddEntity = ({
                     error={!!errors.category}
                   >
                     <InputLabel id="category-label">Status</InputLabel>
-                    <Select {...field} labelId="status-label" label="status">
+                    <Select
+                      {...field}
+                      labelId="status-label"
+                      label="status"
+                      value={field.value || ""}
+                    >
                       {statusOptions.map((option) => (
                         <MenuItem key={option} value={option}>
                           {option}
