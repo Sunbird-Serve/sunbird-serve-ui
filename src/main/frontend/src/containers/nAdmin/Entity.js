@@ -59,15 +59,8 @@ const Entity = () => {
     { Header: "City", accessor: "address_line1" },
     { Header: "Entity Category", accessor: "category" },
     {
-      Header: "Website",
-      accessor: "website",
-      Cell: ({ value }) => {
-        return (
-          <a href={value} target="blank">
-            {value}
-          </a>
-        );
-      },
+      Header: "Status",
+      accessor: "status",
     },
     {
       Header: "Action",

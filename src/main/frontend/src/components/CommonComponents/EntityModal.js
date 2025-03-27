@@ -34,9 +34,9 @@ const EntityModal = ({
 }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [entityNcordList, setEntityNcordList] = useState([]);
   const dispatch = useDispatch();
   const userList = useSelector((state) => state.userlist.data);
-
   const nCoordiatorList = useMemo(() => {
     return userList.filter((item) => item.role.includes("nCoordinator"));
   }, [userList]);
@@ -45,6 +45,24 @@ const EntityModal = ({
     dispatch(fetchUserList());
   }, [dispatch]);
 
+  useEffect(() => {
+    const getEntityUserList = async () => {
+      try {
+        const res = await axios.get(
+          `${configData.SERVE_NEED}/userList/${entityId}`
+        );
+        const entityNcordList = res?.data?.content?.filter(
+          (item) => item.userRole === "nCoordinator"
+        );
+        console.log(entityNcordList);
+        setEntityNcordList(entityNcordList);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getEntityUserList();
+  }, [entityId, nCordAssignSuccess]);
+
   const COLUMNS = [
     { Header: "Co-ordinator Name", accessor: "identityDetails.fullname" },
     { Header: "Email ID", accessor: "contactDetails.email" },
@@ -52,27 +70,65 @@ const EntityModal = ({
     {
       Header: "Action",
       accessor: "osid",
-      Cell: ({ value }) => {
+      Cell: ({ row }) => {
         return (
-          <Box display={"flex"} justifyContent={"center"}>
-            <Button
-              variant="contained"
-              sx={{ textTransform: "none", marginRight: "2rem" }}
-              onClick={(e) => {
-                e.stopPropagation();
-                assignEntity(value);
-              }}
-            >
-              Assign
-            </Button>
+          <Box display="flex" justifyContent="center">
+            {row.original.isAssigned ? (
+              <Typography color="green">Assigned</Typography>
+            ) : (
+              <Button
+                variant="contained"
+                sx={{ textTransform: "none", marginRight: "2rem" }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  assignEntity(row.original.osid);
+                }}
+              >
+                Assign
+              </Button>
+            )}
           </Box>
         );
       },
     },
   ];
 
+  const assignedUsers = useMemo(() => {
+    return nCoordiatorList.filter((user) =>
+      entityNcordList.some((entityUser) => entityUser.userId === user.osid)
+    );
+  }, [nCoordiatorList, entityNcordList]);
+
+  const unassignedUsers = useMemo(() => {
+    return nCoordiatorList.filter(
+      (user) =>
+        !entityNcordList.some((entityUser) => entityUser.userId === user.osid)
+    );
+  }, [nCoordiatorList, entityNcordList]);
+
+  const sortedData = useMemo(() => {
+    return [...assignedUsers, ...unassignedUsers].map((user) => ({
+      ...user,
+      isAssigned: assignedUsers.some(
+        (assignedUser) => assignedUser.userId === user.osid
+      ),
+    }));
+  }, [assignedUsers, unassignedUsers]);
+
+  // console.log("Assigned Users:", assignedUsers);
+  // console.log("Unassigned Users:", unassignedUsers);
+
   const columns = useMemo(() => COLUMNS, []);
-  const data = useMemo(() => nCoordiatorList, [nCoordiatorList]);
+  const data = useMemo(() => {
+    return nCoordiatorList.map((user) => ({
+      ...user,
+      isAssigned: entityNcordList.some(
+        (entityUser) => entityUser.userId === user.osid
+      ),
+    }));
+  }, [nCoordiatorList, entityNcordList]);
+
+  // console.log("data",s data);
 
   const {
     getTableProps,
