@@ -70,7 +70,7 @@ const MainPage = () => {
                       return <Redirect to="/needs" />;
                     } else if (role === "nAdmin") {
                       return <Redirect to="/nAdmin-dashboard" />;
-                    } else if (role === "vAdmin") {
+                    } else if (role === "vAdmin" || role === "sAdmin") {
                       return <Redirect to="/volunteer-list" />;
                     } else if (role === "vCoordinator") {
                       return <Redirect to="/volunteers" />;

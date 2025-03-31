@@ -17,7 +17,9 @@ import AddEntity from "../../components/AssignEntity/AddEntity";
 import { Modal } from "react-bootstrap";
 import RegisterEntity from "../../components/AssignEntity/RegisterEntity";
 import { Snackbar, Alert } from "@mui/material";
-
+import { useSelector } from "react-redux";
+import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 const configData = require("../../configure");
 
 const Entity = () => {
@@ -31,27 +33,54 @@ const Entity = () => {
   const [showRegisterEntity, setShowRegisterEntity] = useState(false);
   const [assignEntityToNcord, setAssignEntityToNcord] = useState(false);
   const [openSnackbar, setOpenSnackbar] = useState(false);
-
+  const userData = useSelector((state) => state.user.data);
+  const userRole = userData.role;
+  const isNAdmin = userRole?.[0] === "nAdmin" ? true : false;
+  const isSAdmin = userRole?.[0] === "sAdmin" ? true : false;
   const userId = localStorage.getItem("userId");
+
   useEffect(() => {
-    const getEntityDetails = async () => {
-      try {
-        if (userId) {
-          const response = await axios.get(
-            `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
-          );
-          const entitie = response.data?.content?.filter(
-            (entity) => entity.status !== "Inactive"
-          );
-          setEntities(entitie);
-          console.log(entities);
+    if (isNAdmin) {
+      const getEntityDetails = async () => {
+        try {
+          if (userId) {
+            const response = await axios.get(
+              `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
+            );
+            const entitie = response.data?.content?.filter(
+              (entity) => entity.status !== "Inactive"
+            );
+            setEntities(entitie);
+            console.log(entities);
+          }
+        } catch (error) {
+          console.log(error);
         }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getEntityDetails();
+      };
+      getEntityDetails();
+    }
   }, [userId, openSnackbar]);
+
+  useEffect(() => {
+    if (isSAdmin) {
+      const getEntityDetails = async () => {
+        try {
+          const response = await axios.get(
+            `${configData.SERVE_NEED}/entity/all?page=0&size=100`
+          );
+          const entities = response.data?.content;
+          // ?.filter(
+          //   (entity) => entity.status === "Active"
+          // );
+          setEntities(entities);
+          console.log(entities);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      getEntityDetails();
+    }
+  }, []);
 
   const COLUMNS = [
     { Header: "Entity Name", accessor: "name" },
@@ -113,6 +142,7 @@ const Entity = () => {
     useSortBy,
     usePagination
   );
+  const { globalFilter, pageIndex, pageSize } = state;
 
   const handleRowClick = (rowData) => {
     setEntityId(rowData?.id);
@@ -180,24 +210,26 @@ const Entity = () => {
               Here's your Entities Data
             </Typography>
           </Box>
-          <Box marginRight={"2rem"}>
-            <Button
-              variant="outlined"
-              sx={{ textTransform: "none", marginRight: "2rem" }}
-              onClick={handleRegisterEntity}
-            >
-              {" "}
-              Register Your Entity
-            </Button>
-            <Button
-              variant="contained"
-              sx={{ textTransform: "none" }}
-              onClick={handleAddEntity}
-            >
-              {" "}
-              <AddIcon /> Add Entity
-            </Button>
-          </Box>
+          {isSAdmin && (
+            <Box marginRight={"2rem"}>
+              <Button
+                variant="outlined"
+                sx={{ textTransform: "none", marginRight: "2rem" }}
+                onClick={handleRegisterEntity}
+              >
+                {" "}
+                Register Your Entity
+              </Button>
+              <Button
+                variant="contained"
+                sx={{ textTransform: "none" }}
+                onClick={handleAddEntity}
+              >
+                {" "}
+                <AddIcon /> Add Entity
+              </Button>
+            </Box>
+          )}
         </Box>
         <Box paddingTop={"1rem"}>
           <table className="tableNeedList">
@@ -243,6 +275,56 @@ const Entity = () => {
               })}
             </tbody>
           </table>
+
+          <div className="pageNav">
+            <div className="needsPerPage">
+              <span>Rows per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+              >
+                {[10, 15, 25].map((pageSize) => (
+                  <option key={pageSize} value={pageSize}>
+                    {pageSize}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <span>
+              Go to
+              <input
+                type="number"
+                defaultValue={pageIndex + 1}
+                onChange={(e) => {
+                  const pageNumber = e.target.value
+                    ? Number(e.target.value) - 1
+                    : 0;
+                  gotoPage(pageNumber);
+                }}
+                style={{ width: "50px" }}
+              />
+              page
+            </span>
+
+            <div className="pageNumber">
+              <button
+                onClick={() => previousPage()}
+                disabled={!canPreviousPage}
+              >
+                {" "}
+                <ArrowBackIosIcon style={{ height: "18px" }} />
+              </button>
+              <span>
+                {" "}
+                Page
+                <strong>{pageIndex + 1}</strong>
+                of {pageOptions.length}
+              </span>
+              <button onClick={() => nextPage()} disabled={!canNextPage}>
+                <ArrowForwardIosIcon style={{ height: "18px" }} />
+              </button>
+            </div>
+          </div>
         </Box>
       </Box>
 

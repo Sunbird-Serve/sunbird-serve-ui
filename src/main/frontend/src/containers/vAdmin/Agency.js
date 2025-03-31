@@ -18,12 +18,14 @@ import { useSelector } from "react-redux";
 import AddAgency from "../../components/AssignAgency/AddAgency";
 import axios from "axios";
 import configData from "../../configure";
+import RegistrationSection from "../../components/RegistrationByLink/RegistrationLink";
 const Agency = () => {
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [showAddAgencyPopup, setshowAddAgencyPopup] = useState(false);
   const [agencies, setAgencies] = useState([]);
   const [updateAgencyList, setUpdateAgencyList] = useState(false);
+  const [agencyDetailsError, setAgencyDetailsError] = useState("");
 
   // const userList = useSelector((state) => state.userlist.data);
   // const vCoordinatorList = useMemo(() => {
@@ -31,6 +33,10 @@ const Agency = () => {
   // }, [userList]);
 
   // console.log("vCoordinatorList", vCoordinatorList);
+  const userData = useSelector((state) => state.user.data);
+  const userRole = userData.role;
+  const isVAdmin = userRole?.[0] === "vAdmin" ? true : false;
+  const isSAdmin = userRole?.[0] === "sAdmin" ? true : false;
 
   const AgencyData = [
     {
@@ -51,20 +57,41 @@ const Agency = () => {
   ];
 
   useEffect(() => {
-    const getAgencies = async () => {
-      try {
-        const response = await axios.get(
-          `${configData.SERVE_VOLUNTEERING}/agency/list`
-        );
-        const agencies = response?.data;
-        console.log(agencies);
-        setAgencies(agencies);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getAgencies();
+    if (isSAdmin) {
+      const getAgencies = async () => {
+        try {
+          const response = await axios.get(
+            `${configData.SERVE_VOLUNTEERING}/agency/list`
+          );
+          const agencies = response?.data;
+          setAgencies(agencies);
+        } catch (error) {
+          console.log(error);
+        }
+      };
+      getAgencies();
+    }
   }, [updateAgencyList]);
+
+  useEffect(() => {
+    if (isVAdmin) {
+      const getAgencyDetails = async () => {
+        try {
+          const res = await axios.get(
+            `${configData.SERVE_VOLUNTEERING}/agency/${userData.agencyId}`
+          );
+          const agencies = res?.data;
+          setAgencies(agencies);
+        } catch (error) {
+          console.log(error);
+          setAgencyDetailsError(
+            "Agency not found! Please contact your administrator!"
+          );
+        }
+      };
+      getAgencyDetails();
+    }
+  }, []);
 
   const handleUpdateAgencyList = () => {
     setUpdateAgencyList((prev) => !prev);
@@ -74,20 +101,43 @@ const Agency = () => {
     { Header: "Agency Name", accessor: "name" },
     { Header: "Email ID", accessor: "contactDetails.email" },
     { Header: "Phone", accessor: "contactDetails.mobile" },
-    { Header: "City", accessor: "contactDetails.address.village" },
+
     { Header: "Agency Type", accessor: "agencyType" },
-    {
-      Header: "Website",
-      accessor: "website",
+  ];
+
+  if (isSAdmin) {
+    COLUMNS.push({
+      Header: "Registration Link",
+      accessor: "osid",
       Cell: ({ value }) => {
         return (
-          <a href={value} target="blank">
-            {value}
-          </a>
+          <Box
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
+            <RegistrationSection agencyId={value} />
+          </Box>
         );
       },
-    },
-  ];
+    });
+  }
+  if (isVAdmin) {
+    COLUMNS.push(
+      { Header: "City", accessor: "contactDetails.address.village" },
+      {
+        Header: "Website",
+        accessor: "website",
+        Cell: ({ value }) => {
+          return (
+            <a href={value} target="blank">
+              {value}
+            </a>
+          );
+        },
+      }
+    );
+  }
 
   const columns = useMemo(() => COLUMNS, []);
   const data = useMemo(() => agencies, [agencies]);
@@ -144,19 +194,23 @@ const Agency = () => {
           </Typography>
         </Box>
         <Box marginRight={"2rem"}>
-          <Button
-            variant="contained"
-            sx={{ textTransform: "none" }}
-            onClick={handleAddAgency}
-          >
-            {" "}
-            <AddIcon /> Add Agency
-          </Button>
+          {isSAdmin && (
+            <Button
+              variant="contained"
+              sx={{ textTransform: "none" }}
+              onClick={handleAddAgency}
+            >
+              {" "}
+              <AddIcon /> Add Agency
+            </Button>
+          )}
         </Box>
       </Box>
-      <Box padding={"0.5rem 0"}>
-        <NeedCard matrixData={AgencyData} />
-      </Box>
+      {isSAdmin && (
+        <Box padding={"0.5rem 0"}>
+          <NeedCard matrixData={AgencyData} />
+        </Box>
+      )}
       <Box paddingTop={"1rem"}>
         <table className="tableNeedList">
           <thead>
@@ -176,27 +230,35 @@ const Agency = () => {
             ))}
           </thead>
           <tbody {...getTableBodyProps()}>
-            {page?.map((row) => {
-              prepareRow(row);
-              return (
-                <tr
-                  {...row?.getRowProps()}
-                  onClick={() => handleRowClick(row?.original)}
-                >
-                  {row?.cells.map((cell) => {
-                    return (
-                      <td
-                        {...cell?.getCellProps()}
-                        style={{ width: cell?.column?.width }}
-                      >
-                        {" "}
-                        {cell?.render("Cell")}
-                      </td>
-                    );
-                  })}
-                </tr>
-              );
-            })}
+            {page.length > 0 ? (
+              page?.map((row) => {
+                prepareRow(row);
+                return (
+                  <tr
+                    {...row?.getRowProps()}
+                    onClick={() => handleRowClick(row?.original)}
+                  >
+                    {row?.cells.map((cell) => {
+                      return (
+                        <td
+                          {...cell?.getCellProps()}
+                          style={{ width: cell?.column?.width }}
+                        >
+                          {" "}
+                          {cell?.render("Cell")}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan={columns.length} style={{ textAlign: "center" }}>
+                  {agencyDetailsError}
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </Box>
@@ -205,7 +267,8 @@ const Agency = () => {
         <VCoordinatorDetails
           handlePopupClose={handleRowClick}
           // data={rowData}
-          agencyId={rowData?.osid}
+          agencyID={rowData?.osid}
+          agencyName={rowData?.name}
           // onStatusUpdate={handleStatusUpdate}
         />
       )}
