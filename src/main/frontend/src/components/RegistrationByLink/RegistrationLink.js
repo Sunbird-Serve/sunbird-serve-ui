@@ -9,7 +9,6 @@ const RegistrationSection = ({ agencyId }) => {
   const history = useHistory();
   const [copied, setCopied] = useState(false);
   const [vRegistration, setVRegistration] = useState(false);
-
   let registrationLink;
   // = `${configData.REGISTRATION_DOMAIN}/volunteer/${agencyId}/vregistration`;
   if (agencyId === "1-e183cda9-6afd-4a91-b14e-79a140801ab8") {
@@ -35,19 +34,36 @@ const RegistrationSection = ({ agencyId }) => {
   return (
     <Box>
       {!vRegistration ? (
-        <Box
-          sx={{
-            p: 2,
-            border: "1px solid #ccc",
-            borderRadius: 2,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
-          <Typography variant="body1" fontWeight="bold">
-            Registration Link:
-          </Typography>
+        // <Box
+        //   sx={{
+        //     p: 2,
+        //     border: "1px solid #ccc",
+        //     borderRadius: 2,
+        //     display: "flex",
+        //     alignItems: "center",
+        //     gap: 1,
+        //   }}
+        // >
+        //   <Typography variant="body1" fontWeight="bold">
+        //     Registration Link:
+        //   </Typography>
+        //   <Typography
+        //     variant="body2"
+        //     color="primary"
+        //     sx={{ wordBreak: "break-all" }}
+        //     component="a"
+        //     href={registrationLink}
+        //     onClick={handleRegistrationClick}
+        //   >
+        //     {registrationLink}
+        //   </Typography>
+        //   <Tooltip title={copied ? "Copied!" : "Copy"}>
+        //     <IconButton onClick={handleCopy} size="small">
+        //       <ContentCopyIcon fontSize="small" />
+        //     </IconButton>
+        //   </Tooltip>
+        // </Box>
+        <Box>
           <Typography
             variant="body2"
             color="primary"
@@ -56,7 +72,7 @@ const RegistrationSection = ({ agencyId }) => {
             href={registrationLink}
             onClick={handleRegistrationClick}
           >
-            {registrationLink}
+            Register to Agency
           </Typography>
           <Tooltip title={copied ? "Copied!" : "Copy"}>
             <IconButton onClick={handleCopy} size="small">
