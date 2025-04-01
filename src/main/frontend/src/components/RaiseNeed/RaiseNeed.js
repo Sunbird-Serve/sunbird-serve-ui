@@ -71,8 +71,8 @@ const RaiseNeed = (props) => {
           );
           const entities =
             response.data?.content
-              ?.filter((entity) => entity.status === "Active")
-              .map((entity) => ({
+              // ?.filter((entity) => entity.status === "Active")
+              ?.map((entity) => ({
                 id: entity.id,
                 name: entity.name,
               })) || [];

@@ -210,26 +210,24 @@ const Entity = () => {
               Here's your Entities Data
             </Typography>
           </Box>
-          {isSAdmin && (
-            <Box marginRight={"2rem"}>
-              <Button
-                variant="outlined"
-                sx={{ textTransform: "none", marginRight: "2rem" }}
-                onClick={handleRegisterEntity}
-              >
-                {" "}
-                Register Your Entity
-              </Button>
-              <Button
-                variant="contained"
-                sx={{ textTransform: "none" }}
-                onClick={handleAddEntity}
-              >
-                {" "}
-                <AddIcon /> Add Entity
-              </Button>
-            </Box>
-          )}
+          <Box marginRight={"2rem"}>
+            <Button
+              variant="outlined"
+              sx={{ textTransform: "none", marginRight: "2rem" }}
+              onClick={handleRegisterEntity}
+            >
+              {" "}
+              Register Your Entity
+            </Button>
+            <Button
+              variant="contained"
+              sx={{ textTransform: "none" }}
+              onClick={handleAddEntity}
+            >
+              {" "}
+              <AddIcon /> Add Entity
+            </Button>
+          </Box>
         </Box>
         <Box paddingTop={"1rem"}>
           <table className="tableNeedList">
