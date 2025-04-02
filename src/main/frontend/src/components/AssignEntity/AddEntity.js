@@ -138,19 +138,20 @@ const AddEntity = ({
           reqBody
         );
         onEntityAdded();
-      }
-      const entityID = res?.data?.id;
-      console.log(entityID);
-      const onboardReq = {
-        entityId: entityID,
-        userId: needAdminId,
-        userRole: "nAdmin",
-      };
 
-      const entityOnboarding = await axios.post(
-        `${configData.SERVE_NEED}/entity/assign`,
-        onboardReq
-      );
+        const entityID = res?.data?.id;
+        console.log(entityID);
+        const onboardReq = {
+          entityId: entityID,
+          userId: needAdminId,
+          userRole: "nAdmin",
+        };
+
+        const entityOnboarding = await axios.post(
+          `${configData.SERVE_NEED}/entity/assign`,
+          onboardReq
+        );
+      }
       handlePopupClose();
     } catch (error) {
       console.log(error);
