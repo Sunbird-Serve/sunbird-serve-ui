@@ -15,6 +15,7 @@ import axios from "axios";
 import configData from "../../configure";
 
 export default function AssignAgency({
+  title,
   label,
   userId,
   agencylist,
@@ -88,7 +89,7 @@ export default function AssignAgency({
       }}
     >
       <Typography variant="h6" fontWeight="bold" gutterBottom>
-        Assign Agency
+        {title}
       </Typography>
 
       <FormControl fullWidth sx={{ mb: 2 }}>

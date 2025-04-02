@@ -1,137 +1,137 @@
 .wrapVolunteer {
-    height: 100%;
-    background-color: white;
+  height: 100%;
+  background-color: white;
 }
 .vNeedType {
-    height: calc(100% - 20px) ;
-    margin: 10px 20px 10px 10px;
-    background-color: white;
-    overflow: scroll;
+  height: calc(100% - 20px);
+  margin: 10px 10px 10px 10px;
+  background-color: white;
+  overflow: scroll;
 
-    @media (max-width: 600px) {
-        margin: 10px 0 10px 10px;
-    }
+  @media (max-width: 600px) {
+    margin: 10px 0 10px 10px;
+  }
 }
 .vNtypesHeader {
-    padding: 10px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    background-color: #FAFAFA;
-    margin-bottom: 10px;
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  background-color: #fafafa;
+  margin-bottom: 10px;
 }
 
 .vGreetNT {
-    font-size: 16px;
+  font-size: 16px;
 }
 .vTitleNT {
-    font-size: 32px;
-    color: #00405E;
-    font-weight: 600;
+  font-size: 32px;
+  color: #00405e;
+  font-weight: 600;
 }
 .vCaptionNT {
-    font-size: 15px;
-    color: #99999F;
+  font-size: 15px;
+  color: #99999f;
 }
 .vfilterHeader {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 .vSearchNT {
-    border: solid #DBDBDB;
-    height: fit-content;
-    padding: 2px;
-    border-radius: 5px;
-    background-color: #FFFFFF;
+  border: solid #dbdbdb;
+  height: fit-content;
+  padding: 2px;
+  border-radius: 5px;
+  background-color: #ffffff;
 }
 .vSearchNT i {
-    color: #99999F;
-    margin: 0px 8px;
+  color: #99999f;
+  margin: 0px 8px;
 }
 .vSearchNT input {
-    border: none;
-    background-color: inherit;
-    width: 400px;
+  border: none;
+  background-color: inherit;
+  width: 400px;
 }
 .vSortNT {
-    display: flex;
-    align-items: center;
-    border: solid #DBDBDB;
-    padding: 4px;
-    border-radius: 5px;
-    background-color: white;
+  display: flex;
+  align-items: center;
+  border: solid #dbdbdb;
+  padding: 4px;
+  border-radius: 5px;
+  background-color: white;
 }
 .vSortNT select {
-    border: none;
-    background-color: white;
+  border: none;
+  background-color: white;
 }
 .vline {
-    border-left: solid #EBEBEB;
-    height: 30px;
+  border-left: solid #ebebeb;
+  height: 30px;
 }
 .toggleView {
-    padding: 2px;
-    margin: 0px 5px;
-    display: flex;
-    border: solid  1px #DBDBDB;
-    border-radius: 3px;
-    background-color: #F7F8F9;
+  padding: 2px;
+  margin: 0px 5px;
+  display: flex;
+  border: solid 1px #dbdbdb;
+  border-radius: 3px;
+  background-color: #f7f8f9;
 }
 .toggleView button {
-    padding: 2px;
-    margin-right: 5px;
-    border: none;
+  padding: 2px;
+  margin-right: 5px;
+  border: none;
 }
 .activeView {
-    background-color: white;
-    color: #0080BC;
+  background-color: white;
+  color: #0080bc;
 }
 .viewNT {
-    background-color: inherit;
+  background-color: inherit;
 }
 
 .wrapAllNT {
-    width: 100%;
-    display: flex;
+  width: 100%;
+  display: flex;
 }
 .wrapGrid {
-    padding: 10px ;
-    display: flex;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 30px;
-    width: fit-content;
+  /* padding: 10px; */
+  display: flex;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  width: auto;
 }
 .gridItem {
-    padding: 15px;
-    border-radius: 5px;
-    color: #3C4044;
-    font-weight: 600;
-    font-size: 15px;
-    z-index: 10;
-    width: 300px;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(219, 219, 219, 1);
+  padding: 15px;
+  border-radius: 5px;
+  color: #3c4044;
+  font-weight: 600;
+  font-size: 15px;
+  z-index: 10;
+  width: 300px;
+  background-color: white;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(219, 219, 219, 1);
 }
 .gridItem:hover {
-    cursor: pointer;
+  cursor: pointer;
 }
 .numNeedsNT {
-    font-size: 12px;
-    color: #99999F;
-    margin-top: 10px;
+  font-size: 12px;
+  color: #99999f;
+  margin-top: 10px;
 }
 .imgGridNT {
-    height: 120px;
-    width: 240px;
-    margin-bottom: 15px;
-    display: flex;
-    justify-content: center;
-    border: none;
+  height: 120px;
+  width: 240px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  border: none;
 }
 .alphabetNT {
-    font-size: 18px;
+  font-size: 18px;
 }

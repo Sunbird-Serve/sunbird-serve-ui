@@ -91,6 +91,9 @@ function Header({ toggleSideNav, role }) {
         {userRole && userRole.includes("vAdmin") && (
           <div className="headname">Volunteer Admin Management</div>
         )}
+        {userRole && userRole.includes("sAdmin") && (
+          <div className="headname">Serve Admin Management</div>
+        )}
       </div>
 
       {/* onclicking PROFILE */}

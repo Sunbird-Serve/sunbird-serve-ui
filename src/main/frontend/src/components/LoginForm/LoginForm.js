@@ -75,7 +75,7 @@ const LoginForm = ({ loginState, changePasswordRequest, passwordChanged }) => {
     }
   };
   return (
-    <div className="loginForm row">
+    <div className="loginForm ">
       {!showResetForm ? (
         <form className="menuLogin col-12 col-sm-7 offset-sm-1 mt-sm-5">
           <div className="greetLogin">Are you a Coordinator?</div>

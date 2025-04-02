@@ -41,10 +41,11 @@ function Volunteers({ agencylist, filterByAgencies }) {
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
   const isVAdmin = userRole?.[0] === "vAdmin" ? true : false;
+  const isSAdmin = userRole?.[0] === "sAdmin" ? true : false;
   const vCordAgencyId = userData?.agencyId;
 
   const volunteerList = useMemo(() => {
-    if (isVAdmin) {
+    if (isVAdmin || isSAdmin) {
       return userList.filter((item) => item.role.includes("Volunteer"));
     } else {
       return userList.filter(
@@ -158,7 +159,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
     // { Header: 'Onboard Status', accessor:'nominationStatus' }
   ];
 
-  if (isVAdmin) {
+  if (isVAdmin || isSAdmin) {
     COLUMNS.push({
       Header: "Agency Name",
       accessor: "agencyId",

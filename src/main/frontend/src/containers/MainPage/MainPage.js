@@ -24,6 +24,7 @@ import SessionDetails from "../nAdmin/SessionDetails";
 import VolunteerList from "../vAdmin/VolunteerList";
 import Agency from "../vAdmin/Agency";
 import VolunteerSignup from "../../components/VolunteerSignup/VolunteerSignup";
+import Entity from "../nAdmin/Entity";
 
 const MainPage = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
@@ -69,7 +70,7 @@ const MainPage = () => {
                       return <Redirect to="/needs" />;
                     } else if (role === "nAdmin") {
                       return <Redirect to="/nAdmin-dashboard" />;
-                    } else if (role === "vAdmin") {
+                    } else if (role === "vAdmin" || role === "sAdmin") {
                       return <Redirect to="/volunteer-list" />;
                     } else if (role === "vCoordinator") {
                       return <Redirect to="/volunteers" />;
@@ -102,6 +103,7 @@ const MainPage = () => {
                   element={<Registration />}
                 />
                 <Route path="/signUp" component={VolunteerSignup} />
+                <Route path="/entities" component={Entity} />
               </Switch>
             </div>
           </div>

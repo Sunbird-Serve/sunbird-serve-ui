@@ -19,7 +19,7 @@ const RaiseNeed = (props) => {
 
   const history = useHistory();
   const uid = useSelector((state) => state.user.data.osid);
-  const entities = useSelector((state) => state.entity.data.content);
+  // const entities = useSelector((state) => state.entity.data.content);
   const needTypes = useSelector((state) => state.needtype.data.content);
 
   // fields to enter in the raise need form
@@ -29,7 +29,7 @@ const RaiseNeed = (props) => {
     name: "",
     needPurpose: "",
     description: "",
-    status: "Approved",
+    status: "New",
     userId: uid,
     entityId: "",
     //requirementId: '',
@@ -60,30 +60,30 @@ const RaiseNeed = (props) => {
   } = data;
   const { startDate, endDate, days, frequency, timeSlots } = dataOccurrence;
   const { skillDetails, volunteersRequired, occurrence, priority } = dataOther;
-  // const [entities, setEntities] = useState([]);
+  const [entities, setEntities] = useState([]);
 
-  // useEffect(() => {
-  //   const getEntityDetails = async () => {
-  //     try {
-  //       if (uid) {
-  //         const response = await axios.get(
-  //           `${configData.ENTITY_DETAILS_GET}/${uid}?page=0&size=100`
-  //         );
-  //         const entities =
-  //           response.data?.content
-  //             ?.filter((entity) => entity.status === "Active")
-  //             .map((entity) => ({
-  //               id: entity.id,
-  //               name: entity.name,
-  //             })) || [];
-  //         setEntities(entities);
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   getEntityDetails();
-  // }, [uid]);
+  useEffect(() => {
+    const getEntityDetails = async () => {
+      try {
+        if (uid) {
+          const response = await axios.get(
+            `${configData.ENTITY_DETAILS_GET}/${uid}?page=0&size=100`
+          );
+          const entities =
+            response.data?.content
+              // ?.filter((entity) => entity.status === "Active")
+              ?.map((entity) => ({
+                id: entity.id,
+                name: entity.name,
+              })) || [];
+          setEntities(entities);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getEntityDetails();
+  }, [uid]);
   //need name and purpose updated by change handler
   //default Handlers to update input fields //
   const changeHandler = (e) => {

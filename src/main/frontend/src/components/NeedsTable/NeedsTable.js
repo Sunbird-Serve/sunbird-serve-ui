@@ -20,11 +20,16 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { FaSort } from "react-icons/fa";
 import Avatar from "@mui/material/Avatar";
 import CoordinatorByUserId from "../../components/CommonComponents/CoordinatorByUserId.js";
-
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Box, IconButton, Menu, MenuItem } from "@mui/material";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { fetchNeeds } from "../../state/needSlice.js";
 const configData = require("../../configure.js");
 
 export const NeedsTable = ({ props, filterByEntity }) => {
   const dispatch = useDispatch();
+  const [updateNeedList, setUpdateNeedList] = useState(false);
   //get userId
   const uid = useSelector((state) => state.user.data.osid);
   const userData = useSelector((state) => state.user.data);
@@ -66,6 +71,54 @@ export const NeedsTable = ({ props, filterByEntity }) => {
       setFilteredData(filtered);
     }
   }, [needTypeId, needList, needsByEntity]);
+
+  useEffect(() => {
+    if (updateNeedList) {
+      dispatch(fetchNeeds());
+      setUpdateNeedList(false);
+    }
+  }, [updateNeedList, dispatch]);
+
+  const StatusCell = ({ value, row }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+      event.stopPropagation();
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+      setAnchorEl(null);
+    };
+
+    const handleAction = (status, e) => {
+      e.stopPropagation();
+      handleStatusUpdate(row.original.need.id, status);
+      handleClose();
+    };
+
+    return (
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        {value}
+        {value === "New" && (
+          <>
+            <IconButton size="small" onClick={handleClick}>
+              <MoreVertIcon />
+            </IconButton>
+            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+              <MenuItem onClick={(e) => handleAction("Approved", e)}>
+                <CheckIcon color="success" /> Approve
+              </MenuItem>
+              <MenuItem onClick={(e) => handleAction("Rejected", e)}>
+                <CloseIcon color="error" /> Reject
+              </MenuItem>
+            </Menu>
+          </>
+        )}
+      </Box>
+    );
+  };
 
   const data = useMemo(() => filteredData, [filteredData, needList]);
 
@@ -138,13 +191,28 @@ export const NeedsTable = ({ props, filterByEntity }) => {
         );
       },
     },
-    { Header: "Status", accessor: "need.status" },
+    {
+      Header: "Status",
+      accessor: "need.status",
+      Cell: StatusCell,
+    },
   ];
 
   const columns = useMemo(
     () => (isNAdmin ? nAdminCOLUMNS : COLUMNS),
     [isNAdmin]
   );
+
+  const handleStatusUpdate = async (needId, status) => {
+    try {
+      const res = await axios.put(
+        `${configData.SERVE_NEED}/need/status/${needId}?status=${status}`
+      );
+      setUpdateNeedList(!updateNeedList);
+    } catch (error) {
+      console.error("Error updating status: ", error);
+    }
+  };
 
   function VolunteerByNeedId({ needId }) {
     const [volunteerList, setVolunteerList] = useState(null);
@@ -299,7 +367,9 @@ export const NeedsTable = ({ props, filterByEntity }) => {
     setActiveTab(tab);
   };
   useEffect(() => {
-    if (activeTab === "approved") {
+    if (activeTab === "new") {
+      setFilter("need.status", "New");
+    } else if (activeTab === "approved") {
       setFilter("need.status", "Approved");
     } else if (activeTab == "nominated") {
       setFilter("need.status", "Nominated");
@@ -336,6 +406,12 @@ export const NeedsTable = ({ props, filterByEntity }) => {
             onClick={() => handleTabClick("all")}
           >
             All
+          </div>
+          <div
+            className={`tabNeed ${activeTab === "new" ? "activeNTab" : ""}`}
+            onClick={() => handleTabClick("new")}
+          >
+            New
           </div>
           <div
             className={`tabNeed ${activeTab === "approved" ? "activeNTab" : ""}`}

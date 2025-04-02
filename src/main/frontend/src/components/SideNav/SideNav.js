@@ -10,6 +10,7 @@ import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import BusinessIcon from "@mui/icons-material/Business";
+import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
 import { useSelector } from "react-redux";
 
 function SideNav() {
@@ -74,6 +75,12 @@ function SideNav() {
             </i>
             <span>Dashboard</span>
           </NavLink>
+          <NavLink to="/entities" exact className="sideNavItem row">
+            <i>
+              <BusinessIcon />
+            </i>
+            <span>Entity</span>
+          </NavLink>
           <NavLink
             to="/nAdmin-sessionDetails"
             exact
@@ -87,22 +94,31 @@ function SideNav() {
         </div>
       )}
 
-      {userRole && userRole.includes("vAdmin") && (
-        <div className="navMenu">
-          <NavLink to="/volunteer-list" exact className="sideNavItem row">
-            <i>
-              <VolunteerActivismOutlinedIcon />
-            </i>
-            <span>Volunteers</span>
-          </NavLink>
-          <NavLink to="/agencies" exact className="sideNavItem row">
-            <i>
-              <BusinessIcon />
-            </i>
-            <span>Agency</span>
-          </NavLink>
-        </div>
-      )}
+      {userRole &&
+        (userRole.includes("vAdmin") || userRole.includes("sAdmin")) && (
+          <div className="navMenu">
+            <NavLink to="/volunteer-list" exact className="sideNavItem row">
+              <i>
+                <VolunteerActivismOutlinedIcon />
+              </i>
+              <span>Volunteers</span>
+            </NavLink>
+            <NavLink to="/agencies" exact className="sideNavItem row">
+              <i>
+                <BusinessIcon />
+              </i>
+              <span>Agency</span>
+            </NavLink>
+            {userRole.includes("sAdmin") && (
+              <NavLink to="/entities" exact className="sideNavItem row">
+                <i>
+                  <SchoolOutlinedIcon />
+                </i>
+                <span>Entity</span>
+              </NavLink>
+            )}
+          </div>
+        )}
 
       <div className="navMenu">
         <NavLink to="/settings" exact className="sideNavItem row">
