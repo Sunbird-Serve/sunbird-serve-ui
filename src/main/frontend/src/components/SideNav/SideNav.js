@@ -110,12 +110,20 @@ function SideNav() {
               <span>Agency</span>
             </NavLink>
             {userRole.includes("sAdmin") && (
-              <NavLink to="/entities" exact className="sideNavItem row">
-                <i>
-                  <SchoolOutlinedIcon />
-                </i>
-                <span>Entity</span>
-              </NavLink>
+              <>
+                <NavLink to="/entities" exact className="sideNavItem row">
+                  <i>
+                    <SchoolOutlinedIcon />
+                  </i>
+                  <span>Entity</span>
+                </NavLink>
+                <NavLink to="/entities" exact className="sideNavItem row">
+                  <i>
+                    <SchoolOutlinedIcon />
+                  </i>
+                  <span>Needs</span>
+                </NavLink>
+              </>
             )}
           </div>
         )}
