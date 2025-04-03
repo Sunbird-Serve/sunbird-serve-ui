@@ -35,6 +35,7 @@ export const NeedsTable = ({ props, filterByEntity }) => {
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
   const isNAdmin = userRole?.[0] === "nAdmin" ? true : false;
+  const isSAdmin = userRole?.[0] === "sAdmin" ? true : false;
 
   const entityIds = useSelector((state) => state.filter.filteredData);
   //get list of needs raised by user
@@ -439,11 +440,13 @@ export const NeedsTable = ({ props, filterByEntity }) => {
           </div>
         </div>
         {/* Raise Need Button */}
-        {!isNAdmin && <button onClick={gotoRaiseNeed}>Raise Need</button>}
+        {!isNAdmin && !isSAdmin && (
+          <button onClick={gotoRaiseNeed}>Raise Need</button>
+        )}
       </div>
 
       {/* Header on top of table: stats and filters */}
-      {!isNAdmin && (
+      {!isNAdmin && !isSAdmin && (
         <div className="topBarNeedTable">
           {/*Counts*/}
           <div className="leftTopBarNeedTable">

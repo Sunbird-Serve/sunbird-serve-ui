@@ -82,7 +82,7 @@ function Volunteers({ agencylist, filterByAgencies }) {
   }, [filterByAgencies]);
 
   useEffect(() => {
-    if (isVAdmin) {
+    if (isVAdmin || isSAdmin) {
       const validAgencies = filterByAgencies?.filter((id) => id !== "all");
       const filteredUsers = filterByAgencies?.includes("all")
         ? volunteerList

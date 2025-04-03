@@ -69,7 +69,7 @@ const MainPage = () => {
                     if (role === "nCoordinator") {
                       return <Redirect to="/needs" />;
                     } else if (role === "nAdmin") {
-                      return <Redirect to="/nAdmin-dashboard" />;
+                      return <Redirect to="/all-needs" />;
                     } else if (role === "vAdmin" || role === "sAdmin") {
                       return <Redirect to="/volunteer-list" />;
                     } else if (role === "vCoordinator") {
@@ -91,7 +91,7 @@ const MainPage = () => {
                 <Route path="/help" component={Help} />
                 <Route path="/no-role" component={NoRoleAssigned} />
                 <Route path="/vregistration" component={Registration} />
-                <Route path="/nAdmin-dashboard" component={Dashboard} />
+                <Route path="/all-needs" component={Dashboard} />
                 <Route path="/volunteer-list" component={VolunteerList} />
                 <Route path="/agencies" component={Agency} />
                 <Route

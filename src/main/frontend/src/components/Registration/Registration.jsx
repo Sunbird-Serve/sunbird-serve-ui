@@ -22,7 +22,6 @@ import VolunteerSignup from "../VolunteerSignup/VolunteerSignup.js";
 const configData = require("../../configure.js");
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-
 const Registration = (props) => {
   const dispatch = useDispatch();
   const navigate = useHistory();
@@ -541,7 +540,7 @@ const Registration = (props) => {
     agencyId:
       props.agencyId === "v8410"
         ? "1-e183cda9-6afd-4a91-b14e-79a140801ab8"
-        : props.agencyId || "",
+        : props.agencyId || configData.AGENCYID,
     status: "Registered",
     role: ["Volunteer"],
   };

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import FilterBy from "../../components/CommonComponents/FilterBy";
 import { Box, Typography } from "@mui/material";
@@ -17,7 +17,9 @@ const Dashboard = () => {
   const [filteredByEnitity, setFilteredByEnitity] = useState([]);
   const [enitities, setEnitities] = useState([]);
   const [matrixData, setMatrixData] = useState([]);
-
+  const userData = useSelector((state) => state.user.data);
+  const userRole = userData.role;
+  const isSAdmin = userRole?.[0] === "sAdmin" ? true : false;
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const userId = localStorage.getItem("userId");
   console.log("userDetails", userId);
@@ -32,19 +34,25 @@ const Dashboard = () => {
   useEffect(() => {
     const getEntityDetails = async () => {
       try {
-        if (userId) {
-          const response = await axios.get(
+        let response;
+        if (userId && !isSAdmin) {
+          response = await axios.get(
             `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
           );
-          const entities =
-            response.data?.content
-              ?.filter((entity) => entity.status === "Active")
-              .map((entity) => ({
-                id: entity.id,
-                name: entity.name,
-              })) || [];
-          setEnitities(entities);
         }
+        if (isSAdmin) {
+          response = await axios.get(
+            `${configData.SERVE_NEED}/entity/all?page=0&size=100`
+          );
+        }
+        const entities =
+          response.data?.content
+            ?.filter((entity) => entity.status !== "Inactive")
+            .map((entity) => ({
+              id: entity.id,
+              name: entity.name,
+            })) || [];
+        setEnitities(entities);
       } catch (error) {
         console.log(error);
       }
@@ -153,7 +161,7 @@ const Dashboard = () => {
         </Box>
       </Box>
       <Box padding={"0.5rem 0"} gap={"0.5rem"} display={"flex"}>
-        <NeedCard matrixData={EnityData} />
+        {!isSAdmin && <NeedCard matrixData={EnityData} />}
         <Box paddingLeft={"3rem"} display={"flex"} alignItems={"center"}>
           <FilterBy
             label={"Select Enitity"}
@@ -162,9 +170,11 @@ const Dashboard = () => {
           />
         </Box>
       </Box>
-      <Box padding={"0.5rem 0"}>
-        <NeedCard matrixData={matrixData} />
-      </Box>
+      {!isSAdmin && (
+        <Box padding={"0.5rem 0"}>
+          <NeedCard matrixData={matrixData} />
+        </Box>
+      )}
       <NeedsTable filterByEntity={true} />
     </Box>
   );
