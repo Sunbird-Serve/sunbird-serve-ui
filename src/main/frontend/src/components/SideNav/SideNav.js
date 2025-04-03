@@ -11,6 +11,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import BusinessIcon from "@mui/icons-material/Business";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
+import ConnectWithoutContactIcon from "@mui/icons-material/ConnectWithoutContact";
 import { useSelector } from "react-redux";
 
 function SideNav() {
@@ -69,7 +70,7 @@ function SideNav() {
 
       {userRole && userRole.includes("nAdmin") && (
         <div className="navMenu">
-          <NavLink to="/nAdmin-dashboard" exact className="sideNavItem row">
+          <NavLink to="/all-needs" exact className="sideNavItem row">
             <i>
               <DashboardIcon />
             </i>
@@ -117,9 +118,9 @@ function SideNav() {
                   </i>
                   <span>Entity</span>
                 </NavLink>
-                <NavLink to="/entities" exact className="sideNavItem row">
+                <NavLink to="/all-needs" exact className="sideNavItem row">
                   <i>
-                    <SchoolOutlinedIcon />
+                    <ConnectWithoutContactIcon />
                   </i>
                   <span>Needs</span>
                 </NavLink>
