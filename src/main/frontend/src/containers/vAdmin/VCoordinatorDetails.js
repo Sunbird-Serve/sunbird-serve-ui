@@ -367,11 +367,6 @@ const VCoordinatorDetails = ({ handlePopupClose, agencyID, agencyName }) => {
                     sx={{ textTransform: "none" }}
                   />
                 )}
-                {/* <Tab
-                label="Assign Agency"
-                value="2"
-                sx={{ textTransform: "none" }}
-              /> */}
               </TabList>
             </Box>
             <TabPanel value="1">

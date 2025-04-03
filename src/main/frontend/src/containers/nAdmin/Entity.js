@@ -20,6 +20,7 @@ import { Snackbar, Alert } from "@mui/material";
 import { useSelector } from "react-redux";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
+import SearchIcon from "@mui/icons-material/Search";
 const configData = require("../../configure");
 
 const Entity = () => {
@@ -229,6 +230,25 @@ const Entity = () => {
             </Button>
           </Box>
         </Box>
+        <Box display={"flex"} justifyContent={"flex-start"}>
+          <Box
+            className="boxSearchNeeds"
+            margin={"0.3rem"}
+            display={"flex"}
+            justifyContent={"flex-end"}
+          >
+            <i>
+              <SearchIcon style={{ height: "18px", width: "18px" }} />
+            </i>
+            <input
+              type="search"
+              name="globalfilter"
+              placeholder="Search need"
+              value={globalFilter || ""}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+            ></input>
+          </Box>
+        </Box>
         <Box paddingTop={"1rem"}>
           <table className="tableNeedList">
             <thead>
@@ -336,6 +356,7 @@ const Entity = () => {
           needAdminId={userId}
           onEntityUpdate={handleEntityUpdate}
           nCordAssignSuccess={handleAssignEntityToNcord}
+          isSAdmin={true}
         />
       )}
 
