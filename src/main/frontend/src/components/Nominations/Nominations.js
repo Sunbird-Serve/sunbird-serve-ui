@@ -16,6 +16,14 @@ import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import DoneIcon from "@mui/icons-material/Done";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { format } from "date-fns";
+import { TextField } from "@mui/material";
+import {
+  LocalizationProvider,
+  DatePicker,
+  TimePicker,
+} from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 const configData = require("../../configure.js");
 
@@ -584,11 +592,77 @@ const Nominations = ({ needData, openPopup }) => {
               formData.map((data, index) => (
                 <div className="deliverable-item" key={index}>
                   <div className="deliv-serial">{index + 1}</div>
-                  <div className="deliv-date">{data.deliverableDate}</div>
-                  <div className="deliv-time">
-                    {data.startTime ? data.startTime.slice(11, 16) : ""} -{" "}
-                    {data.endTime ? data.endTime.slice(11, 16) : ""}
-                  </div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <div className="deliv-date">
+                      {index === editIndex ? (
+                        <DatePicker
+                          value={
+                            data.deliverableDate
+                              ? dayjs(data.deliverableDate)
+                              : null
+                          }
+                          onChange={(newValue) =>
+                            handleDeliverableChange(
+                              {
+                                target: {
+                                  value: newValue
+                                    ? dayjs(newValue).format("YYYY-MM-DD")
+                                    : "",
+                                },
+                              },
+                              index,
+                              "deliverableDate"
+                            )
+                          }
+                          renderInput={(params) => <TextField {...params} />}
+                        />
+                      ) : (
+                        data.deliverableDate
+                      )}
+                    </div>
+
+                    <div className="deliv-time">
+                      {index === editIndex ? (
+                        <>
+                          <TimePicker
+                            value={
+                              data.startTime ? dayjs(data.startTime) : null
+                            }
+                            onChange={(newValue) =>
+                              handleDeliverableChange(
+                                { target: { value: newValue } },
+                                index,
+                                "startTime"
+                              )
+                            }
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                          {" - "}
+                          <TimePicker
+                            value={data.endTime ? dayjs(data.endTime) : null}
+                            onChange={(newValue) =>
+                              handleDeliverableChange(
+                                { target: { value: newValue } },
+                                index,
+                                "endTime"
+                              )
+                            }
+                            renderInput={(params) => <TextField {...params} />}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          {data.startTime
+                            ? dayjs(data.startTime).format("HH:mm")
+                            : ""}{" "}
+                          -{" "}
+                          {data.endTime
+                            ? dayjs(data.endTime).format("HH:mm")
+                            : ""}
+                        </>
+                      )}
+                    </div>
+                  </LocalizationProvider>
                   <div className="deliv-url">
                     {index === editIndex ? (
                       <input

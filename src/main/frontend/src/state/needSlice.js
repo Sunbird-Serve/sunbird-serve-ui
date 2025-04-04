@@ -16,22 +16,22 @@ const initialState = {
 export const fetchNeeds = createAsyncThunk("needs/fetchNeeds", async () => {
   try {
     const response1 = await axios.get(
-      `${configData.NEED_GET}/?page=0&size=100&status=New`
+      `${configData.NEED_GET}/?page=0&size=1000&status=New`
     );
     const response2 = await axios.get(
-      `${configData.NEED_GET}/?page=0&size=100&status=Nominated`
+      `${configData.NEED_GET}/?page=0&size=1000&status=Nominated`
     );
     const response3 = await axios.get(
-      `${configData.NEED_GET}/?page=0&size=100&status=Approved`
+      `${configData.NEED_GET}/?page=0&size=1000&status=Approved`
     );
     const response4 = await axios.get(
-      `${configData.NEED_GET}/?page=0&size=100&status=Rejected`
+      `${configData.NEED_GET}/?page=0&size=1000&status=Rejected`
     );
     const response5 = await axios.get(
-      `${configData.NEED_GET}/?page=0&size=100&status=Assigned`
+      `${configData.NEED_GET}/?page=0&size=1000&status=Assigned`
     );
     const response6 = await axios.get(
-      `${configData.NEED_GET}/?page=0&size=100&status=Fulfilled`
+      `${configData.NEED_GET}/?page=0&size=1000&status=Fulfilled`
     );
     return [
       ...response1.data.content,

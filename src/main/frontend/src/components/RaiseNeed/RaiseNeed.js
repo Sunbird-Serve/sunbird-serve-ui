@@ -67,7 +67,7 @@ const RaiseNeed = (props) => {
       try {
         if (uid) {
           const response = await axios.get(
-            `${configData.ENTITY_DETAILS_GET}/${uid}?page=0&size=100`
+            `${configData.ENTITY_DETAILS_GET}/${uid}?page=0&size=1000`
           );
           const entities =
             response.data?.content

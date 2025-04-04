@@ -35,7 +35,7 @@ const RegisterEntity = ({
     const getEntityDetails = async () => {
       try {
         const response = await axios.get(
-          `${configData.SERVE_NEED}/entity/all?page=0&size=100`
+          `${configData.SERVE_NEED}/entity/all?page=0&size=1000`
         );
         const entities = response.data?.content;
         // ?.filter(
