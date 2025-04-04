@@ -402,41 +402,45 @@ export const NeedsTable = ({ props, filterByEntity }) => {
       <div className="needBar">
         {/* Tabs */}
         <div className="needMenu">
-          <div
-            className={`tabNeed ${activeTab === "all" ? "activeNTab" : ""}`}
-            onClick={() => handleTabClick("all")}
-          >
-            All
+          <div className="needMenu-responsive">
+            <div
+              className={`tabNeed ${activeTab === "all" ? "activeNTab" : ""}`}
+              onClick={() => handleTabClick("all")}
+            >
+              All
+            </div>
+            <div
+              className={`tabNeed ${activeTab === "new" ? "activeNTab" : ""}`}
+              onClick={() => handleTabClick("new")}
+            >
+              New
+            </div>
+            <div
+              className={`tabNeed ${activeTab === "approved" ? "activeNTab" : ""}`}
+              onClick={() => handleTabClick("approved")}
+            >
+              Approved
+            </div>
           </div>
-          <div
-            className={`tabNeed ${activeTab === "new" ? "activeNTab" : ""}`}
-            onClick={() => handleTabClick("new")}
-          >
-            New
-          </div>
-          <div
-            className={`tabNeed ${activeTab === "approved" ? "activeNTab" : ""}`}
-            onClick={() => handleTabClick("approved")}
-          >
-            Approved
-          </div>
-          <div
-            className={`tabNeed ${activeTab === "nominated" ? "activeNTab" : ""}`}
-            onClick={() => handleTabClick("nominated")}
-          >
-            Nominated
-          </div>
-          <div
-            className={`tabNeed ${activeTab === "assigned" ? "activeNTab" : ""}`}
-            onClick={() => handleTabClick("assigned")}
-          >
-            Assigned
-          </div>
-          <div
-            className={`tabNeed ${activeTab === "fulfilled" ? "activeNTab" : ""}`}
-            onClick={() => handleTabClick("fulfilled")}
-          >
-            Fulfilled
+          <div className="needMenu-responsive">
+            <div
+              className={`tabNeed ${activeTab === "nominated" ? "activeNTab" : ""}`}
+              onClick={() => handleTabClick("nominated")}
+            >
+              Nominated
+            </div>
+            <div
+              className={`tabNeed ${activeTab === "assigned" ? "activeNTab" : ""}`}
+              onClick={() => handleTabClick("assigned")}
+            >
+              Assigned
+            </div>
+            <div
+              className={`tabNeed ${activeTab === "fulfilled" ? "activeNTab" : ""}`}
+              onClick={() => handleTabClick("fulfilled")}
+            >
+              Fulfilled
+            </div>
           </div>
         </div>
         {/* Raise Need Button */}
