@@ -37,12 +37,12 @@ const Dashboard = () => {
         let response;
         if (userId && !isSAdmin) {
           response = await axios.get(
-            `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
+            `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=1000`
           );
         }
         if (isSAdmin) {
           response = await axios.get(
-            `${configData.SERVE_NEED}/entity/all?page=0&size=100`
+            `${configData.SERVE_NEED}/entity/all?page=0&size=1000`
           );
         }
         const entities =
@@ -64,7 +64,7 @@ const Dashboard = () => {
     const getNeedsCount = async () => {
       try {
         const response = await axios.get(
-          `${configData.ENTITY_NEED_GET}/${userId}?page=0&size=100`
+          `${configData.ENTITY_NEED_GET}/${userId}?page=0&size=1000`
         );
 
         const statuses = [

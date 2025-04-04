@@ -46,7 +46,7 @@ const Entity = () => {
         try {
           if (userId) {
             const response = await axios.get(
-              `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=100`
+              `${configData.ENTITY_DETAILS_GET}/${userId}?page=0&size=1000`
             );
             const entitie = response.data?.content?.filter(
               (entity) => entity.status !== "Inactive"
@@ -67,7 +67,7 @@ const Entity = () => {
       const getEntityDetails = async () => {
         try {
           const response = await axios.get(
-            `${configData.SERVE_NEED}/entity/all?page=0&size=100`
+            `${configData.SERVE_NEED}/entity/all?page=0&size=1000`
           );
           const entities = response.data?.content;
           // ?.filter(
@@ -212,14 +212,16 @@ const Entity = () => {
             </Typography>
           </Box>
           <Box marginRight={"2rem"}>
-            <Button
-              variant="outlined"
-              sx={{ textTransform: "none", marginRight: "2rem" }}
-              onClick={handleRegisterEntity}
-            >
-              {" "}
-              Register Your Entity
-            </Button>
+            {!isSAdmin && (
+              <Button
+                variant="outlined"
+                sx={{ textTransform: "none", marginRight: "2rem" }}
+                onClick={handleRegisterEntity}
+              >
+                {" "}
+                Register Your Entity
+              </Button>
+            )}
             <Button
               variant="contained"
               sx={{ textTransform: "none" }}
