@@ -1,53 +1,53 @@
 .headerVolunteers {
-    background-color: yellow;
-    margin-right: 10px;
-    padding: 10px 0px;
-    background-color: white;
+  background-color: yellow;
+  margin-right: 10px;
+  padding: 10px 0px;
+  background-color: white;
 }
 .title-vHeader {
-    font-size: 32px;
-    color: #006FA2;
+  font-size: 32px;
+  color: #006fa2;
 }
 .tag-vHeader {
-    font-size: 14px;
-    color: #99999F;
+  font-size: 14px;
+  color: #99999f;
 }
 
 .wrap-tabs-search {
-   display: flex; 
-   justify-content: space-between;
-   padding: 5px;
-   margin-right: 5px;
-   background-color: white;
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  margin-right: 5px;
+  background-color: white;
 
-   @media (max-width: 600px) {
+  @media (max-width: 600px) {
     font-size: 10px;
     display: block;
-}
+  }
 }
 
 .wrap-tabs-vCoord {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border-radius: 5px;
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 5px;
 }
 
 .search-vCoord {
-    border: solid 0.5px;
-    border-radius: 2px;
-    margin-right: 10px;
+  border: solid 0.5px;
+  border-radius: 2px;
+  margin-right: 10px;
 }
 .search-vCoord input {
-    border: none;
-    padding: 3px;
+  border: none;
+  padding: 3px;
 }
 .search-vCoord i {
-    margin: 0px 10px;
-    @media (max-width: 600px) {
-        height:'9px';
-        width:'9px';
-    }
+  margin: 0px 10px;
+  @media (max-width: 600px) {
+    height: "9px";
+    width: "9px";
+  }
 }
 
 /* .stats-vCoord {
@@ -55,37 +55,43 @@
     align-items: center;
 } */
 .tabs-vCoord {
-    padding: 5px 15px;
-    display: flex;
-    align-items: center;
-    gap: 3px;
-}
-.tabs-vCoord icon { 
-    color: #006FA2;
-}
-.tabs-vCoord:hover {
-    cursor: pointer;
-    background-color: #edf4f8;
-}
-.count-vCoord {
-    display: flex;
-    padding: 5px 15px;
-    gap: 5px;
-}
-.stats-filters-vCoord {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 5px 10px;
-}
-.filters-vCoord {
-    display: flex;
-    gap: 5px
-}
-.activeVTab {
-    color: #006FA2;
-}
-.wrap-vtable {
-    margin: 10px 20px 10px 0px;
+  padding: 5px 15px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
 }
 
+.wrap-TvCoord {
+  display: flex;
+  @media (max-width: 320px) {
+    display: block;
+  }
+}
+.tabs-vCoord icon {
+  color: #006fa2;
+}
+.tabs-vCoord:hover {
+  cursor: pointer;
+  background-color: #edf4f8;
+}
+.count-vCoord {
+  display: flex;
+  padding: 5px 15px;
+  gap: 5px;
+}
+.stats-filters-vCoord {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 10px;
+}
+.filters-vCoord {
+  display: flex;
+  gap: 5px;
+}
+.activeVTab {
+  color: #006fa2;
+}
+.wrap-vtable {
+  margin: 10px 20px 10px 0px;
+}
