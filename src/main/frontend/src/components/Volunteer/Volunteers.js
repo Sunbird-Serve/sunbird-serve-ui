@@ -265,41 +265,45 @@ function Volunteers({ agencylist, filterByAgencies }) {
           </div>
           <div className="wrap-tabs-search">
             <div className="wrap-tabs-vCoord">
-              <div
-                className={`tabs-vCoord ${activeTab === "Registered" ? "activeVTab" : ""}`}
-                onClick={() => handleTabClick("Registered")}
-              >
-                <icon>
-                  <ListIcon />{" "}
-                </icon>
-                {statReg ? statReg.length : ""} Registered
+              <div className="wrap-TvCoord">
+                <div
+                  className={`tabs-vCoord ${activeTab === "Registered" ? "activeVTab" : ""}`}
+                  onClick={() => handleTabClick("Registered")}
+                >
+                  <icon>
+                    <ListIcon />{" "}
+                  </icon>
+                  {statReg ? statReg.length : ""} Registered
+                </div>
+                <div
+                  className={`tabs-vCoord ${activeTab === "Recommended" ? "activeVTab" : ""}`}
+                  onClick={() => handleTabClick("Recommended")}
+                >
+                  <icon>
+                    <PersonAddIcon />{" "}
+                  </icon>
+                  {statRecom ? statRecom.length : ""} Recommended
+                </div>
               </div>
-              <div
-                className={`tabs-vCoord ${activeTab === "Recommended" ? "activeVTab" : ""}`}
-                onClick={() => handleTabClick("Recommended")}
-              >
-                <icon>
-                  <PersonAddIcon />{" "}
-                </icon>
-                {statRecom ? statRecom.length : ""} Recommended
-              </div>
-              <div
-                className={`tabs-vCoord ${activeTab === "OnHold" ? "activeVTab" : ""}`}
-                onClick={() => handleTabClick("OnHold")}
-              >
-                <icon>
-                  <ManageAccountsIcon />{" "}
-                </icon>
-                {statOnHold ? statOnHold.length : ""} On Hold
-              </div>
-              <div
-                className={`tabs-vCoord ${activeTab === "Active" ? "activeVTab" : ""}`}
-                onClick={() => handleTabClick("Active")}
-              >
-                <icon>
-                  <GroupIcon />
-                </icon>
-                {statActive ? statActive.length : ""} Active
+              <div className="wrap-TvCoord">
+                <div
+                  className={`tabs-vCoord ${activeTab === "OnHold" ? "activeVTab" : ""}`}
+                  onClick={() => handleTabClick("OnHold")}
+                >
+                  <icon>
+                    <ManageAccountsIcon />{" "}
+                  </icon>
+                  {statOnHold ? statOnHold.length : ""} On Hold
+                </div>
+                <div
+                  className={`tabs-vCoord ${activeTab === "Active" ? "activeVTab" : ""}`}
+                  onClick={() => handleTabClick("Active")}
+                >
+                  <icon>
+                    <GroupIcon />
+                  </icon>
+                  {statActive ? statActive.length : ""} Active
+                </div>
               </div>
             </div>
             <div className="search-vCoord">
