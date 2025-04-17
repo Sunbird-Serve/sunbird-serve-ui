@@ -98,15 +98,241 @@
   border-radius: 5px;
 }
 /* CSS for table is below */
+
+/* --- New Layout Styles for NeedsTable --- */
+.needTabsBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fafafa;
+  padding: 0 24px 0 24px;
+  border-bottom: 1px solid #e0e0e0;
+  min-height: 48px;
+}
+.needTabs {
+  display: flex;
+  gap: 12px;
+}
+.tabNeed {
+  padding: 10px 16px;
+  cursor: pointer;
+  color: #006fa2;
+  font-weight: 500;
+  font-size: 15px;
+  border-bottom: 2px solid transparent;
+  background: none;
+  transition: border-color 0.2s, color 0.2s;
+}
+.tabNeed.activeNTab {
+  color: #1c1c1c;
+  border-bottom: 2px solid #006fa2;
+  background: #e9f0f7;
+}
+.raiseNeedBtn {
+  background: #006fa2;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 16px;
+  transition: background 0.2s;
+}
+.raiseNeedBtn:hover {
+  background: #005080;
+}
+.countsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 24px 8px 24px;
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  min-height: 48px;
+  margin-bottom: 0;
+}
+.countsLeft {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.filtersRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .needTabsBar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 8px 0 8px;
+    gap: 8px;
+  }
+  .needTabs {
+    flex-wrap: wrap;
+    gap: 4px;
+    overflow-x: auto;
+  }
+  .raiseNeedBtn {
+    margin-left: 0;
+    margin-top: 8px;
+    width: 100%;
+  }
+  .countsRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 8px 8px;
+    min-height: unset;
+  }
+  .countsLeft, .filtersRight {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+  }
+  .filtersRight {
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .boxSearchNeeds, .selectNeedType {
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 4px;
+  }
+  .boxSearchNeeds input {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .needTabsBar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4px;
+    gap: 4px;
+  }
+  .needTabs {
+    flex-wrap: wrap;
+    gap: 2px;
+    font-size: 13px;
+  }
+  .tabNeed {
+    font-size: 13px;
+    padding: 7px 8px;
+  }
+  .countsRow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 6px 4px;
+  }
+  .countsLeft, .filtersRight {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    width: 100%;
+  }
+  .filtersRight {
+    margin-top: 2px;
+  }
+  .boxSearchNeeds, .selectNeedType {
+    width: 100%;
+    min-width: 0;
+    margin-bottom: 2px;
+  }
+  .boxSearchNeeds input {
+    width: 100%;
+    min-width: 0;
+    font-size: 13px;
+  }
+  .raiseNeedBtn {
+    width: 100%;
+    font-size: 14px;
+    padding: 7px 0;
+  }
+}
+
+.filtersRow {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px; /* slightly reduced gap */
+  padding: 2px 24px 8px 24px; /* reduced top padding */
+  background: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  min-height: 40px;
+  margin-top: 0; /* remove margin between rows */
+}
+@media (max-width: 600px) {
+  .needTabsBar, .countsRow, .filtersRow {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 8px 8px;
+    gap: 8px;
+  }
+  .needTabs {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .raiseNeedBtn {
+    margin-left: 0;
+    margin-top: 8px;
+    width: 100%;
+  }
+}
+/* --- End New Layout Styles --- */
+
+.tableResponsiveWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
 .tableNeedList {
   border-collapse: collapse;
   width: 100%;
   border: 1.5px solid #f0efef;
-
-  @media (max-width: 600px) {
-    margin-left: 0.5rem;
+}
+@media (max-width: 900px) {
+  .tableNeedList th, .tableNeedList td {
+    font-size: 13px;
+    padding: 6px 4px;
+    min-width: 80px;
+    word-break: break-word;
+  }
+  .tableNeedList th {
+    font-size: 12px;
+    padding: 6px 4px;
+  }
+  .vAvatars-container .avatar {
+    height: 24px !important;
+    width: 24px !important;
+    font-size: 12px !important;
   }
 }
+@media (max-width: 600px) {
+  .tableResponsiveWrapper {
+    margin-left: 0;
+  }
+  .tableNeedList th, .tableNeedList td {
+    font-size: 11px;
+    padding: 4px 2px;
+    min-width: 70px;
+    max-width: 120px;
+    word-break: break-word;
+  }
+  .vAvatars-container .avatar {
+    height: 18px !important;
+    width: 18px !important;
+    font-size: 10px !important;
+    padding: 2px !important;
+    margin-left: -4px !important;
+  }
+}
+
 .tableNeedList th {
   height: 40px;
   text-align: left;
@@ -149,12 +375,25 @@
   background-color: #f2f2f2;
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
   font-size: 14px;
-
-  @media (max-width: 600px) {
+  flex-wrap: wrap;
+}
+@media (max-width: 900px) {
+  .pageNav {
+    font-size: 12px;
+    flex-direction: column;
+    height: auto;
+    gap: 4px;
+    padding: 4px 0;
+  }
+  .pageNav input, .pageNav select {
+    width: 100%;
+    margin: 2px 0;
     font-size: 12px;
   }
 }
+
 .pageNav button {
   border: none;
 }
