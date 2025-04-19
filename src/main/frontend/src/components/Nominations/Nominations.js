@@ -423,29 +423,31 @@ const Nominations = ({ needData, openPopup }) => {
               </div>
             </div>
             <div className="rightBarNomination">
-              <div className="boxSearchNomins">
-                <i>
-                  <SearchIcon style={{ height: "18px", width: "18px" }} />
-                </i>
-                <input
-                  type="search"
-                  name="nsearch"
-                  placeholder="Search"
-                  value={globalFilter || ""}
-                  onChange={(e) => setGlobalFilter(e.target.value)}
-                ></input>
-              </div>
-              <div className="searchLocNomins">
-                <input
-                  type="text"
-                  placeholder="Location"
-                  onChange={(e) => {
-                    setFilter(
-                      "userInfo.contactDetails.address.city",
-                      e.target.value || undefined
-                    );
-                  }}
-                ></input>
+              <div className="search-filters-container">
+                <div className="boxSearchNomins">
+                  <i>
+                    <SearchIcon style={{ height: "18px", width: "18px" }} />
+                  </i>
+                  <input
+                    type="search"
+                    name="nsearch"
+                    placeholder="Search"
+                    value={globalFilter || ""}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                  ></input>
+                </div>
+                <div className="searchLocNomins">
+                  <input
+                    type="text"
+                    placeholder="Location"
+                    onChange={(e) => {
+                      setFilter(
+                        "userInfo.contactDetails.address.city",
+                        e.target.value || undefined
+                      );
+                    }}
+                  ></input>
+                </div>
               </div>
             </div>
           </div>
@@ -453,7 +455,8 @@ const Nominations = ({ needData, openPopup }) => {
       )}
       {/* table for reading list of nominations*/}
       {!gotoDelivs && (
-        <table className="tableNominations">
+        <div className="nominations-table-responsive">
+          <table className="tableNominations">
           <thead>
             {headerGroups.map((headerGroup) => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -494,6 +497,7 @@ const Nominations = ({ needData, openPopup }) => {
             )}
           </tbody>
         </table>
+        </div>
       )}
       {/* reject pop-up */}
       {rejectPopup && (
