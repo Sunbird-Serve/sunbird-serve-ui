@@ -1,16 +1,152 @@
+
 .wrapModifyNeed {
   border: solid;
 }
 
-.modal-content {
-  width: 180% !important;
-  @media (max-width: 721px) {
-    width: 90% !important;
+@media (max-width: 600px) {
+  .wrapModifyNeed {
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+    padding: 8px;
+    margin: 0;
   }
-  @media (max-width: 320px) {
-    width: 60% !important;
+  .modal-content {
+    width: 100vw !important;
+    max-width: 100vw;
+    border-radius: 0;
+    padding: 8px;
+    margin: 0;
+  }
+  .modal-dialog {
+    margin: 0 !important;
+    width: 100vw;
+    max-width: 100vw;
+  }
+  .modal-body {
+    padding: 0;
+    width: 100vw;
+    max-width: 100vw;
+    min-width: 0;
+    font-size: 14px;
+  }
+  .wrapTabs {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 0 0 0;
+    height: auto;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+  }
+  .wrapTabs button {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 44px;
+    padding: 12px 0;
+    font-size: 16px;
+    text-align: center;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .wrapTabs button.active, .wrapTabs button[aria-selected="true"] {
+    border-bottom: 2px solid #0080bc;
+    color: #0080bc;
+    font-weight: 600;
+    background: #f5faff;
+  }
+  .needInfoBox, .needNominations {
+    padding: 0;
+    width: 100vw;
+    max-width: 100vw;
+    border-radius: 0;
+  }
+  .needInfoBar {
+    padding-left: 8px;
+    padding-right: 8px;
+    flex-direction: column;
+    height: auto;
+    gap: 6px;
+  }
+  .needInfoForm {
+    padding: 0 4px;
+  }
+  .needIFormTop {
+    display: block;
+  }
+  .itemNInfo, .itemDescripInfo, .itemDate-modified {
+    width: 100%;
+    padding: 2px;
+    font-size: 13px;
+  }
+  .itemNInfo label, .itemDescripInfo label, .itemDate-modified label {
+    font-size: 13px;
+  }
+  .itemNInfo input, .itemNInfo select, .itemDescripInfo input, .itemDescripInfo select {
+    width: 100%;
+    font-size: 13px;
+    padding: 5px 7px;
+  }
+  .modify-need-table-wrapper {
+    width: 100vw;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 50vh;
+  }
+  .modify-need-table {
+    min-width: 480px;
+    font-size: 12px;
+  }
+  .modify-need-form input,
+  .modify-need-form select,
+  .modify-need-form button {
+    width: 100% !important;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  .wrap-modify-button {
+    flex-direction: column !important;
+    gap: 8px;
+    margin-right: 0 !important;
+    width: 100% !important;
+    align-items: stretch;
+  }
+  .modify-button {
+    width: 100% !important;
+    padding: 10px 0 !important;
+    font-size: 16px !important;
+    box-sizing: border-box;
+    margin-top: 4px;
+  }
+  .alertNomin {
+    left: 0;
+    top: auto;
+    bottom: 0;
+    width: 100vw;
+    font-size: 13px;
+    border-radius: 0;
+    padding: 8px 4px;
   }
 }
+.modal-content {
+  width: 180% !important;
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    width: 100vw !important;
+    max-width: 100vw;
+    border-radius: 0;
+    padding: 8px;
+    margin: 0;
+  }
+}
+
 
 @media (max-width: 768px) {
   .modal-dialog {
@@ -18,9 +154,31 @@
   }
 }
 
+/* Responsive table and form fields for mobile */
+@media (max-width: 600px) {
+  .modify-need-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+  }
+  .modify-need-table {
+    min-width: 480px;
+    font-size: 12px;
+  }
+  .modify-need-form input,
+  .modify-need-form select,
+  .modify-need-form button {
+    width: 100% !important;
+    box-sizing: border-box;
+    margin-bottom: 8px;
+  }
+}
+
+  
+
+
 .modal-body {
-  height: 70vh;
-  overflow-y: auto;
+  height: auto;
+  overflow-y: visible;
   width: -webkit-fill-available;
 }
 
