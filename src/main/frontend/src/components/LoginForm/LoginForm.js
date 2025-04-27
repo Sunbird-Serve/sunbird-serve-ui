@@ -9,6 +9,7 @@ import {
 import SBLogo from "../../assets/sunbirdlogo.png";
 import { FcGoogle } from "react-icons/fc";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
+import NCoordSignUpBtn from "../NCoordSignUp/NCoordSignUpBtn";
 
 const LoginForm = ({ loginState, changePasswordRequest, passwordChanged }) => {
   const [error, setError] = useState("");
@@ -117,6 +118,8 @@ const LoginForm = ({ loginState, changePasswordRequest, passwordChanged }) => {
               Forgot Password?
             </a>
           </div>
+          
+          <NCoordSignUpBtn />
 
           {/*<div className="hline">
             <hr /> <span>or login with</span> <hr/>
