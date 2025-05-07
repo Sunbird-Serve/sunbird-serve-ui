@@ -105,7 +105,9 @@ const MainPage = () => {
                 />
                 <Route path="/signUp" component={VolunteerSignup} />
                 <Route path="/entities" component={Entity} />
-                <Route path="/ncregistration" component={NCoordRegistration} />
+                <Route path="/ncRegistration">
+                  <NCoordRegistration role="nCoordinator" title={"Need Coordinator Registration"} />
+                </Route>
               </Switch>
             </div>
           </div>
