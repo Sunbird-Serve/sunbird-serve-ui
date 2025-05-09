@@ -108,7 +108,6 @@ const AddEntity = ({
         category: entityDetails[0]?.category || "",
         status: entityDetails[0]?.status,
       });
-      console.log(entityDetails[0].status, entityDetails[0].category);
     }
   }, [isEdit, entityDetails, reset]);
 
@@ -119,12 +118,10 @@ const AddEntity = ({
         category: entityDetails[0]?.category || "",
         status: entityDetails[0]?.status || "",
       });
-      console.log(entityDetails[0].status, entityDetails[0].category);
     }
   }, [entityDetails, reset]);
 
   const onSubmit = async (data) => {
-    console.log("submit");
     const reqBody = {
       name: data?.name,
       category: data?.category,
@@ -152,7 +149,6 @@ const AddEntity = ({
         onEntityAdded();
 
         const entityID = res?.data?.id;
-        console.log(entityID);
         const onboardReq = {
           entityId: entityID,
           userId: needAdminId,
@@ -300,7 +296,7 @@ const AddEntity = ({
                 render={({ field }) => (
                   <TextField
                     {...field}
-                    label="City"
+                    label="Block"
                     fullWidth
                     margin="normal"
                     error={!!errors.address_line1}

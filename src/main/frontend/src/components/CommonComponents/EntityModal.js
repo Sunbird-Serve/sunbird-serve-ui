@@ -49,9 +49,6 @@ const EntityModal = ({
   const nCoordiatorList = useMemo(() => {
     return userList.filter((item) => item.role.includes("nCoordinator"));
   }, [userList]);
-  const nAdminList = useMemo(() => {
-    return userList.filter((item) => item.role.includes("nAdmin"));
-  }, [userList]);
 
   useEffect(() => {
     setLoading(true);
@@ -69,11 +66,8 @@ const EntityModal = ({
         const res = await axios.get(
           `${configData.SERVE_NEED}/userList/${entityId}`
         );
-        const entityNcordList = res?.data?.content?.filter(
-          (item) => item.userRole === "nCoordinator"
-        );
-        console.log(entityNcordList);
-        setEntityNcordList(entityNcordList);
+        // Showing all users (coordinator + admin)
+        setEntityNcordList(res?.data?.content);
       } catch (error) {
         console.log(error);
       }
@@ -82,7 +76,7 @@ const EntityModal = ({
   }, [entityId, nCordAssignSuccess]);
 
   const COLUMNS = [
-    { Header: "Co-ordinator Name", accessor: "identityDetails.fullname" },
+    { Header: "Name", accessor: "identityDetails.fullname" },
     { Header: "Email ID", accessor: "contactDetails.email" },
     { Header: "Phone", accessor: "contactDetails.mobile" },
     {
@@ -122,13 +116,17 @@ const EntityModal = ({
   }, [nCoordiatorList, entityNcordList]);
 
   const data2 = useMemo(() => {
-    return nAdminList.map((user) => ({
+    const updatedList = entityNcordList.map((item) =>
+      userList.find((user) => user.osid === item.userId)
+    );
+
+    return updatedList.map((user) => ({
       ...user,
       isAssigned: entityNcordList.some(
         (entityUser) => entityUser.userId === user.osid
       ),
     }));
-  }, [nAdminList, entityNcordList]);
+  }, [userList, entityNcordList]);
 
   // First table instance
   const tableInstance1 = useTable(
@@ -189,7 +187,7 @@ const EntityModal = ({
             <input
               type="search"
               name="globalfilter"
-              placeholder=" Search nCo-ordinator"
+              placeholder=" Search User"
               value={globalFilter || ""}
               onChange={(e) => setGlobalFilter(e.target.value)}
             ></input>
@@ -300,7 +298,6 @@ const EntityModal = ({
   const handleRowClick = (rowData) => {};
 
   const assignEntity = async (nCordId) => {
-    console.log(nCordId);
     try {
       const regReq = {
         entityId: entityId,
@@ -384,7 +381,7 @@ const EntityModal = ({
                       sx={{ textTransform: "none" }}
                     />
                     <Tab
-                      label="Need Admins List"
+                      label="Users List"
                       value="2"
                       sx={{ textTransform: "none" }}
                     />

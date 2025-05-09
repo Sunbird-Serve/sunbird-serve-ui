@@ -52,7 +52,6 @@ const Entity = () => {
               (entity) => entity.status !== "Inactive"
             );
             setEntities(entitie);
-            console.log(entities);
           }
         } catch (error) {
           console.log(error);
@@ -74,7 +73,6 @@ const Entity = () => {
           //   (entity) => entity.status === "Active"
           // );
           setEntities(entities);
-          console.log(entities);
         } catch (error) {
           console.log(error);
         }
@@ -86,7 +84,7 @@ const Entity = () => {
   const COLUMNS = [
     { Header: "Entity Name", accessor: "name" },
     { Header: "Phone", accessor: "mobile" },
-    { Header: "City", accessor: "address_line1" },
+    { Header: "Block", accessor: "address_line1" },
     { Header: "Entity Category", accessor: "category" },
     {
       Header: "Status",
@@ -152,11 +150,9 @@ const Entity = () => {
   };
 
   const editEntity = (entityId) => {
-    console.log(entityId);
     setEdit(true);
     setShowPopup(!showPopup);
     const entityDetails = entities?.filter((entity) => entity.id === entityId);
-    console.log("entityDetails", entityDetails);
     setEntityData(entityDetails);
     setEntityId(entityId);
   };
@@ -166,7 +162,6 @@ const Entity = () => {
   };
 
   const handleRegisterEntity = () => {
-    console.log(showRegisterEntity);
     setShowRegisterEntity(true);
   };
 
@@ -208,7 +203,7 @@ const Entity = () => {
         >
           <Box>
             <Typography variant="body1" color="text.secondary">
-              Here's your Entities Data
+              Your Entity Details
             </Typography>
           </Box>
           <Box marginRight={"2rem"}>
@@ -245,7 +240,7 @@ const Entity = () => {
             <input
               type="search"
               name="globalfilter"
-              placeholder="Search need"
+              placeholder="Search Entity"
               value={globalFilter || ""}
               onChange={(e) => setGlobalFilter(e.target.value)}
             ></input>
@@ -396,10 +391,10 @@ const Entity = () => {
             {edit
               ? "Entity Updated successfully!"
               : entityAssign
-                ? "Entity Assigned successfully!"
-                : assignEntityToNcord
-                  ? "nCoordintor Assigned to Entity successfully!"
-                  : "Entity Created successfully!"}
+              ? "Entity Assigned successfully!"
+              : assignEntityToNcord
+              ? "nCoordintor Assigned to Entity successfully!"
+              : "Entity Created successfully!"}
           </Alert>
         </Snackbar>
       )}
