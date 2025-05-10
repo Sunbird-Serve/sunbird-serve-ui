@@ -8,7 +8,7 @@ import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import { useHistory } from "react-router-dom";
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 
-const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRedirectUrl = "/vregistration", successRedirectionUrl }) => {
+const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRedirectUrl = "/vregistration", successRedirectionUrl = "/vneedtypes" }) => {
   const [error, setError] = useState("");
   const [regStatus, setRegStatus] = useState("");
   const [preFillEmail, setPreFillEmail] = useState("");
