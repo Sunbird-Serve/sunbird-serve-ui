@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./NCoordRegistration.css";
+import "./CoordRegistration.css";
 import {
   Autocomplete,
   Checkbox,
@@ -22,7 +22,7 @@ import CoordSignup from "../VolunteerSignup/VolunteerSignup.js";
 const configData = require("../../configure.js");
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-const NCoordRegistration = (props) => {
+const CoordRegistration = (props) => {
   const dispatch = useDispatch();
   const navigate = useHistory();
 
@@ -759,4 +759,4 @@ const NCoordRegistration = (props) => {
   );
 };
 
-export default NCoordRegistration;
+export default CoordRegistration;

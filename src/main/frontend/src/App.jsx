@@ -117,7 +117,7 @@ import { redirectToOnlineTeachingPage } from "./state/redirectionToOnlineTeachin
 import "./index.css";
 import Registration from "./components/Registration/Registration";
 import { useLocation } from "react-router-dom";
-import NCoordRegistration from "./components/NCoordRegistration/NCoordRegistration";
+import CoordRegistration from "./components/CoordRegistration/CoordRegistration";
 
 function App() {
   const dispatch = useDispatch();
@@ -259,7 +259,7 @@ function App() {
     if (isVolunteerRegistration) {
       return <Registration agencyId={agencyId} />;
     } else if(isVCoordRegistration) {
-      return <NCoordRegistration role="vCoordinator" agencyId={agencyId} title={"Volunteer Coordinator Registration"} />
+      return <CoordRegistration role="vCoordinator" agencyId={agencyId} title={"Volunteer Coordinator Registration"} />
     } else {
       return <LoginPage getVolunteerStatus={handleVolunteer} />;
     }
