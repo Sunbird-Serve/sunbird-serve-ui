@@ -8,7 +8,7 @@ import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import { useHistory } from "react-router-dom";
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 
-const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRedirectUrl="/vregistration" }) => {
+const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRedirectUrl = "/vregistration", successRedirectionUrl }) => {
   const [error, setError] = useState("");
   const [regStatus, setRegStatus] = useState("");
   const [preFillEmail, setPreFillEmail] = useState("");
@@ -37,9 +37,9 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRed
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
       .then((user) => {
-        onClose();
         if (RegistrationByAgencyId) {
-          setRegStatus("success");
+          navigate.push(successRedirectionUrl)
+
         } else {
           navigate.push(regisRedirectUrl);
         }
@@ -60,69 +60,69 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRed
   return (
     // adds user login form
     <>
-      <div className="wrapVolunteerSignup">
-        <div className="volunteerSignup1">
-          <button className="btnCloseVLogin" onClick={onClose}>
-            x
-          </button>
-          <div className="signupForm1 row">
-            {/* Add Login Form */}
-            <form className="menuSignup1 col-10 offset-sm-1">
-              <div className="vsignupHead">
-                <div>
-                  <div className="greetSignup1">Get Started!</div>
-                  <div className="titleSignup1">Create an Account</div>
+    <div className="wrapVolunteerSignup">
+          <div className="volunteerSignup1">
+            <button className="btnCloseVLogin" onClick={onClose}>
+              x
+            </button>
+            <div className="signupForm1 row">
+              {/* Add Login Form */}
+              <form className="menuSignup1 col-10 offset-sm-1">
+                <div className="vsignupHead">
+                  <div>
+                    <div className="greetSignup1">Get Started!</div>
+                    <div className="titleSignup1">Create an Account</div>
+                  </div>
+                  {/* Logo */}
+                  <div className="sbLogo">
+                    <img src={SBLogo} alt="BlueBirdLogo" width="120px" />
+                  </div>
                 </div>
-                {/* Logo */}
-                <div className="sbLogo">
-                  <img src={SBLogo} alt="BlueBirdLogo" width="120px" />
-                </div>
-              </div>
 
-              {/* user credentials */}
-              <div className="unameSignup1">
-                <label className="label">Email Id</label>
-                <input
-                  className="input"
-                  type="text"
-                  name="email"
-                  value={RegistrationByAgencyId ? preFillEmail : email}
-                  placeholder="Enter your email address"
-                  onChange={changeHandler}
-                  autoComplete="off"
-                />
-              </div>
-              <div className="pwdSignup1">
-                <label className="label">
-                  {RegistrationByAgencyId ? "Set Password" : "Password"}{" "}
-                </label>
-                <input
-                  className="input"
-                  type="password"
-                  name="password"
-                  value={password}
-                  placeholder="Enter your password"
-                  onChange={changeHandler}
-                  autoComplete="off"
-                />
-              </div>
-              {/* Login button*/}
-              <div className="btnSignup1">
-                <button type="signup" onClick={signUp}>
-                  Sign Up
-                </button>
-              </div>
-              {/* <div className="gotoLogin"> */}
-              {/* <span>Already have an account?</span> */}
-              {/* <a href="#" onClick={() => loginState(false)}>Login! </a> */}
-              {/* </div>
+                {/* user credentials */}
+                <div className="unameSignup1">
+                  <label className="label">Email Id</label>
+                  <input
+                    className="input"
+                    type="text"
+                    name="email"
+                    value={RegistrationByAgencyId ? preFillEmail : email}
+                    placeholder="Enter your email address"
+                    onChange={changeHandler}
+                    autoComplete="off"
+                  />
+                </div>
+                <div className="pwdSignup1">
+                  <label className="label">
+                    {RegistrationByAgencyId ? "Set Password" : "Password"}{" "}
+                  </label>
+                  <input
+                    className="input"
+                    type="password"
+                    name="password"
+                    value={password}
+                    placeholder="Enter your password"
+                    onChange={changeHandler}
+                    autoComplete="off"
+                  />
+                </div>
+                {/* Login button*/}
+                <div className="btnSignup1">
+                  <button type="signup" onClick={signUp}>
+                    Sign Up
+                  </button>
+                </div>
+                {/* <div className="gotoLogin"> */}
+                {/* <span>Already have an account?</span> */}
+                {/* <a href="#" onClick={() => loginState(false)}>Login! </a> */}
+                {/* </div>
             <div className="hline">
               <hr />
               <span>or login with</span>
               <hr />
             </div> */}
-              {/* Social Media Login*/}
-              {/*{ <div className="btnSLogin">
+                {/* Social Media Login*/}
+                {/*{ <div className="btnSLogin">
               <button type="login" onClick={signInWithGoogle}>
                 {" "}
                 <i>
@@ -139,13 +139,13 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRed
                 Facebook
               </button>
             </div> }*/}
-              {/* Error message when credentials are wrong*/}
-              {error && <div className="signupError">{error.slice(5)}</div>}
-            </form>
+                {/* Error message when credentials are wrong*/}
+                {error && <div className="signupError">{error.slice(5)}</div>}
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-      {regStatus === "success" && <RegFormSuccess />}
+
     </>
   );
 };

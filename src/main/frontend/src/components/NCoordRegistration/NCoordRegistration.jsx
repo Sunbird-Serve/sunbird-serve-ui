@@ -431,7 +431,11 @@ const NCoordRegistration = (props) => {
         })
         .catch(function (error) {
           console.log(error);
+          if (props.agencyId) {
+            setCoordSignup(true);
+          } else {
             setRegStatus("success");
+          }
 
           // setRegStatus("failure");
         })
@@ -739,13 +743,17 @@ const NCoordRegistration = (props) => {
         </div>
       )}
 
-      {regStatus === "success" && userId && <RegFormSuccess />}
+      {regStatus === "success" && userId && <RegFormSuccess redirect={props.role === "nCoordinator" ? "/needs" : "/volunteers"} />}
       {regStatus === "failure" && userId && (
         <RegFormFailure retryReg={retryReg} />
       )}
 
       {coordSignup && (
-        <CoordSignup onClose={closeCoordSignUp} regisRedirectUrl={props.role === "nCoordinator" ? "/ncRegistration" : "/vcRegistration"} RegistrationByAgencyId={props.agencyId} />
+        <CoordSignup 
+          onClose={closeCoordSignUp} 
+          regisRedirectUrl={props.role === "nCoordinator" ? "/ncRegistration" : "/vcRegistration"} 
+          successRedirectionUrl={props.role === "nCoordinator" ? "/needs" : "/volunteers"}
+          RegistrationByAgencyId={props.agencyId} />
       )}
     </div>
   );
