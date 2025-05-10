@@ -3,10 +3,10 @@ import './RegFormSuccess.css'
 import formSuccessImg from './Illustration_Success.jpg'
 import { useHistory } from "react-router-dom";
 
-const RegFormSuccess = () => {
+const RegFormSuccess = ({redirect="/vneedtypes"}) => {
   const navigate = useHistory();
   const gotoHome = () => {
-    navigate.push("/vneedtypes")
+    navigate.push(redirect)
     window.location.reload();
   }
   const delayTime = 3000;

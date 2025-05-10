@@ -13,7 +13,7 @@ const NCoordSignUpBtn = () => {
     <>
       <div className="ncSignup">
         <a href="#" onClick={openCoordSignUp}>
-          Sign up as Need Coordinator?
+          Sign up as Need Coordinator
         </a>
       </div>
 

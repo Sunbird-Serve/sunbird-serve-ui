@@ -25,7 +25,7 @@ import VolunteerList from "../vAdmin/VolunteerList";
 import Agency from "../vAdmin/Agency";
 import VolunteerSignup from "../../components/VolunteerSignup/VolunteerSignup";
 import Entity from "../nAdmin/Entity";
-import NCoordRegistration from "../../components/NCoordRegistration/NCoordRegistration";
+import CoordRegistration from "../../components/CoordRegistration/CoordRegistration";
 
 const MainPage = () => {
   const [isSideNavOpen, setIsSideNavOpen] = useState(false);
@@ -105,7 +105,9 @@ const MainPage = () => {
                 />
                 <Route path="/signUp" component={VolunteerSignup} />
                 <Route path="/entities" component={Entity} />
-                <Route path="/ncregistration" component={NCoordRegistration} />
+                <Route path="/ncRegistration">
+                  <CoordRegistration role="nCoordinator" title={"Need Coordinator Registration"} />
+                </Route>
               </Switch>
             </div>
           </div>
