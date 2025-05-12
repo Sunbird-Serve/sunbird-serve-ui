@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./NCoordRegistration.css";
+import "./CoordRegistration.css";
 import {
   Autocomplete,
   Checkbox,
@@ -22,7 +22,7 @@ import CoordSignup from "../VolunteerSignup/VolunteerSignup.js";
 const configData = require("../../configure.js");
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
-const NCoordRegistration = (props) => {
+const CoordRegistration = (props) => {
   const dispatch = useDispatch();
   const navigate = useHistory();
 
@@ -307,9 +307,9 @@ const NCoordRegistration = (props) => {
         country: formData.country,
       },
     },
-    agencyId: "9270607102",
+    agencyId: props.agencyId ?? "9270607102",
     status: "Registered",
-    role: ["nCoordinator"],
+    role: [props.role],
   };
 
   const [regStatus, setRegStatus] = useState("");
@@ -431,7 +431,11 @@ const NCoordRegistration = (props) => {
         })
         .catch(function (error) {
           console.log(error);
-          setRegStatus("success");
+          if (props.agencyId) {
+            setCoordSignup(true);
+          } else {
+            setRegStatus("success");
+          }
 
           // setRegStatus("failure");
         })
@@ -477,7 +481,7 @@ const NCoordRegistration = (props) => {
       {!regStatus && (
         <div className="reg-main">
           <div className="title-container">
-            <span className="title">Need Coordinator Registration</span>
+            <span className="title">{props.title}</span>
             <div className="info-card">
               <span>Online</span>
               <FiberManualRecordIcon
@@ -526,14 +530,6 @@ const NCoordRegistration = (props) => {
                 onClick={() => onNavClick(1)}
               >
                 Contact Details
-              </span>
-              <hr className="nav-line" />
-              <hr className="nav-line" />
-              <span
-                className={nav === 5 ? "nav-element active" : "nav-element"}
-                onClick={() => onNavClick(5)}
-              >
-                Reference & Consent
               </span>
             </div>
 
@@ -742,74 +738,25 @@ const NCoordRegistration = (props) => {
                   </div>
                 </div>
               </div>
-
-              <div className="form-section" id={5} ref={refArray[5]}>
-                <span className="formCat">Reference & Consent</span>
-                <hr className="form-line" />
-                <div className="formEntries">
-                  <div className="formElement">
-                    <label>Reference Channel</label>
-                    <br />
-                    <input
-                      className="form-input"
-                      placeholder="Enter your Reference Channel"
-                      name="reference"
-                      value={formData.reference ? formData.reference : ""}
-                      onChange={handleChange}
-                    ></input>
-                  </div>
-                </div>
-                <div className="consent-container">
-                  <div>
-                    <input
-                      name="consent"
-                      checked={formData.consent}
-                      onChange={() =>
-                        setFormData({ ...formData, consent: !formData.consent })
-                      }
-                      type="checkbox"
-                    />
-                    <span>
-                      Consent given for sharing preference to other volunteer
-                      agency through secure network
-                    </span>
-                  </div>
-                  <span style={{ padding: "3vh 0", display: "block" }}>
-                    By submiting this form and registering yourself as a
-                    nominee, you will be agreeing to our{" "}
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://www.google.com"
-                    >
-                      Terms & Conditions
-                    </a>{" "}
-                    and{" "}
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href="https://www.google.com"
-                    >
-                      Privacy Policy
-                    </a>
-                  </span>
-                </div>
-              </div>
             </form>
           </div>
         </div>
       )}
 
-      {regStatus === "success" && userId && <RegFormSuccess />}
+      {regStatus === "success" && userId && <RegFormSuccess redirect={props.role === "nCoordinator" ? "/needs" : "/volunteers"} />}
       {regStatus === "failure" && userId && (
         <RegFormFailure retryReg={retryReg} />
       )}
 
       {coordSignup && (
-        <CoordSignup onClose={closeCoordSignUp} regisRedirectUrl="/ncRegistration" />
+        <CoordSignup 
+          onClose={closeCoordSignUp} 
+          regisRedirectUrl={props.role === "nCoordinator" ? "/ncRegistration" : "/vcRegistration"} 
+          successRedirectionUrl={props.role === "nCoordinator" ? "/needs" : "/volunteers"}
+          RegistrationByAgencyId={props.agencyId} />
       )}
     </div>
   );
 };
 
-export default NCoordRegistration;
+export default CoordRegistration;
