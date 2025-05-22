@@ -382,6 +382,9 @@ margin-top: 30px;
   border-radius: 50%;
   background-color: white;
   border: solid #DBDBDB;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .acceptNomin:hover {
   background-color: #EEF9EC;
@@ -739,7 +742,6 @@ color: white;
 white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
-max-width: 120px;
 }
 
 /* Fix for tab overlap with table */
