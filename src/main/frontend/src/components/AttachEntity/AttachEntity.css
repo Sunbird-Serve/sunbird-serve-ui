@@ -1,0 +1,46 @@
+.formEntries {
+    display: grid;
+    grid-template-columns: 50% 50%;
+    justify-items: start;
+    padding: 10px;
+}
+
+.formElement {
+    align-items: start;
+    padding-top: 2%;
+    width: 100%;
+    padding: 10px;
+}
+
+.footer-button {
+    margin-top: 10px;
+    justify-self: end;
+    display: flex;
+    gap: 10px;
+}
+
+.formElement>* {
+    width: 100%;
+}
+
+.modal-dialog {
+    display: flex;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0 auto;
+    min-width: 40%;
+}
+
+.btn-primary:disabled,
+.btn-primary[disabled] {
+    background-color: #0d6efd;
+    opacity: 0.4;
+    color: #cfe2ff;
+    border: 2px solid #084298;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.MuiInputLabel-asterisk {
+    color: red;
+}
