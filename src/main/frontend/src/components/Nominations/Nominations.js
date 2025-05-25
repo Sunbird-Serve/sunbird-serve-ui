@@ -76,8 +76,6 @@ const Nominations = ({ needData, openPopup }) => {
   const [reason, setReason] = useState("");
 
   if (acceptPopup) {
-    console.log(rowData.id); //nominationId
-    console.log(rowData.nominatedUserId); //nominatedUserId
     axios
       .post(
         `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
@@ -136,7 +134,6 @@ const Nominations = ({ needData, openPopup }) => {
           setRowData(row.original);
         };
         const viewDeliverable = () => {
-          console.log(row.original);
           setRowData(row.original);
           axios
             .get(
@@ -144,7 +141,6 @@ const Nominations = ({ needData, openPopup }) => {
             )
             .then((response) => {
               setFulfillment(response.data);
-              console.log(response.data);
             })
             .catch((error) => {
               console.log("error");
@@ -161,8 +157,6 @@ const Nominations = ({ needData, openPopup }) => {
                     style={{
                       height: "20px",
                       width: "20px",
-                      marginLeft: "-5px",
-                      marginBottom: "3px",
                       color: "green",
                     }}
                   />
@@ -172,8 +166,6 @@ const Nominations = ({ needData, openPopup }) => {
                     style={{
                       height: "20px",
                       width: "20px",
-                      marginLeft: "-4.5px",
-                      marginBottom: "3px",
                       color: "red",
                     }}
                   />
@@ -181,14 +173,19 @@ const Nominations = ({ needData, openPopup }) => {
               </>
             )}
             {activeTab === "tabA" && (
-              <button className="styled-button" onClick={viewDeliverable}>
-                View Deliverables
-              </button>
+              <div style={{ display: "flex", gap: "5px" }}>
+                <button className="styled-button" onClick={viewDeliverable}>
+                  View Deliverables
+                </button>
+                <button className="styled-button" onClick={handleReject}>
+                  Drop Volunteer
+                </button>
+              </div>
             )}
           </div>
         );
       },
-      width: 250,
+      width: 400,
     });
   }
 
@@ -216,7 +213,6 @@ const Nominations = ({ needData, openPopup }) => {
         .then((response) => {
           setDeliverables(response.data.needDeliverable);
           setInParas(response.data.inputParameters);
-          console.log(response.data);
           if (response.data.inputParameters.length > 0) {
             setPlanData({
               planPlatform: "",
@@ -292,18 +288,10 @@ const Nominations = ({ needData, openPopup }) => {
 
   const [editIndex, setEditIndex] = useState("");
   const handleEditDeliverable = (item, index) => {
-    console.log(item);
     setEditIndex(index);
   };
   const handleDoneDeliverable = (index) => {
     setEditIndex("");
-    console.log(formData[index].deliverableId);
-    console.log({
-      inputUrl: formData[index].inputUrl,
-      softwarePlatform: formData[index].softwarePlatform,
-      startTime: formData[index].startTime,
-      endTime: formData[index].endTime,
-    });
     axios.put(
       `${configData.SERVE_NEED}/deliverable-details/update/${formData[index].deliverableId}`,
       {
@@ -329,9 +317,7 @@ const Nominations = ({ needData, openPopup }) => {
           deliverableDate: formData[index].deliverableDate,
         }
       )
-      .then((response) => {
-        console.log("Status updated successfully:", response.data);
-      })
+      .then((response) => {})
       .catch((error) => {
         console.error("Error updating status:", error);
       });
@@ -372,12 +358,6 @@ const Nominations = ({ needData, openPopup }) => {
     setPlanData({ ...planData, [e.target.name]: e.target.value });
   };
   const submitComnInfo = () => {
-    console.log({
-      inputUrl: planData.planLink,
-      softwarePlatform: planData.planPlatform,
-      startTime: planData.planStartTime,
-      endTime: planData.planEndTime,
-    });
     axios
       .put(
         `${configData.SERVE_NEED}/all-deliverable-details/update/${planId}`,
@@ -457,46 +437,46 @@ const Nominations = ({ needData, openPopup }) => {
       {!gotoDelivs && (
         <div className="nominations-table-responsive">
           <table className="tableNominations">
-          <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()}>
-                    {column.render("Header")}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.length > 0 ? (
-              page.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr
-                    {...row.getRowProps()}
-                    onClick={() => handleRowClick(row.original)}
-                  >
-                    {row.cells.map((cell) => (
-                      <td
-                        {...cell.getCellProps()}
-                        style={{ width: cell.column.width }}
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan={columns.length} style={{ textAlign: "center" }}>
-                  No Data Available!
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th {...column.getHeaderProps()}>
+                      {column.render("Header")}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.length > 0 ? (
+                page.map((row) => {
+                  prepareRow(row);
+                  return (
+                    <tr
+                      {...row.getRowProps()}
+                      onClick={() => handleRowClick(row.original)}
+                    >
+                      {row.cells.map((cell) => (
+                        <td
+                          {...cell.getCellProps()}
+                          style={{ width: cell.column.width }}
+                        >
+                          {cell.render("Cell")}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={columns.length} style={{ textAlign: "center" }}>
+                    No Data Available!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       )}
       {/* reject pop-up */}
