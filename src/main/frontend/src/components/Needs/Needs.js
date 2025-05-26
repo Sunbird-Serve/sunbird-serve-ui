@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react'
+import React, { useEffect, useState } from 'react'
 import './Needs.css'
 import NeedsTable from '../NeedsTable/NeedsTable'
 import ZeroDisplay from '../../assets/noRecords.png';
@@ -6,9 +6,16 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { useSelector, useDispatch } from 'react-redux'
 import { useHistory } from 'react-router'
 import { fetchNeeds } from "../../state/needSlice";
+import AttachEntity from '../AttachEntity/AttachEntity';
+import { Alert, Snackbar } from '@mui/material';
 
 const Needs = props => {
   const dispatch = useDispatch()
+  const [openAttachEntity, setOpenAttachEntity] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+  const [snackMessage, setSnackMessage] = useState("")
+  const [snackSeverity, setSnackSeverity] = useState("")
+
   const history = useHistory()
   useEffect(()=>{
     dispatch(fetchNeeds());
@@ -27,24 +34,38 @@ const Needs = props => {
   }
 
   return (
-    <div className="wrapNeedsContent"> 
+    <div className="wrapNeedsContent">
       <div className="needsList">
         { needsCount ?  
           //when needs number is non-zero, open needs in table
           <div className="needTable">
             {/*<NeedsTable statusPopup={togglePopup} dataNeed={data} tab={activeTab} /> */}
-            <NeedsTable /> 
+            <NeedsTable />
           </div>
-        : 
+          :
           /* when zero needs, display no needs to display page*/
-          <div className="zeroNeed">  
+          <div className="zeroNeed">
             <img src={ZeroDisplay} alt="SunBirdLogo" width="120px" />
             <div className="headZeroNeed">No Needs to display</div>
             <div className="textZeroNeed">Get started by raising needs and appoint volunteers</div>
-            <button onClick={gotoRaiseNeed}>Raise Need <ArrowRightIcon/></button> 
+            <button onClick={gotoRaiseNeed}>Raise Need <ArrowRightIcon/></button>
+            <button className='assign-entity-button' onClick={() => { setOpenAttachEntity(true) }}>Assign Entity</button>
           </div>
         }
-      </div> 
+      </div>
+      {openAttachEntity && <AttachEntity onClose={() => setOpenAttachEntity(false)} setOpenSnackbar={setOpenSnackbar} setSnackMessage={setSnackMessage} setSnackSeverity={setSnackSeverity} />}
+
+      {openSnackbar && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000}
+          onClose={() => setOpenSnackbar(false)}
+        >
+          <Alert severity={snackSeverity} variant="filled">
+            {snackMessage}
+          </Alert>
+        </Snackbar>
+      )}
     </div>
   )
 }

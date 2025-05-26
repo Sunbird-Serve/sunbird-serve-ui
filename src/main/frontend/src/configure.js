@@ -31,6 +31,8 @@ const configData = {
   ENTITY_DETAILS_GET: `${baseDomainNeed}/api/v1/serve-need/entityDetails`,
   ENTITY_NEEDS: `${baseDomainNeed}/api/v1/serve-need/need/entities`,
   ENTITY_NEED_GET: `${baseDomainNeed}/api/v1/serve-need/needs`,
+  ENTITY_GET_ALL: `${baseDomainNeed}/api/v1/serve-need/entity/all`,
+  ENTITY_ATTACH: `${baseDomainNeed}/api/v1/serve-need/entity/assign`,
   REGISTRATION_DOMAIN: `${baseDomainVolunteering}`,
   UPDATE_USER: `${baseDomainVolunteering}/api/v1/serve-volunteering/user/agencyId/update`,
   AGENCYID: "1-74f81200-dc16-4c65-bf7a-a3ab75952432",
