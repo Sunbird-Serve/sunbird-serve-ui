@@ -120,35 +120,37 @@ function VProfile() {
         </div>
       </div>
       <div className="vProfNav">
-        <NavLink
-          to="/vprofile/vpinfo"
-          default
-          className="vpNavItem"
-          activeClassName="selectedTab"
-        >
-          Profile
-        </NavLink>
-        <NavLink
-          to="/vprofile/vpnominations"
-          className="vpNavItem"
-          activeClassName="selectedTab"
-        >
-          Nominations
-        </NavLink>
-        <NavLink
-          to="/vprofile/vpneedplans"
-          className="vpNavItem"
-          activeClassName="selectedTab"
-        >
-          Need Plans
-        </NavLink>
-        <NavLink
-          to="/vprofile/vpfavourites"
-          className="vpNavItem"
-          activeClassName="selectedTab"
-        >
-          Favourites
-        </NavLink>
+        <div className="navContainer">
+          <NavLink
+            to="/vprofile/vpinfo"
+            exact
+            className="vpNavItem"
+            activeClassName="selectedTab"
+          >
+            <span>Profile</span>
+          </NavLink>
+          <NavLink
+            to="/vprofile/vpnominations"
+            className="vpNavItem"
+            activeClassName="selectedTab"
+          >
+            <span>Nominations</span>
+          </NavLink>
+          <NavLink
+            to="/vprofile/vpneedplans"
+            className="vpNavItem"
+            activeClassName="selectedTab"
+          >
+            <span>Need Plans</span>
+          </NavLink>
+          <NavLink
+            to="/vprofile/vpfavourites"
+            className="vpNavItem"
+            activeClassName="selectedTab"
+          >
+            <span>Favourites</span>
+          </NavLink>
+        </div>
       </div>
       {user && userData && (
         <div className="vpContent">
