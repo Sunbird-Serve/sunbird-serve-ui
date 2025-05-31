@@ -89,17 +89,18 @@ const Nominations = ({ needData, openPopup }) => {
     setAcceptPopup(false);
   }
 
-  const confirmRejection = (e) => {
+  const confirmRejection = (rejectionStatus) => {
     axios
       .post(
-        `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Rejected`
+        `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=${rejectionStatus}`
       )
       .then(
         function (response) {
           setResponseFlag(!responseFlag);
         },
         openPopup("reject"),
-        setRejectPopup(false)
+        setRejectPopup(false),
+        setReason("")
       )
       .catch(function (error) {
         console.log("error");
@@ -484,7 +485,11 @@ const Nominations = ({ needData, openPopup }) => {
         <div className="popupReject">
           <div className="rejectBox">
             <div className="rbTopBar">
-              <span>Reason for Rejection</span>
+              <span>
+                {activeTab === "tabA"
+                  ? "Reason for Dropping"
+                  : "Reason for Rejection"}
+              </span>
               <button onClick={() => setRejectPopup(false)}>X</button>
             </div>
             <div className="rbNomin">
@@ -498,7 +503,9 @@ const Nominations = ({ needData, openPopup }) => {
             <div className="rejectReason">
               <label>Reason</label>
               <textarea
-                placeholder="Write a reason for rejecting the nominee"
+                placeholder={`Write a reason for ${
+                  activeTab === "tabA" ? "dropping" : "rejecting"
+                } the nominee`}
                 name="reason"
                 value={reason}
                 onChange={handleReason}
@@ -511,7 +518,14 @@ const Nominations = ({ needData, openPopup }) => {
               >
                 Cancel
               </div>
-              <div className="confirmBtnRN" onClick={confirmRejection}>
+              <div
+                className="confirmBtnRN"
+                onClick={() =>
+                  confirmRejection(
+                    activeTab === "tabA" ? "Backfill" : "Rejected"
+                  )
+                }
+              >
                 Confirm
               </div>
             </div>
