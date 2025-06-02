@@ -76,8 +76,6 @@ const Nominations = ({ needData, openPopup }) => {
   const [reason, setReason] = useState("");
 
   if (acceptPopup) {
-    console.log(rowData.id); //nominationId
-    console.log(rowData.nominatedUserId); //nominatedUserId
     axios
       .post(
         `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
@@ -91,17 +89,18 @@ const Nominations = ({ needData, openPopup }) => {
     setAcceptPopup(false);
   }
 
-  const confirmRejection = (e) => {
+  const confirmRejection = (rejectionStatus) => {
     axios
       .post(
-        `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Rejected`
+        `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=${rejectionStatus}`
       )
       .then(
         function (response) {
           setResponseFlag(!responseFlag);
         },
         openPopup("reject"),
-        setRejectPopup(false)
+        setRejectPopup(false),
+        setReason("")
       )
       .catch(function (error) {
         console.log("error");
@@ -136,7 +135,6 @@ const Nominations = ({ needData, openPopup }) => {
           setRowData(row.original);
         };
         const viewDeliverable = () => {
-          console.log(row.original);
           setRowData(row.original);
           axios
             .get(
@@ -144,7 +142,6 @@ const Nominations = ({ needData, openPopup }) => {
             )
             .then((response) => {
               setFulfillment(response.data);
-              console.log(response.data);
             })
             .catch((error) => {
               console.log("error");
@@ -161,8 +158,6 @@ const Nominations = ({ needData, openPopup }) => {
                     style={{
                       height: "20px",
                       width: "20px",
-                      marginLeft: "-5px",
-                      marginBottom: "3px",
                       color: "green",
                     }}
                   />
@@ -172,8 +167,6 @@ const Nominations = ({ needData, openPopup }) => {
                     style={{
                       height: "20px",
                       width: "20px",
-                      marginLeft: "-4.5px",
-                      marginBottom: "3px",
                       color: "red",
                     }}
                   />
@@ -181,14 +174,19 @@ const Nominations = ({ needData, openPopup }) => {
               </>
             )}
             {activeTab === "tabA" && (
-              <button className="styled-button" onClick={viewDeliverable}>
-                View Deliverables
-              </button>
+              <div style={{ display: "flex", gap: "5px" }}>
+                <button className="styled-button" onClick={viewDeliverable}>
+                  View Deliverables
+                </button>
+                <button className="styled-button" onClick={handleReject}>
+                  Drop Volunteer
+                </button>
+              </div>
             )}
           </div>
         );
       },
-      width: 250,
+      width: 400,
     });
   }
 
@@ -216,7 +214,6 @@ const Nominations = ({ needData, openPopup }) => {
         .then((response) => {
           setDeliverables(response.data.needDeliverable);
           setInParas(response.data.inputParameters);
-          console.log(response.data);
           if (response.data.inputParameters.length > 0) {
             setPlanData({
               planPlatform: "",
@@ -292,18 +289,10 @@ const Nominations = ({ needData, openPopup }) => {
 
   const [editIndex, setEditIndex] = useState("");
   const handleEditDeliverable = (item, index) => {
-    console.log(item);
     setEditIndex(index);
   };
   const handleDoneDeliverable = (index) => {
     setEditIndex("");
-    console.log(formData[index].deliverableId);
-    console.log({
-      inputUrl: formData[index].inputUrl,
-      softwarePlatform: formData[index].softwarePlatform,
-      startTime: formData[index].startTime,
-      endTime: formData[index].endTime,
-    });
     axios.put(
       `${configData.SERVE_NEED}/deliverable-details/update/${formData[index].deliverableId}`,
       {
@@ -329,9 +318,7 @@ const Nominations = ({ needData, openPopup }) => {
           deliverableDate: formData[index].deliverableDate,
         }
       )
-      .then((response) => {
-        console.log("Status updated successfully:", response.data);
-      })
+      .then((response) => {})
       .catch((error) => {
         console.error("Error updating status:", error);
       });
@@ -372,12 +359,6 @@ const Nominations = ({ needData, openPopup }) => {
     setPlanData({ ...planData, [e.target.name]: e.target.value });
   };
   const submitComnInfo = () => {
-    console.log({
-      inputUrl: planData.planLink,
-      softwarePlatform: planData.planPlatform,
-      startTime: planData.planStartTime,
-      endTime: planData.planEndTime,
-    });
     axios
       .put(
         `${configData.SERVE_NEED}/all-deliverable-details/update/${planId}`,
@@ -423,29 +404,31 @@ const Nominations = ({ needData, openPopup }) => {
               </div>
             </div>
             <div className="rightBarNomination">
-              <div className="boxSearchNomins">
-                <i>
-                  <SearchIcon style={{ height: "18px", width: "18px" }} />
-                </i>
-                <input
-                  type="search"
-                  name="nsearch"
-                  placeholder="Search"
-                  value={globalFilter || ""}
-                  onChange={(e) => setGlobalFilter(e.target.value)}
-                ></input>
-              </div>
-              <div className="searchLocNomins">
-                <input
-                  type="text"
-                  placeholder="Location"
-                  onChange={(e) => {
-                    setFilter(
-                      "userInfo.contactDetails.address.city",
-                      e.target.value || undefined
-                    );
-                  }}
-                ></input>
+              <div className="search-filters-container">
+                <div className="boxSearchNomins">
+                  <i>
+                    <SearchIcon style={{ height: "18px", width: "18px" }} />
+                  </i>
+                  <input
+                    type="search"
+                    name="nsearch"
+                    placeholder="Search"
+                    value={globalFilter || ""}
+                    onChange={(e) => setGlobalFilter(e.target.value)}
+                  ></input>
+                </div>
+                <div className="searchLocNomins">
+                  <input
+                    type="text"
+                    placeholder="Location"
+                    onChange={(e) => {
+                      setFilter(
+                        "userInfo.contactDetails.address.city",
+                        e.target.value || undefined
+                      );
+                    }}
+                  ></input>
+                </div>
               </div>
             </div>
           </div>
@@ -453,54 +436,60 @@ const Nominations = ({ needData, openPopup }) => {
       )}
       {/* table for reading list of nominations*/}
       {!gotoDelivs && (
-        <table className="tableNominations">
-          <thead>
-            {headerGroups.map((headerGroup) => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map((column) => (
-                  <th {...column.getHeaderProps()}>
-                    {column.render("Header")}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody {...getTableBodyProps()}>
-            {page.length > 0 ? (
-              page.map((row) => {
-                prepareRow(row);
-                return (
-                  <tr
-                    {...row.getRowProps()}
-                    onClick={() => handleRowClick(row.original)}
-                  >
-                    {row.cells.map((cell) => (
-                      <td
-                        {...cell.getCellProps()}
-                        style={{ width: cell.column.width }}
-                      >
-                        {cell.render("Cell")}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })
-            ) : (
-              <tr>
-                <td colSpan={columns.length} style={{ textAlign: "center" }}>
-                  No Data Available!
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+        <div className="nominations-table-responsive">
+          <table className="tableNominations">
+            <thead>
+              {headerGroups.map((headerGroup) => (
+                <tr {...headerGroup.getHeaderGroupProps()}>
+                  {headerGroup.headers.map((column) => (
+                    <th {...column.getHeaderProps()}>
+                      {column.render("Header")}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody {...getTableBodyProps()}>
+              {page.length > 0 ? (
+                page.map((row) => {
+                  prepareRow(row);
+                  return (
+                    <tr
+                      {...row.getRowProps()}
+                      onClick={() => handleRowClick(row.original)}
+                    >
+                      {row.cells.map((cell) => (
+                        <td
+                          {...cell.getCellProps()}
+                          style={{ width: cell.column.width }}
+                        >
+                          {cell.render("Cell")}
+                        </td>
+                      ))}
+                    </tr>
+                  );
+                })
+              ) : (
+                <tr>
+                  <td colSpan={columns.length} style={{ textAlign: "center" }}>
+                    No Data Available!
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       )}
       {/* reject pop-up */}
       {rejectPopup && (
         <div className="popupReject">
           <div className="rejectBox">
             <div className="rbTopBar">
-              <span>Reason for Rejection</span>
+              <span>
+                {activeTab === "tabA"
+                  ? "Reason for Dropping"
+                  : "Reason for Rejection"}
+              </span>
               <button onClick={() => setRejectPopup(false)}>X</button>
             </div>
             <div className="rbNomin">
@@ -514,7 +503,9 @@ const Nominations = ({ needData, openPopup }) => {
             <div className="rejectReason">
               <label>Reason</label>
               <textarea
-                placeholder="Write a reason for rejecting the nominee"
+                placeholder={`Write a reason for ${
+                  activeTab === "tabA" ? "dropping" : "rejecting"
+                } the nominee`}
                 name="reason"
                 value={reason}
                 onChange={handleReason}
@@ -527,7 +518,14 @@ const Nominations = ({ needData, openPopup }) => {
               >
                 Cancel
               </div>
-              <div className="confirmBtnRN" onClick={confirmRejection}>
+              <div
+                className="confirmBtnRN"
+                onClick={() =>
+                  confirmRejection(
+                    activeTab === "tabA" ? "Backfill" : "Rejected"
+                  )
+                }
+              >
                 Confirm
               </div>
             </div>

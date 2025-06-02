@@ -8,7 +8,7 @@ import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import { useHistory } from "react-router-dom";
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 
-const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId }) => {
+const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRedirectUrl = "/vregistration", successRedirectionUrl = "/vneedtypes" }) => {
   const [error, setError] = useState("");
   const [regStatus, setRegStatus] = useState("");
   const [preFillEmail, setPreFillEmail] = useState("");
@@ -37,11 +37,11 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId }) => {
     e.preventDefault();
     createUserWithEmailAndPassword(auth, email, password)
       .then((user) => {
-        onClose();
         if (RegistrationByAgencyId) {
-          setRegStatus("success");
+          navigate.push(successRedirectionUrl)
+
         } else {
-          navigate.push("/vregistration");
+          navigate.push(regisRedirectUrl);
         }
       })
       .catch((err) => setError(err.code));
@@ -145,7 +145,7 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId }) => {
           </div>
         </div>
       </div>
-      {regStatus === "success" && <RegFormSuccess />}
+
     </>
   );
 };

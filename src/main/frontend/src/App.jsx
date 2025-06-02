@@ -117,6 +117,7 @@ import { redirectToOnlineTeachingPage } from "./state/redirectionToOnlineTeachin
 import "./index.css";
 import Registration from "./components/Registration/Registration";
 import { useLocation } from "react-router-dom";
+import CoordRegistration from "./components/CoordRegistration/CoordRegistration";
 
 function App() {
   const dispatch = useDispatch();
@@ -124,10 +125,16 @@ function App() {
   const isVolunteerRegistration = /^\/volunteer\/[^/]+\/vregistration$/.test(
     location.pathname
   );
+  const isVCoordRegistration = /^\/volunteer\/[^/]+\/vcRegistration$/.test(
+    location.pathname
+  );
   const match = location.pathname.match(
     /^\/volunteer\/([^/]+)\/vregistration$/
   );
-  const agencyId = match ? match[1] : null;
+  const match2 = location.pathname.match(
+    /^\/volunteer\/([^/]+)\/vcRegistration$/
+  )
+  const agencyId = match ? match[1] : (match2 ? match2[1] : null);
 
   const [presentUser, setPresentUser] = useState(null); // Holds Firebase-authenticated user
   const [loading, setLoading] = useState(true); // Global loading state
@@ -251,6 +258,8 @@ function App() {
   if (presentUser === null) {
     if (isVolunteerRegistration) {
       return <Registration agencyId={agencyId} />;
+    } else if(isVCoordRegistration) {
+      return <CoordRegistration role="vCoordinator" agencyId={agencyId} title={"Volunteer Coordinator Registration"} />
     } else {
       return <LoginPage getVolunteerStatus={handleVolunteer} />;
     }
