@@ -83,7 +83,7 @@ const FilterBy = ({ options, onFilterChange, label, filterByAgencies }) => {
   };
 
   return (
-    <Box width={"16rem"}>
+    <Box sx={{ width: "100%", maxWidth: { xs: "100%", sm: "20rem" } }}>
       <FormControl fullWidth>
         <InputLabel
           id="demo-simple-select-label"

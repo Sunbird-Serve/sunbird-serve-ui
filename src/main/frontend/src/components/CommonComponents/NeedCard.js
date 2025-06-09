@@ -5,7 +5,7 @@ import CardContent from "@mui/material/CardContent";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
-const NeedCard = ({ matrixData }) => {
+const NeedCard = ({ matrixData, className }) => {
   if (!matrixData || matrixData.length === 0) {
     return (
       <Typography variant="body1" color="text.secondary">
@@ -15,7 +15,7 @@ const NeedCard = ({ matrixData }) => {
   }
 
   return (
-    <Box display="flex" flexWrap="wrap" gap="0.5rem">
+    <Box display="flex" flexWrap="wrap" gap="0.5rem" className={className}>
       {matrixData?.map((matrix, index) => (
         <Box
           key={index}

@@ -267,9 +267,29 @@
   border-bottom: 1px solid #e0e0e0;
   min-height: 40px;
   margin-top: 0; /* remove margin between rows */
+  flex-wrap: wrap;
 }
 @media (max-width: 600px) {
-  .needTabsBar, .countsRow, .filtersRow {
+  .needTabsBar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 4px;
+    width: 100%;
+  }
+  
+  .needTabsBar button {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    min-width: auto;
+  }
+  
+  .countsRow, .filtersRow {
     flex-direction: column;
     align-items: stretch;
     padding: 8px 8px;
@@ -287,15 +307,22 @@
 }
 /* --- End New Layout Styles --- */
 
-.tableResponsiveWrapper {
+/* Table wrapper for horizontal scrolling */
+.tableResponsiveWrapper,
+.tableNeedList-wrapper {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 10px;
 }
+
 .tableNeedList {
-  border-collapse: collapse;
   width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
   border: 1.5px solid #f0efef;
 }
+
 @media (max-width: 900px) {
   .tableNeedList th, .tableNeedList td {
     font-size: 13px;
@@ -316,17 +343,67 @@
 @media (max-width: 600px) {
   .tableResponsiveWrapper {
     margin-left: 0;
+    margin-top: 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
   }
-  .tableNeedList th, .tableNeedList td {
+  
+  /* Table header styling */
+  .tableNeedList th {
+    font-size: 10px;
+    padding: 6px 4px;
+    position: sticky;
+    top: 0;
+    background-color: #f0efef;
+    z-index: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  
+  /* Table cell styling */
+  .tableNeedList td {
     font-size: 11px;
-    padding: 4px 2px;
+    padding: 8px 4px;
     min-width: 70px;
-    max-width: 120px;
+    max-width: 110px;
     word-break: break-word;
+    white-space: normal;
   }
+  
+  /* Prioritize important columns */
+  .tableNeedList th:nth-child(1), /* Need Name */
+  .tableNeedList td:nth-child(1) {
+    min-width: 100px;
+    max-width: 140px;
+  }
+  
+  .tableNeedList th:nth-child(5), /* Status */
+  .tableNeedList td:nth-child(5) {
+    min-width: 60px;
+  }
+  
+  /* Hide less important columns on very small screens */
+  @media (max-width: 380px) {
+    .tableNeedList th:nth-child(4), /* Contact Number */
+    .tableNeedList td:nth-child(4) {
+      display: none;
+    }
+  }
+  
+  /* Avatar container styling */
+  .vAvatars-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    padding: 0 2px;
+  }
+  
   .vAvatars-container .avatar {
-    height: 18px !important;
-    width: 18px !important;
+    height: 20px !important;
+    width: 20px !important;
     font-size: 10px !important;
     padding: 2px !important;
     margin-left: -4px !important;
@@ -357,10 +434,51 @@
   border: 1px solid #f7f8f9;
   padding: 8px;
   font-size: 14px;
+}
 
-  @media (max-width: 600px) {
-    font-size: 9px;
-    padding: 0;
+@media (max-width: 600px) {
+  /* Base styles for all table cells */
+  .tableNeedList td,
+  .tableNeedList td *,
+  .tableNeedList td span,
+  .tableNeedList td a,
+  .tableNeedList td div,
+  .tableNeedList td p,
+  .tableNeedList td strong {
+    font-size: 8px !important;
+    line-height: 1.1 !important;
+  }
+  
+  .tableNeedList td {
+    padding: 3px 2px;
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* Target specifically the numeric cells that appear too large */
+@media (max-width: 480px) {
+  /* Force all text in table cells to be small but readable */
+  .tableNeedList td,
+  .tableNeedList td *,
+  .tableNeedList td span,
+  .tableNeedList td div,
+  .tableNeedList td p,
+  .tableNeedList td a,
+  .tableNeedList td strong,
+  .tableNeedList td b {
+    font-size: 9px !important;
+    font-weight: normal !important;
+    line-height: 1.2 !important;
+  }
+  
+  /* Ensure table cells have enough height */
+  .tableNeedList td {
+    height: auto !important;
+    min-height: 24px !important;
+    padding: 4px 3px !important;
   }
 }
 .tableNeedList tr:hover {
@@ -378,19 +496,83 @@
   align-items: center;
   font-size: 14px;
   flex-wrap: wrap;
+  width: 100%;
 }
 @media (max-width: 900px) {
   .pageNav {
     font-size: 12px;
     flex-direction: column;
     height: auto;
-    gap: 4px;
-    padding: 4px 0;
+    gap: 8px;
+    padding: 8px 0;
   }
   .pageNav input, .pageNav select {
     width: 100%;
     margin: 2px 0;
     font-size: 12px;
+  }
+  .needsPerPage {
+    margin-left: 0;
+    width: 100%;
+    justify-content: space-between;
+  }
+  .pageNumber {
+    width: 100%;
+    justify-content: center;
+    margin-top: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Improve pagination controls */
+  .pageNav {
+    font-size: 11px;
+    padding: 6px 0;
+    gap: 6px;
+    width: 100%;
+  }
+  .pageNav input {
+    width: 40px;
+    margin: 0 4px;
+    padding-left: 5px;
+  }
+  .pageNav button {
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 30px;
+  }
+  .pageNumber {
+    gap: 4px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  /* Make table fill width on mobile */
+  .tableNeedList {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    table-layout: fixed;
+  }
+  
+  /* Improve table header styling */
+  .tableNeedList th {
+    font-size: 9px !important;
+    padding: 6px 3px !important;
+    font-weight: 600 !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  /* Make table horizontally scrollable if needed */
+  .tableNeedList-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

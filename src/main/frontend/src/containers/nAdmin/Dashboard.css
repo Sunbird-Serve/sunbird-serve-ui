@@ -1,0 +1,182 @@
+/* Dashboard.css */
+
+.dashboard-container {
+  padding: 1rem; /* Matches the outermost Box padding */
+}
+
+.welcome-section {
+  box-sizing: border-box; /* Default, ensures padding/border included in element's total width/height */
+  /* Styles for this class are primarily handled by MUI Box props or responsive overrides. */
+}
+
+.entity-filter-row {
+  /* Corresponds to the Box with 'Total Active Enities' and 'FilterBy' */
+  display: flex;
+  align-items: center; /* Vertically align items in the row */
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.entity-card-container {
+  box-sizing: border-box; /* Default, ensures padding/border included in element's total width/height */
+  /* Styles for this class are primarily handled by MUI Box props or responsive overrides. */
+}
+
+.filterby-container {
+  /* Corresponds to the Box wrapping the FilterBy component */
+  padding-left: 3rem; /* Default desktop padding */
+  display: flex;
+  align-items: center;
+  flex-grow: 1; /* Allow it to take available space if needed */
+}
+
+.needs-summary-row {
+  /* Corresponds to the Box containing the four summary NeedCards */
+  padding: 0.5rem 0;
+  /* The NeedCard component itself will handle internal layout of its items */
+}
+
+/* --- Media Queries --- */
+
+/* Tablets and larger phones */
+@media (max-width: 768px) {
+  .welcome-section {
+    text-align: center; /* Center welcome text */
+  }
+
+  .entity-filter-row {
+    flex-direction: column; /* Stack items vertically */
+    align-items: stretch; /* Make items take full width */
+    gap: 1rem; /* Increase gap for stacked items */
+  }
+
+  .entity-card-container {
+    width: 100%; /* Make 'Total Active Entities' card full width */
+  }
+
+  .filterby-container {
+    padding-left: 0 !important; /* Remove desktop padding */
+    width: 100%;
+  }
+
+}
+
+  /* The NeedCard component itself uses flexbox with flexWrap='wrap' for its items. */
+  /* Ensure .needs-summary-row allows NeedCard to take appropriate width. */
+  .needs-summary-row {
+    width: 100%; /* Ensure it can use the full width if needed */
+  }
+
+
+/* Smaller phones */
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 0.5rem;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .welcome-section {
+    padding: 0.5rem 0.25rem !important;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    display: flex !important;
+    justify-content: center !important;
+  }
+  
+  .welcome-section > div {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  
+  .welcome-section > div > div {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: center !important;
+  }
+  
+  .welcome-section .MuiTypography-body1 {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .entity-filter-row {
+    gap: 0.75rem;
+    padding: 0 !important;
+    margin-bottom: 0.75rem;
+  }
+
+  .entity-card-container {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Target the NeedCard components using the specific classes we added */
+  .entity-card {
+    /* Entity card (single card) takes full width */
+    width: 100%;
+  }
+  
+  /* For the summary cards container */
+  .summary-cards {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  /* For the entity card - keep it full width */
+  .entity-card > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  /* This targets each individual card box in the summary cards section */
+  .summary-cards > div {
+    width: calc(50% - 0.375rem) !important;
+    max-width: calc(50% - 0.375rem) !important;
+    flex: 0 0 calc(50% - 0.375rem) !important;
+  }
+  
+  /* Make the card content more compact on mobile */
+  .summary-cards .MuiCardContent-root {
+    padding: 10px !important;
+  }
+  
+  /* Adjust typography for better fit in smaller cards */
+  .summary-cards .MuiTypography-h6 {
+    font-size: 1rem !important;
+  }
+  
+  .summary-cards .MuiTypography-body1 {
+    font-size: 0.8rem !important;
+  }
+
+  /* Make cards more compact on mobile */
+  .entity-card-container .MuiCardContent-root,
+  .needs-summary-row .MuiCardContent-root {
+    padding: 0.75rem !important;
+  }
+
+  /* Adjust text size in cards */
+  .entity-card-container .MuiTypography-h6,
+  .needs-summary-row .MuiTypography-h6 {
+    font-size: 1.1rem;
+  }
+
+  .entity-card-container .MuiTypography-body1,
+  .needs-summary-row .MuiTypography-body1 {
+    font-size: 0.85rem;
+  }
+
+  /* Ensure the NeedsTable is also responsive */
+  .dashboard-container > div:last-child {
+    margin-top: 0.5rem;
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
