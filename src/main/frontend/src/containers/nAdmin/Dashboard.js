@@ -11,6 +11,7 @@ import VolunteerNeedsNominated from "../../assets/needsNominated.png";
 import VolunteerNeedsInProgress from "../../assets/needsInProgress.png";
 import VolunteerNeedsApproved from "../../assets/needsApproved.png";
 import totalNeedsCreated from "../../assets/totalNeedsCreated.png";
+import "./Dashboard.css"; // Import the CSS file
 const configData = require("../../configure");
 const Dashboard = () => {
   const dispatch = useDispatch();
@@ -138,9 +139,10 @@ const Dashboard = () => {
   ];
 
   return (
-    <Box padding={"1rem"}>
+    <Box className="dashboard-container">
       <Box
-        padding={"1rem"}
+        className="welcome-section"
+        padding={"1rem"} // Retaining some padding here for structure, can be moved to CSS
         gap={"0.5rem"}
         display={"flex"}
         width={"100%"}
@@ -160,9 +162,9 @@ const Dashboard = () => {
           </Typography>
         </Box>
       </Box>
-      <Box padding={"0.5rem 0"} gap={"0.5rem"} display={"flex"}>
-        {!isSAdmin && <NeedCard matrixData={EnityData} />}
-        <Box paddingLeft={"3rem"} display={"flex"} alignItems={"center"}>
+      <Box className="entity-filter-row">
+        {!isSAdmin && <div className="entity-card-container"><NeedCard matrixData={EnityData} className="entity-card" /></div>}
+        <Box className="filterby-container">
           <FilterBy
             label={"Select Enitity"}
             options={enitities}
@@ -171,8 +173,8 @@ const Dashboard = () => {
         </Box>
       </Box>
       {!isSAdmin && (
-        <Box padding={"0.5rem 0"}>
-          <NeedCard matrixData={matrixData} />
+        <Box className="needs-summary-row">
+          <NeedCard matrixData={matrixData} className="summary-cards" />
         </Box>
       )}
       <NeedsTable filterByEntity={true} />
