@@ -49,7 +49,7 @@ const Needs = props => {
             <div className="headZeroNeed">No Needs to display</div>
             <div className="textZeroNeed">Get started by raising needs and appoint volunteers</div>
             <button onClick={gotoRaiseNeed}>Raise Need <ArrowRightIcon/></button>
-            <button className='assign-entity-button' onClick={() => { setOpenAttachEntity(true) }}>Assign Entity</button>
+            <button className='assign-entity-button' onClick={() => { setOpenAttachEntity(true) }}>Onboard Entity</button>
           </div>
         }
       </div>
