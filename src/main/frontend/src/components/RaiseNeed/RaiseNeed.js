@@ -375,27 +375,35 @@ const RaiseNeed = (props) => {
             <div className="formRight col-sm-6">
               {/* Entity Name */}
               <div className="itemFormNeed">
-                <label>
-                  Entity Name<span class="required-label"></span>
-                </label>
-                <select
-                  className="selectMenu"
-                  name="entityId"
-                  value={entityId}
-                  required
-                  onChange={changeHandler}
-                >
-                  <option value="" defaultValue>
-                    Select Entity
-                  </option>
-                  {entities &&
-                    entities?.map((entype) => (
-                      <option key={entype.osid} value={entype.id}>
-                        {entype.name}
-                      </option>
-                    ))}
-                </select>
-              </div>
+  <label>
+    Entity Name<span className="required-label"></span>
+  </label>
+  <select
+    className="selectMenu"
+    name="entityId"
+    value={entityId}
+    required
+    onChange={changeHandler}
+  >
+    <option value="" defaultValue>
+      Select Entity
+    </option>
+    {entities &&
+      entities.map((entype) => (
+        <option key={entype.osid} value={entype.id}>
+          {entype.name}
+        </option>
+      ))}
+  </select>
+
+  {/* Show message if entity list is empty */}
+  {entities && entities.length === 0 && (
+    <div className="no-entities-message">
+      Please onboard your entity in the previous screen to Raise Need
+    </div>
+  )}
+</div>
+
               {/* Need Description */}
               <label className="itemDescriptionNeedLabel">
                 Need Description
