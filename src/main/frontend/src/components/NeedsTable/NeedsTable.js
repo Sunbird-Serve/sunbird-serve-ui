@@ -397,6 +397,10 @@ export const NeedsTable = ({ props, filterByEntity }) => {
     history.push("/raiseneed");
   };
 
+  const gotoRaiseNeedAI = (e) => {
+    history.push("/raiseneedai");
+  };
+
   return (
     <div className="wrapTable">
       {/* Tabs in a single row */}
@@ -409,9 +413,12 @@ export const NeedsTable = ({ props, filterByEntity }) => {
           <div className={`tabNeed ${activeTab === "assigned" ? "activeNTab" : ""}`} onClick={() => handleTabClick("assigned")}>Assigned</div>
           <div className={`tabNeed ${activeTab === "fulfilled" ? "activeNTab" : ""}`} onClick={() => handleTabClick("fulfilled")}>Fulfilled</div>
         </div>
-        {/* Raise Need Button aligned right */}
+        {/* Raise Need Buttons aligned right */}
         {!isNAdmin && !isSAdmin && (
-          <button className="raiseNeedBtn" onClick={gotoRaiseNeed}>Raise Need</button>
+          <div className="raiseNeedButtons">
+            <button className="raiseNeedBtn" onClick={gotoRaiseNeed}>Raise Need</button>
+            <button className="raiseNeedBtn raiseNeedBtnAI" onClick={gotoRaiseNeedAI}>Raise Need through Agent</button>
+          </div>
         )}
       </div>
 
