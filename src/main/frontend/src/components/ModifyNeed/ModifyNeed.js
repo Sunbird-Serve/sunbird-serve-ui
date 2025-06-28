@@ -234,7 +234,7 @@ const ModifyNeed = (props) => {
                   </div>
                   <div className="needITag">
                     {data.need.description
-                      ? data.need.description.slice(3, -4)
+                      ? data.need.description
                       : "-"}
                   </div>
                 </div>
@@ -324,21 +324,21 @@ const ModifyNeed = (props) => {
                       {!modify && (
                         <span>
                           {data.need.description
-                            ? data.need.description.slice(3, -4)
+                            ? data.need.description
                             : "-"}
                         </span>
                       )}
                       {modify && status == "Approved" && (
                         <span>
                           {data.need.description
-                            ? data.need.description.slice(3, -4)
+                            ? data.need.description
                             : "-"}
                         </span>
                       )}
                       {modify && status != "Approved" && (
                         <input
                           type="text"
-                          name="name"
+                          name="description"
                           value={description}
                           onChange={changeHandler}
                         />

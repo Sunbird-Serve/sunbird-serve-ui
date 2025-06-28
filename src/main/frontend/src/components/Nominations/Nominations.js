@@ -27,6 +27,35 @@ import dayjs from "dayjs";
 
 const configData = require("../../configure.js");
 
+// Function to format time without timezone conversion
+const formatTime = (timeString) => {
+  if (!timeString) return "";
+  // Extract time portion from ISO string (HH:mm format)
+  const timeMatch = timeString.match(/(\d{2}):(\d{2}):/);
+  if (timeMatch) {
+    const hours = parseInt(timeMatch[1]);
+    const minutes = timeMatch[2];
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+  }
+  return timeString;
+};
+
+// Function to create dayjs object from time string without timezone conversion
+const createTimeFromString = (timeString) => {
+  if (!timeString) return null;
+  // Extract time portion from ISO string
+  const timeMatch = timeString.match(/(\d{2}):(\d{2}):/);
+  if (timeMatch) {
+    const hours = parseInt(timeMatch[1]);
+    const minutes = parseInt(timeMatch[2]);
+    // Create a dayjs object with today's date and the extracted time
+    return dayjs().hour(hours).minute(minutes).second(0).millisecond(0);
+  }
+  return null;
+};
+
 const Nominations = ({ needData, openPopup }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user.data);
@@ -292,6 +321,29 @@ const Nominations = ({ needData, openPopup }) => {
     setEditIndex(index);
   };
   const handleDoneDeliverable = (index) => {
+    // Validation: Check if required fields are filled
+    const currentData = formData[index];
+    
+    // Check if status is selected
+    if (!currentData.status || currentData.status === '') {
+      alert('Please select a status');
+      return;
+    }
+    
+    // Check if comments are provided when status is Completed, Cancelled, or Offline
+    if ((currentData.status === 'Completed' || currentData.status === 'Cancelled' || currentData.status === 'Offline') && 
+        (!currentData.comments || currentData.comments.trim() === '')) {
+      alert('Please provide comments for ' + currentData.status + ' status');
+      return;
+    }
+    
+    // Check if number of students is provided
+    if (!currentData.numStudents || currentData.numStudents === '' || currentData.numStudents < 0) {
+      alert('Please enter the number of students');
+      return;
+    }
+    
+    // If all validations pass, proceed with submission
     setEditIndex("");
     axios.put(
       `${configData.SERVE_NEED}/deliverable-details/update/${formData[index].deliverableId}`,
@@ -336,6 +388,7 @@ const Nominations = ({ needData, openPopup }) => {
       inputUrl: inParas.length ? inParas[index].inputUrl : "",
       status: item.status,
       comments: item.comments,
+      numStudents: item.numStudents || "",
     }));
     setFormData(initialFormData);
   }, [deliverables, inParas]);
@@ -656,7 +709,7 @@ const Nominations = ({ needData, openPopup }) => {
                         {isEditing ? (
                           <>
                             <TimePicker
-                              value={data.startTime ? dayjs(data.startTime) : null}
+                              value={createTimeFromString(data.startTime)}
                               onChange={(newValue) =>
                                 handleDeliverableChange(
                                   { target: { value: newValue } },
@@ -668,7 +721,7 @@ const Nominations = ({ needData, openPopup }) => {
                             />
                             {" - "}
                             <TimePicker
-                              value={data.endTime ? dayjs(data.endTime) : null}
+                              value={createTimeFromString(data.endTime)}
                               onChange={(newValue) =>
                                 handleDeliverableChange(
                                   { target: { value: newValue } },
@@ -681,9 +734,9 @@ const Nominations = ({ needData, openPopup }) => {
                           </>
                         ) : (
                           <span title="Time">
-                            {(data.startTime ? dayjs(data.startTime).format('HH:mm') : '') +
+                            {formatTime(data.startTime) +
                               ' - ' +
-                              (data.endTime ? dayjs(data.endTime).format('HH:mm') : '')}
+                              formatTime(data.endTime)}
                           </span>
                         )}
                       </div>
@@ -729,6 +782,7 @@ const Nominations = ({ needData, openPopup }) => {
                               <option value="Planned">Planned</option>
                               <option value="Completed">Completed</option>
                               <option value="Cancelled">Cancelled</option>
+                              <option value="Offline">Offline</option>
                             </select>
                           </div>
                           {data.status === 'Completed' && (
@@ -758,6 +812,24 @@ const Nominations = ({ needData, openPopup }) => {
                                 <option value="Network Issue">Network Issue</option>
                                 <option value="Power Cut">Power Cut</option>
                                 <option value="Students Not Available">Students Not Available</option>
+                                <option value="Volunteer Not Available">Volunteer Not Available</option>
+                              </select>
+                            </div>
+                          )}
+                          {data.status === 'Offline' && (
+                            <div className="field-group">
+                              <select
+                                id={`comments-${index}`}
+                                value={data.comments || ''}
+                                onChange={(e) => handleDeliverableChange(e, index, 'comments')}
+                                className="link-input"
+                                required
+                              >
+                                <option value="">Select Reason</option>
+                                <option value="Network Issue">Network Issue</option>
+                                <option value="Power Cut">Power Cut</option>
+                                <option value="Students Not Available">Students Not Available</option>
+                                <option value="Volunteer Not Available">Volunteer Not Available</option>
                               </select>
                             </div>
                           )}
