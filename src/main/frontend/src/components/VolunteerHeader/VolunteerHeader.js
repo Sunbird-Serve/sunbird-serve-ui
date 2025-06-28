@@ -8,11 +8,12 @@ import Badge from '@mui/material/Badge';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import VolunterLogin from '../VolunteerLogin/VolunteerLogin'
 import VolunterSignup from '../VolunteerSignup/VolunteerSignup'
-import { useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 
 
 function VHeader({ activeComponent, onToggle }) {
   const history = useHistory();
+  const location = useLocation();
 
     const [open,setOpen] = useState(false);
     const [avatarColor, setAvatarColor] = useState(randomColor())
@@ -36,6 +37,12 @@ function VHeader({ activeComponent, onToggle }) {
     const handleLogoClick = () => {
       history.push("/vneedtypes");
     };
+
+    useEffect(() => {
+      if (location.pathname === "/vregistration") {
+        setVsignup(false);
+      }
+    }, [location.pathname]);
 
   return (
     <div className="wrapVHeader">

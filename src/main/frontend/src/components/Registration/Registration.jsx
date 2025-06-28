@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "./Registration.css";
 import {
   Autocomplete,
@@ -14,7 +14,6 @@ import axios from "axios";
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
 import RegFormFailure from "../RegFormFailure/RegFormFailure";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUserList } from "../../state/userListSlice";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useHistory } from "react-router-dom";
@@ -460,8 +459,10 @@ const Registration = (props) => {
 
   useEffect(() => {
     const regEmail = localStorage.getItem("regEmail");
-    setPrefillEmail(regEmail);
-  }, [prefillEmail]);
+    if (regEmail) {
+      setPrefillEmail(regEmail);
+    }
+  }, []);
 
   const handleChange = (event, count = 0) => {
     // console.log(event, "check this");
@@ -520,7 +521,7 @@ const Registration = (props) => {
     return true;
   };
 
-  const dataToPost = {
+  const dataToPost = useMemo(() => ({
     identityDetails: {
       fullname: formData.firstName,
       name: formData.lastName,
@@ -543,7 +544,7 @@ const Registration = (props) => {
         : props.agencyId || configData.AGENCYID,
     status: "Registered",
     role: ["Volunteer"],
-  };
+  }), [formData, prefillEmail, props.agencyId]);
 
   const [regStatus, setRegStatus] = useState("");
 
@@ -598,37 +599,39 @@ const Registration = (props) => {
   });
 
   useEffect(() => {
-    setDataProfile((prev) => ({
-      ...prev,
-      skills: formData.skills,
-      genericDetails: {
-        qualification: formData.qualification,
-        affiliation: formData.affiliation,
-        yearsOfExperience: formData.yoe,
-        employmentStatus: formData.empStatus,
-      },
-      userPreference: {
-        timePreferred: formData.prefTime,
-        dayPreferred: formData.prefDays,
-        interestArea: formData.interests,
-        language: formData.languages,
-      },
-      agencyId: "",
-      userId: userId,
-      onboardDetails: onboradingInfo,
-      consentDetails: {
-        consentGiven: true,
-        consentDate: currentDate,
-        consentDescription:
-          "Consent given for sharing preference to other volunteer agency through secure network",
-      },
-      referenceChannelId: "",
-      volunteeringHours: {
-        totalHours: 0,
-        hoursPerWeek: 0,
-      },
-    }));
-  }, [userId, formData]);
+    if (userId) {
+      setDataProfile((prev) => ({
+        ...prev,
+        skills: formData.skills,
+        genericDetails: {
+          qualification: formData.qualification,
+          affiliation: formData.affiliation,
+          yearsOfExperience: formData.yoe,
+          employmentStatus: formData.empStatus,
+        },
+        userPreference: {
+          timePreferred: formData.prefTime,
+          dayPreferred: formData.prefDays,
+          interestArea: formData.interests,
+          language: formData.languages,
+        },
+        agencyId: "",
+        userId: userId,
+        onboardDetails: onboradingInfo,
+        consentDetails: {
+          consentGiven: true,
+          consentDate: currentDate,
+          consentDescription:
+            "Consent given for sharing preference to other volunteer agency through secure network",
+        },
+        referenceChannelId: "",
+        volunteeringHours: {
+          totalHours: 0,
+          hoursPerWeek: 0,
+        },
+      }));
+    }
+  }, [userId]);
 
   const [loading, setLoading] = useState(false);
 
@@ -691,10 +694,6 @@ const Registration = (props) => {
   const retryReg = () => {
     setRegStatus("");
   };
-
-  useEffect(() => {
-    dispatch(fetchUserList());
-  }, [regStatus]);
 
   return (
     <div>

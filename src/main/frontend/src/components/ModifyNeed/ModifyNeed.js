@@ -234,7 +234,7 @@ const ModifyNeed = (props) => {
                   </div>
                   <div className="needITag">
                     {data.need.description
-                      ? data.need.description.slice(3, -4)
+                      ? data.need.description
                       : "-"}
                   </div>
                 </div>
@@ -252,10 +252,10 @@ const ModifyNeed = (props) => {
                 </div>
               </div>
               {/* Need info below */}
-              <form className="needInfoForm row" id="modifyForm">
+              <form className="needInfoForm" id="modifyForm">
                 <div className="catergoryNInfo">NEED INFO</div>
                 <div className="needIFormTop">
-                  <div className="needInfoTopLeft col-sm-6">
+                  <div className="needInfoTopLeft">
                     {/* Need Name */}
                     <div className="itemNInfo">
                       <label>Need Name</label>
@@ -303,7 +303,7 @@ const ModifyNeed = (props) => {
                     </div>
                   </div>
 
-                  <div className="needInfoTopRight col-sm-6">
+                  <div className="needInfoTopRight">
                     {/* Need Type */}
                     <div className="itemNInfo">
                       <label>Need Type</label>
@@ -324,21 +324,21 @@ const ModifyNeed = (props) => {
                       {!modify && (
                         <span>
                           {data.need.description
-                            ? data.need.description.slice(3, -4)
+                            ? data.need.description
                             : "-"}
                         </span>
                       )}
                       {modify && status == "Approved" && (
                         <span>
                           {data.need.description
-                            ? data.need.description.slice(3, -4)
+                            ? data.need.description
                             : "-"}
                         </span>
                       )}
                       {modify && status != "Approved" && (
                         <input
                           type="text"
-                          name="name"
+                          name="description"
                           value={description}
                           onChange={changeHandler}
                         />
@@ -454,8 +454,8 @@ const ModifyNeed = (props) => {
                   </div>
                 </div>
                 <div className="catergoryNInfo">VOLUNTEER PREREQUISITE</div>
-                <div className="needIFormBottom row">
-                  <div className="formBLeft col-sm-6">
+                <div className="needIFormBottom">
+                  <div className="formBLeft">
                     {/* Skills Required */}
                     {data && (
                       <div className="itemNInfo">
@@ -471,7 +471,7 @@ const ModifyNeed = (props) => {
                       </div>
                     )}
                   </div>
-                  <div className="formBRight col-sm-6">
+                  <div className="formBRight">
                     {/* No. of Volunteers Required */}
                     <div className="itemNInfo">
                       <label>No. of Volunteers required</label>

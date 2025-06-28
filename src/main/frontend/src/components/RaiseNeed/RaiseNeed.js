@@ -24,6 +24,11 @@ const RaiseNeed = (props) => {
 
   // fields to enter in the raise need form
   const [timeslotsArray, setTimeslotsArray] = useState([]);
+  // Find the id for 'Online Teaching' need type
+  const getOnlineTeachingId = () => {
+    const onlineType = needTypes.find((nt) => nt.name === "Online Teaching");
+    return onlineType ? onlineType.id : "";
+  };
   const [data, setData] = useState({
     needTypeId: "",
     name: "",
@@ -61,6 +66,14 @@ const RaiseNeed = (props) => {
   const { startDate, endDate, days, frequency, timeSlots } = dataOccurrence;
   const { skillDetails, volunteersRequired, occurrence, priority } = dataOther;
   const [entities, setEntities] = useState([]);
+
+  // Set default needTypeId to Online Teaching when needTypes are loaded
+  useEffect(() => {
+    const onlineId = getOnlineTeachingId();
+    if (onlineId && data.needTypeId !== onlineId) {
+      setData((prev) => ({ ...prev, needTypeId: onlineId }));
+    }
+  }, [needTypes]);
 
   useEffect(() => {
     const getEntityDetails = async () => {
@@ -113,8 +126,8 @@ const RaiseNeed = (props) => {
   };
 
   //get from input in YearMonthDay format then convert to datetime before updating
-  const [startYMD, setStartYMD] = useState("2024-05-30");
-  const [endYMD, setEndYMD] = useState("2024-07-31");
+  const [startYMD, setStartYMD] = useState("2025-07-01");
+  const [endYMD, setEndYMD] = useState("2025-12-31");
   const handleEndDate = (e) => {
     setDataOccurrence({
       ...dataOccurrence,
@@ -148,9 +161,14 @@ const RaiseNeed = (props) => {
   //initialising day and time selection in obj format and pass to select
   const scheduleTime = [
     {
-      day: "Sunday",
-      startTime: dayjs("2024-04-30T09:30:00.000Z"),
-      endTime: dayjs("2024-04-30T17:00:00.000Z"),
+      day: "Monday",
+      startTime: dayjs("2025-07-01T10:00:00"),
+      endTime: dayjs("2025-07-01T11:00:00"),
+    },
+    {
+      day: "Tuesday",
+      startTime: dayjs("2025-07-01T10:00:00"),
+      endTime: dayjs("2025-07-01T11:00:00"),
     },
   ];
 
@@ -279,10 +297,20 @@ const RaiseNeed = (props) => {
   // raise the need
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log(dataToPost);
+    // Concatenate Need Name and Entity Name for purpose and description
+    const entityObj = entities.find((entype) => entype.id === entityId);
+    const entityName = entityObj ? entityObj.name : "";
+    const concatText = `${name} ${entityName}`;
+    const updatedData = {
+      ...data,
+      needPurpose: concatText,
+      description: concatText,
+    };
+    const updatedDataToPost = { ...dataToPost, needRequest: updatedData };
+    console.log(updatedDataToPost);
     console.log(selectedDays);
     axios
-      .post(`${configData.NEED_POST}`, dataToPost)
+      .post(`${configData.NEED_POST}`, updatedDataToPost)
       .then(function (response) {
         console.log("posted sucessfully", response);
         dispatch(fetchNeedsByUid(uid));
@@ -335,6 +363,7 @@ const RaiseNeed = (props) => {
                 />
               </div>
               {/* Need Purpose */}
+              {/*
               <div className="itemFormNeed">
                 <label>
                   Need Purpose<span class="required-label"></span>
@@ -348,6 +377,7 @@ const RaiseNeed = (props) => {
                   onChange={changeHandler}
                 />
               </div>
+              */}
               {/* Need Type */}
               <div className="itemFormNeed">
                 <label>
@@ -358,16 +388,15 @@ const RaiseNeed = (props) => {
                   name="needTypeId"
                   value={needTypeId}
                   required
-                  onChange={changeHandler}
+                  disabled
                 >
-                  <option value="" defaultValue>
-                    Select Need type
-                  </option>
-                  {needTypes.map((ntype) => (
-                    <option key={ntype.osid} value={ntype.id}>
-                      {ntype.name}
-                    </option>
-                  ))}
+                  {needTypes
+                    .filter((ntype) => ntype.name === "Online Teaching")
+                    .map((ntype) => (
+                      <option key={ntype.osid} value={ntype.id}>
+                        {ntype.name}
+                      </option>
+                    ))}
                 </select>
               </div>
             </div>
@@ -405,6 +434,7 @@ const RaiseNeed = (props) => {
 </div>
 
               {/* Need Description */}
+              {/*
               <label className="itemDescriptionNeedLabel">
                 Need Description
               </label>
@@ -418,120 +448,117 @@ const RaiseNeed = (props) => {
                   onChange={handleQuillEdit}
                 />
               </div>
+              */}
             </div>
           </div>
 
           <div className="formRNcatergory">SESSION DETAILS</div>
-          <div className="wrap-sessionDetails"></div>
-          {/* Date */}
-          <div className="itemWrapDate">
-            <div className="itemDate">
-              <label>
-                Start Date <span class="required-label"></span>
-              </label>
-              <input
-                type="date"
-                name="startYMD"
-                value={startYMD}
-                required
-                onChange={handleStartDate}
-              />
-            </div>
-            <div className="itemDate">
-              <label>
-                End Date <span class="required-label"></span>
-              </label>
-              <input
-                type="date"
-                name="endYMD"
-                value={endYMD}
-                required
-                onChange={handleEndDate}
-              />
-            </div>
-            <div className="itemDate">
-              <label>Recurrence </label>
-              <select
-                className="selectFrequency"
-                name="frequency"
-                value={frequency}
-                onChange={changeFrequency}
-              >
-                <option value="off" defaultValue>
-                  Off
-                </option>
-                <option value="weekdays">Every Weekday</option>
-                <option value="weekend">Every Weekend</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-              </select>
+          {/* Session Dates Section */}
+          <div className="session-section">
+            <div className="session-subheading">Session Dates</div>
+            <div className="session-helper">Select the start and end dates for the session. These define the overall period during which the session can occur.</div>
+            <div className="itemWrapDate">
+              <div className="itemDate">
+                <label>
+                  Session Start Date <span className="required-label"></span>
+                </label>
+                <input
+                  type="date"
+                  name="startYMD"
+                  value={startYMD}
+                  required
+                  onChange={handleStartDate}
+                />
+                <div className="date-format-display">Selected: {startYMD ? startYMD.split('-').reverse().join('-') : ''}</div>
+              </div>
+              <div className="itemDate">
+                <label>
+                  Session End Date <span className="required-label"></span>
+                </label>
+                <input
+                  type="date"
+                  name="endYMD"
+                  value={endYMD}
+                  required
+                  onChange={handleEndDate}
+                />
+                <div className="date-format-display">Selected: {endYMD ? endYMD.split('-').reverse().join('-') : ''}</div>
+              </div>
             </div>
           </div>
 
-          {/* Time */}
-          <div className="itemFormTime">
-            <div className="label-eventdaytime">
-              <label className="day-label">Event Days</label>
-              <label className="time-label">Start Time</label>
-              <label className="time-label">End Time</label>
-            </div>
-            <div className="itemSelectSlots">
-              {frequency === "off" ? (
-                <MultiSelect
-                  onAdd={handleSelectedDaysChange}
-                  scheduleTime={scheduleTime}
-                />
-              ) : (
-                <MonoSelect
-                  onAdd={handleSelectedDaysChange}
-                  frequency={reccurrence}
-                  scheduleTime={scheduleTime}
-                />
-              )}
+          {/* Session Schedule Section */}
+          <div className="session-section">
+            <div className="session-subheading">Session Schedule</div>
+            <div className="session-helper">Specify the days and times for the session. You can add multiple slots if needed.</div>
+            <div className="itemFormTime">
+              <div className="label-eventdaytime">
+                <label className="day-label">Event Days</label>
+                <label className="time-label">Start Time</label>
+                <label className="time-label">End Time</label>
+              </div>
+              <div className="itemSelectSlots">
+                {frequency === "off" ? (
+                  <MultiSelect
+                    onAdd={handleSelectedDaysChange}
+                    scheduleTime={scheduleTime}
+                  />
+                ) : (
+                  <MonoSelect
+                    onAdd={handleSelectedDaysChange}
+                    frequency={reccurrence}
+                    scheduleTime={scheduleTime}
+                  />
+                )}
+              </div>
+              {/* Session summary */}
+              <div className="session-summary">
+                <strong>Summary:</strong> {selectedDays && selectedDays.length > 0
+                  ? selectedDays.map((slot, idx) => `${slot.day} (${slot.startTime?.slice(11,16)} - ${slot.endTime?.slice(11,16)})`).join(", ")
+                  : "No session slots selected yet."}
+              </div>
             </div>
           </div>
 
           {/* lower side of form : prerequisites */}
-          <div className="formRNcatergory">VOLUNTEER PREREQUISITE</div>
-          <div className="formBottom row">
-            <div className="formBLeft col-sm-6">
-              {/* Skills Required */}
-              <div className="itemFormNeed">
-                <label>Skills Required</label>
-                <div className="tokenInput">
-                  <Select
-                    isMulti
-                    value={selectedOptions}
-                    options={options}
-                    onChange={handleChange}
-                    styles={styleTokenInput}
-                  />
-                  <input
-                    type="text"
-                    placeholder="Add Skills "
-                    value={manualSkill}
-                    onChange={(e) => setManualSkill(e.target.value)}
-                    onKeyDown={handleManualSkillAdd}
-                    className="addSkillsInput"
-                  />
-                </div>
-              </div>
-            </div>
-            <div className="formBRight col-sm-6">
-              {/* No. of Volunteers Required */}
-              <div className="itemFormNeed">
-                <label>No. of Volunteers required</label>
-                <input
-                  className="inpVolunteerNum"
-                  type="text"
-                  placeholder="Mention Number of Volunteers"
-                  name="volunteersRequired"
-                  value={volunteersRequired}
-                  onChange={changeHandlerOther}
-                />
-              </div>
-            </div>
-          </div>
+          {/* <div className="formRNcatergory">VOLUNTEER PREREQUISITE</div> */}
+          {/* <div className="formBottom row"> */}
+          {/*   <div className="formBLeft col-sm-6"> */}
+          {/*     <div className="itemFormNeed"> */}
+          {/*       <label>Skills Required</label> */}
+          {/*       <div className="tokenInput"> */}
+          {/*         <Select */}
+          {/*           isMulti */}
+          {/*           value={selectedOptions} */}
+          {/*           options={options} */}
+          {/*           onChange={handleChange} */}
+          {/*           styles={styleTokenInput} */}
+          {/*         /> */}
+          {/*         <input */}
+          {/*           type="text" */}
+          {/*           placeholder="Add Skills " */}
+          {/*           value={manualSkill} */}
+          {/*           onChange={(e) => setManualSkill(e.target.value)} */}
+          {/*           onKeyDown={handleManualSkillAdd} */}
+          {/*           className="addSkillsInput" */}
+          {/*         /> */}
+          {/*       </div> */}
+          {/*     </div> */}
+          {/*   </div> */}
+          {/*   <div className="formBRight col-sm-6"> */}
+          {/*     <div className="itemFormNeed"> */}
+          {/*       <label>No. of Volunteers required</label> */}
+          {/*       <input */}
+          {/*         className="inpVolunteerNum" */}
+          {/*         type="text" */}
+          {/*         placeholder="Mention Number of Volunteers" */}
+          {/*         name="volunteersRequired" */}
+          {/*         value={volunteersRequired} */}
+          {/*         onChange={changeHandlerOther} */}
+          {/*       /> */}
+          {/*     </div> */}
+          {/*   </div> */}
+          {/* </div> */}
         </form>
       </div>
       {/* Close button */}

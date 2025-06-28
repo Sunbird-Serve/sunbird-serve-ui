@@ -682,17 +682,25 @@ border-right: solid 1px #d3d3d3;
 }
 
 .deliv-time {
-flex: 0 0 150px;
+flex: 0 0 200px;
 border-right: solid 1px #d3d3d3;
 @media (max-width: 600px) {
   flex: unset;
 }
 }
 
-.deliv-platform,
+.deliv-platform {
+flex: 0 0 150px;
+border-right: solid 1px #d3d3d3;
+
+@media (max-width: 600px) {
+  flex: unset;
+}
+}
+
 .deliv-url,
 .deliv-status {
-flex: 0 0 150px;
+flex: 0 0 180px;
 border-right: solid 1px #d3d3d3;
 
 @media (max-width: 600px) {
@@ -712,6 +720,19 @@ background-color: inherit;
 border: none;
 cursor: pointer;
 transition: transform 0.2s ease;
+}
+
+@media (max-width: 600px) {
+.deliv-action button {
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  min-width: 0 !important;
+}
+
+.deliv-action button svg {
+  font-size: 14px !important;
+  margin-right: 2px !important;
+}
 }
 
 .deliv-action button:hover {
