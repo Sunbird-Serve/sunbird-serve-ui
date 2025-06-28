@@ -116,15 +116,31 @@ const NeedPlans = () => {
   }
 
   const formatTime = (timeData, timeZone) => {
-    const date = new Date(timeData);
-    const options = {
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: false,
-      timeZone: 'UTC',
-    };
-  
-    return new Intl.DateTimeFormat('en-US', options).format(date);
+    // Check if timeData is valid
+    if (!timeData || timeData === "" || timeData === null || timeData === undefined) {
+      return "00:00"; // Return default time if no valid time data
+    }
+    
+    try {
+      const date = new Date(timeData);
+      
+      // Check if the date is valid
+      if (isNaN(date.getTime())) {
+        return "00:00"; // Return default time if invalid date
+      }
+      
+      const options = {
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false,
+        timeZone: 'UTC',
+      };
+    
+      return new Intl.DateTimeFormat('en-US', options).format(date);
+    } catch (error) {
+      console.warn('Error formatting time:', error, 'timeData:', timeData);
+      return "00:00"; // Return default time on any error
+    }
   };
 
   //make the events from start to end date
@@ -203,7 +219,10 @@ const NeedPlans = () => {
         };
     }
 
-    acc[key].assignedUsers.push(plan.assignedUserId);
+    // Only add the userId if it's not already in the array
+    if (!acc[key].assignedUsers.includes(plan.assignedUserId)) {
+        acc[key].assignedUsers.push(plan.assignedUserId);
+    }
 
     return acc;
   }, {});
@@ -276,6 +295,11 @@ const NeedPlans = () => {
     setExpandEvent(!expandEvent)
   }
 
+  // Add at the top level of the component (after other useState hooks)
+  const [editSession, setEditSession] = useState(null); // { userId, eventKey }
+  const [editFields, setEditFields] = useState({ status: '', comments: '', students: '' });
+  const [showAddSession, setShowAddSession] = useState(false);
+  const [editError, setEditError] = useState('');
 
   return (
       <div>
@@ -335,29 +359,140 @@ const NeedPlans = () => {
                 </div>
                 <div className="dayEventDateNC"> {event.startDate.slice(4,10)} - {event.endDate.slice(4,10)} </div>
               </button>
-              { expandEvent && ( index === clickedEvent ) && <div className="platformInfoNC">
-                <div className="vplan-platform"> 
-                    <span>Software platform:</span> {event.softwarePlatform}
+              { expandEvent && ( index === clickedEvent ) && (
+                <>
+                  {/* Session Details Section */}
+                  <div className="session-details-card" style={{background: '#f7fafd', border: '1.5px solid #0080BC', borderRadius: 10, margin: '16px 0', padding: 16, boxShadow: '0 2px 8px rgba(0,128,188,0.07)'}}>
+                    <div style={{fontWeight: 'bold', fontSize: 16, color: '#0080BC', marginBottom: 10}}>Session Details</div>
+                    {event.assignedUsers.map((user) => {
+                      const plan = needPlans.find(np => np.needId === event.needId && user === np.assignedUserId);
+                      let deliverable = null;
+                      if (plan && plan.platform && plan.platform.needDeliverable && plan.platform.needDeliverable.length > 0) {
+                        deliverable = plan.platform.needDeliverable.find(d => {
+                          if (!d.deliverableDate) return false;
+                          return new Date(d.deliverableDate).toDateString() === event.start;
+                        }) || plan.platform.needDeliverable[0];
+                      }
+                      const isEditing = editSession && editSession.userId === user && editSession.eventKey === event.start;
+                      const handleEdit = () => {
+                        setEditSession({ userId: user, eventKey: event.start });
+                        setEditFields({
+                          status: deliverable?.status || '',
+                          comments: deliverable?.comments || '',
+                          students: deliverable?.numberOfAttendees || deliverable?.numStudents || ''
+                        });
+                        setEditError('');
+                      };
+                      const handleFieldChange = (field, value) => {
+                        setEditFields(prev => ({ ...prev, [field]: value }));
+                        setEditError('');
+                      };
+                      const handleSave = () => {
+                        // Validation: all fields required
+                        if (!editFields.status || !editFields.comments || !editFields.students) {
+                          setEditError('All fields are required.');
+                          return;
+                        }
+                        // TODO: Implement save logic (API call)
+                        setEditSession(null);
+                        setEditError('');
+                      };
+                      const handleCancel = () => {
+                        setEditSession(null);
+                      };
+                      return (
+                        <div className="user-boxNC" key={user} style={{marginBottom: 16, background: '#fff', borderRadius: 8, boxShadow: '0 1px 4px rgba(0,0,0,0.04)', padding: 12}}>
+                          <div className="userNameNC">
+                            <div><Avatar style={{padding:'5px',height:'24px',width:'24px',fontSize:'16px',backgroundColor:randomColor()}}></Avatar></div>
+                            <div className="userName-eventList">{userMap[user]}</div>
+                          </div>
+                          <div className="userContact-eventList">{userContact[user]}</div>
+                          {deliverable && !isEditing && (
+                            <div className="session-details-NC" style={{marginTop: 6, fontSize: 13, color: '#333'}}>
+                              <div><b>Status:</b> {deliverable.status || '-'}</div>
+                              <button style={{marginTop: 8, background: '#0080BC', color: 'white', border: 'none', borderRadius: 4, padding: '4px 16px', fontWeight: 500, cursor: 'pointer'}} onClick={handleEdit}>Edit</button>
+                            </div>
+                          )}
+                          {deliverable && isEditing && (
+                            <div className="session-details-NC-edit" style={{marginTop: 6, fontSize: 13, color: '#333', display: 'flex', flexDirection: 'column', gap: 8}}>
+                              <div>
+                                <b>Status:</b>
+                                <select value={editFields.status} onChange={e => handleFieldChange('status', e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4}} required>
+                                  <option value="">Select Status</option>
+                                  <option value="Planned">Planned</option>
+                                  <option value="Completed">Completed</option>
+                                  <option value="Cancelled">Cancelled</option>
+                                </select>
+                              </div>
+                              {editFields.status === 'Completed' && (
+                                <div>
+                                  <b>Comments:</b>
+                                  <input type="text" value={editFields.comments} onChange={e => handleFieldChange('comments', e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4, width: 180}} required />
+                                </div>
+                              )}
+                              {editFields.status === 'Cancelled' && (
+                                <div>
+                                  <b>Comments:</b>
+                                  <select value={editFields.comments} onChange={e => handleFieldChange('comments', e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4, width: 180}} required>
+                                    <option value="">Select Reason</option>
+                                    <option value="Network Issue">Network Issue</option>
+                                    <option value="Power Cut">Power Cut</option>
+                                    <option value="Students Not Available">Students Not Available</option>
+                                  </select>
+                                </div>
+                              )}
+                              <div>
+                                <b>Students Number:</b>
+                                <input type="number" value={editFields.students} onChange={e => handleFieldChange('students', e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4, width: 80}} required min={1} />
+                              </div>
+                              {editError && <div style={{color: 'red', fontSize: 12, marginTop: 4}}>{editError}</div>}
+                              <div style={{marginTop: 8, display: 'flex', gap: 8}}>
+                                <button style={{background: '#0080BC', color: 'white', border: 'none', borderRadius: 4, padding: '4px 16px', fontWeight: 500, cursor: 'pointer'}} onClick={handleSave}>Save</button>
+                                <button style={{background: '#aaa', color: 'white', border: 'none', borderRadius: 4, padding: '4px 16px', fontWeight: 500, cursor: 'pointer'}} onClick={handleCancel}>Cancel</button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="vplan-url"> 
-  <span>Link :</span> 
-  <a href={event.inputUrl} target="_blank" rel="noopener noreferrer">
-    Session Link
-  </a>
-</div>
-                  <div className="vplan-url"> 
-                    <span>Volunteers :</span> 
+                  {/* Add New Session Link/Button */}
+                  <div style={{margin: '16px 0'}}>
+                    <button
+                      style={{background: 'none', color: '#0080BC', border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'underline'}}
+                      onClick={() => setShowAddSession(v => !v)}
+                    >
+                      {showAddSession ? 'Hide Add New Session' : 'Add New Session'}
+                    </button>
                   </div>
-              </div>}
-              { expandEvent && ( index === clickedEvent ) &&
-                event.assignedUsers.map((user) => <div className="user-boxNC">
-                  <div className="userNameNC">
-                    <div><Avatar style={{padding:'5px',height:'24px',width:'24px',fontSize:'16px',backgroundColor:randomColor()}}></Avatar></div>
-                    <div className="userName-eventList">{userMap[user]}</div>
-                  </div>
-                  <div className="userContact-eventList">{userContact[user]}</div>
-                </div>)
-              }
+                  {showAddSession && (
+                    <div className="add-session-card" style={{background: '#f7fafd', border: '1.5px solid #0080BC', borderRadius: 10, margin: '16px 0', padding: 16, boxShadow: '0 2px 8px rgba(0,128,188,0.07)', fontSize: 13}}>
+                      <div style={{fontWeight: 'bold', fontSize: 16, color: '#0080BC', marginBottom: 10}}>Add New Session</div>
+                      <form style={{display: 'flex', flexDirection: 'column', gap: 10}}>
+                        <div>
+                          <label>Date: <input type="date" style={{marginLeft: 8, padding: 4, borderRadius: 4}} /></label>
+                        </div>
+                        <div>
+                          <label>Start Time: <input type="time" style={{marginLeft: 8, padding: 4, borderRadius: 4}} /></label>
+                        </div>
+                        <div>
+                          <label>End Time: <input type="time" style={{marginLeft: 8, padding: 4, borderRadius: 4}} /></label>
+                        </div>
+                        <div>
+                          <label>Status:
+                            <select style={{marginLeft: 8, padding: 4, borderRadius: 4}}>
+                              <option value="Planned">Planned</option>
+                              <option value="Completed">Completed</option>
+                              <option value="Cancelled">Cancelled</option>
+                            </select>
+                          </label>
+                        </div>
+                        <button type="submit" style={{marginTop: 8, background: '#0080BC', color: 'white', border: 'none', borderRadius: 4, padding: '6px 20px', fontWeight: 500, cursor: 'pointer', alignSelf: 'flex-start'}}>Add Session</button>
+                      </form>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )) }
 
