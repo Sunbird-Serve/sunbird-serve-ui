@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import "./CoordRegistration.css";
 import {
   Autocomplete,
@@ -14,7 +14,6 @@ import axios from "axios";
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess.js";
 import RegFormFailure from "../RegFormFailure/RegFormFailure.js";
 import { useSelector, useDispatch } from "react-redux";
-import { fetchUserList } from "../../state/userListSlice.js";
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import { useHistory } from "react-router-dom";
@@ -22,6 +21,7 @@ import CoordSignup from "../VolunteerSignup/VolunteerSignup.js";
 const configData = require("../../configure.js");
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
 const CoordRegistration = (props) => {
   const dispatch = useDispatch();
   const navigate = useHistory();
@@ -264,8 +264,10 @@ const CoordRegistration = (props) => {
 
   useEffect(() => {
     const regEmail = localStorage.getItem("regEmail");
-    setPrefillEmail(regEmail);
-  }, [prefillEmail]);
+    if (regEmail) {
+      setPrefillEmail(regEmail);
+    }
+  }, []);
 
   const handleChange = (event, count = 0) => {
     // console.log(event, "check this");
@@ -290,7 +292,7 @@ const CoordRegistration = (props) => {
     });
   };
 
-  const dataToPost = {
+  const dataToPost = useMemo(() => ({
     identityDetails: {
       fullname: formData.firstName,
       name: formData.lastName,
@@ -310,7 +312,7 @@ const CoordRegistration = (props) => {
     agencyId: props.agencyId ?? "9270607102",
     status: "Registered",
     role: [props.role],
-  };
+  }), [formData, prefillEmail, props.agencyId, props.role]);
 
   const [regStatus, setRegStatus] = useState("");
 
@@ -365,42 +367,51 @@ const CoordRegistration = (props) => {
   });
 
   useEffect(() => {
-    setDataProfile((prev) => ({
-      ...prev,
-      skills: formData.skills,
-      genericDetails: {
-        qualification: formData.qualification,
-        affiliation: formData.affiliation,
-        yearsOfExperience: formData.yoe,
-        employmentStatus: formData.empStatus,
-      },
-      userPreference: {
-        timePreferred: formData.prefTime,
-        dayPreferred: formData.prefDays,
-        interestArea: formData.interests,
-        language: formData.languages,
-      },
-      agencyId: "",
-      userId: userId,
-      onboardDetails: onboradingInfo,
-      consentDetails: {
-        consentGiven: true,
-        consentDate: currentDate,
-        consentDescription:
-          "Consent given for sharing preference to other volunteer agency through secure network",
-      },
-      referenceChannelId: "",
-      volunteeringHours: {
-        totalHours: 0,
-        hoursPerWeek: 0,
-      },
-    }));
-  }, [userId, formData]);
+    if (userId) {
+      setDataProfile((prev) => ({
+        ...prev,
+        skills: formData.skills,
+        genericDetails: {
+          qualification: formData.qualification,
+          affiliation: formData.affiliation,
+          yearsOfExperience: formData.yoe,
+          employmentStatus: formData.empStatus,
+        },
+        userPreference: {
+          timePreferred: formData.prefTime,
+          dayPreferred: formData.prefDays,
+          interestArea: formData.interests,
+          language: formData.languages,
+        },
+        agencyId: "",
+        userId: userId,
+        onboardDetails: onboradingInfo,
+        consentDetails: {
+          consentGiven: true,
+          consentDate: currentDate,
+          consentDescription:
+            "Consent given for sharing preference to other volunteer agency through secure network",
+        },
+        referenceChannelId: "",
+        volunteeringHours: {
+          totalHours: 0,
+          hoursPerWeek: 0,
+        },
+      }));
+    }
+  }, [userId]); // Only run when userId changes, not on every form field change
 
   const [loading, setLoading] = useState(false);
 
   const submitForm = (e) => {
     e.preventDefault();
+    
+    // Basic validation - temporarily disable email validation checks
+    if (!formData.email || !formData.firstName || !formData.lastName) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    
     setLoading(true);
     axios
       .post(`${configData.USER_GET}/`, dataToPost)
@@ -411,6 +422,12 @@ const CoordRegistration = (props) => {
       .catch(function (error) {
         setLoading(false);
         console.log(error);
+        // Handle specific error cases
+        if (error.response && error.response.status === 409) {
+          alert("This email is already registered. Please use a different email or try logging in.");
+        } else {
+          alert("Registration failed. Please try again.");
+        }
       });
   };
 
@@ -462,10 +479,6 @@ const CoordRegistration = (props) => {
   const closeCoordSignUp = () => {
     setCoordSignup(!coordSignup);
   };
-
-  useEffect(() => {
-    dispatch(fetchUserList());
-  }, [regStatus]);
 
   return (
     <div>
@@ -735,6 +748,15 @@ const CoordRegistration = (props) => {
                       onChange={handleChange}
                       required
                     ></input>
+                    {/* Email validation temporarily disabled */}
+                    {/* <EmailValidation
+                      email={props.agencyId !== "" ? prefillEmail : formData.email}
+                      onValidationChange={(isValid, exists) => 
+                        setEmailValidation({ isValid, exists })
+                      }
+                      showValidation={true}
+                      disabled={false}
+                    /> */}
                   </div>
                 </div>
               </div>

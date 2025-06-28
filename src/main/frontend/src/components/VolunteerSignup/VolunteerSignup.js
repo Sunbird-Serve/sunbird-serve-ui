@@ -7,11 +7,16 @@ import { FcGoogle } from "react-icons/fc";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import { useHistory } from "react-router-dom";
 import RegFormSuccess from "../RegFormSuccess/RegFormSuccess";
+// import EmailValidation from "../CommonComponents/EmailValidation";
 
 const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRedirectUrl = "/vregistration", successRedirectionUrl = "/vneedtypes" }) => {
   const [error, setError] = useState("");
   const [regStatus, setRegStatus] = useState("");
   const [preFillEmail, setPreFillEmail] = useState("");
+  // const [emailValidation, setEmailValidation] = useState({
+  //   isValid: null,
+  //   exists: false
+  // });
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -20,14 +25,18 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRed
 
   useEffect(() => {
     const regEmail = localStorage.getItem("regEmail");
-    setPreFillEmail(regEmail);
-    setData({ email: regEmail, password: password });
-  }, [preFillEmail]);
+    if (regEmail) {
+      setPreFillEmail(regEmail);
+      setData(prevData => ({ ...prevData, email: regEmail }));
+    }
+  }, []);
 
   const changeHandler = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-    if (e.target.name === "email") {
-      localStorage.setItem("regEmail", e.target.value);
+    const { name, value } = e.target;
+    console.log('Input change:', name, value); // Debug log
+    setData(prevData => ({ ...prevData, [name]: value }));
+    if (name === "email") {
+      localStorage.setItem("regEmail", value);
     }
   };
 
@@ -35,16 +44,29 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRed
 
   const signUp = (e) => {
     e.preventDefault();
+    
+    // Basic validation
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    
+    // Proceed with Firebase registration - Firebase will handle duplicate checking
     createUserWithEmailAndPassword(auth, email, password)
       .then((user) => {
         if (RegistrationByAgencyId) {
           navigate.push(successRedirectionUrl)
-
         } else {
           navigate.push(regisRedirectUrl);
         }
       })
-      .catch((err) => setError(err.code));
+      .catch((err) => {
+        if (err.code === 'auth/email-already-in-use') {
+          setError("This email is already registered. Please use a different email or try logging in.");
+        } else {
+          setError(err.code);
+        }
+      });
   };
   const signInWithGoogle = (e) => {
     e.preventDefault();
@@ -86,11 +108,12 @@ const VolunteerSignup = ({ loginState, onClose, RegistrationByAgencyId, regisRed
                   className="input"
                   type="text"
                   name="email"
-                  value={RegistrationByAgencyId ? preFillEmail : email}
+                  value={email}
                   placeholder="Enter your email address"
                   onChange={changeHandler}
                   autoComplete="off"
                 />
+                {/* Email validation temporarily disabled */}
               </div>
               <div className="pwdSignup1">
                 <label className="label">

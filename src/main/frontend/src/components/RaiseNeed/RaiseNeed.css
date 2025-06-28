@@ -214,3 +214,38 @@
     color: #1F1F1F;
     font-weight: 600;
 }
+
+.session-section {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px 18px 12px 18px;
+  margin-bottom: 18px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.session-subheading {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0080BC;
+  margin-bottom: 4px;
+}
+.session-helper {
+  font-size: 12px;
+  color: #5F6367;
+  margin-bottom: 10px;
+}
+.session-summary {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #333;
+  background: #eaf6fb;
+  border-radius: 5px;
+  padding: 8px 10px;
+  min-height: 32px;
+}
+
+.date-format-display {
+  font-size: 12px;
+  color: #0080BC;
+  margin-top: 2px;
+  margin-bottom: 4px;
+}

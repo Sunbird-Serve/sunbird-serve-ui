@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './LoginBanner.css';
 import VolunterLogin from '../VolunteerLogin/VolunteerLogin';
 import VolunterSignup from '../VolunteerSignup/VolunteerSignup';
+import { useLocation } from "react-router-dom";
 
 
 const BannerLogin = ({volunteerStatus}) => {
@@ -11,6 +12,7 @@ const BannerLogin = ({volunteerStatus}) => {
 
   const [vlogin, setVlogin] = useState(false);
   const [vsignup, setVsignup] = useState(false);
+  const location = useLocation();
 
   const loginVolunteer = () => setVlogin(!vlogin);
   const signupVolunteer = () => {
@@ -18,6 +20,11 @@ const BannerLogin = ({volunteerStatus}) => {
     setVsignup(!vsignup); // Toggle the signup modal
 };
 
+  React.useEffect(() => {
+    if (location.pathname === "/vregistration") {
+      setVsignup(false);
+    }
+  }, [location.pathname]);
 
     return(
         // Banner part in the login screen

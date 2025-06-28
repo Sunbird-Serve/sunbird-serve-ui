@@ -27,6 +27,35 @@ import dayjs from "dayjs";
 
 const configData = require("../../configure.js");
 
+// Function to format time without timezone conversion
+const formatTime = (timeString) => {
+  if (!timeString) return "";
+  // Extract time portion from ISO string (HH:mm format)
+  const timeMatch = timeString.match(/(\d{2}):(\d{2}):/);
+  if (timeMatch) {
+    const hours = parseInt(timeMatch[1]);
+    const minutes = timeMatch[2];
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+  }
+  return timeString;
+};
+
+// Function to create dayjs object from time string without timezone conversion
+const createTimeFromString = (timeString) => {
+  if (!timeString) return null;
+  // Extract time portion from ISO string
+  const timeMatch = timeString.match(/(\d{2}):(\d{2}):/);
+  if (timeMatch) {
+    const hours = parseInt(timeMatch[1]);
+    const minutes = parseInt(timeMatch[2]);
+    // Create a dayjs object with today's date and the extracted time
+    return dayjs().hour(hours).minute(minutes).second(0).millisecond(0);
+  }
+  return null;
+};
+
 const Nominations = ({ needData, openPopup }) => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user.data);
@@ -292,6 +321,29 @@ const Nominations = ({ needData, openPopup }) => {
     setEditIndex(index);
   };
   const handleDoneDeliverable = (index) => {
+    // Validation: Check if required fields are filled
+    const currentData = formData[index];
+    
+    // Check if status is selected
+    if (!currentData.status || currentData.status === '') {
+      alert('Please select a status');
+      return;
+    }
+    
+    // Check if comments are provided when status is Completed, Cancelled, or Offline
+    if ((currentData.status === 'Completed' || currentData.status === 'Cancelled' || currentData.status === 'Offline') && 
+        (!currentData.comments || currentData.comments.trim() === '')) {
+      alert('Please provide comments for ' + currentData.status + ' status');
+      return;
+    }
+    
+    // Check if number of students is provided
+    if (!currentData.numStudents || currentData.numStudents === '' || currentData.numStudents < 0) {
+      alert('Please enter the number of students');
+      return;
+    }
+    
+    // If all validations pass, proceed with submission
     setEditIndex("");
     axios.put(
       `${configData.SERVE_NEED}/deliverable-details/update/${formData[index].deliverableId}`,
@@ -336,6 +388,7 @@ const Nominations = ({ needData, openPopup }) => {
       inputUrl: inParas.length ? inParas[index].inputUrl : "",
       status: item.status,
       comments: item.comments,
+      numStudents: item.numStudents || "",
     }));
     setFormData(initialFormData);
   }, [deliverables, inParas]);
@@ -536,24 +589,39 @@ const Nominations = ({ needData, openPopup }) => {
       {/*  */}
       {gotoDelivs && (
         <div className="wrap-NCDeliverables">
-          <div className="backToNoms">
-            <span> Need Deliverable Details</span>
-            <button onClick={() => setGotoDelivs(false)}>
+          <div className="backToNoms" style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', marginBottom: 24, position: 'relative' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <span style={{ fontWeight: 'bold', fontSize: 20, color: '#0080BC', marginBottom: 2 }}>Need Deliverables</span>
+              {rowData?.userInfo && (() => {
+                const schoolName = rowData.userInfo.genericDetails?.affiliation || rowData.userInfo.genericDetails?.schoolName || rowData.userInfo.genericDetails?.school || rowData.userInfo.affiliation || null;
+                return schoolName ? (
+                  <span style={{ fontWeight: 500, fontSize: 15, color: '#555', marginBottom: 2 }}>School: <b>{schoolName}</b></span>
+                ) : null;
+              })()}
+            </div>
+            <button
+              aria-label="Back to Nominations"
+              title="Back to Nominations"
+              style={{ marginLeft: 'auto', fontSize: 18, background: '#0080BC', color: 'white', borderRadius: '50%', width: 40, height: 40, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              onClick={() => setGotoDelivs(false)}
+            >
               <ArrowBackIcon />
             </button>
           </div>
           <div className="table-NCDeliverables">
-            <div className="common-info-section">
-              <div className="title-common-info">
-                Common Details For All Deliverables
-              </div>
-              <div className="common-info-delivs">
-                <div>
-                  <span>Platform</span>
+            <div className="common-info-section" style={{ background: '#f4faff', border: '1.5px solid #0080BC', borderRadius: 10, marginBottom: 18, boxShadow: '0 2px 8px rgba(0,128,188,0.07)', padding: 18 }}>
+              <div className="title-common-info" style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10, color: '#0080BC' }}>Common Details For All Deliverables</div>
+              <div className="common-info-delivs" style={{ display: 'flex', gap: 24, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                <div style={{ minWidth: 180 }}>
+                  <label htmlFor="planPlatform" style={{ fontWeight: 500, color: '#333', marginBottom: 4, display: 'block' }}>Platform</label>
                   <select
+                    id="planPlatform"
                     name="planPlatform"
                     value={planPlatform}
                     onChange={handleComnInfo}
+                    aria-label="Platform"
+                    title="Select the platform for all deliverables"
+                    style={{ width: '100%', padding: 8, borderRadius: 5, border: '1px solid #d3d4d5', fontSize: 14 }}
                   >
                     <option value="">Select Platform</option>
                     <option value="GMEET">GMEET</option>
@@ -561,18 +629,31 @@ const Nominations = ({ needData, openPopup }) => {
                     <option value="WEBEX">WEBEX</option>
                     <option value="TEAMS">TEAMS</option>
                   </select>
+                  <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>e.g. Google Meet, Skype, Webex, Teams</div>
                 </div>
-                <div>
-                  <span>Link</span>
+                <div style={{ minWidth: 220 }}>
+                  <label htmlFor="planLink" style={{ fontWeight: 500, color: '#333', marginBottom: 4, display: 'block' }}>Link</label>
                   <input
+                    id="planLink"
                     type="text"
                     name="planLink"
                     value={planLink}
                     onChange={handleComnInfo}
+                    aria-label="Common Link"
+                    title="Enter the common link for all deliverables"
+                    placeholder="Paste meeting/class link"
+                    style={{ width: '100%', padding: 8, borderRadius: 5, border: '1px solid #d3d4d5', fontSize: 14 }}
                   />
+                  <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>Paste the online class/meeting link</div>
                 </div>
-                <div>
-                  <button onClick={submitComnInfo}>Submit</button>
+                <div style={{ alignSelf: 'flex-end' }}>
+                  <button
+                    onClick={submitComnInfo}
+                    aria-label="Submit Common Details"
+                    style={{ background: '#0080BC', color: 'white', border: 'none', borderRadius: 5, padding: '10px 20px', fontSize: 14, fontWeight: 500, cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,128,188,0.08)' }}
+                  >
+                    Save
+                  </button>
                 </div>
               </div>
             </div>
@@ -582,171 +663,242 @@ const Nominations = ({ needData, openPopup }) => {
               <div className="deliv-time">Time</div>
               <div className="deliv-url">Link</div>
               <div className="deliv-status">Status</div>
-              {!!inParas.length && !isNAdmin && (
-                <div className="deliv-action">Action</div>
-              )}
+              {!!inParas.length && !isNAdmin && <div className="deliv-action">Action</div>}
             </div>
-            {formData.length &&
-              formData.map((data, index) => (
-                <div className="deliverable-item" key={index}>
-                  <div className="deliv-serial">{index + 1}</div>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <div className="deliv-date">
-                      {index === editIndex ? (
-                        <DatePicker
-                          value={
-                            data.deliverableDate
-                              ? dayjs(data.deliverableDate)
-                              : null
-                          }
-                          onChange={(newValue) =>
-                            handleDeliverableChange(
-                              {
-                                target: {
-                                  value: newValue
-                                    ? dayjs(newValue).format("YYYY-MM-DD")
-                                    : "",
-                                },
-                              },
-                              index,
-                              "deliverableDate"
-                            )
-                          }
-                          renderInput={(params) => <TextField {...params} />}
+            {formData.length ? (
+              formData.map((data, index) => {
+                const isEditing = index === editIndex;
+                return (
+                  <div
+                    className="deliverable-item"
+                    key={index}
+                    style={{
+                      border: isEditing ? '2px solid #0080BC' : '1px solid #d3d3d3',
+                      background: isEditing ? '#e6f7ff' : '#f9f9f9',
+                      boxShadow: isEditing ? '0 2px 8px rgba(0,128,188,0.08)' : 'none',
+                      marginBottom: 16,
+                      borderRadius: 8,
+                      padding: 12,
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      alignItems: 'center',
+                      position: 'relative',
+                    }}
+                    aria-label={`Deliverable ${index + 1}`}
+                  >
+                    <div className="deliv-serial">{index + 1}</div>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <div className="deliv-date">
+                        {isEditing ? (
+                          <DatePicker
+                            value={data.deliverableDate ? dayjs(data.deliverableDate) : null}
+                            onChange={(newValue) =>
+                              handleDeliverableChange(
+                                { target: { value: newValue ? dayjs(newValue).format('YYYY-MM-DD') : '' } },
+                                index,
+                                'deliverableDate'
+                              )
+                            }
+                            renderInput={(params) => <TextField {...params} size="small" aria-label="Date" title="Select date" />}
+                          />
+                        ) : (
+                          <span title="Deliverable Date">{data.deliverableDate || <span style={{ color: '#aaa' }}>No date</span>}</span>
+                        )}
+                      </div>
+                      <div className="deliv-time">
+                        {isEditing ? (
+                          <>
+                            <TimePicker
+                              value={createTimeFromString(data.startTime)}
+                              onChange={(newValue) =>
+                                handleDeliverableChange(
+                                  { target: { value: newValue } },
+                                  index,
+                                  'startTime'
+                                )
+                              }
+                              renderInput={(params) => <TextField {...params} size="small" aria-label="Start Time" title="Start time" />}
+                            />
+                            {" - "}
+                            <TimePicker
+                              value={createTimeFromString(data.endTime)}
+                              onChange={(newValue) =>
+                                handleDeliverableChange(
+                                  { target: { value: newValue } },
+                                  index,
+                                  'endTime'
+                                )
+                              }
+                              renderInput={(params) => <TextField {...params} size="small" aria-label="End Time" title="End time" />}
+                            />
+                          </>
+                        ) : (
+                          <span title="Time">
+                            {formatTime(data.startTime) +
+                              ' - ' +
+                              formatTime(data.endTime)}
+                          </span>
+                        )}
+                      </div>
+                    </LocalizationProvider>
+                    <div className="deliv-url">
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={data.inputUrl}
+                          onChange={(e) => handleDeliverableChange(e, index, 'inputUrl')}
+                          className="link-input"
+                          aria-label="Class Link"
+                          title="Paste the class/meeting link"
+                          placeholder="Paste class/meeting link"
                         />
+                      ) : data.inputUrl.toLowerCase() === 'to be added soon'.toLowerCase() ? (
+                        <span style={{ color: '#aaa' }}>To be Added</span>
                       ) : (
-                        data.deliverableDate
-                      )}
-                    </div>
-
-                    <div className="deliv-time">
-                      {index === editIndex ? (
-                        <>
-                          <TimePicker
-                            value={
-                              data.startTime ? dayjs(data.startTime) : null
-                            }
-                            onChange={(newValue) =>
-                              handleDeliverableChange(
-                                { target: { value: newValue } },
-                                index,
-                                "startTime"
-                              )
-                            }
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                          {" - "}
-                          <TimePicker
-                            value={data.endTime ? dayjs(data.endTime) : null}
-                            onChange={(newValue) =>
-                              handleDeliverableChange(
-                                { target: { value: newValue } },
-                                index,
-                                "endTime"
-                              )
-                            }
-                            renderInput={(params) => <TextField {...params} />}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          {data.startTime
-                            ? dayjs(data.startTime).format("HH:mm")
-                            : ""}{" "}
-                          -{" "}
-                          {data.endTime
-                            ? dayjs(data.endTime).format("HH:mm")
-                            : ""}
-                        </>
-                      )}
-                    </div>
-                  </LocalizationProvider>
-                  <div className="deliv-url">
-                    {index === editIndex ? (
-                      <input
-                        type="text"
-                        value={data.inputUrl}
-                        onChange={(e) =>
-                          handleDeliverableChange(e, index, "inputUrl")
-                        }
-                        className="link-input"
-                      />
-                    ) : data.inputUrl.toLowerCase() ===
-                      "to be added soon".toLowerCase() ? (
-                      <span>To be Added</span>
-                    ) : (
-                      <a
-                        href={data.inputUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Class Link
-                      </a>
-                    )}
-                  </div>
-
-                  <div className="deliv-status">
-                    {index === editIndex ? (
-                      <>
-                        <div className="field-group">
-                          <select
-                            id={`status-${index}`}
-                            value={data.status}
-                            onChange={(e) =>
-                              handleDeliverableChange(e, index, "status")
-                            }
-                            className="link-input"
-                          >
-                            <option value="Planned">Planned</option>
-                            <option value="Completed">Completed</option>
-                            <option value="Cancelled">Cancelled</option>
-                          </select>
-                        </div>
-                        <div className="field-group">
-                          <input
-                            id={`comments-${index}`}
-                            value={data.comments || ""}
-                            onChange={(e) =>
-                              handleDeliverableChange(e, index, "comments")
-                            }
-                            className="link-input"
-                            placeholder="Add comments"
-                          />
-                        </div>
-                        <div className="field-group">
-                          <input
-                            id={`students-${index}`}
-                            type="number"
-                            value={data.numStudents || ""}
-                            onChange={(e) =>
-                              handleDeliverableChange(e, index, "numStudents")
-                            }
-                            className="link-input"
-                            placeholder="Students Number"
-                          />
-                        </div>
-                      </>
-                    ) : (
-                      <div>{data.status}</div>
-                    )}
-                  </div>
-                  {!!inParas.length && !isNAdmin && (
-                    <div className="deliv-action">
-                      {index === editIndex ? (
-                        <button onClick={() => handleDoneDeliverable(index)}>
-                          <DoneIcon className="done-icon" />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleEditDeliverable(data, index)}
+                        <a
+                          href={data.inputUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Class Link"
+                          title={data.inputUrl}
                         >
-                          <ModeEditIcon className="edit-icon" />
-                        </button>
+                          Class Link
+                        </a>
                       )}
                     </div>
-                  )}
-                </div>
-              ))}
+                    <div className="deliv-status">
+                      {isEditing ? (
+                        <>
+                          <div className="field-group">
+                            <select
+                              id={`status-${index}`}
+                              value={data.status}
+                              onChange={(e) => handleDeliverableChange(e, index, 'status')}
+                              className="link-input"
+                              aria-label="Status"
+                              title="Select status"
+                              required
+                            >
+                              <option value="Planned">Planned</option>
+                              <option value="Completed">Completed</option>
+                              <option value="Cancelled">Cancelled</option>
+                              <option value="Offline">Offline</option>
+                            </select>
+                          </div>
+                          {data.status === 'Completed' && (
+                            <div className="field-group">
+                              <input
+                                id={`comments-${index}`}
+                                value={data.comments || ''}
+                                onChange={(e) => handleDeliverableChange(e, index, 'comments')}
+                                className="link-input"
+                                placeholder="Add comments"
+                                aria-label="Comments"
+                                title="Add comments"
+                                required
+                              />
+                            </div>
+                          )}
+                          {data.status === 'Cancelled' && (
+                            <div className="field-group">
+                              <select
+                                id={`comments-${index}`}
+                                value={data.comments || ''}
+                                onChange={(e) => handleDeliverableChange(e, index, 'comments')}
+                                className="link-input"
+                                required
+                              >
+                                <option value="">Select Reason</option>
+                                <option value="Network Issue">Network Issue</option>
+                                <option value="Power Cut">Power Cut</option>
+                                <option value="Students Not Available">Students Not Available</option>
+                                <option value="Volunteer Not Available">Volunteer Not Available</option>
+                              </select>
+                            </div>
+                          )}
+                          {data.status === 'Offline' && (
+                            <div className="field-group">
+                              <select
+                                id={`comments-${index}`}
+                                value={data.comments || ''}
+                                onChange={(e) => handleDeliverableChange(e, index, 'comments')}
+                                className="link-input"
+                                required
+                              >
+                                <option value="">Select Reason</option>
+                                <option value="Network Issue">Network Issue</option>
+                                <option value="Power Cut">Power Cut</option>
+                                <option value="Students Not Available">Students Not Available</option>
+                                <option value="Volunteer Not Available">Volunteer Not Available</option>
+                              </select>
+                            </div>
+                          )}
+                          <div className="field-group">
+                            <input
+                              id={`students-${index}`}
+                              type="number"
+                              min={0}
+                              value={data.numStudents || ''}
+                              onChange={(e) => handleDeliverableChange(e, index, 'numStudents')}
+                              className="link-input"
+                              placeholder="Students Number"
+                              aria-label="Number of Students"
+                              title="Enter number of students"
+                              required
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <div>{data.status}</div>
+                      )}
+                    </div>
+                    {!!inParas.length && !isNAdmin && (
+                      <div className="deliv-action" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {isEditing ? (
+                          <>
+                            <button
+                              onClick={() => handleDoneDeliverable(index)}
+                              aria-label="Save Deliverable"
+                              title="Save changes"
+                              style={{ background: '#0080BC', color: 'white', borderRadius: 4, padding: '8px 20px', marginBottom: 4, fontWeight: 500, fontSize: 15, border: 'none', boxShadow: '0 1px 4px rgba(0,128,188,0.08)' }}
+                            >
+                              <DoneIcon className="done-icon" /> Save
+                            </button>
+                            <button
+                              onClick={() => setEditIndex('')}
+                              aria-label="Cancel Edit"
+                              title="Cancel editing"
+                              style={{ background: '#aaa', color: 'white', borderRadius: 4, padding: '8px 20px', fontWeight: 500, fontSize: 15, border: 'none' }}
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setEditIndex(index)}
+                            aria-label="Edit Deliverable"
+                            title="Edit deliverable"
+                            style={{ background: '#0080BC', color: 'white', borderRadius: 4, padding: '6px 12px', fontWeight: 600, fontSize: 14, border: 'none', boxShadow: '0 1px 4px rgba(0,128,188,0.08)', minWidth: 0 }}
+                          >
+                            <ModeEditIcon className="edit-icon" style={{ fontSize: 18, marginRight: 4 }} /> Edit
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {/* Feedback message area */}
+                    {isEditing && (
+                      <div style={{ position: 'absolute', bottom: 8, right: 16, color: '#0080BC', fontSize: 12 }}>
+                        {/* Add feedback here if needed */}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            ) : (
+              <div style={{ textAlign: 'center', color: '#aaa', marginTop: 32 }}>
+                No deliverables found.
+              </div>
+            )}
           </div>
         </div>
       )}
