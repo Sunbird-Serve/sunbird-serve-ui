@@ -122,10 +122,25 @@ const NeedPlans = () => {
     }
     
     try {
-      const date = new Date(timeData);
+      // Handle different time data formats
+      let date;
+      if (typeof timeData === 'string') {
+        // If it's already a time string (HH:MM format), return it directly
+        if (/^\d{1,2}:\d{2}$/.test(timeData)) {
+          return timeData;
+        }
+        // If it's an ISO date string or other date format
+        date = new Date(timeData);
+      } else if (timeData instanceof Date) {
+        date = timeData;
+      } else {
+        // Try to create a date from the value
+        date = new Date(timeData);
+      }
       
       // Check if the date is valid
       if (isNaN(date.getTime())) {
+        console.warn('Invalid date value:', timeData);
         return "00:00"; // Return default time if invalid date
       }
       
@@ -133,7 +148,7 @@ const NeedPlans = () => {
         hour: 'numeric',
         minute: 'numeric',
         hour12: false,
-        timeZone: 'UTC',
+        timeZone: timeZone || 'UTC',
       };
     
       return new Intl.DateTimeFormat('en-US', options).format(date);
@@ -145,16 +160,40 @@ const NeedPlans = () => {
 
   //make the events from start to end date
   function getTimeSlots(needName, startDate, endDate, timeSlots, assignedUserId, needId, platform, meetURL, startTime, endTime) {
+    // Validate inputs
+    if (!timeSlots || !Array.isArray(timeSlots) || timeSlots.length === 0) {
+      console.warn('Invalid timeSlots data:', timeSlots);
+      return [];
+    }
+    
+    if (!startDate || !endDate) {
+      console.warn('Invalid date range:', { startDate, endDate });
+      return [];
+    }
+    
     const timeSlotObject = {};
     timeSlots.forEach(slot => {
-      const day = slot.day.toLowerCase();
-      timeSlotObject[day] = [format(new Date(slot.startTime), 'hh:mm a'), format(new Date(slot.endTime), 'h:mm a')];
+      if (slot && slot.day && slot.startTime && slot.endTime) {
+        const day = slot.day.toLowerCase();
+        // Use the custom formatTime function instead of date-fns format
+        timeSlotObject[day] = [formatTime(slot.startTime, 'UTC'), formatTime(slot.endTime, 'UTC')];
+      } else {
+        console.warn('Invalid time slot data:', slot);
+      }
     });
   
     const dateWithTimeSlots = [];
     const daysOfWeek = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const currentDate = new Date(startDate);
-    while (currentDate <= new Date(endDate)) {
+    const endDateObj = new Date(endDate);
+    
+    // Validate dates
+    if (isNaN(currentDate.getTime()) || isNaN(endDateObj.getTime())) {
+      console.warn('Invalid date values:', { startDate, endDate });
+      return [];
+    }
+    
+    while (currentDate <= endDateObj) {
       const dayIndex = currentDate.getDay();
       const day = daysOfWeek[dayIndex];
       if (timeSlotObject[day]) {
@@ -181,20 +220,37 @@ const NeedPlans = () => {
   useEffect(() => {
     const newEvents = [];
     for (const item of needPlans) {
-      if (item.needPlan.occurrence !== null) {
-        const { startDate, endDate } = item.needPlan.occurrence;
-        let inputURL = "";
-        let softwarePlatform = "";
-        let startTime="";
-        let endTime="";
-        if(item.platform && item.platform.inputParameters.length){
-          inputURL = item.platform.inputParameters[0].inputUrl;
-          softwarePlatform = item.platform.inputParameters[0].softwarePlatform;
-          startTime = item.platform.inputParameters[0].startTime;
-          endTime = item.platform.inputParameters[0].endTime;
+      try {
+        if (item.needPlan && item.needPlan.occurrence !== null && item.needPlan.timeSlots) {
+          const { startDate, endDate } = item.needPlan.occurrence;
+          let inputURL = "";
+          let softwarePlatform = "";
+          let startTime = "";
+          let endTime = "";
+          
+          if (item.platform && item.platform.inputParameters && item.platform.inputParameters.length > 0) {
+            inputURL = item.platform.inputParameters[0].inputUrl || "";
+            softwarePlatform = item.platform.inputParameters[0].softwarePlatform || "";
+            startTime = item.platform.inputParameters[0].startTime || "";
+            endTime = item.platform.inputParameters[0].endTime || "";
+          }
+          
+          const sessions = getTimeSlots(
+            item.needPlan.plan?.name || "Unknown Need", 
+            startDate, 
+            endDate, 
+            item.needPlan.timeSlots, 
+            item.assignedUserId, 
+            item.needId, 
+            softwarePlatform, 
+            inputURL, 
+            startTime, 
+            endTime
+          );
+          newEvents.push(...sessions);
         }
-        const sessions = getTimeSlots(item.needPlan.plan.name, startDate, endDate, item.needPlan.timeSlots, item.assignedUserId, item.needId, softwarePlatform, inputURL, startTime, endTime); // Use getTimeSlots function
-        newEvents.push(...sessions);
+      } catch (error) {
+        console.error('Error processing need plan:', error, item);
       }
     }
     setEvents(newEvents);
