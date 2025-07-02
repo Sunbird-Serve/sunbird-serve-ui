@@ -443,15 +443,65 @@ const NeedPlans = () => {
                         setEditFields(prev => ({ ...prev, [field]: value }));
                         setEditError('');
                       };
-                      const handleSave = () => {
+                      const handleSave = async () => {
                         // Validation: all fields required
                         if (!editFields.status || !editFields.comments || !editFields.students) {
                           setEditError('All fields are required.');
                           return;
                         }
-                        // TODO: Implement save logic (API call)
-                        setEditSession(null);
-                        setEditError('');
+                        if (!deliverable || !plan) {
+                          setEditError('Missing deliverable or plan data.');
+                          return;
+                        }
+                        const needPlanIdToSend = plan?.needPlan?.id || deliverable?.needPlanId;
+                        if (!needPlanIdToSend) {
+                          setEditError('Could not determine needPlanId for this deliverable.');
+                          return;
+                        }
+                        const payload = {
+                          needPlanId: needPlanIdToSend,
+                          comments: editFields.comments,
+                          status: editFields.status,
+                          deliverableDate: deliverable.deliverableDate,
+                          numberOfAttendees: editFields.students
+                        };
+                        console.log('Deliverable update payload:', payload);
+                        try {
+                          await axios.put(
+                            `${configData.NEEDPLAN_DELIVERABLES}/update/${deliverable.id}`,
+                            payload
+                          );
+                          // Update local state for needPlans
+                          setNeedPlans(prevNeedPlans =>
+                            prevNeedPlans.map(np => {
+                              if (
+                                np.needId === plan.needId &&
+                                np.assignedUserId === user
+                              ) {
+                                // Update the deliverable in platform.needDeliverable
+                                const updatedPlatform = { ...np.platform };
+                                if (updatedPlatform.needDeliverable) {
+                                  updatedPlatform.needDeliverable = updatedPlatform.needDeliverable.map(d =>
+                                    d.id === deliverable.id
+                                      ? {
+                                          ...d,
+                                          status: editFields.status,
+                                          comments: editFields.comments,
+                                          numberOfAttendees: editFields.students,
+                                        }
+                                      : d
+                                  );
+                                }
+                                return { ...np, platform: updatedPlatform };
+                              }
+                              return np;
+                            })
+                          );
+                          setEditSession(null);
+                          setEditError('');
+                        } catch (error) {
+                          setEditError('Failed to update deliverable.');
+                        }
                       };
                       const handleCancel = () => {
                         setEditSession(null);
@@ -522,30 +572,17 @@ const NeedPlans = () => {
                     </button>
                   </div>
                   {showAddSession && (
+                    // Find the plan for the first assigned user in this event
+                    (() => {
+                      const firstUser = event.assignedUsers[0];
+                      const planForAdd = needPlans.find(np => np.needId === event.needId && firstUser === np.assignedUserId);
+                      return (
                     <div className="add-session-card" style={{background: '#f7fafd', border: '1.5px solid #0080BC', borderRadius: 10, margin: '16px 0', padding: 16, boxShadow: '0 2px 8px rgba(0,128,188,0.07)', fontSize: 13}}>
                       <div style={{fontWeight: 'bold', fontSize: 16, color: '#0080BC', marginBottom: 10}}>Add New Session</div>
-                      <form style={{display: 'flex', flexDirection: 'column', gap: 10}}>
-                        <div>
-                          <label>Date: <input type="date" style={{marginLeft: 8, padding: 4, borderRadius: 4}} /></label>
-                        </div>
-                        <div>
-                          <label>Start Time: <input type="time" style={{marginLeft: 8, padding: 4, borderRadius: 4}} /></label>
-                        </div>
-                        <div>
-                          <label>End Time: <input type="time" style={{marginLeft: 8, padding: 4, borderRadius: 4}} /></label>
-                        </div>
-                        <div>
-                          <label>Status:
-                            <select style={{marginLeft: 8, padding: 4, borderRadius: 4}}>
-                              <option value="Planned">Planned</option>
-                              <option value="Completed">Completed</option>
-                              <option value="Cancelled">Cancelled</option>
-                            </select>
-                          </label>
-                        </div>
-                        <button type="submit" style={{marginTop: 8, background: '#0080BC', color: 'white', border: 'none', borderRadius: 4, padding: '6px 20px', fontWeight: 500, cursor: 'pointer', alignSelf: 'flex-start'}}>Add Session</button>
-                      </form>
+                      <AddSessionForm plan={planForAdd} setNeedPlans={setNeedPlans} setShowAddSession={setShowAddSession} />
                     </div>
+                      );
+                    })()
                   )}
                 </>
               )}
@@ -570,6 +607,88 @@ const NeedPlans = () => {
         </div>
       </div>
 
+  );
+}
+
+function AddSessionForm({ plan, setNeedPlans, setShowAddSession }) {
+  const [date, setDate] = React.useState("");
+  const [startTime, setStartTime] = React.useState("");
+  const [endTime, setEndTime] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [loading, setLoading] = React.useState(false);
+
+  // Debug logs
+  console.log('AddSessionForm plan:', plan);
+  if (plan) {
+    console.log('plan.needPlan:', plan.needPlan);
+    if (plan.needPlan) {
+      console.log('plan.needPlan.id:', plan.needPlan.id);
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!date || !startTime || !endTime) {
+      setError("All fields are required.");
+      return;
+    }
+    if (!plan || !plan.needPlanId) {
+      setError("Plan information missing.");
+      return;
+    }
+    setLoading(true);
+    setError("");
+    try {
+      // First API: create deliverable
+      const payload = {
+        needPlanId: plan.needPlanId,
+        comments: "",
+        status: "Planned",
+        deliverableDate: `${date}T00:00:00.000Z`
+      };
+      const res = await axios.post(`${configData.NEEDPLAN_DELIVERABLES}/create`, payload);
+      const newDeliverable = res.data;
+      // Second API: create deliverable input
+      const inputPayload = {
+        needDeliverableId: newDeliverable.id,
+        startTime: `${date}T${startTime}:00.000Z`,
+        endTime: `${date}T${endTime}:00.000Z`
+      };
+      await axios.post(`${configData.SERVE_NEED}/deliverable-input/create`, inputPayload);
+      // Refetch updated platform data for this plan
+      const updatedPlatformRes = await axios.get(`${configData.SERVE_NEED}/need-deliverable/${plan.needPlanId}`);
+      const updatedPlatform = updatedPlatformRes.data;
+      // Update local state
+      setNeedPlans(prevNeedPlans => prevNeedPlans.map(np => {
+        if (np.needPlan && np.needPlan.id === plan.needPlan.id) {
+          return { ...np, platform: updatedPlatform };
+        }
+        return np;
+      }));
+      setShowAddSession(false);
+    } catch (err) {
+      setError("Failed to add session.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form style={{display: 'flex', flexDirection: 'column', gap: 10}} onSubmit={handleSubmit}>
+      <div>
+        <label>Date: <input type="date" value={date} onChange={e => setDate(e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4}} required /></label>
+      </div>
+      <div>
+        <label>Start Time: <input type="time" value={startTime} onChange={e => setStartTime(e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4}} required /></label>
+      </div>
+      <div>
+        <label>End Time: <input type="time" value={endTime} onChange={e => setEndTime(e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4}} required /></label>
+      </div>
+      {error && <div style={{color: 'red', fontSize: 12}}>{error}</div>}
+      <button type="submit" disabled={loading} style={{marginTop: 8, background: '#0080BC', color: 'white', border: 'none', borderRadius: 4, padding: '6px 20px', fontWeight: 500, cursor: 'pointer', alignSelf: 'flex-start'}}>
+        {loading ? 'Adding...' : 'Add Session'}
+      </button>
+    </form>
   );
 }
 

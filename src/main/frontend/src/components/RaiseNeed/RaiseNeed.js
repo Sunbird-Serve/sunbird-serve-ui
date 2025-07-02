@@ -388,15 +388,14 @@ const RaiseNeed = (props) => {
                   name="needTypeId"
                   value={needTypeId}
                   required
-                  disabled
+                  onChange={changeHandler}
                 >
-                  {needTypes
-                    .filter((ntype) => ntype.name === "Online Teaching")
-                    .map((ntype) => (
-                      <option key={ntype.osid} value={ntype.id}>
-                        {ntype.name}
-                      </option>
-                    ))}
+                  <option value="" disabled>Select Need Type</option>
+                  {needTypes.map((ntype) => (
+                    <option key={ntype.id} value={ntype.id}>
+                      {ntype.name}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
