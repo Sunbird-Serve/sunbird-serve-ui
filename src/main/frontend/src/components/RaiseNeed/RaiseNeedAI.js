@@ -3,6 +3,8 @@ import { useHistory } from "react-router";
 import axios from "axios";
 import "./RaiseNeed.css";
 
+const configData = require('../../configure.js');
+
 const speakText = (text) => {
   if ('speechSynthesis' in window && text) {
     window.speechSynthesis.cancel();
@@ -73,7 +75,7 @@ const RaiseNeedAI = () => {
     setError(null);
     setConversation([{ sender: 'user', text: transcribedText }]);
     try {
-      const response = await axios.post('/agent/agent-raise-need', {
+      const response = await axios.post(configData.AGENT_RAISE_NEED, {
         prompt: transcribedText
       }, {
         headers: {
@@ -115,7 +117,7 @@ const RaiseNeedAI = () => {
       console.log(fullPrompt);
     setConversation(prev => [...prev, { sender: 'user', text: userInput }]);
     try {
-      const response = await axios.post('/agent/agent-raise-need', {
+      const response = await axios.post(configData.AGENT_RAISE_NEED, {
         prompt: fullPrompt
       }, {
         headers: {

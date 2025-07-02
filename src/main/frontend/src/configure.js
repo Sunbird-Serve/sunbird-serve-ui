@@ -36,6 +36,7 @@ const configData = {
   REGISTRATION_DOMAIN: `${baseDomainVolunteering}`,
   UPDATE_USER: `${baseDomainVolunteering}/api/v1/serve-volunteering/user/agencyId/update`,
   AGENCYID: "1-74f81200-dc16-4c65-bf7a-a3ab75952432",
+  AGENT_RAISE_NEED: `http://localhost:8080/agent/agent-raise-need`,
 };
 
 module.exports = configData;

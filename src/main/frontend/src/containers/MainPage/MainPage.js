@@ -9,6 +9,7 @@ import SideNav from "../../components/SideNav/SideNav";
 import Header from "../../components/Header/Header";
 import Needs from "../../components/Needs/Needs";
 import RaiseNeed from "../../components/RaiseNeed/RaiseNeed";
+import RaiseNeedAI from "../../components/RaiseNeed/RaiseNeedAI";
 import NeedPlans from "../../components/Need Plans/NeedPlans";
 import Volunteers from "../../components/Volunteer/Volunteers";
 import Settings from "../../components/Settings/Settings";
@@ -85,6 +86,7 @@ const MainPage = () => {
                 />
                 <Route path="/needs" component={Needs} />
                 <Route path="/raiseneed" component={RaiseNeed} />
+                <Route path="/raiseneedai" component={RaiseNeedAI} />
                 <Route path="/needPlans" component={NeedPlans} />
                 <Route path="/volunteers" component={Volunteers} />
                 <Route path="/settings" component={Settings} />
