@@ -44,54 +44,45 @@ const NeedPlans = () => {
   //fetch all plans: plans created by joining needs, plans and platforms 
   const [needPlans, setNeedPlans] = useState([]);
   const [error, setError] = useState(null);
-  useEffect(() => {
-    const fetchData = () => {
-      
-      const fetchRequests = fulfillments.map(obj => {
-        const { needId, needPlanId } = obj;
 
-
+  const fetchAllPlans = async () => {
+    if (!fulfillments.length) return;
+    const fetchRequests = fulfillments.map(obj => {
+      const { needId, needPlanId } = obj;
       // Fetch needPlan details
-        const fetchNeedPlan = axios.get(`${configData.SERVE_NEED}/need-plan/read/${needPlanId}`)
-          .then(response => response.data)
-          .catch(error => {
-            console.error(`Error fetching needPlan for ${needPlanId}:`, error);
-            return null;
-          });
-
-        // Fetch need details
-        const fetchNeed = axios.get(`${configData.SERVE_NEED}/need/${needId}`)
-          .then(response => response.data)
-          .catch(error => {
-            console.error(`Error fetching need for ${needId}:`, error);
-            return null;
-          });
-        // Fetch platform details
-        const fetchPlatform = axios.get(`${configData.SERVE_NEED}/need-deliverable/${needPlanId}`)
-          .then(response => response.data)
-          .catch(error => {
-            // console.error(`Error fetching platform for ${needId}:`, error);
-            return null;
-          });
-          return Promise.all([fetchNeedPlan, fetchNeed, fetchPlatform])
-          .then(([needPlan, need, platform]) => ({
-            ...obj,
-            needPlan,
-            need,
-            platform
-          }));
-      });
-
-      Promise.all(fetchRequests)
-        .then(results => {
-          setNeedPlans(results.filter(result => result !== null));
-        })
+      const fetchNeedPlan = axios.get(`${configData.SERVE_NEED}/need-plan/read/${needPlanId}`)
+        .then(response => response.data)
         .catch(error => {
-          setError(error.message);
+          console.error(`Error fetching needPlan for ${needPlanId}:`, error);
+          return null;
         });
-    };
+      // Fetch need details
+      const fetchNeed = axios.get(`${configData.SERVE_NEED}/need/${needId}`)
+        .then(response => response.data)
+        .catch(error => {
+          console.error(`Error fetching need for ${needId}:`, error);
+          return null;
+        });
+      // Fetch platform details
+      const fetchPlatform = axios.get(`${configData.SERVE_NEED}/need-deliverable/${needPlanId}`)
+        .then(response => response.data)
+        .catch(error => {
+          return null;
+        });
+      return Promise.all([fetchNeedPlan, fetchNeed, fetchPlatform])
+        .then(([needPlan, need, platform]) => ({
+          ...obj,
+          needPlan,
+          need,
+          platform
+        }));
+    });
+    const results = await Promise.all(fetchRequests);
+    setNeedPlans(results.filter(result => result !== null));
+  };
 
-    fetchData();
+  useEffect(() => {
+    fetchAllPlans();
   }, [fulfillments]);
   console.log(needPlans)
 
@@ -579,7 +570,7 @@ const NeedPlans = () => {
                       return (
                     <div className="add-session-card" style={{background: '#f7fafd', border: '1.5px solid #0080BC', borderRadius: 10, margin: '16px 0', padding: 16, boxShadow: '0 2px 8px rgba(0,128,188,0.07)', fontSize: 13}}>
                       <div style={{fontWeight: 'bold', fontSize: 16, color: '#0080BC', marginBottom: 10}}>Add New Session</div>
-                      <AddSessionForm plan={planForAdd} setNeedPlans={setNeedPlans} setShowAddSession={setShowAddSession} />
+                      <AddSessionForm plan={planForAdd} setNeedPlans={setNeedPlans} setShowAddSession={setShowAddSession} fetchAllPlans={fetchAllPlans} />
                     </div>
                       );
                     })()
@@ -610,7 +601,7 @@ const NeedPlans = () => {
   );
 }
 
-function AddSessionForm({ plan, setNeedPlans, setShowAddSession }) {
+function AddSessionForm({ plan, setNeedPlans, setShowAddSession, fetchAllPlans }) {
   const [date, setDate] = React.useState("");
   const [startTime, setStartTime] = React.useState("");
   const [endTime, setEndTime] = React.useState("");
@@ -655,16 +646,8 @@ function AddSessionForm({ plan, setNeedPlans, setShowAddSession }) {
         endTime: `${date}T${endTime}:00.000Z`
       };
       await axios.post(`${configData.SERVE_NEED}/deliverable-input/create`, inputPayload);
-      // Refetch updated platform data for this plan
-      const updatedPlatformRes = await axios.get(`${configData.SERVE_NEED}/need-deliverable/${plan.needPlanId}`);
-      const updatedPlatform = updatedPlatformRes.data;
-      // Update local state
-      setNeedPlans(prevNeedPlans => prevNeedPlans.map(np => {
-        if (np.needPlan && np.needPlan.id === plan.needPlan.id) {
-          return { ...np, platform: updatedPlatform };
-        }
-        return np;
-      }));
+      // Instead of updating just one plan, trigger a full reload
+      if (fetchAllPlans) await fetchAllPlans();
       setShowAddSession(false);
     } catch (err) {
       setError("Failed to add session.");
