@@ -10,12 +10,14 @@ import SBLogo from "../../assets/sunbirdlogo.png";
 import { FcGoogle } from "react-icons/fc";
 import FacebookRoundedIcon from "@mui/icons-material/FacebookRounded";
 import NCoordSignUpBtn from "../NCoordSignUp/NCoordSignUpBtn";
+import VolunteerSignup from "../VolunteerSignup/VolunteerSignup";
 
 const LoginForm = ({ loginState, changePasswordRequest, passwordChanged }) => {
   const [error, setError] = useState("");
   const [resetEmail, setResetEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
+  const [showVolunteerSignup, setShowVolunteerSignup] = useState(false);
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -75,6 +77,13 @@ const LoginForm = ({ loginState, changePasswordRequest, passwordChanged }) => {
       passwordChanged();
     }
   };
+
+  const openVolunteerSignup = (e) => {
+    e.preventDefault();
+    setShowVolunteerSignup(true);
+  };
+  const closeVolunteerSignup = () => setShowVolunteerSignup(false);
+
   return (
     <div className="loginForm ">
       {!showResetForm ? (
@@ -118,8 +127,28 @@ const LoginForm = ({ loginState, changePasswordRequest, passwordChanged }) => {
               Forgot Password?
             </a>
           </div>
-          
           <NCoordSignUpBtn />
+          <div style={{ textAlign: 'center', marginTop: 10 }}>
+            <button
+              className="btnVolunteerSignup"
+              style={{
+                background: '#0080BC',
+                color: 'white',
+                border: 'none',
+                borderRadius: 6,
+                padding: '8px 20px',
+                fontSize: 15,
+                cursor: 'pointer',
+                marginTop: 8,
+              }}
+              onClick={openVolunteerSignup}
+            >
+              Volunteer Sign Up
+            </button>
+          </div>
+          {showVolunteerSignup && (
+            <VolunteerSignup onClose={closeVolunteerSignup} />
+          )}
 
           {/*<div className="hline">
             <hr /> <span>or login with</span> <hr/>
