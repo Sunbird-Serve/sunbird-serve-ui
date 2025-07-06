@@ -269,6 +269,12 @@ const CoordRegistration = (props) => {
     }
   }, []);
 
+  useEffect(() => {
+    if (prefillEmail && !formData.email) {
+      setFormData((prev) => ({ ...prev, email: prefillEmail }));
+    }
+  }, [prefillEmail]);
+
   const handleChange = (event, count = 0) => {
     // console.log(event, "check this");
     const { name, value } = event.target;

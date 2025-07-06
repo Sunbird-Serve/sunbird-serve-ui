@@ -64,6 +64,7 @@ const Nominations = ({ needData, openPopup }) => {
 
   const [activeTab, setActiveTab] = useState("tabN");
   const [responseFlag, setResponseFlag] = useState(false);
+  const [userSelectedTab, setUserSelectedTab] = useState(false); // Track if user manually selected a tab
 
   const [rejectPopup, setRejectPopup] = useState(false); //reject nomination
   const [acceptPopup, setAcceptPopup] = useState(false); //accept nomination
@@ -79,10 +80,23 @@ const Nominations = ({ needData, openPopup }) => {
       });
   }, [dispatch, activeTab, acceptPopup, rejectPopup, openPopup, responseFlag]);
 
+  // Set default tab based on nomination status (only on initial load)
+  useEffect(() => {
+    if (nomsList.length > 0 && !userSelectedTab) {
+      const hasAcceptedNominations = nomsList.some(item => item.nominationStatus === "Approved");
+      if (hasAcceptedNominations && activeTab === "tabN") {
+        setActiveTab("tabA");
+      } else if (!hasAcceptedNominations && activeTab === "tabA") {
+        setActiveTab("tabN");
+      }
+    }
+  }, [nomsList, userSelectedTab]);
+
   // const nomsList = useSelector((state) => state.nominationbynid.data);
   //filter nominations as per active tab
   const handleTabClick = (tab) => {
     setActiveTab(tab);
+    setUserSelectedTab(true); // Mark that user has manually selected a tab
   };
   const [dataNoms, setDataNoms] = useState([]);
   useEffect(() => {
@@ -182,23 +196,25 @@ const Nominations = ({ needData, openPopup }) => {
           <div className="actionsCell">
             {activeTab === "tabN" && !isNAdmin && (
               <>
-                <button className="acceptNomin" onClick={handleAccept}>
+                <button className="acceptNomin" onClick={handleAccept} style={{ display: "flex", alignItems: "center", gap: "8px", background: "#4CAF50", color: "white", border: "none", borderRadius: "6px", padding: "12px 20px", cursor: "pointer", fontSize: "16px", fontWeight: "500", minWidth: "120px", justifyContent: "center" }}>
                   <CheckIcon
                     style={{
                       height: "20px",
                       width: "20px",
-                      color: "green",
+                      color: "white",
                     }}
                   />
+                  Confirm
                 </button>
-                <button className="rejectNomin" onClick={handleReject}>
+                <button className="rejectNomin" onClick={handleReject} style={{ display: "flex", alignItems: "center", gap: "8px", background: "#f44336", color: "white", border: "none", borderRadius: "6px", padding: "12px 20px", cursor: "pointer", fontSize: "16px", fontWeight: "500", minWidth: "120px", justifyContent: "center" }}>
                   <ClearIcon
                     style={{
                       height: "20px",
                       width: "20px",
-                      color: "red",
+                      color: "white",
                     }}
                   />
+                  Reject
                 </button>
               </>
             )}
@@ -382,10 +398,10 @@ const Nominations = ({ needData, openPopup }) => {
     const initialFormData = deliverables.map((item, index) => ({
       deliverableId: item.id,
       deliverableDate: item.deliverableDate,
-      startTime: inParas.length ? inParas[index].startTime : "",
-      endTime: inParas.length ? inParas[index].endTime : "",
-      softwarePlatform: inParas.length ? inParas[index].softwarePlatform : "",
-      inputUrl: inParas.length ? inParas[index].inputUrl : "",
+      startTime: inParas[index]?.startTime || "",
+      endTime: inParas[index]?.endTime || "",
+      softwarePlatform: inParas[index]?.softwarePlatform || "",
+      inputUrl: inParas[index]?.inputUrl || "",
       status: item.status,
       comments: item.comments,
       numStudents: item.numStudents || "",
