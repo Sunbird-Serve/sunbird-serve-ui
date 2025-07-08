@@ -216,8 +216,7 @@ function VolunteerNeedType() {
                               need &&
                               need.need &&
                               need.need.needTypeId === item.id &&
-                              (need.need.status === "Approved" ||
-                                need.need.status === "Nominated")
+                              (need.need.status === "Approved")
                           ).length
                         }{" "}
                         Needs

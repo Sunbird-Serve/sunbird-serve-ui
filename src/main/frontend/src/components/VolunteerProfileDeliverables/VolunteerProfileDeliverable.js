@@ -302,11 +302,22 @@ const VolunteerProfileDeliverable = (props) => {
         </div>
         <div className="rowNVP">
           <div className="itemNVP">
-            <span>Organizer :</span>{" "}
+            <span>Coordinator Name :</span>{" "}
             {ncoordInfo.length ? ncoordInfo[0]?.identityDetails?.fullname : ""}
           </div>
           <div className="itemNVP">
             <span>Entity :</span> {entityById[props.needId]}
+          </div>
+        </div>
+        {/* Coordinator Contact Row */}
+        <div className="rowNVP">
+          <div className="itemNVP">
+            <span>Coordinator Email :</span>{" "}
+            {ncoordInfo.length ? ncoordInfo[0]?.contactDetails?.email : ""}
+          </div>
+          <div className="itemNVP">
+            <span>Coordinator Mobile :</span>{" "}
+            {ncoordInfo.length ? ncoordInfo[0]?.contactDetails?.mobile : ""}
           </div>
         </div>
         <div className="rowNVP">
