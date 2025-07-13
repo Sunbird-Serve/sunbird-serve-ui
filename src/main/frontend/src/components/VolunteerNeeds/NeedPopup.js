@@ -30,7 +30,14 @@ function NeedPopup({ open, onClose, need }) {
       axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=1000`)
         .then((response) => {
           const nominations = Object.values(response.data);
-          if (nominations.length > 0) {
+          // Only consider active nominations (Nominated, Inprogress)
+          // Ignore old fulfilled, rejected, or approved nominations
+          const activeNominations = nominations.filter(nomination => 
+            nomination.nominationStatus === "Nominated" || 
+            nomination.nominationStatus === "Inprogress"
+          );
+          
+          if (activeNominations.length > 0) {
             setAlreadyNominated(true);
           } else {
             setAlreadyNominated(false);
