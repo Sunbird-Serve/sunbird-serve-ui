@@ -19,8 +19,38 @@ function NeedPopup({ open, onClose, need }) {
   const userId = useSelector((state)=> state.user.data.osid)
   const [alertLogin, setAlertLogin] = useState(false)
   const [notifyRegister, setNotifyRegister] = useState(false)
+  const [alreadyNominated, setAlreadyNominated] = useState(false); // NEW
+  const [nominationsLoading, setNominationsLoading] = useState(false); // NEW
+  const [nominationError, setNominationError] = useState(""); // NEW
+
+  // Fetch user's nominations on mount
+  useEffect(() => {
+    if (userId && open) {
+      setNominationsLoading(true);
+      axios.get(`${configData.NOMINATIONS_GET}/${userId}?page=0&size=1000`)
+        .then((response) => {
+          const nominations = Object.values(response.data);
+          if (nominations.length > 0) {
+            setAlreadyNominated(true);
+          } else {
+            setAlreadyNominated(false);
+          }
+        })
+        .catch((error) => {
+          setNominationError("Could not check nominations. Please try again later.");
+        })
+        .finally(() => {
+          setNominationsLoading(false);
+        });
+    }
+  }, [userId, open]);
+
   //NOMINATION to a need on Nominate button click
   const nominateNeed = () => {
+    if (alreadyNominated) {
+      setNominationError("You can nominate once and only to one need.");
+      return;
+    }
     const needId = need.need.id;
     if(userId){
       setIsNominating(true); // Start loading
@@ -93,10 +123,18 @@ function NeedPopup({ open, onClose, need }) {
             <button 
               className={`nominate-button ${isNominating ? 'nominating' : ''}`} 
               onClick={nominateNeed}
-              disabled={isNominating}
+              disabled={isNominating || alreadyNominated || nominationsLoading}
             >
               {isNominating ? 'Nominating...' : 'Nominate'}
             </button>
+            {alreadyNominated && (
+              <div style={{ color: 'red', marginTop: '10px', fontWeight: 500 }}>
+                You can nominate once and only to one need.
+              </div>
+            )}
+            {nominationError && (
+              <div style={{ color: 'red', marginTop: '10px' }}>{nominationError}</div>
+            )}
             {isNominating && <div className="nomination-loader"></div>}
         <p className="notification-needpopup">Hurry! Nominations will be closed soon</p>
         {/* <div className="aboutHeading">About</div> */}
