@@ -464,6 +464,13 @@ const Registration = (props) => {
     }
   }, []);
 
+  // Pre-populate formData.email only if agencyId is absent and prefillEmail exists
+  useEffect(() => {
+    if (!props.agencyId && prefillEmail) {
+      setFormData(f => ({ ...f, email: prefillEmail }));
+    }
+  }, [props.agencyId, prefillEmail]);
+
   const handleChange = (event, count = 0) => {
     // console.log(event, "check this");
     const { name, value } = event.target;
@@ -910,19 +917,14 @@ const Registration = (props) => {
                     </label>
                     <br />
                     <input
+                      type="email"
                       className="form-input"
                       placeholder="chandlerBing@gmail.com"
                       name="email"
-                      value={
-                        props.agencyId !== ""
-                          ? prefillEmail
-                          : formData.email
-                            ? formData.email
-                            : ""
-                      }
+                      value={formData.email || ""}
                       onChange={handleChange}
                       required
-                    ></input>
+                    />
                   </div>
                   {/* <div className="formElement">
                 <label>Address</label>
