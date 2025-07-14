@@ -387,6 +387,9 @@ export const NeedsTable = ({ props, filterByEntity }) => {
   const [rowData, setRowData] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const handleRowClick = (rowData) => {
+    if (rowData?.need?.status?.toLowerCase() === "fulfilled") {
+      return; // Do nothing if fulfilled
+    }
     setRowData(rowData);
     setShowPopup(!showPopup);
   };

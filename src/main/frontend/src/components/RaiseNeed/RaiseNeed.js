@@ -126,7 +126,13 @@ const RaiseNeed = (props) => {
   };
 
   //get from input in YearMonthDay format then convert to datetime before updating
-  const [startYMD, setStartYMD] = useState("2025-07-01");
+  const [startYMD, setStartYMD] = useState(() => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
   const [endYMD, setEndYMD] = useState("2025-12-31");
   const handleEndDate = (e) => {
     setDataOccurrence({
