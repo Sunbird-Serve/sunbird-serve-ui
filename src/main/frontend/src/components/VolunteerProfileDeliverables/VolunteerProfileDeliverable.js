@@ -103,6 +103,7 @@ const VolunteerProfileDeliverable = (props) => {
   const [completedDeliverables, setCompletedDeliverables] = useState(null);
   const [cancelledDeliverables, setCancelledDeliverables] = useState(null);
   const [dstat, setDstat] = useState(false);
+  const [rejectionError, setRejectionError] = useState("");
 
   const filterDeliverablesByMonth = (deliverables, month) => {
     if (!month) return deliverables;
@@ -289,6 +290,15 @@ const VolunteerProfileDeliverable = (props) => {
     return hours + dateTimeString.slice(13, 16) + ampm;
   };
 
+  const REJECTION_REASONS = [
+    "Network Issue",
+    "Power Cut",
+    "Students Not Available",
+    "Volunteer Not Available"
+  ];
+
+  const [beneficsError, setBeneficsError] = useState("");
+
   return (
     <div>
       {/* NEED INFORMATION */}
@@ -472,7 +482,7 @@ const VolunteerProfileDeliverable = (props) => {
                         <div className="inwrap-cpopup">
                           <div className="cpopup">
                             <div className="topbar-cpopup">
-                              <div>Reason for Rejection</div>
+                              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Reason for Cancelling</div>
                               <div>
                                 <button
                                   className="cancel-button"
@@ -489,14 +499,20 @@ const VolunteerProfileDeliverable = (props) => {
                             </div>
                             <div className="wrap-reasonbox">
                               <label>Reason</label>
-                              <textarea
+                              <select
                                 className="reject-reason"
                                 value={rejection}
-                                onChange={handleChange}
-                                rows={4}
-                                cols={60}
-                                placeholder="Write a reason for cancelling the need plan deliverable"
-                              ></textarea>
+                                onChange={e => { setRejection(e.target.value); setRejectionError(""); }}
+                                required
+                              >
+                                <option value="">Select Reason</option>
+                                {REJECTION_REASONS.map((reason) => (
+                                  <option key={reason} value={reason}>{reason}</option>
+                                ))}
+                              </select>
+                             {rejectionError && (
+                               <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{rejectionError}</div>
+                             )}
                             </div>
                             <div className="cancel-buttons">
                               <button
@@ -507,7 +523,13 @@ const VolunteerProfileDeliverable = (props) => {
                               </button>
                               <button
                                 className="reject-confirm-button"
-                                onClick={() => confirmRejection(item)}
+                                onClick={() => {
+                                  if (!rejection) {
+                                    setRejectionError("Please select a reason for cancelling.");
+                                    return;
+                                  }
+                                  confirmRejection(item);
+                                }}
                               >
                                 Confirm
                               </button>
@@ -550,13 +572,18 @@ const VolunteerProfileDeliverable = (props) => {
                               ></textarea>
                             </div>
                             <div className="wrap-beneficbox">
-                              <label>Beneficiaries Attended</label>
+                              <label>Students attended</label>
                               <input
-                                type="text"
+                                type="number"
                                 name="numBenfics"
-                                value={numBenefics}
-                                onChange={handleBenefics}
+                                value={numBenefics || ""}
+                                onChange={e => { setNumBenefics(e.target.value); setBeneficsError(""); }}
+                                min={0}
+                                required
                               />
+                              {beneficsError && (
+                                <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{beneficsError}</div>
+                              )}
                             </div>
                             <div className="cancel-buttons">
                               <button
@@ -567,7 +594,13 @@ const VolunteerProfileDeliverable = (props) => {
                               </button>
                               <button
                                 className="reject-confirm-button"
-                                onClick={() => confirmCompleted(item, cindex)}
+                                onClick={() => {
+                                  if (!numBenefics || isNaN(numBenefics) || Number(numBenefics) < 0) {
+                                    setBeneficsError("Please enter the number of students attended.");
+                                    return;
+                                  }
+                                  confirmCompleted(item, cindex);
+                                }}
                               >
                                 Confirm
                               </button>
