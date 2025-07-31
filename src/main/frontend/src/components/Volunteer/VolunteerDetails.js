@@ -396,6 +396,11 @@ const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
                       On Hold
                     </button>
                   )}
+                  {userDetails?.status === "OnHold" && (
+                    <button onClick={() => handleVStatus("Recommended")}>
+                      Mark as Recommended
+                    </button>
+                  )}
                   {userDetails?.status === "Recommended" && (
                     <button onClick={() => handleVStatus("Active")}>
                       Mark Active
@@ -405,6 +410,21 @@ const VolunteerDetails = (props, { onStatusUpdate, handleClose }) => {
                     <button onClick={() => handleVStatus("Active")}>
                       {" "}
                       Make Active
+                    </button>
+                  )}
+                  {userDetails?.status === "Active" && (
+                    <button onClick={() => handleVStatus("Inactive")}>
+                      Mark as Inactive
+                    </button>
+                  )}
+                  {userDetails?.status === "Inactive" && (
+                    <button onClick={() => handleVStatus("Recommended")}>
+                      Mark as Recommended
+                    </button>
+                  )}
+                  {userDetails?.status === "Inactive" && (
+                    <button onClick={() => handleVStatus("Active")}>
+                      Mark Active
                     </button>
                   )}
                   {userDetails?.status === "Register" && (
