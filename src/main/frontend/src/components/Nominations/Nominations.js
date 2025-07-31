@@ -186,7 +186,7 @@ const Nominations = ({ needData, openPopup }) => {
           setInfoPopup(true);
           // Fetch volunteer's nomination history
           axios
-            .get(`https://serve-v1.evean.net/api/v1/serve-fulfill/nomination/${row.original.nominatedUserId}?page=0&size=10`)
+            .get(`${configData.SERVE_FULFILL}/nomination/${row.original.nominatedUserId}?page=0&size=10`)
             .then((response) => {
               const nominations = response.data;
               // Fetch entity names for each nomination through the chain: need → entity → entity name
