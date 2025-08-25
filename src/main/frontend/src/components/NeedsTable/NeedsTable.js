@@ -27,6 +27,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { fetchNeeds } from "../../state/needSlice.js";
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import { formatEntityName } from "../../utils/entityNameFormatter";
 const configData = require("../../configure.js");
 
 export const NeedsTable = ({ props, filterByEntity }) => {
@@ -129,7 +130,11 @@ export const NeedsTable = ({ props, filterByEntity }) => {
     { Header: "Need Name", accessor: "need.name", width: 250 },
     { Header: "Need Type", accessor: "needType.name" },
     { Header: "Location", accessor: "entity.district" },
-    { Header: "Entity", accessor: "entity.name" },
+    { 
+      Header: "Entity", 
+      accessor: "entity.name",
+      Cell: ({ value }) => formatEntityName(value)
+    },
     {
       Header: "Volunteer",
       accessor: "need.id",
@@ -157,7 +162,11 @@ export const NeedsTable = ({ props, filterByEntity }) => {
 
   const nAdminCOLUMNS = [
     { Header: "Need Name", accessor: "need.name", width: 250 },
-    { Header: "Entity", accessor: "entity.name" },
+    { 
+      Header: "Entity", 
+      accessor: "entity.name",
+      Cell: ({ value }) => formatEntityName(value)
+    },
     {
       Header: "Volunteer",
       accessor: "need.id",

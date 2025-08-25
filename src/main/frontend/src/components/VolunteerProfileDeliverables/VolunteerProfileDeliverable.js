@@ -7,6 +7,7 @@ import NeedsImage from "../../assets/fileIcon.png";
 import { format } from "date-fns";
 import CloseIcon from "@mui/icons-material/Close";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
+import { formatEntityName } from "../../utils/entityNameFormatter";
 
 const configData = require("../../configure.js");
 const currentDate = format(new Date(), "yyyy-MM-dd");
@@ -119,6 +120,9 @@ const VolunteerProfileDeliverable = (props) => {
         const response = await axios.get(
           `${configData.NEEDPLAN_DELIVERABLES}/${planId}`
         );
+        console.log("Need Plan Deliverables Response:", response.data);
+        console.log("Input Parameters:", response.data.inputParameters);
+        console.log("Need Deliverables:", response.data.needDeliverable);
         setDeliverables(response.data.needDeliverable);
         setInParas(response.data.inputParameters);
       } catch (error) {
@@ -290,6 +294,7 @@ const VolunteerProfileDeliverable = (props) => {
     return hours + dateTimeString.slice(13, 16) + ampm;
   };
 
+  // Helper function to format entity name and separate UDISE codes
   const REJECTION_REASONS = [
     "Network Issue",
     "Power Cut",
@@ -297,376 +302,459 @@ const VolunteerProfileDeliverable = (props) => {
     "Volunteer Not Available"
   ];
 
+  // Helper function to check if a date is in the future
+  const isFutureDate = (dateString) => {
+    if (!dateString) return false;
+    const deliverableDate = new Date(dateString);
+    const currentDate = new Date();
+    // Reset time to start of day for accurate comparison
+    currentDate.setHours(0, 0, 0, 0);
+    deliverableDate.setHours(0, 0, 0, 0);
+    return deliverableDate > currentDate;
+  };
+
+  // Helper to safely show description without trimming content
+  const formatDescription = (htmlString) => {
+    if (!htmlString) return "";
+    // Remove wrapping <p> tags if present, but keep full text
+    return htmlString.replace(/^<p>/i, "").replace(/<\/p>$/i, "").trim();
+  };
+
   const [beneficsError, setBeneficsError] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Check if data is loaded
+  const isDataLoaded = needsList.length > 0 && needFulfils.length > 0;
 
   return (
     <div>
-      {/* NEED INFORMATION */}
-      <div className="detailsNeedVoluntProfile">
-        <div className="nameNVP">{needById[props.needId]?.name}</div>
-        <div className="typeNVP">
-          {needTypeById[needById[props.needId]?.needTypeId]}
-        </div>
-        <div className="aboutNVP">
-          {needById[props.needId]?.description.slice(3, -4)}
-        </div>
-        <div className="rowNVP">
-          <div className="itemNVP">
-            <span>Coordinator Name :</span>{" "}
-            {ncoordInfo.length ? ncoordInfo[0]?.identityDetails?.fullname : ""}
-          </div>
-          <div className="itemNVP">
-            <span>Entity :</span> {entityById[props.needId]}
-          </div>
-        </div>
-        {/* Coordinator Contact Row */}
-        <div className="rowNVP">
-          <div className="itemNVP">
-            <span>Coordinator Email :</span>{" "}
-            {ncoordInfo.length ? ncoordInfo[0]?.contactDetails?.email : ""}
-          </div>
-          <div className="itemNVP">
-            <span>Coordinator Mobile :</span>{" "}
-            {ncoordInfo.length ? ncoordInfo[0]?.contactDetails?.mobile : ""}
-          </div>
-        </div>
-        <div className="rowNVP">
-          <div className="itemNVP">
-            <span>Start Date :</span>
-            {occurrenceById[props.needId]
-              ? occurrenceById[props.needId]?.startDate.slice(0, 10)
-              : ""}
-          </div>
-          <div className="itemNVP">
-            <span>End Date : </span>
-            {occurrenceById[props.needId]
-              ? occurrenceById[props.needId]?.endDate.slice(0, 10)
-              : ""}
-          </div>
-        </div>
-        <div className="rowNVP">
-          <div className="itemNVP">
-            <span>Time :</span>{" "}
-            {inParas.length
-              ? formatTime(inParas[0]?.startTime) +
-                " - " +
-                formatTime(inParas[0]?.endTime)
-              : ""}
-          </div>
-          <div className="itemNVP">
-            <span>Content Resources: </span>
-            {inParas.length && inParas[0]?.resourceUrl ? (
-              <a
-                href={inParas[0]?.resourceUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Resource Link
-              </a>
-            ) : (
-              <a href="https://serve-jcms.evean.net/home/view_course/">
-                {" "}
-                View{" "}
-              </a>
-            )}
-          </div>
-        </div>
-        <div className="rowNVP">
-          <div className="itemNVP">
-            <span>Platform :</span>
-            {inParas.length && inParas[0]?.softwarePlatform
-              ? inParas[0].inputUrl === "To be added soon"
-                ? "Available Shortly"
-                : inParas[0].softwarePlatform
-              : ""}
-          </div>
-          <div className="itemNVP">
-            <span>URL: </span>
-            {inParas.length &&
-            inParas[0].inputUrl &&
-            inParas[0].inputUrl !== "To be added soon" ? (
-              <a
-                href={inParas[0].inputUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Session Link
-              </a>
-            ) : (
-              <span>Available Shortly</span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* NEED PLAN DELIVERABLES*/}
-      <div className="deliverablesNeedVolunteerProfile">
-        {/*DNVP refer to Need Plan Deliverables from Volunteer Profile*/}
-        <div className="headDNVP">
-          Need Plan Deliverables
-          <div className="monthFilterContainer">
-            <div className="selectMonth">
-              <i className="nSortDateIcon">
-                <CalendarTodayIcon
-                  style={{ fontSize: "18px", margin: "0px 3px" }}
-                />
-              </i>
-              <select
-                className="selectMonthType"
-                value={selectedMonth}
-                onChange={handleMonthFilter}
-              >
-                <option value="">All Months</option>
-                {monthOptions}
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-      {deliverables.length ? (
-        <div className="listDNVP">
-          <div className="listDNVPbox">
-            <button className="todoDNVP">To-Do</button>
-            <div>
-              {todoDeliverables &&
-                todoDeliverables.map((item, index) => (
-                  <div key={index} className="deliverable-container">
-                    <div className="deliverable-title">
-                      <div>
-                        <img
-                          src={NeedsImage}
-                          alt="Nominated Needs"
-                          width="20px"
-                        />
-                      </div>
-                      <div>
-                        {needById[props.needId].name}: Session {index + 1}
-                      </div>
-                    </div>
-                    <div className="date-deliverable">
-                      <div>Due {item.deliverableDate}</div>
-                      <div>
-                        <button
-                          className="button-dstat"
-                          onClick={() => {
-                            setSelectedIndex(index);
-                            setClickMarker(!clickMarker);
-                          }}
-                        >
-                          <MoreVertIcon
-                            style={{ color: "black", fontSize: "16px" }}
-                          />
-                        </button>
-                      </div>
-                    </div>
-                    {index === selectedIndex && clickMarker && (
-                      <div ref={divRef} className="status-ticker">
-                        <button
-                          className="delstat-complete"
-                          onClick={() => handleCompleted(item, index + 1)}
-                        >
-                          Mark as Completed
-                        </button>
-                        <button
-                          className="delstat-cancel"
-                          onClick={() => handleCancel(item, index + 1)}
-                        >
-                          Cancel Plan
-                        </button>
-                      </div>
-                    )}
-
-                    {/* CANCEL popup */}
-                    {cancelPopup && (
-                      <div className="wrap-cpopup">
-                        <div className="inwrap-cpopup">
-                          <div className="cpopup">
-                            <div className="topbar-cpopup">
-                              <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Reason for Cancelling</div>
-                              <div>
-                                <button
-                                  className="cancel-button"
-                                  onClick={() => setCancelPopup("")}
-                                >
-                                  <div className="close-cpopup">
-                                    <CloseIcon style={{ height: "20px" }} />
-                                  </div>
-                                </button>
-                              </div>
-                            </div>
-                            <div className="title-cancel">
-                              {needById[props.needId].name}: Session {cindex}
-                            </div>
-                            <div className="wrap-reasonbox">
-                              <label>Reason</label>
-                              <select
-                                className="reject-reason"
-                                value={rejection}
-                                onChange={e => { setRejection(e.target.value); setRejectionError(""); }}
-                                required
-                              >
-                                <option value="">Select Reason</option>
-                                {REJECTION_REASONS.map((reason) => (
-                                  <option key={reason} value={reason}>{reason}</option>
-                                ))}
-                              </select>
-                             {rejectionError && (
-                               <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{rejectionError}</div>
-                             )}
-                            </div>
-                            <div className="cancel-buttons">
-                              <button
-                                className="reject-cancel-button"
-                                onClick={() => setCancelPopup("")}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                className="reject-confirm-button"
-                                onClick={() => {
-                                  if (!rejection) {
-                                    setRejectionError("Please select a reason for cancelling.");
-                                    return;
-                                  }
-                                  confirmRejection(item);
-                                }}
-                              >
-                                Confirm
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* COMPLETE popup */}
-                    {completePopup && (
-                      <div className="wrap-cpopup">
-                        <div className="inwrap-cpopup">
-                          <div className="cpopup">
-                            <div className="topbar-cpopup">
-                              <label>Confirmation</label>
-                              <div>
-                                <button
-                                  className="cancel-button"
-                                  onClick={() => setCompletePopup("")}
-                                >
-                                  <div className="close-cpopup">
-                                    <CloseIcon style={{ height: "20px" }} />
-                                  </div>
-                                </button>
-                              </div>
-                            </div>
-                            <div className="title-cancel">
-                              {needById[props.needId].name}: Session {cindex}
-                            </div>
-                            <div className="wrap-reasonbox">
-                              <label>Comments/Notes</label>
-                              <textarea
-                                className="reject-reason"
-                                value={notes}
-                                onChange={handleNotes}
-                                rows={4}
-                                cols={60}
-                                placeholder="Write comments or notes on the need plan deliverable"
-                              ></textarea>
-                            </div>
-                            <div className="wrap-beneficbox">
-                              <label>Students attended</label>
-                              <input
-                                type="number"
-                                name="numBenfics"
-                                value={numBenefics || ""}
-                                onChange={e => { setNumBenefics(e.target.value); setBeneficsError(""); }}
-                                min={0}
-                                required
-                              />
-                              {beneficsError && (
-                                <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{beneficsError}</div>
-                              )}
-                            </div>
-                            <div className="cancel-buttons">
-                              <button
-                                className="reject-cancel-button"
-                                onClick={() => setCompletePopup("")}
-                              >
-                                Cancel
-                              </button>
-                              <button
-                                className="reject-confirm-button"
-                                onClick={() => {
-                                  if (!numBenefics || isNaN(numBenefics) || Number(numBenefics) < 0) {
-                                    setBeneficsError("Please enter the number of students attended.");
-                                    return;
-                                  }
-                                  confirmCompleted(item, cindex);
-                                }}
-                              >
-                                Confirm
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-            </div>
-          </div>
-          <div className="listDNVPbox">
-            <button className="completedDNVP">Completed</button>
-            <div>
-              {completedDeliverables &&
-                completedDeliverables.map((item, index) => (
-                  <div key={index} className="deliverable-container">
-                    <div className="deliverable-title">
-                      <div>
-                        <img
-                          src={NeedsImage}
-                          alt="Nominated Needs"
-                          width="20px"
-                        />
-                      </div>
-                      <div>
-                        {needById[props.needId].name}: Session {index + 1}
-                      </div>
-                    </div>
-                    <div className="date-completed-deliverable">
-                      Completed on {item.deliverableDate}
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-          <div className="listDNVPbox">
-            <button className="canceledDNVP">Canceled</button>
-            {cancelledDeliverables &&
-              cancelledDeliverables.map((item, index) => (
-                <div key={index} className="deliverable-container">
-                  <div className="deliverable-title">
-                    <div>
-                      <img
-                        src={NeedsImage}
-                        alt="Nominated Needs"
-                        width="20px"
-                      />
-                    </div>
-                    <div>
-                      {needById[props.needId].name}: Session {index + 1}
-                    </div>
-                  </div>
-                  <div className="date-completed-deliverable">
-                    Cancelled on {item.deliverableDate}
-                  </div>
-                </div>
-              ))}
-          </div>
+      {!isDataLoaded ? (
+        <div className="loading-state">
+          <div className="loading-spinner"></div>
+          <p>Loading need information...</p>
         </div>
       ) : (
-        <div className="deliverable-unapproved">
-          Need is yet to be approved, Coordinator will get in touch with you
-          soon
-        </div>
+        <>
+          {/* NEED INFORMATION */}
+          <div className="detailsNeedVoluntProfile">
+            {/* Header Section */}
+            <div className="need-header-section">
+              <div className="need-title-section">
+                <div className="nameNVP">{needById[props.needId]?.name}</div>
+                <div className="typeNVP">
+                  {needTypeById[needById[props.needId]?.needTypeId]}
+                </div>
+              </div>
+              <div className="aboutNVP">
+                {formatDescription(needById[props.needId]?.description)}
+              </div>
+            </div>
+
+            {/* Information Grid */}
+            <div className="need-info-grid">
+              {/* Basic Details Section */}
+              <div className="info-section">
+                <div className="info-section-title">Basic Details</div>
+                <div className="info-item">
+                  <span className="info-label">Entity Name:</span>
+                  <span className="info-value">
+                    {formatEntityName(entityById[props.needId]) || "Not Available"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Start Date:</span>
+                  <span className="info-value">
+                    {occurrenceById[props.needId]?.startDate
+                      ? occurrenceById[props.needId].startDate.slice(0, 10)
+                      : "Not Available"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">End Date:</span>
+                  <span className="info-value">
+                    {occurrenceById[props.needId]?.endDate
+                      ? occurrenceById[props.needId].endDate.slice(0, 10)
+                      : "Not Available"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Time:</span>
+                  <span className="info-value">
+                    {inParas.length && inParas[0]?.startTime && inParas[0]?.endTime
+                      ? formatTime(inParas[0].startTime) +
+                        " - " +
+                        formatTime(inParas[0].endTime)
+                      : "Not Available"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Coordinator Information Section */}
+              <div className="info-section">
+                <div className="info-section-title">Coordinator Information</div>
+                <div className="info-item">
+                  <span className="info-label">Name:</span>
+                  <span className="info-value">
+                    {ncoordInfo.length && ncoordInfo[0]?.identityDetails?.fullname 
+                      ? ncoordInfo[0].identityDetails.fullname 
+                      : "Not Available"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Email:</span>
+                  <span className="info-value email">
+                    {ncoordInfo.length && ncoordInfo[0]?.contactDetails?.email 
+                      ? ncoordInfo[0].contactDetails.email 
+                      : "Not Available"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Mobile:</span>
+                  <span className="info-value mobile">
+                    {ncoordInfo.length && ncoordInfo[0]?.contactDetails?.mobile 
+                      ? ncoordInfo[0].contactDetails.mobile 
+                      : "Not Available"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Session Details Section */}
+              <div className="info-section">
+                <div className="info-section-title">Session Details</div>
+                <div className="info-item">
+                  <span className="info-label">Platform:</span>
+                  <span className="info-value">
+                    {inParas.length && inParas[0]?.softwarePlatform
+                      ? inParas[0].softwarePlatform
+                      : "Available Shortly"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Session URL:</span>
+                  <span className="info-value">
+                    {inParas.length && inParas[0]?.inputUrl && inParas[0].inputUrl !== "To be added soon" ? (
+                      <a
+                        href={inParas[0].inputUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Session Link
+                      </a>
+                    ) : (
+                      "Available Shortly"
+                    )}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Content:</span>
+                  <span className="info-value">
+                    {inParas.length && inParas[0]?.resourceUrl ? (
+                      <a
+                        href={inParas[0]?.resourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Resource Link
+                      </a>
+                    ) : (
+                      <a 
+                        href="https://serve-jcms.evean.net/home/view_course/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        View Course
+                      </a>
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* NEED PLAN DELIVERABLES*/}
+          <div className="deliverablesNeedVolunteerProfile">
+            {/*DNVP refer to Need Plan Deliverables from Volunteer Profile*/}
+            <div className="headDNVP">
+              Need Plan Deliverables
+              <div className="monthFilterContainer">
+                <div className="selectMonth">
+                  <i className="nSortDateIcon">
+                    <CalendarTodayIcon
+                      style={{ fontSize: "18px", margin: "0px 3px" }}
+                    />
+                  </i>
+                  <select
+                    className="selectMonthType"
+                    value={selectedMonth}
+                    onChange={handleMonthFilter}
+                  >
+                    <option value="">All Months</option>
+                    {monthOptions}
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          {deliverables.length ? (
+            <div className="listDNVP">
+              <div className="listDNVPbox">
+                <button className="todoDNVP">To-Do</button>
+                <div>
+                  {todoDeliverables &&
+                    todoDeliverables.map((item, index) => (
+                      <div key={index} className="deliverable-container">
+                        <div className="deliverable-title">
+                          <div>
+                            <img
+                              src={NeedsImage}
+                              alt="Nominated Needs"
+                              width="20px"
+                            />
+                          </div>
+                          <div>
+                            {needById[props.needId].name}: Session {index + 1}
+                          </div>
+                        </div>
+                        <div className="date-deliverable">
+                          <div>Due {item.deliverableDate}</div>
+                          <div>
+                            <button
+                              className={`button-dstat ${isFutureDate(item.deliverableDate) ? 'future-date-disabled' : ''}`}
+                              onClick={() => {
+                                if (!isFutureDate(item.deliverableDate)) {
+                                  setSelectedIndex(index);
+                                  setClickMarker(!clickMarker);
+                                }
+                              }}
+                              title={isFutureDate(item.deliverableDate) ? "Cannot update future schedules" : "More options"}
+                            >
+                              <MoreVertIcon
+                                style={{ 
+                                  color: isFutureDate(item.deliverableDate) ? "#ccc" : "black", 
+                                  fontSize: "16px" 
+                                }}
+                              />
+                            </button>
+                          </div>
+                        </div>
+                        {index === selectedIndex && clickMarker && (
+                          <div ref={divRef} className="status-ticker">
+                            {isFutureDate(item.deliverableDate) ? (
+                              <div className="future-date-warning">
+                                Cannot update future schedules
+                              </div>
+                            ) : (
+                              <>
+                                <button
+                                  className="delstat-complete"
+                                  onClick={() => handleCompleted(item, index + 1)}
+                                >
+                                  Mark as Completed
+                                </button>
+                                <button
+                                  className="delstat-cancel"
+                                  onClick={() => handleCancel(item, index + 1)}
+                                >
+                                  Cancel Plan
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        )}
+
+                        {/* CANCEL popup */}
+                        {cancelPopup && (
+                          <div className="wrap-cpopup">
+                            <div className="inwrap-cpopup">
+                              <div className="cpopup">
+                                <div className="topbar-cpopup">
+                                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Reason for Cancelling</div>
+                                  <div>
+                                    <button
+                                      className="cancel-button"
+                                      onClick={() => setCancelPopup("")}
+                                    >
+                                      <div className="close-cpopup">
+                                        <CloseIcon style={{ height: "20px" }} />
+                                      </div>
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="title-cancel">
+                                  {needById[props.needId].name}: Session {cindex}
+                                </div>
+                                <div className="wrap-reasonbox">
+                                  <label>Reason</label>
+                                  <select
+                                    className="reject-reason"
+                                    value={rejection}
+                                    onChange={e => { setRejection(e.target.value); setRejectionError(""); }}
+                                    required
+                                  >
+                                    <option value="">Select Reason</option>
+                                    {REJECTION_REASONS.map((reason) => (
+                                      <option key={reason} value={reason}>{reason}</option>
+                                    ))}
+                                  </select>
+                                 {rejectionError && (
+                                   <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{rejectionError}</div>
+                                 )}
+                                </div>
+                                <div className="cancel-buttons">
+                                  <button
+                                    className="reject-cancel-button"
+                                    onClick={() => setCancelPopup("")}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    className="reject-confirm-button"
+                                    onClick={() => {
+                                      if (!rejection) {
+                                        setRejectionError("Please select a reason for cancelling.");
+                                        return;
+                                      }
+                                      confirmRejection(item);
+                                    }}
+                                  >
+                                    Confirm
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* COMPLETE popup */}
+                        {completePopup && (
+                          <div className="wrap-cpopup">
+                            <div className="inwrap-cpopup">
+                              <div className="cpopup">
+                                <div className="topbar-cpopup">
+                                  <label>Confirmation</label>
+                                  <div>
+                                    <button
+                                      className="cancel-button"
+                                      onClick={() => setCompletePopup("")}
+                                    >
+                                      <div className="close-cpopup">
+                                        <CloseIcon style={{ height: "20px" }} />
+                                      </div>
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className="title-cancel">
+                                  {needById[props.needId].name}: Session {cindex}
+                                </div>
+                                <div className="wrap-reasonbox">
+                                  <label>Comments/Notes</label>
+                                  <textarea
+                                    className="reject-reason"
+                                    value={notes}
+                                    onChange={handleNotes}
+                                    rows={4}
+                                    cols={60}
+                                    placeholder="Write comments or notes on the need plan deliverable"
+                                  ></textarea>
+                                </div>
+                                <div className="wrap-beneficbox">
+                                  <label>Students attended</label>
+                                  <input
+                                    type="number"
+                                    name="numBenfics"
+                                    value={numBenefics || ""}
+                                    onChange={e => { setNumBenefics(e.target.value); setBeneficsError(""); }}
+                                    min={0}
+                                    required
+                                  />
+                                  {beneficsError && (
+                                    <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{beneficsError}</div>
+                                  )}
+                                </div>
+                                <div className="cancel-buttons">
+                                  <button
+                                    className="reject-cancel-button"
+                                    onClick={() => setCompletePopup("")}
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    className="reject-confirm-button"
+                                    onClick={() => {
+                                      if (!numBenefics || isNaN(numBenefics) || Number(numBenefics) < 0) {
+                                        setBeneficsError("Please enter the number of students attended.");
+                                        return;
+                                      }
+                                      confirmCompleted(item, cindex);
+                                    }}
+                                  >
+                                    Confirm
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <div className="listDNVPbox">
+                <button className="completedDNVP">Completed</button>
+                <div>
+                  {completedDeliverables &&
+                    completedDeliverables.map((item, index) => (
+                      <div key={index} className="deliverable-container">
+                        <div className="deliverable-title">
+                          <div>
+                            <img
+                              src={NeedsImage}
+                              alt="Nominated Needs"
+                              width="20px"
+                            />
+                          </div>
+                          <div>
+                            {needById[props.needId].name}: Session {index + 1}
+                          </div>
+                        </div>
+                        <div className="date-completed-deliverable">
+                          Completed on {item.deliverableDate}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <div className="listDNVPbox">
+                <button className="canceledDNVP">Canceled</button>
+                {cancelledDeliverables &&
+                  cancelledDeliverables.map((item, index) => (
+                    <div key={index} className="deliverable-container">
+                      <div className="deliverable-title">
+                        <div>
+                          <img
+                            src={NeedsImage}
+                            alt="Nominated Needs"
+                            width="20px"
+                          />
+                        </div>
+                        <div>
+                          {needById[props.needId].name}: Session {index + 1}
+                        </div>
+                      </div>
+                      <div className="date-completed-deliverable">
+                        Cancelled on {item.deliverableDate}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          ) : (
+            <div className="deliverable-unapproved">
+              Need is yet to be approved, Coordinator will get in touch with you
+              soon
+            </div>
+          )}
+        </>
       )}
     </div>
   );

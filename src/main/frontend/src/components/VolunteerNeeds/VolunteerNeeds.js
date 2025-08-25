@@ -11,6 +11,7 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useSelector } from 'react-redux'
 import DateRangeIcon from '@mui/icons-material/DateRange';
+import { formatEntityName } from '../../utils/entityNameFormatter';
 
 export const VolunteerNeeds = props => {
   const needList = useSelector((state) => state.need.data);
@@ -140,7 +141,7 @@ export const VolunteerNeeds = props => {
                 </div>
                 <div className="location-container gray-text">
                     <LocationOnOutlinedIcon style={{ fontSize: 15 }} />
-                    <span>{(item.entity && item.entity.name) ? item.entity.name : ''}</span>
+                    {formatEntityName(item.entity && item.entity.name)}
                 </div>
                 <div className="location-vrequired">
                   <div className="location-container gray-text">
