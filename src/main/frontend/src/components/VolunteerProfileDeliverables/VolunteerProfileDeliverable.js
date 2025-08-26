@@ -95,14 +95,20 @@ const VolunteerProfileDeliverable = (props) => {
 
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [clickMarker, setClickMarker] = useState(false); //for three dots
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [cancelPopup, setCancelPopup] = useState("");
   const [completePopup, setCompletePopup] = useState("");
+  const [reschedulePopup, setReschedulePopup] = useState("");
   const [rejection, setRejection] = useState("");
   const [sessionData, setSessionData] = useState();
+  const [rescheduleDate, setRescheduleDate] = useState("");
+  const [rescheduleError, setRescheduleError] = useState("");
+  const [rescheduleSuccess, setRescheduleSuccess] = useState("");
 
   const [todoDeliverables, setTodoDeliverables] = useState(null);
   const [completedDeliverables, setCompletedDeliverables] = useState(null);
   const [cancelledDeliverables, setCancelledDeliverables] = useState(null);
+  const [rescheduledDeliverables, setRescheduledDeliverables] = useState(null);
   const [dstat, setDstat] = useState(false);
   const [rejectionError, setRejectionError] = useState("");
 
@@ -130,7 +136,7 @@ const VolunteerProfileDeliverable = (props) => {
       }
     };
     fetchData();
-  }, [planId, clickMarker, rejection, cancelPopup, dstat]);
+  }, [planId, rejection, cancelPopup, completePopup, reschedulePopup, dstat]);
 
   useEffect(() => {
     const filteredDeliverables = filterDeliverablesByMonth(
@@ -155,6 +161,13 @@ const VolunteerProfileDeliverable = (props) => {
       filteredDeliverables &&
         filteredDeliverables.filter((item) => item.status === "Cancelled")
     );
+    setRescheduledDeliverables(
+      filteredDeliverables &&
+        filteredDeliverables.filter((item) => 
+          item.status === "Rescheduled" || 
+          item.status === "InProgress"
+        )
+    );
   }, [deliverables, selectedMonth, dstat]); // Depend on both deliverables and selectedMonth
 
   const handleMonthFilter = (e) => {
@@ -170,24 +183,42 @@ const VolunteerProfileDeliverable = (props) => {
   const [cindex, setCIndex] = useState(""); //display on popup
 
   const handleCancel = (item, index) => {
-    setClickMarker(!clickMarker);
-    setCancelPopup(item); //for popup to appear
+    console.log("Cancel clicked for item:", item);
+    console.log("Setting cancelPopup to:", item);
+    console.log("Setting cindex to:", index);
+    
+    // Reset all dropdown states immediately
+    setClickMarker(false);
+    setIsDropdownOpen(false);
+    setSelectedIndex(null);
+    
+    // Set modal states
+    setCancelPopup(item);
     setCIndex(index);
     setSessionData(item);
+    
+    console.log("States set, cancelPopup should now be:", item);
   };
   const handleChange = (e) => {
     setRejection(e.target.value);
   };
   //const confirmRejection = (item) => {}
   const confirmRejection = (item) => {
-    setRejection("");
-    setCancelPopup("");
+    console.log("confirmRejection called with item:", item);
+    console.log("Current rejection value:", rejection);
+    
+    if (!rejection) {
+      setRejectionError("Please select a reason for cancelling.");
+      return;
+    }
+    
     console.log({
       needPlanId: planId,
       comments: sessionData.comments,
       status: "Cancelled",
       deliverableDate: sessionData.deliverableDate,
     });
+    
     axios
       .put(`${configData.NEEDPLAN_DELIVERABLES}/update/${sessionData.id}`, {
         needPlanId: planId,
@@ -196,13 +227,15 @@ const VolunteerProfileDeliverable = (props) => {
         deliverableDate: sessionData.deliverableDate,
       })
       .then((response) => {
-        console.log("Deliverable Completed");
+        console.log("Deliverable Cancelled");
+        setRejection("");
+        setCancelPopup("");
         setDstat(!dstat);
       })
       .catch((error) => {
-        console.log("Error marking deliverable completed");
+        console.log("Error marking deliverable cancelled");
+        setRejectionError("Failed to cancel session. Please try again.");
       });
-    console.log(rejection);
   };
 
   const [numBenefics, setNumBenefics] = useState(null);
@@ -215,10 +248,42 @@ const VolunteerProfileDeliverable = (props) => {
   };
 
   const handleCompleted = (item, index) => {
-    setClickMarker(!clickMarker);
+    console.log("Complete clicked for item:", item);
+    console.log("Setting completePopup to:", item);
+    console.log("Setting cindex to:", index);
+    
+    // Reset all dropdown states immediately
+    setClickMarker(false);
+    setIsDropdownOpen(false);
+    setSelectedIndex(null);
+    
+    // Set modal states
     setCompletePopup(item);
     setCIndex(index);
     setSessionData(item);
+    
+    console.log("States set, completePopup should now be:", item);
+  };
+
+  const handleReschedule = (item, index) => {
+    console.log("Reschedule clicked for item:", item);
+    console.log("Setting reschedulePopup to:", item);
+    console.log("Setting cindex to:", index);
+    
+    // Reset all dropdown states immediately
+    setClickMarker(false);
+    setIsDropdownOpen(false);
+    setSelectedIndex(null);
+    
+    // Set modal states
+    setReschedulePopup(item);
+    setCIndex(index);
+    setSessionData(item);
+    setRescheduleDate("");
+    setRescheduleError("");
+    setRescheduleSuccess("");
+    
+    console.log("States set, reschedulePopup should now be:", item);
   };
 
   const confirmCompleted = () => {
@@ -269,11 +334,84 @@ const VolunteerProfileDeliverable = (props) => {
       });
   };
 
+  const confirmReschedule = () => {
+    console.log("confirmReschedule called with date:", rescheduleDate);
+    console.log("sessionData:", sessionData);
+    
+    if (!rescheduleDate) {
+      setRescheduleError("Please select a rescheduled date.");
+      return;
+    }
+
+    const selectedDate = new Date(rescheduleDate);
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate <= currentDate) {
+      setRescheduleError("Please select a future date for rescheduling.");
+      return;
+    }
+
+    setRescheduleError("");
+    setReschedulePopup("");
+
+    // First, update the original session to "InProgress" status
+    axios
+      .put(`${configData.NEEDPLAN_DELIVERABLES}/update/${sessionData.id}`, {
+        needPlanId: planId,
+        comments: `Session rescheduled to ${rescheduleDate}`,
+        status: "Rescheduled", // Change original session to InProgress
+        deliverableDate: sessionData.deliverableDate, // Keep original date unchanged
+      })
+      .then((response) => {
+        console.log("Original session updated to Rescheduled status");
+        
+        // Then, create a new need deliverable with status "Planned"
+        return axios.post(`${configData.NEEDPLAN_DELIVERABLES}/create`, {
+          needPlanId: planId,
+          comments: `Rescheduled session from ${sessionData.deliverableDate}`,
+          status: "Planned",
+          deliverableDate: rescheduleDate,
+        });
+      })
+      .then((response) => {
+        console.log("New deliverable created for rescheduled session");
+        const newDeliverable = response.data;
+        
+        // Then, create input parameters for the new session
+        return axios.post(`${configData.SERVE_NEED}/deliverable-input/create`, {
+          needDeliverableId: newDeliverable.id,
+          startTime: `${rescheduleDate}T00:00:00.000Z`,
+          endTime: `${rescheduleDate}T23:59:59.000Z`
+        });
+      })
+      .then((response) => {
+        console.log("Input parameters created for rescheduled session");
+        
+        // Show success message
+        setRescheduleSuccess("Session rescheduled successfully!");
+        
+        // Refresh the data to show the changes
+        setDstat(!dstat);
+        
+        // Clear success message after 3 seconds
+        setTimeout(() => setRescheduleSuccess(""), 3000);
+      })
+      .catch((error) => {
+        console.log("Error rescheduling session", error);
+        setRescheduleError("Failed to reschedule session. Please try again.");
+      });
+  };
+
   const divRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (divRef.current && !divRef.current.contains(event.target)) {
+        // Reset all dropdown states
         setClickMarker(false);
+        setIsDropdownOpen(false);
+        setSelectedIndex(null);
       }
     };
 
@@ -328,6 +466,8 @@ const VolunteerProfileDeliverable = (props) => {
 
   return (
     <div>
+
+      
       {!isDataLoaded ? (
         <div className="loading-state">
           <div className="loading-spinner"></div>
@@ -499,6 +639,9 @@ const VolunteerProfileDeliverable = (props) => {
             <div className="listDNVP">
               <div className="listDNVPbox">
                 <button className="todoDNVP">To-Do</button>
+                {todoDeliverables && todoDeliverables.length > 0 && (
+                  <div className="column-count">{todoDeliverables.length}</div>
+                )}
                 <div>
                   {todoDeliverables &&
                     todoDeliverables.map((item, index) => (
@@ -517,13 +660,25 @@ const VolunteerProfileDeliverable = (props) => {
                         </div>
                         <div className="date-deliverable">
                           <div>Due {item.deliverableDate}</div>
+                          {item.comments && item.comments.includes("Rescheduled session from") && (
+                            <div className="reschedule-comment">
+                              {item.comments}
+                            </div>
+                          )}
                           <div>
                             <button
                               className={`button-dstat ${isFutureDate(item.deliverableDate) ? 'future-date-disabled' : ''}`}
                               onClick={() => {
                                 if (!isFutureDate(item.deliverableDate)) {
-                                  setSelectedIndex(index);
-                                  setClickMarker(!clickMarker);
+                                  // If clicking on the same item, toggle the dropdown
+                                  if (selectedIndex === index && isDropdownOpen) {
+                                    setIsDropdownOpen(false);
+                                    setClickMarker(false);
+                                  } else {
+                                    setSelectedIndex(index);
+                                    setIsDropdownOpen(true);
+                                    setClickMarker(true);
+                                  }
                                 }
                               }}
                               title={isFutureDate(item.deliverableDate) ? "Cannot update future schedules" : "More options"}
@@ -537,7 +692,7 @@ const VolunteerProfileDeliverable = (props) => {
                             </button>
                           </div>
                         </div>
-                        {index === selectedIndex && clickMarker && (
+                        {index === selectedIndex && isDropdownOpen && (
                           <div ref={divRef} className="status-ticker">
                             {isFutureDate(item.deliverableDate) ? (
                               <div className="future-date-warning">
@@ -552,6 +707,12 @@ const VolunteerProfileDeliverable = (props) => {
                                   Mark as Completed
                                 </button>
                                 <button
+                                  className="delstat-reschedule"
+                                  onClick={() => handleReschedule(item, index + 1)}
+                                >
+                                  Reschedule
+                                </button>
+                                <button
                                   className="delstat-cancel"
                                   onClick={() => handleCancel(item, index + 1)}
                                 >
@@ -562,145 +723,16 @@ const VolunteerProfileDeliverable = (props) => {
                           </div>
                         )}
 
-                        {/* CANCEL popup */}
-                        {cancelPopup && (
-                          <div className="wrap-cpopup">
-                            <div className="inwrap-cpopup">
-                              <div className="cpopup">
-                                <div className="topbar-cpopup">
-                                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Reason for Cancelling</div>
-                                  <div>
-                                    <button
-                                      className="cancel-button"
-                                      onClick={() => setCancelPopup("")}
-                                    >
-                                      <div className="close-cpopup">
-                                        <CloseIcon style={{ height: "20px" }} />
-                                      </div>
-                                    </button>
-                                  </div>
-                                </div>
-                                <div className="title-cancel">
-                                  {needById[props.needId].name}: Session {cindex}
-                                </div>
-                                <div className="wrap-reasonbox">
-                                  <label>Reason</label>
-                                  <select
-                                    className="reject-reason"
-                                    value={rejection}
-                                    onChange={e => { setRejection(e.target.value); setRejectionError(""); }}
-                                    required
-                                  >
-                                    <option value="">Select Reason</option>
-                                    {REJECTION_REASONS.map((reason) => (
-                                      <option key={reason} value={reason}>{reason}</option>
-                                    ))}
-                                  </select>
-                                 {rejectionError && (
-                                   <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{rejectionError}</div>
-                                 )}
-                                </div>
-                                <div className="cancel-buttons">
-                                  <button
-                                    className="reject-cancel-button"
-                                    onClick={() => setCancelPopup("")}
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    className="reject-confirm-button"
-                                    onClick={() => {
-                                      if (!rejection) {
-                                        setRejectionError("Please select a reason for cancelling.");
-                                        return;
-                                      }
-                                      confirmRejection(item);
-                                    }}
-                                  >
-                                    Confirm
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* COMPLETE popup */}
-                        {completePopup && (
-                          <div className="wrap-cpopup">
-                            <div className="inwrap-cpopup">
-                              <div className="cpopup">
-                                <div className="topbar-cpopup">
-                                  <label>Confirmation</label>
-                                  <div>
-                                    <button
-                                      className="cancel-button"
-                                      onClick={() => setCompletePopup("")}
-                                    >
-                                      <div className="close-cpopup">
-                                        <CloseIcon style={{ height: "20px" }} />
-                                      </div>
-                                    </button>
-                                  </div>
-                                </div>
-                                <div className="title-cancel">
-                                  {needById[props.needId].name}: Session {cindex}
-                                </div>
-                                <div className="wrap-reasonbox">
-                                  <label>Comments/Notes</label>
-                                  <textarea
-                                    className="reject-reason"
-                                    value={notes}
-                                    onChange={handleNotes}
-                                    rows={4}
-                                    cols={60}
-                                    placeholder="Write comments or notes on the need plan deliverable"
-                                  ></textarea>
-                                </div>
-                                <div className="wrap-beneficbox">
-                                  <label>Students attended</label>
-                                  <input
-                                    type="number"
-                                    name="numBenfics"
-                                    value={numBenefics || ""}
-                                    onChange={e => { setNumBenefics(e.target.value); setBeneficsError(""); }}
-                                    min={0}
-                                    required
-                                  />
-                                  {beneficsError && (
-                                    <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{beneficsError}</div>
-                                  )}
-                                </div>
-                                <div className="cancel-buttons">
-                                  <button
-                                    className="reject-cancel-button"
-                                    onClick={() => setCompletePopup("")}
-                                  >
-                                    Cancel
-                                  </button>
-                                  <button
-                                    className="reject-confirm-button"
-                                    onClick={() => {
-                                      if (!numBenefics || isNaN(numBenefics) || Number(numBenefics) < 0) {
-                                        setBeneficsError("Please enter the number of students attended.");
-                                        return;
-                                      }
-                                      confirmCompleted(item, cindex);
-                                    }}
-                                  >
-                                    Confirm
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )}
+                        
                       </div>
                     ))}
                 </div>
               </div>
               <div className="listDNVPbox">
                 <button className="completedDNVP">Completed</button>
+                {completedDeliverables && completedDeliverables.length > 0 && (
+                  <div className="column-count">{completedDeliverables.length}</div>
+                )}
                 <div>
                   {completedDeliverables &&
                     completedDeliverables.map((item, index) => (
@@ -726,6 +758,9 @@ const VolunteerProfileDeliverable = (props) => {
               </div>
               <div className="listDNVPbox">
                 <button className="canceledDNVP">Canceled</button>
+                {cancelledDeliverables && cancelledDeliverables.length > 0 && (
+                  <div className="column-count">{cancelledDeliverables.length}</div>
+                )}
                 {cancelledDeliverables &&
                   cancelledDeliverables.map((item, index) => (
                     <div key={index} className="deliverable-container">
@@ -747,17 +782,242 @@ const VolunteerProfileDeliverable = (props) => {
                     </div>
                   ))}
               </div>
-            </div>
-          ) : (
-            <div className="deliverable-unapproved">
-              Need is yet to be approved, Coordinator will get in touch with you
-              soon
-            </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-};
+              {rescheduledDeliverables && rescheduledDeliverables.length > 0 && (
+                <div className="listDNVPbox">
+                  <button className="rescheduledDNVP">Rescheduled</button>
+                  <div className="column-count">{rescheduledDeliverables.length}</div>
+                  {rescheduledDeliverables.map((item, index) => (
+                    <div key={index} className="deliverable-container">
+                      <div className="deliverable-title">
+                        <div>
+                          <img
+                            src={NeedsImage}
+                            alt="Nominated Needs"
+                            width="20px"
+                          />
+                        </div>
+                        <div>
+                          {needById[props.needId].name}: Session {index + 1}
+                        </div>
+                      </div>
+                      <div className="date-completed-deliverable">
+                        {item.status === "Rescheduled" 
+                          ? `Rescheduled to ${item.comments ? item.comments.replace("Session rescheduled to ", "") : item.deliverableDate}` 
+                          : `Rescheduled on ${item.deliverableDate}`}
+                      </div>
+                      {item.status === "Rescheduled" && item.comments && item.comments.includes("Session rescheduled to") && (
+                        <div className="original-session-info">
+                          Original: {item.deliverableDate}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                             )}
+             </div>
+           ) : (
+             <div className="deliverable-unapproved">
+               Need is yet to be approved, Coordinator will get in touch with you
+               soon
+             </div>
+           )}
+
+           {/* MODALS - Rendered at component level */}
+           
+           {/* CANCEL popup */}
+           {cancelPopup && (
+             <div className="wrap-cpopup">
+               <div className="inwrap-cpopup">
+                 <div className="cpopup">
+                   <div className="topbar-cpopup">
+                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Reason for Cancelling</div>
+                     <div>
+                       <button
+                         className="cancel-button"
+                         onClick={() => setCancelPopup("")}
+                       >
+                         <div className="close-cpopup">
+                           <CloseIcon style={{ height: "20px" }} />
+                         </div>
+                       </button>
+                     </div>
+                   </div>
+                   <div className="title-cancel">
+                     {needById[props.needId].name}: Session {cindex}
+                   </div>
+                   <div className="wrap-reasonbox">
+                     <label>Reason</label>
+                     <select
+                       className="reject-reason"
+                       value={rejection}
+                       onChange={e => { setRejection(e.target.value); setRejectionError(""); }}
+                       required
+                     >
+                       <option value="">Select Reason</option>
+                       {REJECTION_REASONS.map((reason) => (
+                         <option key={reason} value={reason}>{reason}</option>
+                       ))}
+                     </select>
+                    {rejectionError && (
+                      <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{rejectionError}</div>
+                    )}
+                   </div>
+                   <div className="cancel-buttons">
+                     <button
+                       className="reject-cancel-button"
+                       onClick={() => setCancelPopup("")}
+                     >
+                       Cancel
+                     </button>
+                     <button
+                       className="reject-confirm-button"
+                       onClick={() => {
+                         if (!rejection) {
+                           setRejectionError("Please select a reason for cancelling.");
+                           return;
+                         }
+                         confirmRejection();
+                       }}
+                     >
+                       Confirm
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
+
+           {/* COMPLETE popup */}
+           {completePopup && (
+             <div className="wrap-cpopup">
+               <div className="inwrap-cpopup">
+                 <div className="cpopup">
+                   <div className="topbar-cpopup">
+                     <label>Confirmation</label>
+                     <div>
+                       <button
+                         className="cancel-button"
+                         onClick={() => setCompletePopup("")}
+                       >
+                         <div className="close-cpopup">
+                           <CloseIcon style={{ height: "20px" }} />
+                         </div>
+                       </button>
+                     </div>
+                   </div>
+                   <div className="title-cancel">
+                     {needById[props.needId].name}: Session {cindex}
+                   </div>
+                   <div className="wrap-reasonbox">
+                     <label>Comments/Notes</label>
+                     <textarea
+                       className="reject-reason"
+                       value={notes}
+                       onChange={handleNotes}
+                       rows={4}
+                       cols={60}
+                       placeholder="Write comments or notes on the need plan deliverable"
+                     ></textarea>
+                   </div>
+                   <div className="wrap-beneficbox">
+                     <label>Students attended</label>
+                     <input
+                       type="number"
+                       name="numBenfics"
+                       value={numBenefics || ""}
+                       onChange={e => { setNumBenefics(e.target.value); setBeneficsError(""); }}
+                       min={0}
+                       required
+                     />
+                     {beneficsError && (
+                       <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{beneficsError}</div>
+                     )}
+                   </div>
+                   <div className="cancel-buttons">
+                     <button
+                       className="reject-cancel-button"
+                       onClick={() => setCompletePopup("")}
+                     >
+                       Cancel
+                     </button>
+                     <button
+                       className="reject-confirm-button"
+                       onClick={() => {
+                         if (!numBenefics || isNaN(numBenefics) || Number(numBenefics) < 0) {
+                           setBeneficsError("Please enter the number of students attended.");
+                           return;
+                         }
+                         confirmCompleted();
+                       }}
+                     >
+                       Confirm
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
+
+           {/* RESCHEDULE popup */}
+           {reschedulePopup && (
+             <div className="wrap-cpopup">
+               <div className="inwrap-cpopup">
+                 <div className="cpopup">
+                   <div className="topbar-cpopup">
+                     <div style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Reschedule Session</div>
+                     <div>
+                       <button
+                         className="cancel-button"
+                         onClick={() => setReschedulePopup("")}
+                       >
+                         <div className="close-cpopup">
+                           <CloseIcon style={{ height: "20px" }} />
+                         </div>
+                       </button>
+                     </div>
+                   </div>
+                   <div className="title-cancel">
+                     {needById[props.needId].name}: Session {cindex}
+                   </div>
+                   <div className="wrap-reasonbox">
+                     <label>New Date</label>
+                     <input
+                       type="date"
+                       className="reject-reason"
+                       value={rescheduleDate}
+                       onChange={(e) => { setRescheduleDate(e.target.value); setRescheduleError(""); }}
+                       min={new Date().toISOString().split('T')[0]}
+                       required
+                     />
+                     {rescheduleError && (
+                       <div style={{ color: 'red', marginTop: 4, fontSize: '0.95rem' }}>{rescheduleError}</div>
+                     )}
+                     {rescheduleSuccess && (
+                       <div style={{ color: 'green', marginTop: 4, fontSize: '0.95rem' }}>{rescheduleSuccess}</div>
+                     )}
+                   </div>
+                   <div className="cancel-buttons">
+                     <button
+                       className="reject-cancel-button"
+                       onClick={() => setReschedulePopup("")}
+                     >
+                       Cancel
+                     </button>
+                     <button
+                       className="reject-confirm-button"
+                       onClick={confirmReschedule}
+                     >
+                       Reschedule
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </div>
+           )}
+         </>
+       )}
+     </div>
+   );
+ };
 
 export default VolunteerProfileDeliverable;
