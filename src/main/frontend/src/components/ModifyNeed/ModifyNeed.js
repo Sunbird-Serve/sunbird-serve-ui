@@ -8,6 +8,7 @@ import MonoSelect from "../RaiseNeed/MonoSelect";
 import axios from "axios";
 import dayjs from "dayjs";
 import { Modal, Button } from "react-bootstrap";
+import { formatEntityName } from "../../utils/entityNameFormatter";
 
 const configData = require("../../configure.js");
 
@@ -299,7 +300,7 @@ const ModifyNeed = (props) => {
                     {/* Entity Name */}
                     <div className="itemNInfo">
                       <label>Entity Name</label>
-                      {<span>{data.entity.name ? data.entity.name : ""} </span>}
+                      {<span>{data.entity.name ? formatEntityName(data.entity.name) : ""} </span>}
                     </div>
                   </div>
 

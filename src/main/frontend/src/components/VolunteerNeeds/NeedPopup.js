@@ -10,6 +10,7 @@ import VolunteerLogin from '../VolunteerLogin/VolunteerLogin';
 import EmailIcon from '@mui/icons-material/Email';
 import { useSelector, useDispatch } from 'react-redux'
 import NominationSuccess from '../../assets/nominationSuccess.png';
+import { formatEntityName } from '../../utils/entityNameFormatter';
 
 
 const configData = require('../../configure.js');
@@ -98,6 +99,8 @@ function NeedPopup({ open, onClose, need }) {
   }
 
   const history = useHistory();
+
+  // Helper function to format entity name and separate UDISE codes
   const handleRegisterClick = (e) => {
     e.preventDefault();
     history.push("/vregistration")
@@ -167,7 +170,7 @@ function NeedPopup({ open, onClose, need }) {
           ))}
         </div>
         <p className="popupNKey">Entity Name </p>
-        <p>{ need.entity.name }</p>
+        <p>{ formatEntityName(need.entity.name) }</p>
         <p className="popupNKey">Skills Required</p>
         <p className="popupNValue">{ (need.needRequirement && need.needRequirement.skillDetails)? need.needRequirement.skillDetails : '' }</p>
         </div>
