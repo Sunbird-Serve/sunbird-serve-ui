@@ -437,7 +437,8 @@ const VolunteerProfileDeliverable = (props) => {
     "Network Issue",
     "Power Cut",
     "Students Not Available",
-    "Volunteer Not Available"
+    "Volunteer Not Available",
+    "Infra Related Issues"
   ];
 
   // Helper function to check if a date is in the future
