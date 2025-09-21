@@ -104,7 +104,10 @@ const Nominations = ({ needData, openPopup }) => {
   useEffect(() => {
     if (activeTab === "tabA") {
       setDataNoms(
-        nomsList.filter((item) => item.nominationStatus === "Approved")
+        nomsList.filter((item) => 
+          item.nominationStatus === "Approved" || 
+          item.nominationStatus === "Backfill"
+        )
       );
     } else if (activeTab === "tabR") {
       setDataNoms(
@@ -123,16 +126,88 @@ const Nominations = ({ needData, openPopup }) => {
   const [volunteerHistory, setVolunteerHistory] = useState([]);
 
   if (acceptPopup) {
-    axios
-      .post(
-        `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
-      )
-      .then(function (response) {
-        setResponseFlag(!responseFlag);
-      }, openPopup("accept"))
-      .catch(function (error) {
-        console.log("error");
-      });
+    // Check if there is a backfill for this need
+    const backfilledNoms = (nomsList || []).filter(
+      (n) => n.needId === rowData.needId && n.nominationStatus === "Backfill"
+    );
+    
+    if (backfilledNoms.length > 0) {
+      // Two-step process: First drop backfilled volunteer, then approve new volunteer
+      (async () => {
+        try {
+          // Step 1: Mark the backfilled volunteer as backfilled and update deliverable status
+          for (const bNom of backfilledNoms) {
+            // Update nomination status to Backfill
+            await axios.post(
+              `${configData.NOMINATION_CONFIRM}/${bNom.nominatedUserId}/confirm/${bNom.id}?status=Backfill`
+            );
+            
+            // Get fulfillments for the dropped volunteer to find deliverable IDs
+            try {
+              const fulfResp = await axios.get(
+                `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${bNom.nominatedUserId}?page=0&size=100`
+              );
+              const fulfillments = Array.isArray(fulfResp.data) ? fulfResp.data : [];
+              const relevantFulfillments = fulfillments.filter((f) => f.needId === rowData.needId);
+              
+              // Update deliverable status to PlannedPause for each fulfillment
+              for (const fulfillment of relevantFulfillments) {
+                try {
+                  const deliverableResp = await axios.get(
+                    `${configData.SERVE_NEED}/need-deliverable/${fulfillment.needPlanId}`
+                  );
+                  const deliverables = deliverableResp.data.needDeliverable || [];
+                  
+                  // Update only Planned deliverables to PlannedPause, keep other statuses unchanged
+                  for (const deliverable of deliverables) {
+                    if (deliverable.status === "Planned") {
+                      await axios.put(
+                        `${configData.NEEDPLAN_DELIVERABLES}/update/${deliverable.id}`,
+                        {
+                          needPlanId: fulfillment.needPlanId,
+                          status: "PlannedPause",
+                          deliverableDate: deliverable.deliverableDate,
+                          comments: deliverable.comments || ""
+                        }
+                      );
+                    }
+                    // Other statuses (Completed, Cancelled, Offline) remain unchanged
+                  }
+                } catch (deliverableErr) {
+                  console.log("Failed to update deliverable status:", deliverableErr);
+                }
+              }
+            } catch (fulfillmentErr) {
+              console.log("Failed to fetch fulfillments:", fulfillmentErr);
+            }
+          }
+          
+          // Step 2: Approve the new volunteer (this creates new deliverables)
+          await axios.post(
+            `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
+          );
+          
+          setResponseFlag(!responseFlag);
+          openPopup("accept");
+        } catch (err) {
+          console.log("Error in two-step approval process:", err);
+          alert("Failed to process approval. Please try again.");
+        }
+      })();
+    } else {
+      // Normal approval flow when no backfill exists
+      axios
+        .post(
+          `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
+        )
+        .then(function (response) {
+          setResponseFlag(!responseFlag);
+          openPopup("accept");
+        })
+        .catch(function (error) {
+          console.log("error");
+        });
+    }
     setAcceptPopup(false);
   }
 
@@ -161,12 +236,84 @@ const Nominations = ({ needData, openPopup }) => {
     {
       Header: "Volunteer Name",
       accessor: "userInfo.identityDetails.fullname",
+      Cell: ({ row }) => {
+        const name = row.original.userInfo?.identityDetails?.fullname || 'N/A';
+        const isBackfilled = row.original.nominationStatus === "Backfill";
+        
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{
+              color: isBackfilled ? '#6c757d' : 'inherit',
+              textDecoration: isBackfilled ? 'line-through' : 'none',
+              opacity: isBackfilled ? 0.7 : 1
+            }}>
+              {name}
+            </span>
+            {isBackfilled && (
+              <span style={{
+                backgroundColor: '#dc3545',
+                color: 'white',
+                padding: '1px 6px',
+                borderRadius: '8px',
+                fontSize: '9px',
+                fontWeight: 'bold'
+              }}>
+                BACKFILLED
+              </span>
+            )}
+          </div>
+        );
+      },
       width: 150,
     },
     { Header: "Location", accessor: "userInfo.contactDetails.address.city" },
     { Header: "Phone Number", accessor: "userInfo.contactDetails.mobile" },
     { Header: "Email", accessor: "userInfo.contactDetails.email" },
     { Header: "Status", accessor: "userInfo.status" },
+    {
+      Header: "Nomination Status",
+      accessor: "nominationStatus",
+      Cell: ({ row }) => {
+        const status = row.original.nominationStatus;
+        if (status === "Backfill") {
+          return (
+            <div 
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              title={`Volunteer was backfilled (dropped). Reason: ${row.original.reason || 'Not specified'}`}
+            >
+              <span style={{ 
+                color: '#dc3545', 
+                fontWeight: 'bold',
+                textDecoration: 'line-through'
+              }}>
+                Backfilled
+              </span>
+              <span style={{
+                backgroundColor: '#dc3545',
+                color: 'white',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                fontSize: '10px',
+                fontWeight: 'bold'
+              }}>
+                DROPPED
+              </span>
+            </div>
+          );
+        } else if (status === "Approved") {
+          return (
+            <span style={{ 
+              color: '#28a745', 
+              fontWeight: 'bold' 
+            }}>
+              Approved
+            </span>
+          );
+        }
+        return status;
+      },
+      width: 150,
+    },
   ];
 
   if (!isNAdmin || activeTab === "tabA") {
@@ -278,18 +425,53 @@ const Nominations = ({ needData, openPopup }) => {
               setVolunteerHistory([]);
             });
         };
-        const viewDeliverable = () => {
+        const viewDeliverable = async () => {
           setRowData(row.original);
-          axios
-            .get(
-              `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`
-            )
-            .then((response) => {
-              setFulfillment(response.data);
-            })
-            .catch((error) => {
-              console.log("error");
-            });
+          
+          try {
+            // Get fulfillments by needId to find the current assigned volunteer and needPlanId
+            const needFulfillmentResp = await axios.get(
+              `${configData.SERVE_FULFILL}/fulfillment/need-read/${row.original.needId}?page=0&size=10`
+            );
+            
+            const needFulfillments = Array.isArray(needFulfillmentResp.data) ? needFulfillmentResp.data : [];
+            
+            if (needFulfillments.length > 0) {
+              // Get the most recent fulfillment for this need (by osUpdatedAt or osCreatedAt)
+              const currentFulfillment = needFulfillments.reduce((latest, current) => {
+                const latestDate = new Date(latest.osUpdatedAt || latest.osCreatedAt);
+                const currentDate = new Date(current.osUpdatedAt || current.osCreatedAt);
+                return currentDate > latestDate ? current : latest;
+              });
+              
+              console.log("Selected fulfillment:", currentFulfillment);
+              console.log("All fulfillments:", needFulfillments);
+              
+              // Set the fulfillment array with just this one fulfillment
+              setFulfillment([currentFulfillment]);
+              
+              // Also set the planId directly to avoid dependency on useEffect
+              setPlanId(currentFulfillment.needPlanId);
+            } else {
+              // Fallback to original logic if no fulfillments found
+              const fallbackResp = await axios.get(
+                `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`
+              );
+              setFulfillment(fallbackResp.data);
+            }
+          } catch (error) {
+            console.log("Error fetching fulfillments:", error);
+            // Fallback to original logic
+            try {
+              const fallbackResp = await axios.get(
+                `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`
+              );
+              setFulfillment(fallbackResp.data);
+            } catch (fallbackError) {
+              console.log("Fallback also failed:", fallbackError);
+            }
+          }
+          
           setGotoDelivs(true);
         };
 
@@ -331,11 +513,25 @@ const Nominations = ({ needData, openPopup }) => {
             )}
             {activeTab === "tabA" && (
               <div style={{ display: "flex", gap: "5px" }}>
-                <button className="styled-button" onClick={viewDeliverable}>
-                  View Deliverables
-                </button>
-                <button className="styled-button" onClick={handleReject}>
-                  Drop Volunteer
+                {row.original.nominationStatus !== "Backfill" && (
+                  <button className="styled-button" onClick={viewDeliverable}>
+                    View Deliverables
+                  </button>
+                )}
+                {row.original.nominationStatus !== "Backfill" && (
+                  <button className="styled-button" onClick={handleReject}>
+                    Drop Volunteer
+                  </button>
+                )}
+                <button className="infoNomin" onClick={handleInfo} style={{ display: "flex", alignItems: "center", gap: "4px", background: "#2196F3", color: "white", border: "none", borderRadius: "4px", padding: "8px 12px", cursor: "pointer", fontSize: "14px", fontWeight: "500", minWidth: "80px", justifyContent: "center" }}>
+                  <InfoIcon
+                    style={{
+                      height: "16px",
+                      width: "16px",
+                      color: "white",
+                    }}
+                  />
+                  Info
                 </button>
               </div>
             )}
@@ -464,9 +660,9 @@ const Nominations = ({ needData, openPopup }) => {
       return;
     }
     
-    // Check if number of students is provided
-    if (!currentData.numStudents || currentData.numStudents === '' || currentData.numStudents < 0) {
-      alert('Please enter the number of students');
+    // Check if number of students is provided (required only for Completed status)
+    if (currentData.status === 'Completed' && (!currentData.numStudents || currentData.numStudents === '' || currentData.numStudents < 0)) {
+      alert('Please enter the number of students for Completed status');
       return;
     }
     
@@ -1136,6 +1332,7 @@ const Nominations = ({ needData, openPopup }) => {
                                     <option value="Power Cut">Power Cut</option>
                                     <option value="Students Not Available">Students Not Available</option>
                                     <option value="Volunteer Not Available">Volunteer Not Available</option>
+                                    <option value="Infra Related Issues">Infra Related Issues</option>
                                   </select>
                                 </div>
                               )}
@@ -1153,6 +1350,7 @@ const Nominations = ({ needData, openPopup }) => {
                                     <option value="Power Cut">Power Cut</option>
                                     <option value="Students Not Available">Students Not Available</option>
                                     <option value="Volunteer Not Available">Volunteer Not Available</option>
+                                    <option value="Infra Related Issues">Infra Related Issues</option>
                                   </select>
                                 </div>
                               )}
@@ -1167,7 +1365,7 @@ const Nominations = ({ needData, openPopup }) => {
                                   placeholder="Students Number"
                                   aria-label="Number of Students"
                                   title="Enter number of students"
-                                  required
+                                  required={data.status === 'Completed'}
                                 />
                               </div>
                             </>

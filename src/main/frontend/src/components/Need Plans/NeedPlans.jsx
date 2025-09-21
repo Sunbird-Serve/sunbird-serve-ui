@@ -435,9 +435,15 @@ const NeedPlans = () => {
                         setEditError('');
                       };
                       const handleSave = async () => {
-                        // Validation: all fields required
-                        if (!editFields.status || !editFields.comments || !editFields.students) {
-                          setEditError('All fields are required.');
+                        // Validation: status and comments required
+                        if (!editFields.status || !editFields.comments) {
+                          setEditError('Status and comments are required.');
+                          return;
+                        }
+                        
+                        // Student count required only for Completed status
+                        if (editFields.status === 'Completed' && (!editFields.students || editFields.students === '')) {
+                          setEditError('Student count is required for Completed status.');
                           return;
                         }
                         if (!deliverable || !plan) {
@@ -535,12 +541,14 @@ const NeedPlans = () => {
                                     <option value="Network Issue">Network Issue</option>
                                     <option value="Power Cut">Power Cut</option>
                                     <option value="Students Not Available">Students Not Available</option>
+                                    <option value="Volunteer Not Available">Volunteer Not Available</option>
+                                    <option value="Infra Related Issues">Infra Related Issues</option>
                                   </select>
                                 </div>
                               )}
                               <div>
                                 <b>Students Number:</b>
-                                <input type="number" value={editFields.students} onChange={e => handleFieldChange('students', e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4, width: 80}} required min={1} />
+                                <input type="number" value={editFields.students} onChange={e => handleFieldChange('students', e.target.value)} style={{marginLeft: 8, padding: 4, borderRadius: 4, width: 80}} required={editFields.status === 'Completed'} min={1} />
                               </div>
                               {editError && <div style={{color: 'red', fontSize: 12, marginTop: 4}}>{editError}</div>}
                               <div style={{marginTop: 8, display: 'flex', gap: 8}}>
