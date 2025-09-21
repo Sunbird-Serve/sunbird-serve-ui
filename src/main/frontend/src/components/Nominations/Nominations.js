@@ -132,62 +132,74 @@ const Nominations = ({ needData, openPopup }) => {
     );
     
     if (backfilledNoms.length > 0) {
-      // Option 2: Skip approval API entirely for backfill cases
-      // Directly update backfilled nomination to Approved and reassign fulfillments
+      // Two-step process: First drop backfilled volunteer, then approve new volunteer
       (async () => {
         try {
-          // Reassign fulfillments from dropped volunteer to newly approved one
+          // Step 1: Mark the backfilled volunteer as backfilled and update deliverable status
           for (const bNom of backfilledNoms) {
+            // Update nomination status to Backfill
+            await axios.post(
+              `${configData.NOMINATION_CONFIRM}/${bNom.nominatedUserId}/confirm/${bNom.id}?status=Backfill`
+            );
+            
+            // Get fulfillments for the dropped volunteer to find deliverable IDs
             try {
-              // Fetch fulfillments for the dropped volunteer
               const fulfResp = await axios.get(
                 `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${bNom.nominatedUserId}?page=0&size=100`
               );
-              const fulf = Array.isArray(fulfResp.data) ? fulfResp.data : [];
-              const fulfToReassign = fulf.filter((f) => f.needId === rowData.needId);
+              const fulfillments = Array.isArray(fulfResp.data) ? fulfResp.data : [];
+              const relevantFulfillments = fulfillments.filter((f) => f.needId === rowData.needId);
               
-              for (const fItem of fulfToReassign) {
-                // Update fulfillment's assignedUserId to the newly approved volunteer
+              // Update deliverable status to PlannedPause for each fulfillment
+              for (const fulfillment of relevantFulfillments) {
                 try {
-                  await axios.put(
-                    `${configData.SERVE_FULFILL}/fulfillment/update/${fItem.id}`,
-                    { assignedUserId: rowData.nominatedUserId }
+                  const deliverableResp = await axios.get(
+                    `${configData.SERVE_NEED}/need-deliverable/${fulfillment.needPlanId}`
                   );
-                } catch (e) {
-                  console.log("Failed to update fulfillment:", e);
-                  // Continue with other fulfillments even if one fails
+                  const deliverables = deliverableResp.data.needDeliverable || [];
+                  
+                  // Update only Planned deliverables to PlannedPause, keep other statuses unchanged
+                  for (const deliverable of deliverables) {
+                    if (deliverable.status === "Planned") {
+                      await axios.put(
+                        `${configData.NEEDPLAN_DELIVERABLES}/update/${deliverable.id}`,
+                        {
+                          needPlanId: fulfillment.needPlanId,
+                          status: "PlannedPause",
+                          deliverableDate: deliverable.deliverableDate,
+                          comments: deliverable.comments || ""
+                        }
+                      );
+                    }
+                    // Other statuses (Completed, Cancelled, Offline) remain unchanged
+                  }
+                } catch (deliverableErr) {
+                  console.log("Failed to update deliverable status:", deliverableErr);
                 }
               }
-            } catch (innerErr) {
-              // Ignore per-volunteer errors
+            } catch (fulfillmentErr) {
+              console.log("Failed to fetch fulfillments:", fulfillmentErr);
             }
           }
           
-          // Update the current nomination status to Approved
-          await axios.put(`${configData.NOMINATIONS_GET}/${rowData.id}`, {
-            nominationStatus: "Approved"
-          });
+          // Step 2: Approve the new volunteer (this creates new deliverables)
+          await axios.post(
+            `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
+          );
           
           setResponseFlag(!responseFlag);
           openPopup("accept");
         } catch (err) {
-          console.log("Error in backfill reassignment:", err);
-          // Fallback to normal approval if backfill handling fails
-          axios
-            .post(`${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`)
-            .then(() => {
-              setResponseFlag(!responseFlag);
-              openPopup("accept");
-            })
-            .catch((error) => {
-              console.log("Fallback approval also failed:", error);
-            });
+          console.log("Error in two-step approval process:", err);
+          alert("Failed to process approval. Please try again.");
         }
       })();
     } else {
       // Normal approval flow when no backfill exists
       axios
-        .post(`${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`)
+        .post(
+          `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
+        )
         .then(function (response) {
           setResponseFlag(!responseFlag);
           openPopup("accept");
@@ -413,18 +425,53 @@ const Nominations = ({ needData, openPopup }) => {
               setVolunteerHistory([]);
             });
         };
-        const viewDeliverable = () => {
+        const viewDeliverable = async () => {
           setRowData(row.original);
-          axios
-            .get(
-              `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`
-            )
-            .then((response) => {
-              setFulfillment(response.data);
-            })
-            .catch((error) => {
-              console.log("error");
-            });
+          
+          try {
+            // Get fulfillments by needId to find the current assigned volunteer and needPlanId
+            const needFulfillmentResp = await axios.get(
+              `${configData.SERVE_FULFILL}/fulfillment/need-read/${row.original.needId}?page=0&size=10`
+            );
+            
+            const needFulfillments = Array.isArray(needFulfillmentResp.data) ? needFulfillmentResp.data : [];
+            
+            if (needFulfillments.length > 0) {
+              // Get the most recent fulfillment for this need (by osUpdatedAt or osCreatedAt)
+              const currentFulfillment = needFulfillments.reduce((latest, current) => {
+                const latestDate = new Date(latest.osUpdatedAt || latest.osCreatedAt);
+                const currentDate = new Date(current.osUpdatedAt || current.osCreatedAt);
+                return currentDate > latestDate ? current : latest;
+              });
+              
+              console.log("Selected fulfillment:", currentFulfillment);
+              console.log("All fulfillments:", needFulfillments);
+              
+              // Set the fulfillment array with just this one fulfillment
+              setFulfillment([currentFulfillment]);
+              
+              // Also set the planId directly to avoid dependency on useEffect
+              setPlanId(currentFulfillment.needPlanId);
+            } else {
+              // Fallback to original logic if no fulfillments found
+              const fallbackResp = await axios.get(
+                `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`
+              );
+              setFulfillment(fallbackResp.data);
+            }
+          } catch (error) {
+            console.log("Error fetching fulfillments:", error);
+            // Fallback to original logic
+            try {
+              const fallbackResp = await axios.get(
+                `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${row.original.nominatedUserId}?page=0&size=10`
+              );
+              setFulfillment(fallbackResp.data);
+            } catch (fallbackError) {
+              console.log("Fallback also failed:", fallbackError);
+            }
+          }
+          
           setGotoDelivs(true);
         };
 
@@ -466,9 +513,11 @@ const Nominations = ({ needData, openPopup }) => {
             )}
             {activeTab === "tabA" && (
               <div style={{ display: "flex", gap: "5px" }}>
-                <button className="styled-button" onClick={viewDeliverable}>
-                  View Deliverables
-                </button>
+                {row.original.nominationStatus !== "Backfill" && (
+                  <button className="styled-button" onClick={viewDeliverable}>
+                    View Deliverables
+                  </button>
+                )}
                 {row.original.nominationStatus !== "Backfill" && (
                   <button className="styled-button" onClick={handleReject}>
                     Drop Volunteer
