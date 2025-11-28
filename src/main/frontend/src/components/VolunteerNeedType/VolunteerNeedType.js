@@ -59,6 +59,14 @@ function VolunteerNeedType() {
   }, [ntypeData, searchQueryNT]);
 
   const needList = useSelector((state) => state.need.data);
+  
+  // Calculate total approved needs across all types
+  const totalApprovedNeeds = needList.filter(
+    (need) =>
+      need &&
+      need.need &&
+      need.need.status === "Approved"
+  ).length;
 
   const [sortRev, setSortRev] = useState("");
   const handleSort = (e) => {
@@ -182,6 +190,21 @@ function VolunteerNeedType() {
               </button>
             </div>
           </div>
+          {/* Messages based on needs availability */}
+          {totalApprovedNeeds === 0 && (
+            <div className="volunteerMessageBox noNeedsMessage">
+              <p className="volunteerMessageText">
+                Go ahead with registrations and you will be notified when needs come up.
+              </p>
+            </div>
+          )}
+          {totalApprovedNeeds > 0 && (
+            <div className="volunteerMessageBox hasNeedsMessage">
+              <p className="volunteerMessageText">
+                If the need time and days don't match your preference, you can still go ahead with registration. More needs come up and you will be notified.
+              </p>
+            </div>
+          )}
           {/* List of need types in grid view */}
           <div className="wrapAllNT">
             {Object.entries(groupedNTs).map(([firstAlphabet, groupedList]) => (
