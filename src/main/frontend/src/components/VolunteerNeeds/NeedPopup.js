@@ -171,8 +171,12 @@ function NeedPopup({ open, onClose, need }) {
         </div>
         <p className="popupNKey">Entity Name </p>
         <p>{ formatEntityName(need.entity.name) }</p>
-        <p className="popupNKey">Skills Required</p>
-        <p className="popupNValue">{ (need.needRequirement && need.needRequirement.skillDetails)? need.needRequirement.skillDetails : '' }</p>
+        {need.needRequirement?.skillDetails && (
+          <>
+            <p className="popupNKey">Skills Required</p>
+            <p className="popupNValue">{need.needRequirement.skillDetails}</p>
+          </>
+        )}
         </div>
         <div className="inviteToEvent">
             <ShareIcon style={{ fontSize: "15px" }} />
