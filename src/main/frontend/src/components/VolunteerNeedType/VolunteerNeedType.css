@@ -196,3 +196,34 @@
 .alphabetNT {
   font-size: 18px;
 }
+
+.volunteerMessageBox {
+  margin: 20px 20px 30px 20px;
+  padding: 15px 20px;
+  border-radius: 8px;
+  @media (max-width: 600px) {
+    margin: 15px 0.5rem 20px 0.5rem;
+    padding: 12px 15px;
+  }
+}
+
+.noNeedsMessage {
+  background-color: #FAFAFA;
+  border: 1px solid #DBDBDB;
+  text-align: center;
+}
+
+.hasNeedsMessage {
+  background-color: #F1FDFD;
+  border: 1px solid #0080BC;
+}
+
+.volunteerMessageText {
+  font-size: 14px;
+  color: #3C4044;
+  margin: 0;
+  line-height: 1.6;
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
+}
