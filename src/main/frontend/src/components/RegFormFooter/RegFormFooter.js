@@ -1,6 +1,6 @@
 import React from 'react'
 import './RegFormFooter.css'
-import SBBlueLogo from '../../sunbirdBlueLogo.png'
+import SBLogo from '../../assets/sunbirdlogo.png'
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SearchIcon from '@mui/icons-material/Search';
@@ -12,7 +12,7 @@ function RegFormFooter() {
     <div className='footerFull'>
         
         <div className='footer'>
-          <img className='footerLogo' src={SBBlueLogo} alt="SunBirdLogo" width="150px" />
+          <img className='footerLogo' src={SBLogo} alt="SunBirdLogo" width="150px" />
           <div className='footerText'>
             Sunbird Serve building block can enable efficient volunteer interactions that add significant value to society and overall human development. It enables relevant actors to crowdsource volunteers for their needs and participate in interactions towards realization of the value.
           </div>

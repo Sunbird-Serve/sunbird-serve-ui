@@ -1,6 +1,6 @@
 import React from 'react'
 import './VolunteerFooter.css'
-import SunBirdLogo from '../../assets/logoInFooter.png'
+import SBLogo from '../../assets/sunbirdlogo.png'
 import TwitterIcon from '@mui/icons-material/Twitter';
 import InstagramIcon from '@mui/icons-material/Instagram';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
@@ -9,7 +9,7 @@ function VolunteerFooter() {
   return (
     <div className='wrapFooter'>
         <div className="contentFooter col-sm-8">
-            <img src={SunBirdLogo} alt="SunBirdLogo" height="40px" />
+            <img src={SBLogo} alt="SunBirdLogo" height="40px" />
             <p>
                 Sunbird Serve building block can enable efficient volunteer interactions that add significant
                 value to society and overall human development. It enables relevant actors to crowdsource
