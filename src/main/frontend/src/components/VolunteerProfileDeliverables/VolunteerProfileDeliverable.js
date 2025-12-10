@@ -459,6 +459,58 @@ const VolunteerProfileDeliverable = (props) => {
     return htmlString.replace(/^<p>/i, "").replace(/<\/p>$/i, "").trim();
   };
 
+  // Helper function to find a valid session URL from input parameters
+  const findValidSessionUrl = () => {
+    if (!inParas || !Array.isArray(inParas) || inParas.length === 0) {
+      return null;
+    }
+    
+    // Placeholder strings to ignore (case-insensitive)
+    const placeholderStrings = [
+      "to be added soon",
+      "to be added",
+      "available shortly",
+      "coming soon",
+      "tbd",
+      "tba",
+      ""
+    ];
+    
+    // Search through all input parameters to find a valid URL
+    for (const inPara of inParas) {
+      if (inPara?.inputUrl) {
+        const url = inPara.inputUrl.trim();
+        // Check if URL is not empty and not a placeholder
+        if (url && 
+            url.length > 0 && 
+            !placeholderStrings.includes(url.toLowerCase())) {
+          return url;
+        }
+      }
+    }
+    
+    return null;
+  };
+
+  // Helper function to find a valid platform from input parameters
+  const findValidPlatform = () => {
+    if (!inParas || !Array.isArray(inParas) || inParas.length === 0) {
+      return null;
+    }
+    
+    // Search through all input parameters to find a valid platform
+    for (const inPara of inParas) {
+      if (inPara?.softwarePlatform) {
+        const platform = inPara.softwarePlatform.trim();
+        if (platform && platform.length > 0) {
+          return platform;
+        }
+      }
+    }
+    
+    return null;
+  };
+
   const [beneficsError, setBeneficsError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
@@ -565,25 +617,26 @@ const VolunteerProfileDeliverable = (props) => {
                 <div className="info-item">
                   <span className="info-label">Platform:</span>
                   <span className="info-value">
-                    {inParas.length && inParas[0]?.softwarePlatform
-                      ? inParas[0].softwarePlatform
-                      : "Available Shortly"}
+                    {findValidPlatform() || "Available Shortly"}
                   </span>
                 </div>
                 <div className="info-item">
                   <span className="info-label">Session URL:</span>
                   <span className="info-value">
-                    {inParas.length && inParas[0]?.inputUrl && inParas[0].inputUrl !== "To be added soon" ? (
-                      <a
-                        href={inParas[0].inputUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Session Link
-                      </a>
-                    ) : (
-                      "Available Shortly"
-                    )}
+                    {(() => {
+                      const sessionUrl = findValidSessionUrl();
+                      return sessionUrl ? (
+                        <a
+                          href={sessionUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Session Link
+                        </a>
+                      ) : (
+                        "Available Shortly"
+                      );
+                    })()}
                   </span>
                 </div>
                 <div className="info-item">

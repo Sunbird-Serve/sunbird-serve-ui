@@ -64,17 +64,25 @@ export const NeedsTable = ({ props, filterByEntity }) => {
   };
   const [filteredData, setFilteredData] = useState([]);
 
+  // Decide the base list once, then layer other filters on top.
+  const baseNeeds = useMemo(() => {
+    if (filterByEntity) return needsByEntity || [];
+    // Admins should see all needs, volunteers/coordinators see their own
+    if (isNAdmin || isSAdmin) return needList || [];
+    return needsByUser || [];
+  }, [filterByEntity, needsByEntity, isNAdmin, isSAdmin, needList, needsByUser]);
+
   useEffect(() => {
-    let filtered = filterByEntity ? needsByEntity : needsByUser;
+    let filtered = baseNeeds;
+
     if (needTypeId) {
-      const filtered = needsByUser?.filter(
-        (item) => item.need.needTypeId === needTypeId
+      filtered = filtered.filter(
+        (item) => item?.need?.needTypeId === needTypeId
       );
-      setFilteredData(filtered);
-    } else {
-      setFilteredData(filtered);
     }
-  }, [needTypeId, needList, needsByEntity]);
+
+    setFilteredData(filtered);
+  }, [baseNeeds, needTypeId]);
 
   useEffect(() => {
     if (updateNeedList) {
