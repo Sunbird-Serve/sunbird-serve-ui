@@ -3,9 +3,10 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import NeedCard from "../../components/CommonComponents/NeedCard";
 import FilterBy from "../../components/CommonComponents/FilterBy";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, TextField, Select, MenuItem, FormControl, InputLabel } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import NeedsTable from "../../components/NeedsTable/NeedsTable";
-import { setFilteredData } from "../../state/filterSlice";
+import { setFilteredData, setAdminSearchQuery, setAdminNeedTypeFilter } from "../../state/filterSlice";
 import { fetchEntityNeeds } from "../../state/needSlice";
 import VolunteerNeedsNominated from "../../assets/needsNominated.png";
 import VolunteerNeedsInProgress from "../../assets/needsInProgress.png";
@@ -18,9 +19,13 @@ const Dashboard = () => {
   const [filteredByEnitity, setFilteredByEnitity] = useState([]);
   const [enitities, setEnitities] = useState([]);
   const [matrixData, setMatrixData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedNeedType, setSelectedNeedType] = useState("");
   const userData = useSelector((state) => state.user.data);
   const userRole = userData.role;
   const isSAdmin = userRole?.[0] === "sAdmin" ? true : false;
+  const isNAdmin = userRole?.[0] === "nAdmin" ? true : false;
+  const needTypes = useSelector((state) => state.needtype?.data?.content || []);
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const userId = localStorage.getItem("userId");
   console.log("userDetails", userId);
@@ -175,6 +180,60 @@ const Dashboard = () => {
       {!isSAdmin && (
         <Box className="needs-summary-row">
           <NeedCard matrixData={matrixData} className="summary-cards" />
+        </Box>
+      )}
+      {/* Additional filters for admins */}
+      {(isNAdmin || isSAdmin) && (
+        <Box 
+          sx={{ 
+            display: "flex", 
+            gap: "1rem", 
+            marginBottom: "1rem",
+            padding: "1rem",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "8px",
+            alignItems: "center",
+            flexWrap: "wrap"
+          }}
+        >
+          <Box sx={{ flex: "1", minWidth: "250px" }}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Search needs by name, entity, or location..."
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                dispatch(setAdminSearchQuery(e.target.value));
+              }}
+              InputProps={{
+                startAdornment: (
+                  <SearchIcon sx={{ color: "action.active", mr: 1 }} />
+                ),
+              }}
+              variant="outlined"
+            />
+          </Box>
+          <Box sx={{ minWidth: "200px" }}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Need Type</InputLabel>
+              <Select
+                value={selectedNeedType}
+                label="Need Type"
+                onChange={(e) => {
+                  setSelectedNeedType(e.target.value);
+                  dispatch(setAdminNeedTypeFilter(e.target.value));
+                }}
+              >
+                <MenuItem value="">All Need Types</MenuItem>
+                {needTypes.map((ntype) => (
+                  <MenuItem key={ntype.id} value={ntype.id}>
+                    {ntype.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Box>
       )}
       <NeedsTable filterByEntity={true} />
