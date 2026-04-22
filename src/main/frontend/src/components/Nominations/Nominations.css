@@ -2,6 +2,8 @@
   border: none;
   width: 100%;
   height: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
 .wrapTopbarNominations {
   height: 72px;
@@ -256,8 +258,6 @@ border-radius: 5px;
   border-collapse: collapse;
   width: 100%;
   border: 1.5px solid #F0EFEF;
-  width: 95%;
-  margin-left: 2.5%;
   min-width: 600px;
 }
 
@@ -269,6 +269,8 @@ overflow-x: auto;
 position: relative;
 z-index: 0;
 margin-top: 30px;
+padding: 0 10px;
+box-sizing: border-box;
 }
 
 @media (max-width: 900px) {

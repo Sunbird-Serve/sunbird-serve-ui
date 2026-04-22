@@ -51,9 +51,9 @@ function VPNominations() {
     const fetchCompletedSessions = async () => {
       //setLoading(true);
       try {
-        // Fetch fulfillments to get needPlanIds
+        // Fetch fulfillments to get needPlanIds (increased size to get all fulfillments)
         const fulfillmentResponse = await axios.get(
-          `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${userId}?page=0&size=10`
+          `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${userId}?page=0&size=1000`
         );
         const fulfillments = fulfillmentResponse.data;
 

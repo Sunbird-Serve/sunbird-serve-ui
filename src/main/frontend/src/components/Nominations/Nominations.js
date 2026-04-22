@@ -69,7 +69,6 @@ const Nominations = ({ needData, openPopup }) => {
   const [userSelectedTab, setUserSelectedTab] = useState(false); // Track if user manually selected a tab
 
   const [rejectPopup, setRejectPopup] = useState(false); //reject nomination
-  const [acceptPopup, setAcceptPopup] = useState(false); //accept nomination
   //need to which nomination is done
   const needId = needData.need.id;
   //update nominations for the need
@@ -80,7 +79,7 @@ const Nominations = ({ needData, openPopup }) => {
       .then((response) => {
         setNomsList(response.data);
       });
-  }, [dispatch, activeTab, acceptPopup, rejectPopup, openPopup, responseFlag]);
+  }, [dispatch, activeTab, rejectPopup, openPopup, responseFlag]);
 
   // Set default tab based on nomination status (only on initial load)
   useEffect(() => {
@@ -124,92 +123,96 @@ const Nominations = ({ needData, openPopup }) => {
   const [reason, setReason] = useState("");
   const [infoPopup, setInfoPopup] = useState(false);
   const [volunteerHistory, setVolunteerHistory] = useState([]);
+  const [isProcessingAccept, setIsProcessingAccept] = useState(false);
 
-  if (acceptPopup) {
-    // Check if there is a backfill for this need
-    const backfilledNoms = (nomsList || []).filter(
-      (n) => n.needId === rowData.needId && n.nominationStatus === "Backfill"
-    );
-    
-    if (backfilledNoms.length > 0) {
-      // Two-step process: First drop backfilled volunteer, then approve new volunteer
-      (async () => {
-        try {
-          // Step 1: Mark the backfilled volunteer as backfilled and update deliverable status
-          for (const bNom of backfilledNoms) {
-            // Update nomination status to Backfill
-            await axios.post(
-              `${configData.NOMINATION_CONFIRM}/${bNom.nominatedUserId}/confirm/${bNom.id}?status=Backfill`
+  const handleAcceptNomination = async (nominationRowData) => {
+    if (isProcessingAccept) return; // Guard against double-clicks
+    setIsProcessingAccept(true);
+    try {
+      // Check if there is a backfill for this need
+      const backfilledNoms = (nomsList || []).filter(
+        (n) => n.needId === nominationRowData.needId && n.nominationStatus === "Backfill"
+      );
+
+      if (backfilledNoms.length > 0) {
+        // Two-step process: First drop backfilled volunteer, then approve new volunteer
+        // Step 1: FIRST update deliverables BEFORE marking nomination as backfilled
+        for (const bNom of backfilledNoms) {
+          console.log(`🔍 Backfill Process: Fetching fulfillments for volunteer ${bNom.nominatedUserId} BEFORE marking as backfilled`);
+
+          try {
+            const fulfResp = await axios.get(
+              `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${bNom.nominatedUserId}?page=0&size=100`
             );
-            
-            // Get fulfillments for the dropped volunteer to find deliverable IDs
-            try {
-              const fulfResp = await axios.get(
-                `${configData.SERVE_FULFILL}/fulfillment/volunteer-read/${bNom.nominatedUserId}?page=0&size=100`
-              );
-              const fulfillments = Array.isArray(fulfResp.data) ? fulfResp.data : [];
-              const relevantFulfillments = fulfillments.filter((f) => f.needId === rowData.needId);
-              
-              // Update deliverable status to PlannedPause for each fulfillment
-              for (const fulfillment of relevantFulfillments) {
-                try {
-                  const deliverableResp = await axios.get(
-                    `${configData.SERVE_NEED}/need-deliverable/${fulfillment.needPlanId}`
-                  );
-                  const deliverables = deliverableResp.data.needDeliverable || [];
-                  
-                  // Update only Planned deliverables to PlannedPause, keep other statuses unchanged
-                  for (const deliverable of deliverables) {
-                    if (deliverable.status === "Planned") {
-                      await axios.put(
-                        `${configData.NEEDPLAN_DELIVERABLES}/update/${deliverable.id}`,
-                        {
-                          needPlanId: fulfillment.needPlanId,
-                          status: "PlannedPause",
-                          deliverableDate: deliverable.deliverableDate,
-                          comments: deliverable.comments || ""
-                        }
-                      );
-                    }
-                    // Other statuses (Completed, Cancelled, Offline) remain unchanged
+            const fulfillments = Array.isArray(fulfResp.data) ? fulfResp.data : [];
+            console.log(`✅ Found ${fulfillments.length} total fulfillments for volunteer`);
+
+            const relevantFulfillments = fulfillments.filter((f) => f.needId === nominationRowData.needId);
+            console.log(`✅ Found ${relevantFulfillments.length} fulfillments for this specific need (${nominationRowData.needId})`);
+
+            for (const fulfillment of relevantFulfillments) {
+              try {
+                const deliverableResp = await axios.get(
+                  `${configData.SERVE_NEED}/need-deliverable/${fulfillment.needPlanId}`
+                );
+                const deliverables = deliverableResp.data.needDeliverable || [];
+                console.log(`📋 Found ${deliverables.length} deliverables for needPlanId ${fulfillment.needPlanId}`);
+
+                let updatedCount = 0;
+                for (const deliverable of deliverables) {
+                  if (deliverable.status === "Planned") {
+                    await axios.put(
+                      `${configData.NEEDPLAN_DELIVERABLES}/update/${deliverable.id}`,
+                      {
+                        needPlanId: fulfillment.needPlanId,
+                        status: "PlannedPause",
+                        deliverableDate: deliverable.deliverableDate,
+                        comments: deliverable.comments || ""
+                      }
+                    );
+                    updatedCount++;
                   }
-                } catch (deliverableErr) {
-                  console.log("Failed to update deliverable status:", deliverableErr);
                 }
+                console.log(`✅ Updated ${updatedCount} deliverables from Planned to PlannedPause`);
+              } catch (deliverableErr) {
+                console.log("❌ Failed to update deliverable status:", deliverableErr);
               }
-            } catch (fulfillmentErr) {
-              console.log("Failed to fetch fulfillments:", fulfillmentErr);
             }
+          } catch (fulfillmentErr) {
+            console.log("❌ Failed to fetch fulfillments:", fulfillmentErr);
           }
-          
-          // Step 2: Approve the new volunteer (this creates new deliverables)
+
+          console.log(`🔄 NOW marking nomination ${bNom.id} as Backfill for volunteer ${bNom.nominatedUserId}`);
           await axios.post(
-            `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
+            `${configData.NOMINATION_CONFIRM}/${bNom.nominatedUserId}/confirm/${bNom.id}?status=Backfill`
           );
-          
-          setResponseFlag(!responseFlag);
-          openPopup("accept");
-        } catch (err) {
-          console.log("Error in two-step approval process:", err);
-          alert("Failed to process approval. Please try again.");
+          console.log(`✅ Nomination marked as Backfill successfully`);
         }
-      })();
-    } else {
-      // Normal approval flow when no backfill exists
-      axios
-        .post(
-          `${configData.NOMINATION_CONFIRM}/${rowData.nominatedUserId}/confirm/${rowData.id}?status=Approved`
-        )
-        .then(function (response) {
-          setResponseFlag(!responseFlag);
-          openPopup("accept");
-        })
-        .catch(function (error) {
-          console.log("error");
-        });
+
+        // Step 2: Approve the new volunteer
+        console.log(`🆕 Approving new volunteer ${nominationRowData.nominatedUserId} for nomination ${nominationRowData.id}`);
+        await axios.post(
+          `${configData.NOMINATION_CONFIRM}/${nominationRowData.nominatedUserId}/confirm/${nominationRowData.id}?status=Approved`
+        );
+        console.log(`✅ New volunteer approved successfully. Backfill process complete!`);
+
+        setResponseFlag(prev => !prev);
+        openPopup("accept");
+      } else {
+        // Normal approval flow when no backfill exists
+        await axios.post(
+          `${configData.NOMINATION_CONFIRM}/${nominationRowData.nominatedUserId}/confirm/${nominationRowData.id}?status=Approved`
+        );
+        setResponseFlag(prev => !prev);
+        openPopup("accept");
+      }
+    } catch (err) {
+      console.log("Error in approval process:", err);
+      alert("Failed to process approval. Please try again.");
+    } finally {
+      setIsProcessingAccept(false);
     }
-    setAcceptPopup(false);
-  }
+  };
 
   const confirmRejection = (rejectionStatus) => {
     axios
@@ -321,8 +324,7 @@ const Nominations = ({ needData, openPopup }) => {
       Header: "Actions",
       Cell: ({ row }) => {
         const handleAccept = () => {
-          setRowData(row.original);
-          setAcceptPopup(true);
+          handleAcceptNomination(row.original);
         };
         const handleReject = () => {
           setRejectPopup(true);
@@ -479,7 +481,7 @@ const Nominations = ({ needData, openPopup }) => {
           <div className="actionsCell">
             {activeTab === "tabN" && !isNAdmin && (
               <>
-                <button className="acceptNomin" onClick={handleAccept} style={{ display: "flex", alignItems: "center", gap: "8px", background: "#4CAF50", color: "white", border: "none", borderRadius: "6px", padding: "12px 20px", cursor: "pointer", fontSize: "16px", fontWeight: "500", minWidth: "120px", justifyContent: "center" }}>
+                <button className="acceptNomin" onClick={handleAccept} disabled={isProcessingAccept} style={{ display: "flex", alignItems: "center", gap: "8px", background: isProcessingAccept ? "#9E9E9E" : "#4CAF50", color: "white", border: "none", borderRadius: "6px", padding: "12px 20px", cursor: isProcessingAccept ? "not-allowed" : "pointer", fontSize: "16px", fontWeight: "500", minWidth: "120px", justifyContent: "center" }}>
                   <CheckIcon
                     style={{
                       height: "20px",
@@ -487,7 +489,7 @@ const Nominations = ({ needData, openPopup }) => {
                       color: "white",
                     }}
                   />
-                  Confirm
+                  {isProcessingAccept ? "Processing..." : "Confirm"}
                 </button>
                 <button className="rejectNomin" onClick={handleReject} style={{ display: "flex", alignItems: "center", gap: "8px", background: "#f44336", color: "white", border: "none", borderRadius: "6px", padding: "12px 20px", cursor: "pointer", fontSize: "16px", fontWeight: "500", minWidth: "120px", justifyContent: "center" }}>
                   <ClearIcon
