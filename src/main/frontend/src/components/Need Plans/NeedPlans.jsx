@@ -348,6 +348,13 @@ const NeedPlans = () => {
   const [showAddSession, setShowAddSession] = useState(false);
   const [editError, setEditError] = useState('');
 
+  // Modify Timings state
+  const [showModifyTimings, setShowModifyTimings] = useState(false);
+  const [modifyTimingsFields, setModifyTimingsFields] = useState({ startTime: '', endTime: '' });
+  const [modifyTimingsError, setModifyTimingsError] = useState('');
+  const [modifyTimingsSuccess, setModifyTimingsSuccess] = useState('');
+  const [modifyTimingsLoading, setModifyTimingsLoading] = useState(false);
+
   return (
       <div>
         <div className="wrapCalender">
@@ -562,14 +569,97 @@ const NeedPlans = () => {
                     })}
                   </div>
                   {/* Add New Session Link/Button */}
-                  <div style={{margin: '16px 0'}}>
+                  <div style={{margin: '16px 0', display: 'flex', gap: 16}}>
                     <button
                       style={{background: 'none', color: '#0080BC', border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'underline'}}
                       onClick={() => setShowAddSession(v => !v)}
                     >
                       {showAddSession ? 'Hide Add New Session' : 'Add New Session'}
                     </button>
+                    <button
+                      style={{background: 'none', color: '#0080BC', border: 'none', fontWeight: 600, fontSize: 14, cursor: 'pointer', textDecoration: 'underline'}}
+                      onClick={() => {
+                        const firstUser = event.assignedUsers[0];
+                        const plan = needPlans.find(np => np.needId === event.needId && firstUser === np.assignedUserId);
+                        const currentStart = plan?.platform?.inputParameters?.[0]?.startTime || '';
+                        const currentEnd = plan?.platform?.inputParameters?.[0]?.endTime || '';
+                        setModifyTimingsFields({
+                          startTime: formatTime(currentStart, 'Asia/Kolkata'),
+                          endTime: formatTime(currentEnd, 'Asia/Kolkata'),
+                        });
+                        setModifyTimingsError('');
+                        setModifyTimingsSuccess('');
+                        setShowModifyTimings(v => !v);
+                      }}
+                    >
+                      {showModifyTimings ? 'Hide Modify Timings' : 'Modify Timings'}
+                    </button>
                   </div>
+                  {showModifyTimings && (
+                    (() => {
+                      const firstUser = event.assignedUsers[0];
+                      const planForTimings = needPlans.find(np => np.needId === event.needId && firstUser === np.assignedUserId);
+                      const currentInputUrl = planForTimings?.platform?.inputParameters?.[0]?.inputUrl || '';
+                      const currentPlatform = planForTimings?.platform?.inputParameters?.[0]?.softwarePlatform || '';
+                      const handleModifyTimingsSubmit = async (e) => {
+                        e.preventDefault();
+                        if (!modifyTimingsFields.startTime || !modifyTimingsFields.endTime) {
+                          setModifyTimingsError('Both start time and end time are required.');
+                          return;
+                        }
+                        if (modifyTimingsFields.startTime >= modifyTimingsFields.endTime) {
+                          setModifyTimingsError('Start time must be before end time.');
+                          return;
+                        }
+                        if (!planForTimings?.needPlanId) {
+                          setModifyTimingsError('Plan information missing.');
+                          return;
+                        }
+                        setModifyTimingsLoading(true);
+                        setModifyTimingsError('');
+                        setModifyTimingsSuccess('');
+                        try {
+                          const today = new Date().toISOString().split('T')[0];
+                          await axios.put(
+                            `${configData.SERVE_NEED}/all-deliverable-details/update/${planForTimings.needPlanId}`,
+                            {
+                              inputUrl: currentInputUrl,
+                              softwarePlatform: currentPlatform,
+                              startTime: `${today}T${modifyTimingsFields.startTime}:00.000Z`,
+                              endTime: `${today}T${modifyTimingsFields.endTime}:00.000Z`,
+                            }
+                          );
+                          setModifyTimingsSuccess('Session timings updated for all remaining sessions.');
+                          await fetchAllPlans();
+                          setTimeout(() => setModifyTimingsSuccess(''), 3000);
+                        } catch (error) {
+                          console.error('Error updating session timings:', error);
+                          setModifyTimingsError('Failed to update session timings. Please try again.');
+                        } finally {
+                          setModifyTimingsLoading(false);
+                        }
+                      };
+                      return (
+                        <div style={{background: '#f7fafd', border: '1.5px solid #0080BC', borderRadius: 10, margin: '16px 0', padding: 16, boxShadow: '0 2px 8px rgba(0,128,188,0.07)', fontSize: 13}}>
+                          <div style={{fontWeight: 'bold', fontSize: 16, color: '#0080BC', marginBottom: 10}}>Modify Session Timings</div>
+                          <p style={{fontSize: 12, color: '#666', marginBottom: 12}}>This will update the timings for all remaining sessions under this need plan.</p>
+                          <form style={{display: 'flex', flexDirection: 'column', gap: 10}} onSubmit={handleModifyTimingsSubmit}>
+                            <div>
+                              <label>Start Time: <input type="time" value={modifyTimingsFields.startTime} onChange={e => { setModifyTimingsFields(prev => ({...prev, startTime: e.target.value})); setModifyTimingsError(''); }} style={{marginLeft: 8, padding: 4, borderRadius: 4}} required /></label>
+                            </div>
+                            <div>
+                              <label>End Time: <input type="time" value={modifyTimingsFields.endTime} onChange={e => { setModifyTimingsFields(prev => ({...prev, endTime: e.target.value})); setModifyTimingsError(''); }} style={{marginLeft: 8, padding: 4, borderRadius: 4}} required /></label>
+                            </div>
+                            {modifyTimingsError && <div style={{color: 'red', fontSize: 12}}>{modifyTimingsError}</div>}
+                            {modifyTimingsSuccess && <div style={{color: 'green', fontSize: 12}}>{modifyTimingsSuccess}</div>}
+                            <button type="submit" disabled={modifyTimingsLoading} style={{marginTop: 8, background: '#0080BC', color: 'white', border: 'none', borderRadius: 4, padding: '6px 20px', fontWeight: 500, cursor: 'pointer', alignSelf: 'flex-start'}}>
+                              {modifyTimingsLoading ? 'Updating...' : 'Update All Sessions'}
+                            </button>
+                          </form>
+                        </div>
+                      );
+                    })()
+                  )}
                   {showAddSession && (
                     // Find the plan for the first assigned user in this event
                     (() => {

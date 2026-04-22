@@ -246,7 +246,61 @@
   margin: 50px 100px;
   font-size: 20px;
   padding: 20px;
-  border-radius: 5px
+  border-radius: 5px;
+  background-color: #FAFAFA;
+  @media (max-width: 600px) {
+    margin: 20px 2rem;
+    font-size: 16px;
+    padding: 15px;
+  }
+}
+
+.emptyNeedMessage {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.emptyNeedTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #3C4044;
+  margin: 0;
+  @media (max-width: 600px) {
+    font-size: 16px;
+  }
+}
+
+.emptyNeedText {
+  font-size: 15px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+  @media (max-width: 600px) {
+    font-size: 14px;
+  }
+}
+
+.needsMessage {
+  background-color: #F1FDFD;
+  border: 1px solid #0080BC;
+  border-radius: 8px;
+  padding: 15px 20px;
+  margin: 20px 100px;
+  @media (max-width: 600px) {
+    margin: 15px 2rem;
+    padding: 12px 15px;
+  }
+}
+
+.needsMessageText {
+  font-size: 14px;
+  color: #3C4044;
+  margin: 0;
+  line-height: 1.6;
+  @media (max-width: 600px) {
+    font-size: 12px;
+  }
 }
 .vSearchNeed {
   border: solid #DBDBDB;

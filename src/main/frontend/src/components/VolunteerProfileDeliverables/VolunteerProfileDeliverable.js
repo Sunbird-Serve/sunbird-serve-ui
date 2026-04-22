@@ -661,6 +661,18 @@ const VolunteerProfileDeliverable = (props) => {
                     )}
                   </span>
                 </div>
+                <div className="info-item">
+                  <span className="info-label">Content Url:</span>
+                  <span className="info-value">
+                    <a
+                      href="https://drive.google.com/drive/folders/1Myhew2HIwPjtpr5ihD4jDY1HYZF_JgWG?usp=drive_link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Content Link
+                    </a>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
