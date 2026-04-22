@@ -640,28 +640,6 @@ const VolunteerProfileDeliverable = (props) => {
                   </span>
                 </div>
                 <div className="info-item">
-                  <span className="info-label">Content:</span>
-                  <span className="info-value">
-                    {inParas.length && inParas[0]?.resourceUrl ? (
-                      <a
-                        href={inParas[0]?.resourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Resource Link
-                      </a>
-                    ) : (
-                      <a 
-                        href="https://serve-jcms.evean.net/home/view_course/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        View Course
-                      </a>
-                    )}
-                  </span>
-                </div>
-                <div className="info-item">
                   <span className="info-label">Content Url:</span>
                   <span className="info-value">
                     <a
