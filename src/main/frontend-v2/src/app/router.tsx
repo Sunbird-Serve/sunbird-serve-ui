@@ -36,8 +36,25 @@ const RaiseNeedPage = lazy(() =>
 const NeedSchedulePage = lazy(() =>
   import('@features/needs/pages/NeedSchedulePage').then((m) => ({ default: m.NeedSchedulePage })),
 );
+const VolunteersPage = lazy(() =>
+  import('@features/volunteers/pages/VolunteersPage').then((m) => ({ default: m.VolunteersPage })),
+);
 const PlaceholderPage = lazy(() =>
   import('@shared/components/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage })),
+);
+
+// Volunteer/Explore pages
+const MySessionsPage = lazy(() =>
+  import('@features/explore/pages/MySessionsPage').then((m) => ({ default: m.MySessionsPage })),
+);
+const ExploreNeedsPage = lazy(() =>
+  import('@features/explore/pages/ExploreNeedsPage').then((m) => ({ default: m.ExploreNeedsPage })),
+);
+const MyNominationsPage = lazy(() =>
+  import('@features/explore/pages/MyNominationsPage').then((m) => ({ default: m.MyNominationsPage })),
+);
+const VolunteerProfilePage = lazy(() =>
+  import('@features/explore/pages/VolunteerProfilePage').then((m) => ({ default: m.VolunteerProfilePage })),
 );
 
 // Loading fallback
@@ -81,6 +98,14 @@ export const router = createBrowserRouter([
         element: (
           <SuspenseWrapper>
             <ResetPasswordPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: '/explore-needs',
+        element: (
+          <SuspenseWrapper>
+            <ExploreNeedsPage />
           </SuspenseWrapper>
         ),
       },
@@ -140,10 +165,7 @@ export const router = createBrowserRouter([
             path: 'volunteers',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="Volunteers"
-                  description="Volunteer management coming in Phase 5."
-                />
+                <VolunteersPage />
               </SuspenseWrapper>
             ),
           },
@@ -151,10 +173,7 @@ export const router = createBrowserRouter([
             path: 'volunteers/:id',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="Volunteer Details"
-                  description="Volunteer detail view coming in Phase 5."
-                />
+                <VolunteersPage />
               </SuspenseWrapper>
             ),
           },
@@ -226,26 +245,20 @@ export const router = createBrowserRouter([
         path: '/explore',
         element: <VolunteerLayout />,
         children: [
-          { index: true, element: <Navigate to="needs" replace /> },
+          { index: true, element: <Navigate to="sessions" replace /> },
           {
-            path: 'needs',
+            path: 'sessions',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="Explore Needs"
-                  description="Browse available needs coming in Phase 5."
-                />
+                <MySessionsPage />
               </SuspenseWrapper>
             ),
           },
           {
-            path: 'profile',
+            path: 'needs',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="My Profile"
-                  description="Volunteer profile coming in Phase 5."
-                />
+                <ExploreNeedsPage />
               </SuspenseWrapper>
             ),
           },
@@ -253,10 +266,15 @@ export const router = createBrowserRouter([
             path: 'nominations',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="My Nominations"
-                  description="Track your nominations coming in Phase 5."
-                />
+                <MyNominationsPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: 'profile',
+            element: (
+              <SuspenseWrapper>
+                <VolunteerProfilePage />
               </SuspenseWrapper>
             ),
           },

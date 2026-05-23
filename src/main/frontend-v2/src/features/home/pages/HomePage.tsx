@@ -154,6 +154,13 @@ export function HomePage() {
                   An open-source platform that connects passionate volunteers to meaningful causes —
                   matching every verified need with the right skills, instantly and at scale.
                 </Typography>
+                <Button
+                  variant="text"
+                  sx={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'underline', alignSelf: 'flex-start', px: 0 }}
+                  onClick={() => navigate('/explore-needs')}
+                >
+                  Explore Available Needs →
+                </Button>
               </Stack>
             </Grid>
 
