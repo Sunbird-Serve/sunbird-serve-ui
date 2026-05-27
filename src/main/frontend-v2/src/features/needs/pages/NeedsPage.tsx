@@ -62,11 +62,20 @@ export function NeedsPage() {
     async function fetchNeeds() {
       setLoading(true);
       const statuses = ['New', 'Nominated', 'Approved', 'Rejected', 'Assigned', 'Fulfilled'];
+      const rawAgencyId = user?.agencyId || '';
+      const agencyId = rawAgencyId.startsWith('1-') ? rawAgencyId.substring(2) : rawAgencyId;
+      const headers: Record<string, string> = {};
+      if (agencyId) headers['X-Agency-Id'] = agencyId;
+
+      console.log('NeedsPage: user agencyId =', agencyId);
+      console.log('NeedsPage: sending X-Agency-Id header =', headers['X-Agency-Id'] || 'NOT SET');
+      console.log('NeedsPage: user osid =', user?.osid);
+      console.log('NeedsPage: full user object =', user);
 
       try {
         const results = await Promise.allSettled(
           statuses.map((status) =>
-            fetch(`${BASE_URL}/api/v1/serve-need/need/?status=${status}&page=0&size=200`)
+            fetch(`${BASE_URL}/api/v1/serve-need/need/?status=${status}&page=0&size=200`, { headers })
               .then((r) => (r.ok ? r.json() : null)),
           ),
         );
@@ -82,6 +91,11 @@ export function NeedsPage() {
           }
         }
         setAllNeeds(needs);
+        console.log('NeedsPage: total needs fetched =', needs.length);
+        if (needs.length > 0) {
+          console.log('NeedsPage: first need agencyId =', (needs[0] as unknown as Record<string, unknown>).agencyId || needs[0].need?.entityId || 'not found in response');
+          console.log('NeedsPage: first need full object =', needs[0]);
+        }
       } catch {
         // Silent fail — show empty
       } finally {
@@ -90,7 +104,7 @@ export function NeedsPage() {
     }
 
     fetchNeeds();
-  }, []);
+  }, [user?.agencyId]);
 
   // For coordinator: filter to only their own needs
   const needs = isAdmin ? allNeeds : allNeeds.filter((n) => n.need?.userId === userId);

@@ -39,6 +39,12 @@ const NeedSchedulePage = lazy(() =>
 const VolunteersPage = lazy(() =>
   import('@features/volunteers/pages/VolunteersPage').then((m) => ({ default: m.VolunteersPage })),
 );
+const EntitiesPage = lazy(() =>
+  import('@features/entities/pages/EntitiesPage').then((m) => ({ default: m.EntitiesPage })),
+);
+const AgenciesPage = lazy(() =>
+  import('@features/entities/pages/AgenciesPage').then((m) => ({ default: m.AgenciesPage })),
+);
 const PlaceholderPage = lazy(() =>
   import('@shared/components/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage })),
 );
@@ -192,10 +198,7 @@ export const router = createBrowserRouter([
             path: 'entities',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="Entities"
-                  description="Entity management coming in Phase 5."
-                />
+                <EntitiesPage />
               </SuspenseWrapper>
             ),
           },
@@ -203,10 +206,7 @@ export const router = createBrowserRouter([
             path: 'agencies',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="Agencies"
-                  description="Agency management coming in Phase 5."
-                />
+                <AgenciesPage />
               </SuspenseWrapper>
             ),
           },
