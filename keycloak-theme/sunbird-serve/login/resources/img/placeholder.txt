@@ -1,0 +1,10 @@
+Place these images here:
+- logo.png — Sunbird Serve logo (height ~40px)
+- bg.jpg — Optional background image (if you want an image instead of gradient)
+
+The CSS uses a gradient by default. If you want a background image, add this to login.css:
+
+#kc-login {
+  background: url('../img/bg.jpg') no-repeat center center;
+  background-size: cover;
+}

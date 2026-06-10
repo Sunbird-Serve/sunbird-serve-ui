@@ -8,7 +8,7 @@ import { fetchUserByEmail } from '@features/auth/state/userSlice';
 import { getRoleConfig } from '@config/roles';
 import { Box, CircularProgress, Typography, Stack } from '@mui/material';
 
-// Full-screen loading state shown while user data is being fetched after auth
+// Full-screen loading state shown during Keycloak init or user data fetch
 function FullScreenLoader() {
   return (
     <Box
@@ -25,34 +25,33 @@ function FullScreenLoader() {
       <Stack spacing={2} alignItems="center">
         <CircularProgress size={40} />
         <Typography variant="body2" color="text.secondary">
-          Loading your dashboard...
+          Loading...
         </Typography>
       </Stack>
     </Box>
   );
 }
 
-// Inner component that has access to auth context and handles user fetching + redirection
+// Inner component that has access to auth context
 function AppInner() {
-  const { firebaseUser, loading: authLoading } = useAuth();
+  const { initialized, authenticated, user, roles } = useAuth();
   const dispatch = useAppDispatch();
-  const { data: user, status } = useAppSelector((state) => state.user);
+  const { status: userStatus } = useAppSelector((state) => state.user);
 
-  // Fetch user details when Firebase auth state changes
+  // Fetch user details (osid, identityDetails) after Keycloak authenticates
   useEffect(() => {
-    if (firebaseUser?.email) {
-      const encodedEmail = firebaseUser.email.replace(/@/g, '%40');
+    if (authenticated && user?.email) {
+      const encodedEmail = user.email.replace(/@/g, '%40');
       dispatch(fetchUserByEmail(encodedEmail));
     }
-  }, [firebaseUser, dispatch]);
+  }, [authenticated, user?.email, dispatch]);
 
-  // Role-based redirect after successful user fetch
+  // Role-based redirect after user data loads
   useEffect(() => {
-    if (status === 'succeeded' && user?.role) {
-      const roleConfig = getRoleConfig(user.role);
+    if (authenticated && userStatus === 'succeeded' && roles.length > 0) {
+      const roleConfig = getRoleConfig(roles);
       if (roleConfig) {
         const currentPath = window.location.pathname;
-        // Only redirect if user is on a public page (login, signup, home)
         const publicPaths = ['/', '/login', '/signup', '/reset-password'];
         const isOnPublicPage = publicPaths.some(
           (p) => currentPath === p || currentPath.startsWith('/signup/'),
@@ -62,23 +61,22 @@ function AppInner() {
         }
       }
     }
-  }, [status, user]);
+  }, [authenticated, userStatus, roles]);
 
-  // Show full-screen loader when:
-  // 1. Firebase auth is still initializing
-  // 2. User is authenticated but user details are still loading
-  if (authLoading) {
+  // Show loader during Keycloak initialization
+  if (!initialized) {
     return <FullScreenLoader />;
   }
 
-  if (firebaseUser && status === 'loading') {
+  // Show loader while fetching user details after auth
+  if (authenticated && userStatus === 'loading') {
     return <FullScreenLoader />;
   }
 
   return <RouterProvider router={router} />;
 }
 
-// Root App component — wraps everything in providers
+// Root App component
 export function App() {
   return (
     <AppProviders>

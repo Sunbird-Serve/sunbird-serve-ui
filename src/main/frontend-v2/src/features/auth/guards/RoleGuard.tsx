@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAppSelector } from '@app/store';
-import { UserRole } from '@config/roles';
 import { Box, CircularProgress } from '@mui/material';
+import { useAuth } from '../hooks/useAuth';
+import { UserRole } from '@config/roles';
 
 interface RoleGuardProps {
   allowedRoles: UserRole[];
@@ -9,29 +9,21 @@ interface RoleGuardProps {
 }
 
 export function RoleGuard({ allowedRoles, redirectTo = '/app/dashboard' }: RoleGuardProps) {
-  const { data: user, status } = useAppSelector((state) => state.user);
+  const { initialized, authenticated, roles } = useAuth();
 
-  if (status === 'loading') {
+  if (!initialized) {
     return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
         <CircularProgress />
       </Box>
     );
   }
 
-  if (!user?.role) {
+  if (!authenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  const userRoles = Array.isArray(user.role) ? user.role : [user.role];
-  const hasAccess = userRoles.some((role) => allowedRoles.includes(role as UserRole));
+  const hasAccess = roles.some((role) => allowedRoles.includes(role as UserRole));
 
   if (!hasAccess) {
     return <Navigate to={redirectTo} replace />;

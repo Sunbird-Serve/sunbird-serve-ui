@@ -1,12 +1,11 @@
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { Outlet } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
+import { useAuth } from '../hooks/useAuth';
 
 export function ProtectedRoute() {
-  const { firebaseUser, loading } = useAuth();
-  const location = useLocation();
+  const { initialized, authenticated, keycloakLogin } = useAuth();
 
-  if (loading) {
+  if (!initialized) {
     return (
       <Box
         sx={{
@@ -21,8 +20,21 @@ export function ProtectedRoute() {
     );
   }
 
-  if (!firebaseUser) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  if (!authenticated) {
+    // Redirect to Keycloak login
+    keycloakLogin();
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
   }
 
   return <Outlet />;

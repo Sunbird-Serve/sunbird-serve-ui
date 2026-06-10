@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -10,17 +10,9 @@ import {
   Paper,
   Tab,
   Tabs,
-  TextField,
-  IconButton,
-  InputAdornment,
   Alert,
-  Link,
   Divider,
-  LinearProgress,
-  CircularProgress,
 } from '@mui/material';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import GoogleIcon from '@mui/icons-material/Google';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import SchoolIcon from '@mui/icons-material/School';
@@ -59,41 +51,38 @@ const impactItems = [
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { login, loginWithGoogle } = useAuth();
+  const { authenticated, keycloakLogin } = useAuth();
 
   const [tab, setTab] = useState(0);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      await login(email, password);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Login failed';
-      const cleaned = message
-        .replace('Firebase: ', '')
-        .replace(/\(auth\/.*\)\.?/, '')
-        .replace('Error ', '')
-        .trim();
-      setError(cleaned || 'Invalid email or password.');
-    } finally {
-      setLoading(false);
+  // If already authenticated, redirect to dashboard
+  useEffect(() => {
+    if (authenticated) {
+      navigate('/app/dashboard');
     }
+  }, [authenticated, navigate]);
+
+  const handleLogin = () => {
+    keycloakLogin();
   };
 
-  const handleGoogleLogin = async () => {
-    setError('');
-    try {
-      await loginWithGoogle();
-    } catch {
-      setError('Google sign-in failed. Please try again.');
-    }
+  const handleRegister = () => {
+    // Keycloak register URL
+    const kcUrl = import.meta.env.VITE_KEYCLOAK_URL;
+    const realm = import.meta.env.VITE_KEYCLOAK_REALM;
+    const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID;
+    const redirectUri = encodeURIComponent(window.location.origin);
+    window.location.href = `${kcUrl}/realms/${realm}/protocol/openid-connect/registrations?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid`;
+  };
+
+  const handleGoogleLogin = () => {
+    // Redirect to Keycloak with Google IdP hint
+    const kcUrl = import.meta.env.VITE_KEYCLOAK_URL;
+    const realm = import.meta.env.VITE_KEYCLOAK_REALM;
+    const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID;
+    const redirectUri = encodeURIComponent(window.location.origin);
+    window.location.href = `${kcUrl}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid&kc_idp_hint=google`;
   };
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -196,93 +185,37 @@ export function HomePage() {
 
                 {/* Login Tab */}
                 {tab === 0 && (
-                  <form onSubmit={handleLogin}>
-                    <Stack spacing={2.5}>
-                      {loading && <LinearProgress sx={{ borderRadius: 1 }} />}
+                  <Stack spacing={2.5}>
+                    <Typography variant="body2" color="text.secondary" textAlign="center">
+                      Sign in to access your dashboard
+                    </Typography>
 
-                      <TextField
-                        label="Email Address"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        fullWidth
-                        autoComplete="email"
-                        size="medium"
-                        InputLabelProps={{ shrink: true }}
-                        placeholder="Enter your email"
-                        disabled={loading}
-                      />
-                      <TextField
-                        label="Password"
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        fullWidth
-                        autoComplete="current-password"
-                        size="medium"
-                        InputLabelProps={{ shrink: true }}
-                        placeholder="Enter your password"
-                        disabled={loading}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                onClick={() => setShowPassword(!showPassword)}
-                                edge="end"
-                                size="small"
-                                aria-label={showPassword ? 'hide password' : 'show password'}
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        }}
-                      />
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        size="large"
-                        fullWidth
-                        disabled={loading}
-                        sx={{ py: 1.5 }}
-                        startIcon={
-                          loading ? <CircularProgress size={18} color="inherit" /> : undefined
-                        }
-                      >
-                        {loading ? 'Signing in...' : 'Sign In'}
-                      </Button>
+                    <Button
+                      variant="contained"
+                      size="large"
+                      fullWidth
+                      onClick={handleLogin}
+                      sx={{ py: 1.5 }}
+                    >
+                      Sign In
+                    </Button>
 
-                      <Box textAlign="center">
-                        <Link
-                          component="button"
-                          type="button"
-                          variant="body2"
-                          underline="hover"
-                          onClick={() => navigate('/reset-password')}
-                        >
-                          Forgot password?
-                        </Link>
-                      </Box>
+                    <Divider>
+                      <Typography variant="caption" color="text.secondary">
+                        OR
+                      </Typography>
+                    </Divider>
 
-                      <Divider>
-                        <Typography variant="caption" color="text.secondary">
-                          OR
-                        </Typography>
-                      </Divider>
-
-                      <Button
-                        variant="outlined"
-                        fullWidth
-                        startIcon={<GoogleIcon />}
-                        onClick={handleGoogleLogin}
-                        sx={{ py: 1.2 }}
-                      >
-                        Continue with Google
-                      </Button>
-                    </Stack>
-                  </form>
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      startIcon={<GoogleIcon />}
+                      onClick={handleGoogleLogin}
+                      sx={{ py: 1.2 }}
+                    >
+                      Continue with Google
+                    </Button>
+                  </Stack>
                 )}
 
                 {/* Sign Up Tab */}
@@ -297,7 +230,7 @@ export function HomePage() {
                       size="large"
                       fullWidth
                       startIcon={<VolunteerActivismIcon />}
-                      onClick={() => navigate('/signup/volunteer')}
+                      onClick={handleRegister}
                       sx={{ py: 1.8, justifyContent: 'flex-start', px: 3 }}
                     >
                       <Stack alignItems="flex-start" sx={{ ml: 1 }}>
@@ -315,7 +248,7 @@ export function HomePage() {
                       size="large"
                       fullWidth
                       startIcon={<SchoolIcon />}
-                      onClick={() => navigate('/signup/coordinator')}
+                      onClick={handleRegister}
                       sx={{ py: 1.8, justifyContent: 'flex-start', px: 3 }}
                     >
                       <Stack alignItems="flex-start" sx={{ ml: 1 }}>

@@ -1,19 +1,23 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import type { RootState } from './store';
+import keycloak from '@config/keycloak';
 
-// Base API with X-Agency-Id header auto-injected from user state
+// Base API with Keycloak Bearer token + X-Agency-Id header
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
-    prepareHeaders: (headers, { getState }) => {
-      const state = getState() as RootState;
-      const rawAgencyId = state.user.data?.agencyId || '';
-      // Strip "1-" prefix (Sunbird RC format) to get plain UUID for need service
-      const agencyId = rawAgencyId.startsWith('1-') ? rawAgencyId.substring(2) : rawAgencyId;
+    prepareHeaders: (headers) => {
+      // Attach Bearer token from Keycloak
+      if (keycloak.token) {
+        headers.set('Authorization', `Bearer ${keycloak.token}`);
+      }
+
+      // Attach X-Agency-Id from token claims
+      const agencyId = (keycloak.tokenParsed as Record<string, unknown> | undefined)?.agencyId as string || '';
       if (agencyId) {
         headers.set('X-Agency-Id', agencyId);
       }
+
       return headers;
     },
   }),
