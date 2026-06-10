@@ -77,16 +77,12 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
       if (!needId) return;
       setLoading(true);
       setError('');
-      console.log('SessionsPanel: fetching for needId:', needId);
       try {
         // Step 1: Get need plans for this need
         const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${needId}`);
-        console.log('SessionsPanel: need-plan response status:', planResp.status);
         if (!planResp.ok) throw new Error('Failed to fetch need plans');
         const planData = await planResp.json();
-        console.log('SessionsPanel: need-plan data:', planData);
         const plans = Array.isArray(planData) ? planData : (planData.content || []);
-        console.log('SessionsPanel: plans extracted:', plans.length, plans[0]);
 
         if (plans.length === 0) {
           setLoading(false);
@@ -96,7 +92,6 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
         // Use the first plan — planId is nested under .plan.id
         const planObj = plans[0];
         const planId = planObj?.plan?.id || planObj?.id || planObj?.osid || '';
-        console.log('SessionsPanel: using planId:', planId);
         setNeedPlanId(planId);
 
         if (!planId) {
@@ -317,7 +312,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
   if (deliverables.length === 0) {
     return (
       <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
-        No sessions found for this need. (needId: {needId || 'EMPTY'})
+        No sessions found for this need.
       </Typography>
     );
   }

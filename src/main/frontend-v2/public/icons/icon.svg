@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="64" fill="#0E7490"/>
+  <text x="256" y="200" font-family="Arial, sans-serif" font-size="120" font-weight="bold" fill="white" text-anchor="middle">S</text>
+  <text x="256" y="320" font-family="Arial, sans-serif" font-size="48" font-weight="600" fill="#FCD34D" text-anchor="middle">SERVE</text>
+  <text x="256" y="380" font-family="Arial, sans-serif" font-size="28" fill="rgba(255,255,255,0.7)" text-anchor="middle">Sunbird</text>
+</svg>

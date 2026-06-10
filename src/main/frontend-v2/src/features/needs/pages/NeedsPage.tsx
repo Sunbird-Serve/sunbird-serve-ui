@@ -65,8 +65,6 @@ export function NeedsPage() {
       const statuses = ['New', 'Nominated', 'Approved', 'Rejected', 'Assigned', 'Fulfilled'];
       const headers = getAuthHeaders();
 
-      console.log('NeedsPage: user agencyId =', headers['X-Agency-Id'] || 'NOT SET');
-
       try {
         const results = await Promise.allSettled(
           statuses.map((status) =>

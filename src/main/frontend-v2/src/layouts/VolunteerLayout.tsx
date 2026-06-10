@@ -1,4 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import {
   Box,
   AppBar,
@@ -108,7 +109,9 @@ export function VolunteerLayout() {
 
       {/* Content */}
       <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, sm: 3 }, pb: isMobile ? 9 : 3 }}>
-        <Outlet />
+        <ErrorBoundary>
+          <Outlet />
+        </ErrorBoundary>
       </Box>
 
       {/* Mobile bottom navigation */}

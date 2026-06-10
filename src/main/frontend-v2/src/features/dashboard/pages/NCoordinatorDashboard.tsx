@@ -184,7 +184,6 @@ export function NCoordinatorDashboard() {
             // Skip failed individual fetches
           }
         }
-        console.log('Session results:', sessionResults);
         setSessions(sessionResults);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load sessions');

@@ -1,11 +1,13 @@
 {
   "name": "Sunbird Serve",
   "short_name": "Serve",
-  "description": "Volunteer and Need Management Platform",
+  "description": "Volunteer and Need Management Platform - Translating Intent to Impact",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#1565C0",
+  "theme_color": "#0E7490",
+  "orientation": "portrait-primary",
+  "categories": ["education", "social"],
   "icons": [
     {
       "src": "icons/icon-192x192.png",
@@ -18,10 +20,22 @@
       "type": "image/png"
     },
     {
-      "src": "icons/icon-512x512.png",
+      "src": "icons/icon-512x512-maskable.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My Sessions",
+      "short_name": "Sessions",
+      "url": "/app/dashboard"
+    },
+    {
+      "name": "Explore Needs",
+      "short_name": "Explore",
+      "url": "/explore-needs"
     }
   ]
 }

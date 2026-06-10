@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { ErrorBoundary } from '@shared/components/ErrorBoundary';
 import {
   Box,
   Drawer,
@@ -148,7 +149,9 @@ export function AdminLayout() {
 
         {/* Page content */}
         <Box sx={{ flexGrow: 1, p: 3 }}>
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </Box>
       </Box>
     </Box>
