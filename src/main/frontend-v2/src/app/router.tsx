@@ -17,6 +17,9 @@ import { HomePage } from '@features/home/pages/HomePage';
 const RegistrationPage = lazy(() =>
   import('@features/auth/pages/RegistrationPage').then((m) => ({ default: m.RegistrationPage })),
 );
+const CoordinatorRegistrationPage = lazy(() =>
+  import('@features/auth/pages/CoordinatorRegistrationPage').then((m) => ({ default: m.CoordinatorRegistrationPage })),
+);
 const DashboardPage = lazy(() =>
   import('@features/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 );
@@ -81,6 +84,22 @@ export const router = createBrowserRouter([
         element: (
           <SuspenseWrapper>
             <RegistrationPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: '/register/volunteer-profile',
+        element: (
+          <SuspenseWrapper>
+            <RegistrationPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: '/register/coordinator-profile',
+        element: (
+          <SuspenseWrapper>
+            <CoordinatorRegistrationPage />
           </SuspenseWrapper>
         ),
       },

@@ -8,7 +8,7 @@ import { fetchUserByEmail } from '@features/auth/state/userSlice';
 import { getRoleConfig } from '@config/roles';
 import { Box, CircularProgress, Typography, Stack } from '@mui/material';
 
-// Full-screen loading state shown during Keycloak init or user data fetch
+// Full-screen loading state
 function FullScreenLoader() {
   return (
     <Box
@@ -32,13 +32,13 @@ function FullScreenLoader() {
   );
 }
 
-// Inner component that has access to auth context
+// Inner component with auth context access
 function AppInner() {
   const { initialized, authenticated, user, roles } = useAuth();
   const dispatch = useAppDispatch();
   const { status: userStatus } = useAppSelector((state) => state.user);
 
-  // Fetch user details (osid, identityDetails) after Keycloak authenticates
+  // Fetch user details after Keycloak authenticates
   useEffect(() => {
     if (authenticated && user?.email) {
       const encodedEmail = user.email.replace(/@/g, '%40');
@@ -46,19 +46,31 @@ function AppInner() {
     }
   }, [authenticated, user?.email, dispatch]);
 
-  // Role-based redirect after user data loads
+  // Role-based redirect OR registration redirect
   useEffect(() => {
-    if (authenticated && userStatus === 'succeeded' && roles.length > 0) {
+    if (!authenticated) return;
+
+    const currentPath = window.location.pathname;
+    const isOnRegPage = currentPath.startsWith('/register/');
+
+    // User exists in backend — redirect to their dashboard
+    if (userStatus === 'succeeded' && roles.length > 0) {
+      const publicPaths = ['/', '/login', '/explore-needs'];
+      const isOnPublicPage = publicPaths.includes(currentPath);
       const roleConfig = getRoleConfig(roles);
-      if (roleConfig) {
-        const currentPath = window.location.pathname;
-        const publicPaths = ['/', '/login', '/signup', '/reset-password'];
-        const isOnPublicPage = publicPaths.some(
-          (p) => currentPath === p || currentPath.startsWith('/signup/'),
-        );
-        if (isOnPublicPage) {
-          router.navigate(roleConfig.defaultRoute);
-        }
+      if (roleConfig && (isOnPublicPage || isOnRegPage)) {
+        router.navigate(roleConfig.defaultRoute);
+      }
+    }
+
+    // User NOT in backend — redirect to registration
+    if (userStatus === 'failed' && !isOnRegPage) {
+      const coordinatorRoles = ['nCoordinator', 'nAdmin', 'vCoordinator', 'vAdmin', 'sAdmin'];
+      const isCoordinator = roles.some((r) => coordinatorRoles.includes(r));
+      if (isCoordinator) {
+        router.navigate('/register/coordinator-profile');
+      } else {
+        router.navigate('/register/volunteer-profile');
       }
     }
   }, [authenticated, userStatus, roles]);
@@ -68,8 +80,8 @@ function AppInner() {
     return <FullScreenLoader />;
   }
 
-  // Show loader while fetching user details after auth
-  if (authenticated && userStatus === 'loading') {
+  // Show loader while fetching user details — block everything until we know if user exists
+  if (authenticated && userStatus !== 'succeeded' && userStatus !== 'failed') {
     return <FullScreenLoader />;
   }
 

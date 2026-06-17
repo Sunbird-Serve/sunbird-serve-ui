@@ -9,7 +9,7 @@ import { NeedDetailDialog } from '../components/NeedDetailDialog';
 import { ModifyScheduleDialog } from '../components/ModifyScheduleDialog';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 function normalizeItem(item: Record<string, unknown>): NeedListItem | null {
   if (!item) return null;

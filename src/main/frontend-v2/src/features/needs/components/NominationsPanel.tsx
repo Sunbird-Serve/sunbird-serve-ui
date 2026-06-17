@@ -81,7 +81,7 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
   }, [enrichedNominations, tab]);
 
   const handleAccept = async (nom: NominationItem) => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+    const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
     try {
       // Step 1: Check for existing backfilled volunteers for this need

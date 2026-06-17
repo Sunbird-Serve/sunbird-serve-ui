@@ -68,21 +68,15 @@ export function HomePage() {
   };
 
   const handleRegister = () => {
-    // Keycloak register URL
-    const kcUrl = import.meta.env.VITE_KEYCLOAK_URL;
-    const realm = import.meta.env.VITE_KEYCLOAK_REALM;
-    const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID;
-    const redirectUri = encodeURIComponent(window.location.origin);
-    window.location.href = `${kcUrl}/realms/${realm}/protocol/openid-connect/registrations?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid`;
+    import('@config/keycloak').then((mod) => {
+      mod.default.register();
+    });
   };
 
   const handleGoogleLogin = () => {
-    // Redirect to Keycloak with Google IdP hint
-    const kcUrl = import.meta.env.VITE_KEYCLOAK_URL;
-    const realm = import.meta.env.VITE_KEYCLOAK_REALM;
-    const clientId = import.meta.env.VITE_KEYCLOAK_CLIENT_ID;
-    const redirectUri = encodeURIComponent(window.location.origin);
-    window.location.href = `${kcUrl}/realms/${realm}/protocol/openid-connect/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=openid&kc_idp_hint=google`;
+    import('@config/keycloak').then((mod) => {
+      mod.default.login({ idpHint: 'google' });
+    });
   };
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
