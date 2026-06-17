@@ -18,8 +18,12 @@ export const fetchUserByEmail = createAsyncThunk<User, string>(
   async (email, { rejectWithValue }) => {
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
+      const { getAuthHeaders } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeaders();
+
       const response = await fetch(
         `${baseUrl}/api/v1/serve-volunteering/user/email?email=${email}`,
+        { headers },
       );
       if (!response.ok) {
         throw new Error(`Failed to fetch user: ${response.statusText}`);
