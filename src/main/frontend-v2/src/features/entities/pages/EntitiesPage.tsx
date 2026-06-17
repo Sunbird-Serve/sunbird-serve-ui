@@ -29,7 +29,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 interface Entity {
   id: string;

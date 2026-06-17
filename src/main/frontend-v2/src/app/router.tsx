@@ -12,17 +12,13 @@ import { ProtectedRoute } from '@features/auth/guards/ProtectedRoute';
 
 // Eager-loaded pages (small, critical path)
 import { HomePage } from '@features/home/pages/HomePage';
-import { LoginPage } from '@features/auth/pages/LoginPage';
 
 // Lazy-loaded pages
-const ResetPasswordPage = lazy(() =>
-  import('@features/auth/pages/ResetPasswordPage').then((m) => ({ default: m.ResetPasswordPage })),
-);
-const SignUpPage = lazy(() =>
-  import('@features/auth/pages/SignUpPage').then((m) => ({ default: m.SignUpPage })),
-);
 const RegistrationPage = lazy(() =>
   import('@features/auth/pages/RegistrationPage').then((m) => ({ default: m.RegistrationPage })),
+);
+const CoordinatorRegistrationPage = lazy(() =>
+  import('@features/auth/pages/CoordinatorRegistrationPage').then((m) => ({ default: m.CoordinatorRegistrationPage })),
 );
 const DashboardPage = lazy(() =>
   import('@features/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
@@ -82,15 +78,7 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: [
       { path: '/', element: <HomePage /> },
-      { path: '/login', element: <LoginPage /> },
-      {
-        path: '/signup/:type',
-        element: (
-          <SuspenseWrapper>
-            <SignUpPage />
-          </SuspenseWrapper>
-        ),
-      },
+      { path: '/login', element: <HomePage /> },
       {
         path: '/register/:agencyId',
         element: (
@@ -100,10 +88,18 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/reset-password',
+        path: '/register/volunteer-profile',
         element: (
           <SuspenseWrapper>
-            <ResetPasswordPage />
+            <RegistrationPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: '/register/coordinator-profile',
+        element: (
+          <SuspenseWrapper>
+            <CoordinatorRegistrationPage />
           </SuspenseWrapper>
         ),
       },

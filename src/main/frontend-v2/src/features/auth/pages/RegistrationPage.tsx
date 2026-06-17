@@ -144,9 +144,12 @@ export function RegistrationPage() {
 
     try {
       // Step 1: Create user
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeadersWithJson();
+
       const userResponse = await fetch(`${API.USER}/`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(userPayload),
       });
 
@@ -195,7 +198,7 @@ export function RegistrationPage() {
 
       const profileResponse = await fetch(`${API.USER_PROFILE}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(profilePayload),
       });
 

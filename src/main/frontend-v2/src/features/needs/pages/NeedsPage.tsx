@@ -7,8 +7,9 @@ import { NeedListItem, useUpdateNeedStatusMutation } from '../api/needsApi';
 import { NeedsTable } from '../components/NeedsTable';
 import { NeedDetailDialog } from '../components/NeedDetailDialog';
 import { ModifyScheduleDialog } from '../components/ModifyScheduleDialog';
+import { getAuthHeaders } from '@shared/utils/authHeaders';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 function normalizeItem(item: Record<string, unknown>): NeedListItem | null {
   if (!item) return null;
@@ -62,15 +63,7 @@ export function NeedsPage() {
     async function fetchNeeds() {
       setLoading(true);
       const statuses = ['New', 'Nominated', 'Approved', 'Rejected', 'Assigned', 'Fulfilled'];
-      const rawAgencyId = user?.agencyId || '';
-      const agencyId = rawAgencyId.startsWith('1-') ? rawAgencyId.substring(2) : rawAgencyId;
-      const headers: Record<string, string> = {};
-      if (agencyId) headers['X-Agency-Id'] = agencyId;
-
-      console.log('NeedsPage: user agencyId =', agencyId);
-      console.log('NeedsPage: sending X-Agency-Id header =', headers['X-Agency-Id'] || 'NOT SET');
-      console.log('NeedsPage: user osid =', user?.osid);
-      console.log('NeedsPage: full user object =', user);
+      const headers = getAuthHeaders();
 
       try {
         const results = await Promise.allSettled(
@@ -91,11 +84,6 @@ export function NeedsPage() {
           }
         }
         setAllNeeds(needs);
-        console.log('NeedsPage: total needs fetched =', needs.length);
-        if (needs.length > 0) {
-          console.log('NeedsPage: first need agencyId =', (needs[0] as unknown as Record<string, unknown>).agencyId || needs[0].need?.entityId || 'not found in response');
-          console.log('NeedsPage: first need full object =', needs[0]);
-        }
       } catch {
         // Silent fail — show empty
       } finally {

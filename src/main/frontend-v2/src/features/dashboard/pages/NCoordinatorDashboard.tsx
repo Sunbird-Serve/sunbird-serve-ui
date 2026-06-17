@@ -24,9 +24,8 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useAppSelector } from '@app/store';
 import { WelcomeBanner } from '../components/WelcomeBanner';
 import { StatusChip } from '../components/StatusChip';
-import { auth } from '@config/firebase';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 interface Fulfillment {
   needId: string;
@@ -97,10 +96,9 @@ export function NCoordinatorDashboard() {
       if (!userId) return;
       setLoading(true);
       try {
-        // Build headers — X-Agency-Id required by new backend
-        const agencyId = user?.agencyId || '';
-        const headers: Record<string, string> = {};
-        if (agencyId) headers['X-Agency-Id'] = agencyId;
+        // Build headers from Keycloak
+        const { getAuthHeaders: getHeaders } = await import('@shared/utils/authHeaders');
+        const headers = getHeaders();
 
         // Get fulfillments for this coordinator
         const fulfResp = await fetch(
@@ -186,7 +184,6 @@ export function NCoordinatorDashboard() {
             // Skip failed individual fetches
           }
         }
-        console.log('Session results:', sessionResults);
         setSessions(sessionResults);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load sessions');
@@ -249,11 +246,8 @@ export function NCoordinatorDashboard() {
     setSaving(true);
     setError('');
     try {
-      const token = await auth.currentUser?.getIdToken();
-      const agencyId = user?.agencyId || '';
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      if (token) headers['Authorization'] = `Bearer ${token}`;
-      if (agencyId) headers['X-Agency-Id'] = agencyId;
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeadersWithJson();
 
       await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${d.id}`, {
         method: 'PUT',

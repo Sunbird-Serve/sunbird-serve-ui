@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -25,7 +25,9 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CloseIcon from '@mui/icons-material/Close';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useAppSelector } from '@app/store';
-import { useGetAvailableNeedsQuery, useSelfNominateMutation, AvailableNeed } from '../api/exploreApi';
+import { useSelfNominateMutation, AvailableNeed } from '../api/exploreApi';
+
+const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 function formatDays(need: AvailableNeed): string {
   const schedule = need.requirement?.schedule || need.occurrence;
@@ -60,7 +62,21 @@ export function ExploreNeedsPage() {
   const user = useAppSelector((state) => state.user.data);
   const userId = user?.osid || '';
 
-  const { data: needs = [], isLoading } = useGetAvailableNeedsQuery();
+  const [needs, setNeeds] = useState<AvailableNeed[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch(`${BASE_URL}/api/v1/serve-need/need/?status=Approved&page=0&size=100`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data) {
+          const content = Array.isArray(data) ? data : (data.content || []);
+          setNeeds(content);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  }, []);
   const [selfNominate, { isLoading: nominating }] = useSelfNominateMutation();
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');

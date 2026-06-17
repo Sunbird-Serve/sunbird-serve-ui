@@ -17,7 +17,7 @@ export const fetchUserByEmail = createAsyncThunk<User, string>(
   'user/fetchUserByEmail',
   async (email, { rejectWithValue }) => {
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const baseUrl = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
       const response = await fetch(
         `${baseUrl}/api/v1/serve-volunteering/user/email?email=${email}`,
       );
@@ -43,6 +43,8 @@ const userSlice = createSlice({
       state.data = null;
       state.status = 'idle';
       state.error = null;
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userDetails');
     },
   },
   extraReducers: (builder) => {
