@@ -21,6 +21,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import InsightsIcon from '@mui/icons-material/Insights';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { useAuth } from '@features/auth';
+import { getRoleConfig } from '@config/roles';
 
 const impactItems = [
   {
@@ -51,17 +52,19 @@ const impactItems = [
 
 export function HomePage() {
   const navigate = useNavigate();
-  const { authenticated, keycloakLogin } = useAuth();
+  const { authenticated, roles, keycloakLogin } = useAuth();
 
   const [tab, setTab] = useState(0);
   const [error, setError] = useState('');
 
-  // If already authenticated, redirect to dashboard
+  // If already authenticated, redirect based on role
   useEffect(() => {
     if (authenticated) {
-      navigate('/app/dashboard');
+      const role = roles.length > 0 ? roles[0] : undefined;
+      const roleConfig = getRoleConfig(role);
+      navigate(roleConfig?.defaultRoute || '/app/dashboard');
     }
-  }, [authenticated, navigate]);
+  }, [authenticated, roles, navigate]);
 
   const handleLogin = () => {
     keycloakLogin();
