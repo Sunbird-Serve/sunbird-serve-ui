@@ -1,6 +1,7 @@
 import { Box, CircularProgress } from '@mui/material';
 import { useAppSelector } from '@app/store';
 import { useAuth } from '@features/auth';
+import { Navigate } from 'react-router-dom';
 import { NCoordinatorDashboard } from './NCoordinatorDashboard';
 import { NAdminDashboard } from './NAdminDashboard';
 import { VCoordinatorDashboard } from './VCoordinatorDashboard';
@@ -42,6 +43,8 @@ export function DashboardPage() {
     case 'vAdmin':
     case 'sAdmin':
       return <VAdminDashboard />;
+    case 'Volunteer':
+      return <Navigate to="/explore/sessions" replace />;
     default:
       return <NCoordinatorDashboard />;
   }

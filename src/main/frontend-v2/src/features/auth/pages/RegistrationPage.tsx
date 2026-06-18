@@ -19,6 +19,7 @@ import {
   Autocomplete,
 } from '@mui/material';
 import { API } from '@config/api';
+import { useAuth } from '../hooks/useAuth';
 
 const GENDER_OPTIONS = ['Male', 'Female', 'Transgender', 'Others'];
 
@@ -65,18 +66,19 @@ interface FormData {
 export function RegistrationPage() {
   const { agencyId } = useParams<{ agencyId: string }>();
   const navigate = useNavigate();
+  const { user: keycloakUser } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
-    firstName: '',
-    lastName: '',
+    firstName: keycloakUser?.firstName || '',
+    lastName: keycloakUser?.lastName || '',
     gender: '',
     dob: '',
     nationality: '',
     mobile: '',
-    email: localStorage.getItem('regEmail') || '',
+    email: keycloakUser?.email || localStorage.getItem('regEmail') || '',
     city: '',
     state: '',
     country: '',
@@ -341,6 +343,8 @@ export function RegistrationPage() {
                           onChange={handleChange('email')}
                           required
                           fullWidth
+                          disabled={!!keycloakUser?.email}
+                          helperText={keycloakUser?.email ? 'Email from your account' : undefined}
                         />
                       </Stack>
                       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
