@@ -26,6 +26,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useAppSelector } from '@app/store';
 import { useSelfNominateMutation, AvailableNeed } from '../api/exploreApi';
+import { getAuthHeaders } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -66,7 +67,9 @@ export function ExploreNeedsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`${BASE_URL}/api/v1/serve-need/need/?status=Approved&page=0&size=100`)
+    fetch(`${BASE_URL}/api/v1/serve-need/need/?status=Approved&page=0&size=100`, {
+      headers: getAuthHeaders(),
+    })
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (data) {
