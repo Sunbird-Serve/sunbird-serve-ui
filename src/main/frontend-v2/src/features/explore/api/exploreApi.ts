@@ -58,12 +58,11 @@ export const exploreApi = baseApi.injectEndpoints({
     }),
 
     // Self-nominate for a need
-    // POST /api/v1/serve-fulfill/nomination/nominate
+    // POST /api/v1/serve-fulfill/nomination/{needId}/nominate/{userId}
     selfNominate: builder.mutation<unknown, { needId: string; userId: string }>({
       query: ({ needId, userId }) => ({
-        url: '/api/v1/serve-fulfill/nomination/nominate',
+        url: `/api/v1/serve-fulfill/nomination/${needId}/nominate/${userId}`,
         method: 'POST',
-        body: { needId, nominatedUserId: userId, nominationStatus: 'Nominated' },
       }),
       invalidatesTags: ['Nomination'],
     }),
