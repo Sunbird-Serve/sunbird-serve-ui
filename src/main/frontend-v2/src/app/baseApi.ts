@@ -20,6 +20,13 @@ export const baseApi = createApi({
     // Determine the correct base URL based on the endpoint path
     const baseUrl = getBaseUrl(args);
 
+    // Ensure token is fresh before making the request
+    try {
+      await keycloak.updateToken(30);
+    } catch {
+      // If refresh fails, proceed with existing token (may be null)
+    }
+
     const rawBaseQuery = fetchBaseQuery({
       baseUrl,
       prepareHeaders: (headers) => {
