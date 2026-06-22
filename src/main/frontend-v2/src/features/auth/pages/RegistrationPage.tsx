@@ -209,10 +209,17 @@ export function RegistrationPage() {
         console.warn('Profile creation failed, but user was created.');
       }
 
-      // Success — navigate to login
-      navigate('/login', {
-        state: { message: 'Registration successful! Please sign in to continue.' },
-      });
+      // Force token refresh to pick up the newly assigned Keycloak role
+      try {
+        const keycloak = (await import('@config/keycloak')).default;
+        await keycloak.updateToken(-1); // Force refresh by setting minValidity to -1
+      } catch {
+        // If token refresh fails, user will get the new role on next login
+        console.warn('Token refresh failed — role will be available on next login.');
+      }
+
+      // Navigate directly to volunteer explore page
+      navigate('/explore/sessions');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     } finally {
