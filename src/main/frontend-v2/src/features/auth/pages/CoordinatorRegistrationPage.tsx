@@ -19,18 +19,20 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 const GENDER_OPTIONS = ['Male', 'Female', 'Transgender', 'Others'];
 
 export function CoordinatorRegistrationPage() {
-  const { user, roles, agencyId } = useAuth();
+  const { user, agencyId } = useAuth();
   const dispatch = useAppDispatch();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  const [firstName, setFirstName] = useState(user?.firstName || '');
+  const [lastName, setLastName] = useState(user?.lastName || '');
   const [gender, setGender] = useState('');
   const [mobile, setMobile] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const email = user?.email || '';
-  const role = roles.length > 0 ? roles[0] : 'nCoordinator';
+  // This is the coordinator registration page — always use nCoordinator role
+  // (Keycloak token may only have default realm roles at this point)
+  const role = 'nCoordinator';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +61,7 @@ export function CoordinatorRegistrationPage() {
           mobile,
           address: { city: '', state: '', country: '' },
         },
-        agencyId: agencyId || '',
+        agencyId: agencyId || '9270607102',
         status: 'Active',
         role: [role],
       };
@@ -99,7 +101,7 @@ export function CoordinatorRegistrationPage() {
                 <Box textAlign="center">
                   <Typography variant="h5" fontWeight={700} gutterBottom>Complete Your Profile</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Please fill in your basic details to get started as a {role === 'nAdmin' ? 'Need Admin' : 'Need Coordinator'}.
+                    Please fill in your basic details to get started as a Need Coordinator.
                   </Typography>
                 </Box>
 

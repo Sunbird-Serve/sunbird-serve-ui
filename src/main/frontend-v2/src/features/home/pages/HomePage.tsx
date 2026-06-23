@@ -57,10 +57,11 @@ export function HomePage() {
   const [tab, setTab] = useState(0);
   const [error, setError] = useState('');
 
-  // If already authenticated, redirect based on role
+  // If already authenticated AND has roles, redirect based on role
+  // (New users without roles will be handled by App.tsx registration redirect)
   useEffect(() => {
-    if (authenticated) {
-      const role = roles.length > 0 ? roles[0] : undefined;
+    if (authenticated && roles.length > 0) {
+      const role = roles[0];
       const roleConfig = getRoleConfig(role);
       navigate(roleConfig?.defaultRoute || '/app/dashboard');
     }
