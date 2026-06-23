@@ -18,6 +18,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { useAppSelector } from '@app/store';
 import { useGetMyNominationsQuery } from '../api/exploreApi';
+import { getAuthHeaders } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -69,7 +70,9 @@ export function MyNominationsPage() {
       for (const needId of uniqueNeedIds) {
         try {
           // Get need details
-          const needResp = await fetch(`${BASE_URL}/api/v1/serve-need/need/${needId}`);
+          const needResp = await fetch(`${BASE_URL}/api/v1/serve-need/need/${needId}`, {
+            headers: getAuthHeaders(),
+          });
           if (needResp.ok) {
             const data = await needResp.json();
             const need = Array.isArray(data) ? data[0] : data;
@@ -80,7 +83,9 @@ export function MyNominationsPage() {
             let days = '', startDate = '', endDate = '', coordinatorName = '', coordinatorPhone = '';
             let timeSlots: { day: string; startTime: string; endTime: string }[] = [];
             try {
-              const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${needId}`);
+              const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${needId}`, {
+                headers: getAuthHeaders(),
+              });
               if (planResp.ok) {
                 const planData = await planResp.json();
                 const plans = Array.isArray(planData) ? planData : (planData.content || []);
@@ -97,7 +102,9 @@ export function MyNominationsPage() {
             const coordUserId = need?.userId || need?.need?.userId;
             if (coordUserId) {
               try {
-                const coordResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${coordUserId}`);
+                const coordResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${coordUserId}`, {
+                  headers: getAuthHeaders(),
+                });
                 if (coordResp.ok) {
                   const coordData = await coordResp.json();
                   coordinatorName = coordData?.identityDetails?.fullname || '';

@@ -70,7 +70,8 @@ export function HomePage() {
     keycloakLogin();
   };
 
-  const handleRegister = () => {
+  const handleRegister = (type: 'volunteer' | 'coordinator') => {
+    localStorage.setItem('pendingRegistrationType', type);
     import('@config/keycloak').then((mod) => {
       mod.default.register();
     });
@@ -227,7 +228,7 @@ export function HomePage() {
                       size="large"
                       fullWidth
                       startIcon={<VolunteerActivismIcon />}
-                      onClick={handleRegister}
+                      onClick={() => handleRegister('volunteer')}
                       sx={{ py: 1.8, justifyContent: 'flex-start', px: 3 }}
                     >
                       <Stack alignItems="flex-start" sx={{ ml: 1 }}>
@@ -245,7 +246,7 @@ export function HomePage() {
                       size="large"
                       fullWidth
                       startIcon={<SchoolIcon />}
-                      onClick={handleRegister}
+                      onClick={() => handleRegister('coordinator')}
                       sx={{ py: 1.8, justifyContent: 'flex-start', px: 3 }}
                     >
                       <Stack alignItems="flex-start" sx={{ ml: 1 }}>

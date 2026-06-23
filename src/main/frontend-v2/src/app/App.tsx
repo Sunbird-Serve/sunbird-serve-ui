@@ -67,9 +67,15 @@ function AppInner() {
     if (userStatus === 'failed' && !isOnRegPage) {
       const coordinatorRoles = ['nCoordinator', 'nAdmin', 'vCoordinator', 'vAdmin', 'sAdmin'];
       const isCoordinator = roles.some((r) => coordinatorRoles.includes(r));
-      if (isCoordinator) {
+
+      // Also check localStorage for pending registration type (set before Keycloak redirect)
+      const pendingType = localStorage.getItem('pendingRegistrationType');
+
+      if (isCoordinator || pendingType === 'coordinator') {
+        localStorage.removeItem('pendingRegistrationType');
         router.navigate('/register/coordinator-profile');
       } else {
+        localStorage.removeItem('pendingRegistrationType');
         router.navigate('/register/volunteer-profile');
       }
     }
