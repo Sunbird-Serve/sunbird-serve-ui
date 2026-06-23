@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -21,6 +22,7 @@ const GENDER_OPTIONS = ['Male', 'Female', 'Transgender', 'Others'];
 export function CoordinatorRegistrationPage() {
   const { user, agencyId } = useAuth();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState(user?.firstName || '');
   const [lastName, setLastName] = useState(user?.lastName || '');
@@ -80,7 +82,16 @@ export function CoordinatorRegistrationPage() {
       const encodedEmail = email.replace(/@/g, '%40');
       await dispatch(fetchUserByEmail(encodedEmail)).unwrap();
 
-      // Redirect will happen automatically via App.tsx role-based redirect
+      // Force token refresh to pick up the newly assigned nCoordinator role
+      try {
+        const keycloak = (await import('@config/keycloak')).default;
+        await keycloak.updateToken(-1);
+      } catch {
+        // If refresh fails, navigate anyway — role will be available on next login
+      }
+
+      // Navigate to coordinator dashboard
+      navigate('/app/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed.');
     } finally {
