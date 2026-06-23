@@ -8,7 +8,7 @@
             <span style="font-size: 1.4rem; font-weight: 700; color: #0E7490;">Create Account</span>
         </div>
         <div style="text-align: center; color: #475569; font-size: 0.85rem;">
-            Join Sunbird Serve as a Volunteer
+            Join Project Serve
         </div>
     <#elseif section = "form">
         <form id="kc-register-form" action="${url.registrationAction}" method="post">
