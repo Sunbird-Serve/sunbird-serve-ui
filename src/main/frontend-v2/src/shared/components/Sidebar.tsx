@@ -45,9 +45,12 @@ export function Sidebar({ items, onItemClick }: SidebarProps) {
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Logo / Brand */}
       <Box sx={{ p: 2.5, borderBottom: 1, borderColor: 'divider' }}>
-        <Typography variant="h6" fontWeight={700} color="primary.main">
-          Sunbird Serve
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 32, width: 32 }} />
+          <Typography variant="h6" fontWeight={700} color="primary.main">
+            Sunbird Serve
+          </Typography>
+        </Box>
         <Typography variant="caption" color="text.secondary">
           Management Portal
         </Typography>

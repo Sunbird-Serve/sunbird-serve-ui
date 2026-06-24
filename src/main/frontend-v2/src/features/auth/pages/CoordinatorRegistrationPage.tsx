@@ -102,7 +102,10 @@ export function CoordinatorRegistrationPage() {
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', bgcolor: 'background.default' }}>
       <Box sx={{ p: 2 }}>
-        <Typography variant="h6" fontWeight={700} color="primary.main">Sunbird Serve</Typography>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 28, width: 28 }} />
+          <Typography variant="h6" fontWeight={700} color="primary.main">Sunbird Serve</Typography>
+        </Stack>
       </Box>
       <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', p: 2 }}>
         <Container maxWidth="sm">

@@ -106,7 +106,8 @@ export function ExploreNeedsPage() {
       const district = (need.entity?.district || '').toLowerCase();
       const days = formatDays(need).toLowerCase();
       const skills = (need.requirement?.skillDetails || '').toLowerCase();
-      return name.includes(q) || entity.includes(q) || district.includes(q) || days.includes(q) || skills.includes(q);
+      const timeSlots = formatTimeSlots(need).toLowerCase();
+      return name.includes(q) || entity.includes(q) || district.includes(q) || days.includes(q) || skills.includes(q) || timeSlots.includes(q);
     });
   }, [needs, search]);
 
@@ -153,7 +154,7 @@ export function ExploreNeedsPage() {
       <TextField
         fullWidth
         size="small"
-        placeholder="Search by school, subject, days, location..."
+        placeholder="Search by school, subject, days, time, location..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         InputProps={{
@@ -185,6 +186,7 @@ export function ExploreNeedsPage() {
             const entityName = need.entity?.name || '';
             const district = need.entity?.district || '';
             const days = formatDays(need);
+            const timeSlots = formatTimeSlots(need);
             const alreadyNominated = nominatedIds.includes(needId);
 
             return (
@@ -211,6 +213,12 @@ export function ExploreNeedsPage() {
                       <Stack direction="row" spacing={0.5} alignItems="center">
                         <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
                         <Typography variant="caption" color="text.secondary">{days}</Typography>
+                      </Stack>
+                    )}
+                    {timeSlots && (
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                        <Typography variant="caption" color="text.secondary">{timeSlots}</Typography>
                       </Stack>
                     )}
                   </Stack>

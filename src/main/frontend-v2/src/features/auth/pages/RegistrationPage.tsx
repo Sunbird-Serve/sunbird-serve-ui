@@ -239,9 +239,12 @@ export function RegistrationPage() {
       {/* Top bar */}
       <Box sx={{ p: 2 }}>
         <Link component={RouterLink} to="/" underline="none">
-          <Typography variant="h6" fontWeight={700} color="primary.main">
-            Sunbird Serve
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1}>
+            <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 28, width: 28 }} />
+            <Typography variant="h6" fontWeight={700} color="primary.main">
+              Sunbird Serve
+            </Typography>
+          </Stack>
         </Link>
       </Box>
 

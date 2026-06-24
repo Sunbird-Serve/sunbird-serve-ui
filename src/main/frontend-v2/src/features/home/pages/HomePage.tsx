@@ -114,12 +114,15 @@ export function HomePage() {
             {/* Left — Branding */}
             <Grid item xs={12} md={6}>
               <Stack spacing={2.5}>
-                <Typography
-                  variant="overline"
-                  sx={{ color: 'rgba(255,255,255,0.7)', letterSpacing: 2 }}
-                >
-                  Sunbird Serve
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 28, width: 28 }} />
+                  <Typography
+                    variant="overline"
+                    sx={{ color: 'rgba(255,255,255,0.7)', letterSpacing: 2 }}
+                  >
+                    Sunbird Serve
+                  </Typography>
+                </Stack>
                 <Typography
                   variant="h3"
                   fontWeight={700}
@@ -329,10 +332,13 @@ export function HomePage() {
           bgcolor: 'background.paper',
         }}
       >
-        <Typography variant="caption" color="text.secondary">
-          &copy; {new Date().getFullYear()} Sunbird Serve &middot; Open Source &middot; Digital
-          Public Good
-        </Typography>
+        <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
+          <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 20, width: 20, opacity: 0.7 }} />
+          <Typography variant="caption" color="text.secondary">
+            &copy; {new Date().getFullYear()} Sunbird Serve &middot; Open Source &middot; Digital
+            Public Good
+          </Typography>
+        </Stack>
       </Box>
     </Box>
   );
