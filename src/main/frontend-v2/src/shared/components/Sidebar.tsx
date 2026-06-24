@@ -46,7 +46,7 @@ export function Sidebar({ items, onItemClick }: SidebarProps) {
       {/* Logo / Brand */}
       <Box sx={{ p: 2.5, borderBottom: 1, borderColor: 'divider' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 32, width: 32 }} />
+          <img src="/icons/serve-logo.jpeg" alt="Sunbird Serve" style={{ height: 32, width: 32, borderRadius: 4 }} />
           <Typography variant="h6" fontWeight={700} color="primary.main">
             Sunbird Serve
           </Typography>

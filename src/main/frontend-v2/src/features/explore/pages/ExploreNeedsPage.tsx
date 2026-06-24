@@ -38,14 +38,14 @@ function formatDays(need: AvailableNeed): string {
 
 function formatTimeSlots(need: AvailableNeed): string {
   const schedule = need.requirement?.schedule || need.occurrence;
-  const slots = schedule?.timeSlots;
+  const slots = schedule?.timeSlots || need.timeSlots;
   if (!slots || slots.length === 0) return '';
   return slots.map((s) => {
     const startMatch = s.startTime?.match(/(\d{2}):(\d{2})/);
     const endMatch = s.endTime?.match(/(\d{2}):(\d{2})/);
     const start = startMatch ? `${parseInt(startMatch[1]) % 12 || 12}:${startMatch[2]} ${parseInt(startMatch[1]) >= 12 ? 'PM' : 'AM'}` : '';
     const end = endMatch ? `${parseInt(endMatch[1]) % 12 || 12}:${endMatch[2]} ${parseInt(endMatch[1]) >= 12 ? 'PM' : 'AM'}` : '';
-    return `${s.day} ${start}–${end}`;
+    return `${start}–${end}`;
   }).join(', ');
 }
 
