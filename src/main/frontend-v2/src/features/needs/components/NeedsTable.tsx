@@ -20,12 +20,21 @@ import {
   ListItemText,
   Typography,
   Skeleton,
+  Stack,
+  Card,
+  CardContent,
+  CardActionArea,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import ScheduleIcon from '@mui/icons-material/Schedule';
+import BusinessIcon from '@mui/icons-material/Business';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 import { NeedListItem } from '../api/needsApi';
 
@@ -100,6 +109,9 @@ export function NeedsTable({
     return `${start} → ${end}`;
   };
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
   return (
     <Paper sx={{ width: '100%' }}>
       {/* Status Tabs */}
@@ -132,11 +144,102 @@ export function NeedsTable({
               </InputAdornment>
             ),
           }}
-          sx={{ maxWidth: 320 }}
+          sx={{ maxWidth: { xs: '100%', sm: 320 }, width: '100%' }}
+          fullWidth
         />
       </Box>
 
-      {/* Table */}
+      {/* Mobile Card View */}
+      {isMobile ? (
+        <Box sx={{ p: 2, pt: 1 }}>
+          {loading ? (
+            <Stack spacing={1.5}>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} variant="rounded" height={100} />
+              ))}
+            </Stack>
+          ) : paginatedNeeds.length === 0 ? (
+            <Box sx={{ py: 6, textAlign: 'center' }}>
+              <Typography variant="body2" color="text.secondary">No needs found</Typography>
+            </Box>
+          ) : (
+            <Stack spacing={1.5}>
+              {paginatedNeeds.map((item) => (
+                <Card key={item.need?.id || Math.random()} variant="outlined">
+                  <CardActionArea onClick={() => item.need && onRowClick?.(item)}>
+                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 0.5 }}>
+                        <Typography variant="subtitle2" fontWeight={600} sx={{ flex: 1, mr: 1 }}>
+                          {item.need?.name || '—'}
+                        </Typography>
+                        <StatusChip status={item.need?.status || 'Unknown'} />
+                      </Stack>
+                      <Stack spacing={0.5} sx={{ mt: 1 }}>
+                        {item.entity?.name && (
+                          <Stack direction="row" spacing={0.5} alignItems="center">
+                            <BusinessIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">{item.entity.name}</Typography>
+                          </Stack>
+                        )}
+                        {item.entity?.district && (
+                          <Stack direction="row" spacing={0.5} alignItems="center">
+                            <LocationOnIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">{item.entity.district}</Typography>
+                          </Stack>
+                        )}
+                        {item.occurrence?.startDate && (
+                          <Stack direction="row" spacing={0.5} alignItems="center">
+                            <CalendarTodayIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">
+                              {formatTimeline(item.occurrence)}
+                            </Typography>
+                          </Stack>
+                        )}
+                        {item.needType?.name && (
+                          <Typography variant="caption" color="text.secondary">
+                            Type: {item.needType.name}
+                          </Typography>
+                        )}
+                      </Stack>
+                      {/* Mobile actions */}
+                      <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 1 }}>
+                        {!isAdmin && (
+                          <IconButton
+                            size="small"
+                            color="primary"
+                            onClick={(e) => { e.stopPropagation(); onModifySchedule?.(item); }}
+                          >
+                            <ScheduleIcon fontSize="small" />
+                          </IconButton>
+                        )}
+                        {isAdmin && item.need?.status === 'New' && (
+                          <>
+                            <IconButton
+                              size="small"
+                              color="success"
+                              onClick={(e) => { e.stopPropagation(); onApprove?.(item.need!.id); }}
+                            >
+                              <CheckIcon fontSize="small" />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              color="error"
+                              onClick={(e) => { e.stopPropagation(); onReject?.(item.need!.id); }}
+                            >
+                              <CloseIcon fontSize="small" />
+                            </IconButton>
+                          </>
+                        )}
+                      </Stack>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              ))}
+            </Stack>
+          )}
+        </Box>
+      ) : (
+      /* Desktop Table View */
       <TableContainer>
         <Table size="small">
           <TableHead>
@@ -237,6 +340,7 @@ export function NeedsTable({
           </TableBody>
         </Table>
       </TableContainer>
+      )}
 
       {/* Pagination */}
       <TablePagination

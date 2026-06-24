@@ -20,6 +20,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PendingIcon from '@mui/icons-material/Pending';
 import { useAppSelector } from '@app/store';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
+import { getAuthHeaders } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -108,6 +109,7 @@ export function NeedSchedulePage() {
         // Get fulfillments for this coordinator
         const fulfResp = await fetch(
           `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=50`,
+          { headers: getAuthHeaders() },
         );
         if (!fulfResp.ok) { setLoading(false); return; }
         const fulfData = await fulfResp.json();
@@ -120,7 +122,7 @@ export function NeedSchedulePage() {
         for (const fulf of fulfs) {
           try {
             // Get need name from need-plan
-            const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`);
+            const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`, { headers: getAuthHeaders() });
             let needName = '';
             let planId = fulf.needPlanId;
             if (planResp.ok) {
@@ -137,7 +139,7 @@ export function NeedSchedulePage() {
             let volunteerPhone = '';
             if (fulf.assignedUserId) {
               try {
-                const volResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${fulf.assignedUserId}`);
+                const volResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${fulf.assignedUserId}`, { headers: getAuthHeaders() });
                 if (volResp.ok) {
                   const volData = await volResp.json();
                   volunteerName = volData?.identityDetails?.fullname || volData?.identityDetails?.name || '';
@@ -147,7 +149,7 @@ export function NeedSchedulePage() {
             }
 
             // Get deliverables
-            const delivResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/${planId}`);
+            const delivResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/${planId}`, { headers: getAuthHeaders() });
             if (delivResp.ok) {
               const delivData = await delivResp.json();
               const deliverables = delivData.needDeliverable || delivData.content || [];
