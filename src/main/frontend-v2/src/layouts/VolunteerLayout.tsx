@@ -63,7 +63,7 @@ export function VolunteerLayout() {
       <AppBar position="sticky" sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
         <Toolbar>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
-            <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 28, width: 28 }} />
+            <img src="/icons/serve-logo.jpeg" alt="Sunbird Serve" style={{ height: 28, width: 28, borderRadius: 4 }} />
             <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
               Sunbird Serve
             </Typography>

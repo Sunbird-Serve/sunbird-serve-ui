@@ -13,6 +13,7 @@ export interface AvailableNeed {
   needType?: { id: string; name: string };
   occurrence?: { startDate?: string; endDate?: string; days?: string; timeSlots?: { day: string; startTime: string; endTime: string }[] };
   requirement?: { skillDetails?: string; schedule?: { days?: string; timeSlots?: { day: string; startTime: string; endTime: string }[] } };
+  timeSlots?: { day: string; startTime: string; endTime: string }[];
   // Nested format support
   need?: { id: string; name: string; status: string; entityId?: string };
 }
