@@ -67,10 +67,19 @@ export function ExploreNeedsPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const headers = getAuthHeaders();
     fetch(`${BASE_URL}/api/v1/serve-need/need/?status=Approved&page=0&size=100`, {
-      headers: getAuthHeaders(),
+      ...(headers.Authorization ? { headers } : {}),
     })
-      .then((r) => r.ok ? r.json() : null)
+      .then((r) => {
+        if (r.status === 401) {
+          // Backend requires auth — try with auth headers if available
+          if (headers.Authorization) return null;
+          // No token available — needs will remain empty, user sees login prompt
+          return null;
+        }
+        return r.ok ? r.json() : null;
+      })
       .then((data) => {
         if (data) {
           const content = Array.isArray(data) ? data : (data.content || []);
@@ -160,8 +169,13 @@ export function ExploreNeedsPage() {
       {filteredNeeds.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <Typography variant="body1" color="text.secondary">
-            {search ? 'No needs match your search.' : 'No needs available right now. Check back later.'}
+            {search ? 'No needs match your search.' : userId ? 'No needs available right now. Check back later.' : 'Please login to explore available needs.'}
           </Typography>
+          {!userId && (
+            <Button variant="contained" href="/login" sx={{ mt: 2 }}>
+              Login to Explore
+            </Button>
+          )}
         </Paper>
       ) : (
         <Grid container spacing={2}>
