@@ -62,9 +62,12 @@ export function VolunteerLayout() {
       {/* Header */}
       <AppBar position="sticky" sx={{ bgcolor: 'background.paper', color: 'text.primary' }}>
         <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, color: 'primary.main' }}>
-            Sunbird Serve
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
+            <img src="/icons/icon.svg" alt="Sunbird Serve" style={{ height: 28, width: 28 }} />
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+              Sunbird Serve
+            </Typography>
+          </Box>
 
           <IconButton onClick={handleProfileMenuOpen} aria-label="open profile menu">
             <Avatar
