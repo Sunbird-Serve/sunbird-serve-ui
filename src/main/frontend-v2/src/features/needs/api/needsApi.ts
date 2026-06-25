@@ -305,13 +305,13 @@ export const needsApi = baseApi.injectEndpoints({
     }),
 
     // Confirm/Reject/Backfill a nomination
-    // POST /api/v1/serve-fulfill/nomination/{needId}/nominate/{userId}/confirm/{nominationId}?status={status}&comments={reason}
+    // POST /api/v1/serve-fulfill/nomination/nominate/{userId}/confirm/{nominationId}?status={status}&comments={reason}
     confirmNomination: builder.mutation<
       unknown,
       { needId: string; userId: string; nominationId: string; status: string; comments?: string }
     >({
-      query: ({ needId, userId, nominationId, status, comments }) => ({
-        url: `/api/v1/serve-fulfill/nomination/${needId}/nominate/${userId}/confirm/${nominationId}?status=${status}${comments ? `&comments=${encodeURIComponent(comments)}` : ''}`,
+      query: ({ userId, nominationId, status, comments }) => ({
+        url: `/api/v1/serve-fulfill/nomination/nominate/${userId}/confirm/${nominationId}?status=${status}${comments ? `&comments=${encodeURIComponent(comments)}` : ''}`,
         method: 'POST',
       }),
       invalidatesTags: ['Nomination', 'Need'],
