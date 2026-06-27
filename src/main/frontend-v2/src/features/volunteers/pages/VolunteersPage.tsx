@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -42,6 +43,7 @@ const STATUS_CARDS = [
 ];
 
 export function VolunteersPage() {
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.user.data);
   const role = Array.isArray(user?.role) ? user?.role[0] : user?.role;
   const isAdmin = role === 'vAdmin' || role === 'sAdmin';
@@ -201,7 +203,7 @@ export function VolunteersPage() {
                       key={vol.osid}
                       hover
                       sx={{ cursor: 'pointer' }}
-                      onClick={() => setSelectedVolunteer(vol)}
+                      onClick={() => navigate(`/app/volunteers/${vol.osid}`)}
                     >
                       <TableCell>
                         <Typography variant="body2" fontWeight={500}>
@@ -249,7 +251,7 @@ export function VolunteersPage() {
         />
       </Paper>
 
-      {/* Detail Dialog */}
+      {/* Detail Dialog (kept for quick view) */}
       <VolunteerDetailDialog
         volunteer={selectedVolunteer}
         agencies={agencies}

@@ -6,6 +6,7 @@ import { NCoordinatorDashboard } from './NCoordinatorDashboard';
 import { NAdminDashboard } from './NAdminDashboard';
 import { VCoordinatorDashboard } from './VCoordinatorDashboard';
 import { VAdminDashboard } from './VAdminDashboard';
+import { SAdminDashboard } from './SAdminDashboard';
 
 export function DashboardPage() {
   const { data: user, status } = useAppSelector((state) => state.user);
@@ -41,10 +42,11 @@ export function DashboardPage() {
     case 'vCoordinator':
       return <VCoordinatorDashboard />;
     case 'vAdmin':
-    case 'sAdmin':
       return <VAdminDashboard />;
+    case 'sAdmin':
+      return <SAdminDashboard />;
     case 'Volunteer':
-      return <Navigate to="/explore/sessions" replace />;
+      return <Navigate to="/explore/home" replace />;
     default:
       return <NCoordinatorDashboard />;
   }
