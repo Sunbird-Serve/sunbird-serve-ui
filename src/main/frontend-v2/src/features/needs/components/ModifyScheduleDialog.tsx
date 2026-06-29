@@ -119,9 +119,10 @@ export function ModifyScheduleDialog({ need, onClose }: ModifyScheduleDialogProp
       }).unwrap();
 
       // Also reschedule deliverables with new days/times
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeadersWithJson();
       try {
-        const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${need.need.id}`);
+        const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${need.need.id}`, { headers });
         if (planResp.ok) {
           const planData = await planResp.json();
           const plans = Array.isArray(planData) ? planData : (planData.content || []);
