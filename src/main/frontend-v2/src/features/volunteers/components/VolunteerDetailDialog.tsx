@@ -78,8 +78,11 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
       if (!volunteer || tab !== 1) return;
       setNomLoading(true);
       try {
+        const { getAuthHeaders } = await import('@shared/utils/authHeaders');
+        const headers = getAuthHeaders();
+
         // Fetch nominations
-        const nomResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/nomination/${volunteer.osid}?page=0&size=50`);
+        const nomResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/nomination/${volunteer.osid}?page=0&size=50`, { headers });
         let noms: { id: string; needId: string; nominationStatus: string }[] = [];
         if (nomResp.ok) {
           const nomData = await nomResp.json();
@@ -87,7 +90,7 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
         }
 
         // Also fetch fulfillments (assigned needs)
-        const fulfResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/fulfillment/volunteer-read/${volunteer.osid}?page=0&size=50`);
+        const fulfResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/fulfillment/volunteer-read/${volunteer.osid}?page=0&size=50`, { headers });
         let fulfs: { needId: string }[] = [];
         if (fulfResp.ok) {
           const fulfData = await fulfResp.json();
@@ -125,7 +128,7 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
           let endDate = '';
           try {
             // Get need info
-            const needResp = await fetch(`${BASE_URL}/api/v1/serve-need/need/${item.needId}`);
+            const needResp = await fetch(`${BASE_URL}/api/v1/serve-need/need/${item.needId}`, { headers });
             if (needResp.ok) {
               const needData = await needResp.json();
               const need = Array.isArray(needData) ? needData[0] : needData;
@@ -135,7 +138,7 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
               // Fetch entity separately
               if (entityId) {
                 try {
-                  const entityResp = await fetch(`${BASE_URL}/api/v1/serve-need/entity/${entityId}`);
+                  const entityResp = await fetch(`${BASE_URL}/api/v1/serve-need/entity/${entityId}`, { headers });
                   if (entityResp.ok) {
                     const entityData = await entityResp.json();
                     const entity = Array.isArray(entityData) ? entityData[0] : entityData;
@@ -148,7 +151,7 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
 
             // Get dates from need-plan
             try {
-              const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${item.needId}`);
+              const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${item.needId}`, { headers });
               if (planResp.ok) {
                 const planData = await planResp.json();
                 const plans = Array.isArray(planData) ? planData : (planData.content || []);
