@@ -193,7 +193,7 @@ export function NeedSchedulePage() {
 
     for (const session of sessions) {
       if (needFilter !== 'all' && session.needName !== needFilter) continue;
-      const params = session.inputParams.length > 0 ? session.inputParams[0] : null;
+      const params = session.inputParams.length > 0 ? session.inputParams[session.inputParams.length - 1] : null;
 
       for (const d of session.deliverables) {
         const dateStr = d.deliverableDate?.split('T')[0] || '';
