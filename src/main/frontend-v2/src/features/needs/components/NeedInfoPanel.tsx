@@ -120,10 +120,12 @@ export function NeedInfoPanel({ need }: NeedInfoPanelProps) {
       // Also update all deliverable timings and days
       // Get needPlanId from need-plan endpoint, then reschedule
       if (timeSlots.length > 0) {
-        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+        const headers = getAuthHeadersWithJson();
         try {
           const planResp = await fetch(
             `${BASE_URL}/api/v1/serve-need/need-plan/${need.need.id}`,
+            { headers },
           );
           if (planResp.ok) {
             const planData = await planResp.json();

@@ -90,12 +90,16 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
       );
 
       if (backfilledNoms.length > 0) {
+        const { getAuthHeaders, getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+        const authHeaders = getAuthHeaders();
+        const authJsonHeaders = getAuthHeadersWithJson();
         // Step 2: For each backfilled volunteer, pause their deliverables and inactivate plan
         for (const bNom of backfilledNoms) {
           try {
             // Get fulfillments for the backfilled volunteer
             const fulfResp = await fetch(
               `${BASE_URL}/api/v1/serve-fulfill/fulfillment/volunteer-read/${bNom.nominatedUserId}?page=0&size=100`,
+              { headers: authHeaders },
             );
             if (fulfResp.ok) {
               const fulfData = await fulfResp.json();
@@ -110,6 +114,7 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
                 // Get deliverables for this plan
                 const delivResp = await fetch(
                   `${BASE_URL}/api/v1/serve-need/need-deliverable/${planId}`,
+                  { headers: authHeaders },
                 );
                 if (delivResp.ok) {
                   const delivData = await delivResp.json();
@@ -122,7 +127,7 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
                         `${BASE_URL}/api/v1/serve-need/need-deliverable/update/${deliverable.id}`,
                         {
                           method: 'PUT',
-                          headers: { 'Content-Type': 'application/json' },
+                          headers: authJsonHeaders,
                           body: JSON.stringify({
                             needPlanId: planId,
                             status: 'PlannedPause',
@@ -138,7 +143,7 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
                 // Inactivate the need plan
                 await fetch(
                   `${BASE_URL}/api/v1/serve-need/need-plan/status/${planId}?status=Inactive`,
-                  { method: 'PUT' },
+                  { method: 'PUT', headers: authHeaders },
                 );
               }
             }
