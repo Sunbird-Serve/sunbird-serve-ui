@@ -125,7 +125,9 @@ export function MySessionsPage() {
       if (!userId) return;
       setLoading(true);
       try {
-        const fulfResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=20`);
+        const { getAuthHeaders } = await import('@shared/utils/authHeaders');
+        const headers = getAuthHeaders();
+        const fulfResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/fulfillment/volunteer-read/${userId}?page=0&size=20`, { headers });
         if (!fulfResp.ok) { setLoading(false); return; }
         const fulfData = await fulfResp.json();
         const fulfs = Array.isArray(fulfData) ? fulfData : (fulfData.content || []);
@@ -134,7 +136,7 @@ export function MySessionsPage() {
         for (const fulf of fulfs) {
           try {
             // Get need plan info
-            const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`);
+            const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`, { headers });
             let needName = '', planId = fulf.needPlanId, startDate = '', endDate = '', days = '';
             if (planResp.ok) {
               const planData = await planResp.json();
@@ -151,7 +153,7 @@ export function MySessionsPage() {
             // Get entity name from need
             let entityName = '';
             try {
-              const needResp = await fetch(`${BASE_URL}/api/v1/serve-need/need/${fulf.needId}`);
+              const needResp = await fetch(`${BASE_URL}/api/v1/serve-need/need/${fulf.needId}`, { headers });
               if (needResp.ok) {
                 const needData = await needResp.json();
                 const need = Array.isArray(needData) ? needData[0] : needData;
@@ -164,7 +166,7 @@ export function MySessionsPage() {
             let coordinator: CoordinatorInfo = { name: '', phone: '', email: '' };
             if (fulf.coordUserId) {
               try {
-                const coordResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${fulf.coordUserId}`);
+                const coordResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${fulf.coordUserId}`, { headers });
                 if (coordResp.ok) {
                   const coordData = await coordResp.json();
                   coordinator = {
@@ -177,7 +179,7 @@ export function MySessionsPage() {
             }
 
             // Get deliverables
-            const delivResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/${planId}`);
+            const delivResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/${planId}`, { headers });
             if (delivResp.ok) {
               const delivData = await delivResp.json();
               results.push({
@@ -230,8 +232,10 @@ export function MySessionsPage() {
     if (!completeTarget || !selectedNeed || !studentCount) { setError('Student count is required.'); return; }
     setSaving(true);
     try {
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeadersWithJson();
       await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${completeTarget.id}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        method: 'PUT', headers,
         body: JSON.stringify({
           needPlanId: selectedNeed.planId, status: 'Completed',
           comments: notes || 'Session completed',
@@ -242,7 +246,7 @@ export function MySessionsPage() {
       // Log volunteer hours
       try {
         await fetch(`${BASE_URL}/api/v1/serve-volunteering/volunteer-hours/`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: 'POST', headers,
           body: JSON.stringify({ userId, needId: selectedNeed.needId, deliveryHours: 1, deliveryDate: new Date().toISOString(), needDeliverableId: completeTarget.id }),
         });
       } catch { /* best effort */ }
@@ -258,8 +262,10 @@ export function MySessionsPage() {
     if (!cancelTarget || !selectedNeed || !cancelReason) { setError('Please select a reason.'); return; }
     setSaving(true);
     try {
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeadersWithJson();
       await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${cancelTarget.id}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        method: 'PUT', headers,
         body: JSON.stringify({ needPlanId: selectedNeed.planId, status: 'Cancelled', comments: cancelReason, deliverableDate: cancelTarget.deliverableDate?.split('T')[0] || '' }),
       });
       setSelectedNeed((prev) => prev ? { ...prev, deliverables: prev.deliverables.map((d) => d.id === cancelTarget.id ? { ...d, status: 'Cancelled', comments: cancelReason } : d) } : null);
@@ -274,12 +280,14 @@ export function MySessionsPage() {
     if (!isFutureDate(rescheduleDate)) { setError('Please select a future date.'); return; }
     setSaving(true);
     try {
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeadersWithJson();
       await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${rescheduleTarget.id}`, {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        method: 'PUT', headers,
         body: JSON.stringify({ needPlanId: selectedNeed.planId, status: 'Rescheduled', comments: `Rescheduled to ${rescheduleDate}`, deliverableDate: rescheduleTarget.deliverableDate?.split('T')[0] || '' }),
       });
       await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/create`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers,
         body: JSON.stringify({ needPlanId: selectedNeed.planId, status: 'Planned', comments: `Rescheduled from ${rescheduleTarget.deliverableDate?.split('T')[0]}`, deliverableDate: rescheduleDate }),
       });
       setSelectedNeed((prev) => prev ? { ...prev, deliverables: prev.deliverables.map((d) => d.id === rescheduleTarget.id ? { ...d, status: 'Rescheduled' } : d) } : null);

@@ -130,6 +130,7 @@ export function NCoordinatorDashboard() {
             // Get need plan info (for the need name)
             const planResp = await fetch(
               `${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`,
+              { headers },
             );
             let needName = '';
             if (planResp.ok) {
@@ -147,6 +148,7 @@ export function NCoordinatorDashboard() {
               try {
                 const volResp = await fetch(
                   `${BASE_URL}/api/v1/serve-volunteering/user/${fulf.assignedUserId}`,
+                  { headers },
                 );
                 if (volResp.ok) {
                   const volData = await volResp.json();

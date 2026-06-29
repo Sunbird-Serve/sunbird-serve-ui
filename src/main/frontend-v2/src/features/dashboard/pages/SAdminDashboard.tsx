@@ -206,12 +206,27 @@ export function SAdminDashboard() {
         for (const need of assignedNeeds.slice(0, 50)) {
           try {
             const fulfResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}?page=0&size=10`,
+              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}`,
               { headers },
             );
             if (fulfResp.ok) {
               const fulfData = await fulfResp.json();
               const items = Array.isArray(fulfData) ? fulfData : (fulfData.content || []);
+              fulfs.push(...items);
+            }
+          } catch { /* skip */ }
+        }
+
+        // Fallback: try coordinator-read
+        if (fulfs.length === 0) {
+          try {
+            const coordResp = await fetch(
+              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=1000`,
+              { headers },
+            );
+            if (coordResp.ok) {
+              const coordData = await coordResp.json();
+              const items = Array.isArray(coordData) ? coordData : (coordData.content || []);
               fulfs.push(...items);
             }
           } catch { /* skip */ }

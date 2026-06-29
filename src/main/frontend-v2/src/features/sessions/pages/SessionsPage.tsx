@@ -226,7 +226,7 @@ export function SessionsPage() {
         for (const need of assignedNeeds.slice(0, 50)) {
           try {
             const fulfResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}?page=0&size=10`,
+              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}`,
               { headers },
             );
             if (fulfResp.ok) {
@@ -235,6 +235,21 @@ export function SessionsPage() {
               fulfs.push(...items);
             }
           } catch { /* skip individual failures */ }
+        }
+
+        // Fallback: also try coordinator-read in case admin is also a coordinator
+        if (fulfs.length === 0) {
+          try {
+            const coordResp = await fetch(
+              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=1000`,
+              { headers },
+            );
+            if (coordResp.ok) {
+              const coordData = await coordResp.json();
+              const items = Array.isArray(coordData) ? coordData : (coordData.content || []);
+              fulfs.push(...items);
+            }
+          } catch { /* skip */ }
         }
 
         if (fulfs.length === 0) {
