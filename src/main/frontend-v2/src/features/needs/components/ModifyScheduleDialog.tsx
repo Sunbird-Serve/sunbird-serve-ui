@@ -132,8 +132,8 @@ export function ModifyScheduleDialog({ need, onClose }: ModifyScheduleDialogProp
               // Call reschedule API
               const formattedSlotsForReschedule = timeSlots.map((s) => ({
                 day: s.day,
-                startTime: s.startTime,
-                endTime: s.endTime,
+                startTime: `${startDate}T${s.startTime}:00.000Z`,
+                endTime: `${startDate}T${s.endTime}:00.000Z`,
               }));
 
               await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${planId}/reschedule`, {
