@@ -49,9 +49,12 @@ export function KeycloakAuthProvider({ children }: KeycloakAuthProviderProps) {
       });
 
       // Roles from token — could be in realm_access.roles or directly in claims
-      const tokenRoles = (claims.roles as string[]) ||
+      // Filter to only recognized app roles (ignore Keycloak default roles)
+      const APP_ROLES = ['nCoordinator', 'vCoordinator', 'nAdmin', 'vAdmin', 'sAdmin', 'Volunteer'];
+      const allTokenRoles = (claims.roles as string[]) ||
         (claims.realm_access as { roles?: string[] })?.roles || [];
-      setRoles(tokenRoles);
+      const appRoles = allTokenRoles.filter((r) => APP_ROLES.includes(r));
+      setRoles(appRoles);
 
       // Agency info from custom claims
       setAgencyId((claims.agencyId as string) || '');

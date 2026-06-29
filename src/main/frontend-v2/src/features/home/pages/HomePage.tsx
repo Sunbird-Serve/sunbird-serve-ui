@@ -22,6 +22,7 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { useAuth } from '@features/auth';
 import { getRoleConfig } from '@config/roles';
+import { useAppSelector } from '@app/store';
 
 const impactItems = [
   {
@@ -53,6 +54,7 @@ const impactItems = [
 export function HomePage() {
   const navigate = useNavigate();
   const { authenticated, roles, keycloakLogin } = useAuth();
+  const backendUser = useAppSelector((state) => state.user.data);
 
   const [tab, setTab] = useState(0);
   const [error, setError] = useState('');
@@ -60,12 +62,14 @@ export function HomePage() {
   // If already authenticated AND has roles, redirect based on role
   // (New users without roles will be handled by App.tsx registration redirect)
   useEffect(() => {
-    if (authenticated && roles.length > 0) {
-      const role = roles[0];
+    if (!authenticated) return;
+    const effectiveRoles = roles.length > 0 ? roles : (backendUser?.role || []);
+    if (effectiveRoles.length > 0) {
+      const role = effectiveRoles[0];
       const roleConfig = getRoleConfig(role);
       navigate(roleConfig?.defaultRoute || '/app/dashboard');
     }
-  }, [authenticated, roles, navigate]);
+  }, [authenticated, roles, backendUser?.role, navigate]);
 
   const handleLogin = () => {
     keycloakLogin();

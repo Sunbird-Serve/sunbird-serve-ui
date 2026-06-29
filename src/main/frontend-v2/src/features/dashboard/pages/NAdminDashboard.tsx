@@ -221,36 +221,34 @@ export function NAdminDashboard() {
         const { getAuthHeaders } = await import('@shared/utils/authHeaders');
         const headers = getAuthHeaders();
 
-        // Fetch fulfillments for this admin's needs
-        const fulfResp = await fetch(
-          `${BASE_URL}/api/v1/serve-fulfill/fulfillment/needadmin-read/${userId}?page=0&size=1000`,
+        // Get assigned needs, then fetch fulfillments per need
+        const needsResp = await fetch(
+          `${BASE_URL}/api/v1/serve-need/need/?status=Assigned&page=0&size=200`,
           { headers },
         );
-
-        let fulfs: Fulfillment[] = [];
-        if (fulfResp.ok) {
-          const fulfData = await fulfResp.json();
-          fulfs = Array.isArray(fulfData)
-            ? fulfData
-            : Array.isArray(fulfData?.content)
-              ? fulfData.content
-              : [];
+        let assignedNeeds: { id: string }[] = [];
+        if (needsResp.ok) {
+          const needsData = await needsResp.json();
+          const content = Array.isArray(needsData) ? needsData : (needsData.content || []);
+          assignedNeeds = content.map((n: Record<string, unknown>) => ({
+            id: (n.id as string) || ((n.need as Record<string, unknown>)?.id as string) || '',
+          })).filter((n: { id: string }) => n.id);
         }
 
-        // If the admin-specific endpoint doesn't exist, try coordinator-read as fallback
-        if (fulfs.length === 0) {
-          const fallbackResp = await fetch(
-            `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=100`,
-            { headers },
-          );
-          if (fallbackResp.ok) {
-            const fallbackData = await fallbackResp.json();
-            fulfs = Array.isArray(fallbackData)
-              ? fallbackData
-              : Array.isArray(fallbackData?.content)
-                ? fallbackData.content
-                : [];
-          }
+        // Fetch fulfillments per need via /fulfillment/need-read/{needId}
+        let fulfs: { needId: string; needPlanId: string; assignedUserId: string }[] = [];
+        for (const need of assignedNeeds.slice(0, 30)) {
+          try {
+            const fulfResp = await fetch(
+              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}?page=0&size=10`,
+              { headers },
+            );
+            if (fulfResp.ok) {
+              const fulfData = await fulfResp.json();
+              const items = Array.isArray(fulfData) ? fulfData : (fulfData.content || []);
+              fulfs.push(...items);
+            }
+          } catch { /* skip */ }
         }
 
         const sessionResults: SessionData[] = [];

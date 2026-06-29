@@ -166,7 +166,7 @@ export const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
   },
   Volunteer: {
     label: 'Volunteer',
-    defaultRoute: '/explore/sessions',
+    defaultRoute: '/explore/home',
     layout: 'volunteer',
     sidebarItems: [],
     permissions: ['explore.needs', 'nominations.self', 'profile.edit'],
