@@ -32,6 +32,12 @@ interface Deliverable {
   deliverableDate: string;
   status: string;
   comments?: string;
+  inputParameters?: {
+    startTime?: string;
+    endTime?: string;
+    inputUrl?: string;
+    softwarePlatform?: string;
+  };
 }
 
 interface InputParameter {
@@ -317,7 +323,7 @@ export function VolunteerHomePage() {
           </Typography>
           <Stack spacing={1.5}>
             {todaySessions.map(({ assignment, deliverable }) => {
-              const params = assignment.inputParams[0];
+              const params = deliverable.inputParameters || (assignment.inputParams.length > 0 ? assignment.inputParams[assignment.inputParams.length - 1] : null);
               return (
                 <Stack
                   key={deliverable.id}
@@ -481,7 +487,7 @@ export function VolunteerHomePage() {
                     )}
                   </Box>
                   <Typography variant="caption" color="text.secondary">
-                    {formatTime(assignment.inputParams[0]?.startTime)}
+                    {formatTime(deliverable.inputParameters?.startTime || assignment.inputParams[assignment.inputParams.length - 1]?.startTime)}
                   </Typography>
                 </Stack>
               ))}
