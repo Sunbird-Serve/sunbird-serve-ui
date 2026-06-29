@@ -23,9 +23,11 @@ import TodayIcon from '@mui/icons-material/Today';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ExploreIcon from '@mui/icons-material/Explore';
 import PersonIcon from '@mui/icons-material/Person';
+import HomeIcon from '@mui/icons-material/Home';
 
 const NAV_ITEMS = [
-  { label: 'My Sessions', path: '/explore/sessions', icon: <TodayIcon /> },
+  { label: 'Home', path: '/explore/home', icon: <HomeIcon /> },
+  { label: 'Sessions', path: '/explore/sessions', icon: <TodayIcon /> },
   { label: 'My Needs', path: '/explore/nominations', icon: <AssignmentIcon /> },
   { label: 'Explore', path: '/explore/needs', icon: <ExploreIcon /> },
   { label: 'Profile', path: '/explore/profile', icon: <PersonIcon /> },

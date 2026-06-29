@@ -35,11 +35,17 @@ const NeedSchedulePage = lazy(() =>
 const VolunteersPage = lazy(() =>
   import('@features/volunteers/pages/VolunteersPage').then((m) => ({ default: m.VolunteersPage })),
 );
+const VolunteerJourneyPage = lazy(() =>
+  import('@features/volunteers/pages/VolunteerJourneyPage').then((m) => ({ default: m.VolunteerJourneyPage })),
+);
 const EntitiesPage = lazy(() =>
   import('@features/entities/pages/EntitiesPage').then((m) => ({ default: m.EntitiesPage })),
 );
 const AgenciesPage = lazy(() =>
   import('@features/entities/pages/AgenciesPage').then((m) => ({ default: m.AgenciesPage })),
+);
+const SessionsPage = lazy(() =>
+  import('@features/sessions/pages/SessionsPage').then((m) => ({ default: m.SessionsPage })),
 );
 const PlaceholderPage = lazy(() =>
   import('@shared/components/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage })),
@@ -57,6 +63,9 @@ const MyNominationsPage = lazy(() =>
 );
 const VolunteerProfilePage = lazy(() =>
   import('@features/explore/pages/VolunteerProfilePage').then((m) => ({ default: m.VolunteerProfilePage })),
+);
+const VolunteerHomePage = lazy(() =>
+  import('@features/explore/pages/VolunteerHomePage').then((m) => ({ default: m.VolunteerHomePage })),
 );
 
 // Loading fallback
@@ -175,7 +184,7 @@ export const router = createBrowserRouter([
             path: 'volunteers/:id',
             element: (
               <SuspenseWrapper>
-                <VolunteersPage />
+                <VolunteerJourneyPage />
               </SuspenseWrapper>
             ),
           },
@@ -210,10 +219,7 @@ export const router = createBrowserRouter([
             path: 'sessions',
             element: (
               <SuspenseWrapper>
-                <PlaceholderPage
-                  title="Sessions"
-                  description="Session details coming in Phase 4."
-                />
+                <SessionsPage />
               </SuspenseWrapper>
             ),
           },
@@ -241,7 +247,15 @@ export const router = createBrowserRouter([
         path: '/explore',
         element: <VolunteerLayout />,
         children: [
-          { index: true, element: <Navigate to="sessions" replace /> },
+          { index: true, element: <Navigate to="home" replace /> },
+          {
+            path: 'home',
+            element: (
+              <SuspenseWrapper>
+                <VolunteerHomePage />
+              </SuspenseWrapper>
+            ),
+          },
           {
             path: 'sessions',
             element: (
