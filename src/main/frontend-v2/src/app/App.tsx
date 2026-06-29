@@ -47,6 +47,8 @@ function AppInner() {
   }, [authenticated, user?.email, dispatch]);
 
   // Role-based redirect OR registration redirect
+  const backendUser = useAppSelector((state) => state.user.data);
+
   useEffect(() => {
     if (!authenticated) return;
 
@@ -54,12 +56,19 @@ function AppInner() {
     const isOnRegPage = currentPath.startsWith('/register/');
 
     // User exists in backend — redirect to their dashboard
-    if (userStatus === 'succeeded' && roles.length > 0) {
-      const publicPaths = ['/', '/login', '/explore-needs'];
-      const isOnPublicPage = publicPaths.includes(currentPath);
-      const roleConfig = getRoleConfig(roles);
-      if (roleConfig && (isOnPublicPage || isOnRegPage)) {
-        router.navigate(roleConfig.defaultRoute);
+    if (userStatus === 'succeeded') {
+      // Determine effective role: Keycloak roles first, then backend user role
+      const effectiveRoles = roles.length > 0
+        ? roles
+        : (backendUser?.role || []);
+
+      if (effectiveRoles.length > 0) {
+        const publicPaths = ['/', '/login', '/explore-needs'];
+        const isOnPublicPage = publicPaths.includes(currentPath);
+        const roleConfig = getRoleConfig(effectiveRoles);
+        if (roleConfig && (isOnPublicPage || isOnRegPage)) {
+          router.navigate(roleConfig.defaultRoute);
+        }
       }
     }
 
@@ -79,7 +88,7 @@ function AppInner() {
         router.navigate('/register/volunteer-profile');
       }
     }
-  }, [authenticated, userStatus, roles]);
+  }, [authenticated, userStatus, roles, backendUser?.role]);
 
   // Show loader during Keycloak initialization
   if (!initialized) {

@@ -187,25 +187,34 @@ export function SAdminDashboard() {
       setSessionsLoading(true);
       try {
         const headers = getAuthHeaders();
-        // sAdmin: try admin endpoint, then fallback
-        let fulfs: Fulfillment[] = [];
-        const fulfResp = await fetch(
-          `${BASE_URL}/api/v1/serve-fulfill/fulfillment/needadmin-read/${userId}?page=0&size=1000`,
+
+        // Get assigned needs, then fetch fulfillments per need
+        const needsResp = await fetch(
+          `${BASE_URL}/api/v1/serve-need/need/?status=Assigned&page=0&size=200`,
           { headers },
         );
-        if (fulfResp.ok) {
-          const fulfData = await fulfResp.json();
-          fulfs = Array.isArray(fulfData) ? fulfData : (fulfData?.content || []);
+        let assignedNeeds: { id: string }[] = [];
+        if (needsResp.ok) {
+          const needsData = await needsResp.json();
+          const content = Array.isArray(needsData) ? needsData : (needsData.content || []);
+          assignedNeeds = content.map((n: Record<string, unknown>) => ({
+            id: (n.id as string) || ((n.need as Record<string, unknown>)?.id as string) || '',
+          })).filter((n: { id: string }) => n.id);
         }
-        if (fulfs.length === 0) {
-          const fallback = await fetch(
-            `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=1000`,
-            { headers },
-          );
-          if (fallback.ok) {
-            const fbData = await fallback.json();
-            fulfs = Array.isArray(fbData) ? fbData : (fbData?.content || []);
-          }
+
+        let fulfs: Fulfillment[] = [];
+        for (const need of assignedNeeds.slice(0, 50)) {
+          try {
+            const fulfResp = await fetch(
+              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}?page=0&size=10`,
+              { headers },
+            );
+            if (fulfResp.ok) {
+              const fulfData = await fulfResp.json();
+              const items = Array.isArray(fulfData) ? fulfData : (fulfData.content || []);
+              fulfs.push(...items);
+            }
+          } catch { /* skip */ }
         }
 
         const results: SessionData[] = [];
