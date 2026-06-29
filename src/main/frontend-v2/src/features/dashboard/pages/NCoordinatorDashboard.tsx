@@ -40,6 +40,12 @@ interface Deliverable {
   status: string;
   comments?: string;
   numberOfAttendees?: number;
+  inputParameters?: {
+    startTime?: string;
+    endTime?: string;
+    inputUrl?: string;
+    softwarePlatform?: string;
+  };
 }
 
 interface InputParameter {
@@ -200,10 +206,11 @@ export function NCoordinatorDashboard() {
   const todayStr = new Date().toISOString().split('T')[0];
   const todayDeliverables: { deliverable: Deliverable; params: InputParameter | null; session: SessionData; needName: string; volunteerName: string; volunteerPhone: string }[] = [];
   for (const session of sessions) {
-    const params = session.inputParams.length > 0 ? session.inputParams[0] : null;
+    const planParams = session.inputParams.length > 0 ? session.inputParams[0] : null;
     for (const d of session.deliverables) {
       if (d.deliverableDate?.startsWith(todayStr)) {
-        todayDeliverables.push({ deliverable: d, params, session, needName: session.needName || '', volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
+        const effectiveParams = d.inputParameters || planParams;
+        todayDeliverables.push({ deliverable: d, params: effectiveParams, session, needName: session.needName || '', volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
       }
     }
   }
@@ -214,10 +221,11 @@ export function NCoordinatorDashboard() {
   const nextWeekStr = nextWeek.toISOString().split('T')[0];
   const upcomingDeliverables: { deliverable: Deliverable; params: InputParameter | null; session: SessionData; needName: string; volunteerName: string; volunteerPhone: string }[] = [];
   for (const session of sessions) {
-    const params = session.inputParams.length > 0 ? session.inputParams[0] : null;
+    const planParams = session.inputParams.length > 0 ? session.inputParams[0] : null;
     for (const d of session.deliverables) {
       if (d.deliverableDate && d.deliverableDate > todayStr && d.deliverableDate <= nextWeekStr && d.status === 'Planned') {
-        upcomingDeliverables.push({ deliverable: d, params, session, needName: session.needName || '', volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
+        const effectiveParams = d.inputParameters || planParams;
+        upcomingDeliverables.push({ deliverable: d, params: effectiveParams, session, needName: session.needName || '', volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
       }
     }
   }

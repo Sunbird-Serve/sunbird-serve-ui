@@ -29,6 +29,12 @@ interface Deliverable {
   status: string;
   comments?: string;
   numberOfAttendees?: number;
+  inputParameters?: {
+    startTime?: string;
+    endTime?: string;
+    inputUrl?: string;
+    softwarePlatform?: string;
+  };
 }
 
 interface InputParameter {
@@ -125,7 +131,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     .sort((a, b) => a.deliverableDate.localeCompare(b.deliverableDate))
     .slice(0, 5);
 
-  const commonParams: InputParameter | null = inputParams.length > 0 ? inputParams[0] : null;
+  const commonParams: InputParameter | null = inputParams.length > 0 ? inputParams[inputParams.length - 1] : null;
 
   const startEdit = (d: Deliverable) => {
     setEditingId(d.id);
@@ -185,7 +191,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
   const renderSession = (d: Deliverable, isToday: boolean) => {
     const isEditing = editingId === d.id;
     const dateStr = d.deliverableDate?.split('T')[0] || '—';
-    const params = commonParams;
+    const params = d.inputParameters || commonParams;
 
     return (
       <Paper

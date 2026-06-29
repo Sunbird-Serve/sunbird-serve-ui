@@ -40,6 +40,12 @@ interface Deliverable {
   status: string;
   comments?: string;
   numberOfAttendees?: number;
+  inputParameters?: {
+    startTime?: string;
+    endTime?: string;
+    inputUrl?: string;
+    softwarePlatform?: string;
+  };
 }
 
 interface InputParameter {
@@ -225,7 +231,11 @@ export function MySessionsPage() {
   const cancelledDelivs = selectedNeed?.deliverables.filter((d) => d.status === 'Cancelled' || d.status === 'Rescheduled' || d.status === 'Offline') || [];
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const params = selectedNeed?.inputParams?.[0] || null;
+  const planParams = selectedNeed?.inputParams?.length ? selectedNeed.inputParams[selectedNeed.inputParams.length - 1] : null;
+
+  // For today's "Join" button — use today's deliverable inputParameters or fall back to plan-level
+  const todayDeliv = todoDelivs.find((d) => d.deliverableDate?.startsWith(todayStr));
+  const params = todayDeliv?.inputParameters || planParams;
 
   // Actions
   const handleComplete = async () => {
