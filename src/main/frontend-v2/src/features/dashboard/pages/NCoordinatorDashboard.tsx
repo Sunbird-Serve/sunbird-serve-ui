@@ -208,7 +208,7 @@ export function NCoordinatorDashboard() {
   for (const session of sessions) {
     const planParams = session.inputParams.length > 0 ? session.inputParams[0] : null;
     for (const d of session.deliverables) {
-      if (d.deliverableDate?.startsWith(todayStr)) {
+      if (d.deliverableDate?.startsWith(todayStr) && d.status !== 'PlannedPause' && d.status !== 'Cancelled' && d.status !== 'Rescheduled') {
         const effectiveParams = d.inputParameters || planParams;
         todayDeliverables.push({ deliverable: d, params: effectiveParams, session, needName: session.needName || '', volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
       }

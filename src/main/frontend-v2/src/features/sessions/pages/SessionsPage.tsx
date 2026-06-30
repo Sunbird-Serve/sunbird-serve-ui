@@ -57,6 +57,12 @@ interface Deliverable {
   status: string;
   comments?: string;
   numberOfAttendees?: number;
+  inputParameters?: {
+    startTime?: string;
+    endTime?: string;
+    inputUrl?: string;
+    softwarePlatform?: string;
+  };
 }
 
 interface InputParameter {
@@ -329,15 +335,18 @@ export function SessionsPage() {
   const allSessions: FlatSession[] = useMemo(() => {
     const flat: FlatSession[] = [];
     for (const plan of sessionPlans) {
-      const params = plan.inputParams.length > 0 ? plan.inputParams[0] : null;
+      const planParams = plan.inputParams.length > 0 ? plan.inputParams[plan.inputParams.length - 1] : null;
       for (const d of plan.deliverables) {
+        // Prefer deliverable-level inputParameters over plan-level
+        const delivParams = d.inputParameters || null;
+        const effectiveParams = delivParams || planParams;
         flat.push({
           id: d.id,
           date: d.deliverableDate?.split('T')[0] || '',
           status: d.status,
-          startTime: params?.startTime,
-          endTime: params?.endTime,
-          sessionLink: params?.inputUrl,
+          startTime: effectiveParams?.startTime,
+          endTime: effectiveParams?.endTime,
+          sessionLink: effectiveParams?.inputUrl,
           needName: plan.needName || '',
           volunteerName: plan.volunteerName || '',
           volunteerPhone: plan.volunteerPhone || '',

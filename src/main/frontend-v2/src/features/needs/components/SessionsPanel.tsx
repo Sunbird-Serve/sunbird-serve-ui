@@ -18,6 +18,7 @@ import LinkIcon from '@mui/icons-material/Link';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
+import AddLinkIcon from '@mui/icons-material/AddLink';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
@@ -77,6 +78,11 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
   const [editDate, setEditDate] = useState('');
   const [saving, setSaving] = useState(false);
 
+  // Session link state
+  const [editingLink, setEditingLink] = useState(false);
+  const [sessionLink, setSessionLink] = useState('');
+  const [savingLink, setSavingLink] = useState(false);
+
   // Fetch: need-plan → deliverables
   useEffect(() => {
     async function fetchData() {
@@ -113,6 +119,11 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
           const delivData = await delivResp.json();
           setDeliverables(delivData.needDeliverable || delivData.content || []);
           setInputParams(delivData.inputParameters || []);
+          // Initialize session link from existing input params
+          const existingParams = delivData.inputParameters || [];
+          if (existingParams.length > 0) {
+            setSessionLink(existingParams[existingParams.length - 1]?.inputUrl || '');
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load sessions');
@@ -185,6 +196,49 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
       setError('Failed to update session.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  // Save session link — updates the plan-level input parameters
+  const handleSaveLink = async () => {
+    if (!sessionLink.trim()) { setError('Please enter a valid URL.'); return; }
+    setSavingLink(true);
+    setError('');
+    try {
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const headers = getAuthHeadersWithJson();
+
+      // Create/update input parameter for this plan
+      await fetch(`${BASE_URL}/api/v1/serve-need/deliverable-input/create`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          needPlanId: needPlanId,
+          inputUrl: sessionLink.trim(),
+          softwarePlatform: commonParams?.softwarePlatform || 'Online',
+          startTime: commonParams?.startTime || '',
+          endTime: commonParams?.endTime || '',
+        }),
+      });
+
+      // Update local state
+      setInputParams((prev) => {
+        const updated = [...prev];
+        if (updated.length > 0) {
+          updated[updated.length - 1] = { ...updated[updated.length - 1], inputUrl: sessionLink.trim() };
+        } else {
+          updated.push({ inputUrl: sessionLink.trim() });
+        }
+        return updated;
+      });
+
+      setSuccess('Session link saved.');
+      setEditingLink(false);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch {
+      setError('Failed to save session link.');
+    } finally {
+      setSavingLink(false);
     }
   };
 
@@ -331,23 +385,72 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
 
-      {/* Common session info */}
-      {commonParams && (
-        <Paper sx={{ p: 2, mb: 2, bgcolor: 'rgba(14, 116, 144, 0.04)' }}>
-          <Typography variant="subtitle2" color="primary.main" gutterBottom>Session Info</Typography>
+      {/* Session Link Management */}
+      <Paper sx={{ p: 2, mb: 2, bgcolor: 'rgba(14, 116, 144, 0.04)' }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+          <Typography variant="subtitle2" color="primary.main">Session Info</Typography>
+          {!editingLink && (
+            <Button
+              size="small"
+              startIcon={commonParams?.inputUrl ? <EditIcon /> : <AddLinkIcon />}
+              onClick={() => { setEditingLink(true); setSessionLink(commonParams?.inputUrl || ''); }}
+            >
+              {commonParams?.inputUrl ? 'Edit Link' : 'Add Session Link'}
+            </Button>
+          )}
+        </Stack>
+
+        {!editingLink ? (
           <Stack direction="row" spacing={3} flexWrap="wrap">
-            {commonParams.inputUrl && (
-              <Typography variant="body2">
-                <strong>Link:</strong>{' '}
-                <Link href={commonParams.inputUrl} target="_blank" underline="hover">Session Link</Link>
+            {commonParams?.inputUrl ? (
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <LinkIcon fontSize="small" color="action" />
+                <Link href={commonParams.inputUrl} target="_blank" variant="body2" underline="hover">
+                  {commonParams.inputUrl.length > 50 ? commonParams.inputUrl.slice(0, 50) + '...' : commonParams.inputUrl}
+                </Link>
+              </Stack>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No session link set. Add one so volunteers can join.
               </Typography>
             )}
-            <Typography variant="body2">
-              <strong>Time:</strong> {formatTime(commonParams.startTime)} – {formatTime(commonParams.endTime)}
-            </Typography>
+            {commonParams?.startTime && (
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <AccessTimeIcon fontSize="small" color="action" />
+                <Typography variant="body2">
+                  {formatTime(commonParams.startTime)} – {formatTime(commonParams.endTime)}
+                </Typography>
+              </Stack>
+            )}
           </Stack>
-        </Paper>
-      )}
+        ) : (
+          <Stack spacing={1.5}>
+            <TextField
+              size="small"
+              fullWidth
+              label="Session Link (Google Meet, Zoom, etc.)"
+              placeholder="https://meet.google.com/abc-defg-hij"
+              value={sessionLink}
+              onChange={(e) => setSessionLink(e.target.value)}
+              InputLabelProps={{ shrink: true }}
+            />
+            <Stack direction="row" spacing={1}>
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={<SaveIcon />}
+                onClick={handleSaveLink}
+                disabled={savingLink || !sessionLink.trim()}
+              >
+                {savingLink ? 'Saving...' : 'Save Link'}
+              </Button>
+              <Button size="small" variant="text" onClick={() => setEditingLink(false)}>
+                Cancel
+              </Button>
+            </Stack>
+          </Stack>
+        )}
+      </Paper>
 
       {/* Today's sessions */}
       {todaySessions.length > 0 && (
