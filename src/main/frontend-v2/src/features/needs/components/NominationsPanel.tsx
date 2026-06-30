@@ -140,11 +140,13 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
                   }
                 }
 
-                // Inactivate the need plan
-                await fetch(
-                  `${BASE_URL}/api/v1/serve-need/need-plan/status/${planId}?status=Inactive`,
-                  { method: 'PUT', headers: authHeaders },
-                );
+                // Inactivate the need plan (may fail if role lacks permission — non-critical)
+                try {
+                  await fetch(
+                    `${BASE_URL}/api/v1/serve-need/need-plan/status/${planId}?status=Inactive`,
+                    { method: 'PUT', headers: authHeaders },
+                  );
+                } catch { /* non-critical — plan inactivation is best-effort */ }
               }
             }
           } catch {
