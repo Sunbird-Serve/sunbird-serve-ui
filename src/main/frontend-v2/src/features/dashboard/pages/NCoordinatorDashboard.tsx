@@ -206,10 +206,9 @@ export function NCoordinatorDashboard() {
   const todayStr = new Date().toISOString().split('T')[0];
   const todayDeliverables: { deliverable: Deliverable; params: InputParameter | null; session: SessionData; needName: string; volunteerName: string; volunteerPhone: string }[] = [];
   for (const session of sessions) {
-    const planParams = session.inputParams.length > 0 ? session.inputParams[0] : null;
     for (const d of session.deliverables) {
       if (d.deliverableDate?.startsWith(todayStr) && d.status !== 'PlannedPause' && d.status !== 'Cancelled' && d.status !== 'Rescheduled') {
-        const effectiveParams = d.inputParameters || planParams;
+        const effectiveParams = d.inputParameters || null;
         todayDeliverables.push({ deliverable: d, params: effectiveParams, session, needName: session.needName || '', volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
       }
     }
@@ -221,10 +220,9 @@ export function NCoordinatorDashboard() {
   const nextWeekStr = nextWeek.toISOString().split('T')[0];
   const upcomingDeliverables: { deliverable: Deliverable; params: InputParameter | null; session: SessionData; needName: string; volunteerName: string; volunteerPhone: string }[] = [];
   for (const session of sessions) {
-    const planParams = session.inputParams.length > 0 ? session.inputParams[0] : null;
     for (const d of session.deliverables) {
       if (d.deliverableDate && d.deliverableDate > todayStr && d.deliverableDate <= nextWeekStr && d.status === 'Planned') {
-        const effectiveParams = d.inputParameters || planParams;
+        const effectiveParams = d.inputParameters || null;
         upcomingDeliverables.push({ deliverable: d, params: effectiveParams, session, needName: session.needName || '', volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
       }
     }

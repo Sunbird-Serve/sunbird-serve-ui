@@ -335,18 +335,16 @@ export function SessionsPage() {
   const allSessions: FlatSession[] = useMemo(() => {
     const flat: FlatSession[] = [];
     for (const plan of sessionPlans) {
-      const planParams = plan.inputParams.length > 0 ? plan.inputParams[plan.inputParams.length - 1] : null;
       for (const d of plan.deliverables) {
-        // Prefer deliverable-level inputParameters over plan-level
+        // Read from deliverable JSONB inputParameters only
         const delivParams = d.inputParameters || null;
-        const effectiveParams = delivParams || planParams;
         flat.push({
           id: d.id,
           date: d.deliverableDate?.split('T')[0] || '',
           status: d.status,
-          startTime: effectiveParams?.startTime,
-          endTime: effectiveParams?.endTime,
-          sessionLink: effectiveParams?.inputUrl,
+          startTime: delivParams?.startTime,
+          endTime: delivParams?.endTime,
+          sessionLink: delivParams?.inputUrl,
           needName: plan.needName || '',
           volunteerName: plan.volunteerName || '',
           volunteerPhone: plan.volunteerPhone || '',
