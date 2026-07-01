@@ -67,7 +67,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
-  const [inputParams, setInputParams] = useState<InputParameter[]>([]);
+  const [, setInputParams] = useState<InputParameter[]>([]);
   const [needPlanId, setNeedPlanId] = useState('');
 
   // Edit state
@@ -141,8 +141,6 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     .filter((d) => d.deliverableDate && d.deliverableDate > todayStr && d.status === 'Planned')
     .sort((a, b) => a.deliverableDate.localeCompare(b.deliverableDate))
     .slice(0, 5);
-
-  const commonParams: InputParameter | null = inputParams.length > 0 ? inputParams[inputParams.length - 1] : null;
 
   // Get session link from the first deliverable that has one in its JSONB inputParameters
   const effectiveLink = (() => {
