@@ -231,11 +231,10 @@ export function MySessionsPage() {
   const cancelledDelivs = selectedNeed?.deliverables.filter((d) => d.status === 'Cancelled' || d.status === 'Rescheduled' || d.status === 'Offline') || [];
 
   const todayStr = new Date().toISOString().split('T')[0];
-  const planParams = selectedNeed?.inputParams?.length ? selectedNeed.inputParams[selectedNeed.inputParams.length - 1] : null;
 
-  // For today's "Join" button — use today's deliverable inputParameters or fall back to plan-level
+  // For today's "Join" button — use today's deliverable inputParameters directly
   const todayDeliv = todoDelivs.find((d) => d.deliverableDate?.startsWith(todayStr));
-  const params = todayDeliv?.inputParameters || planParams;
+  const params = todayDeliv?.inputParameters || null;
 
   // Actions
   const handleComplete = async () => {

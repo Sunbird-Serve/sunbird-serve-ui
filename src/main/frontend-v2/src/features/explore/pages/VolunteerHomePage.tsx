@@ -323,7 +323,7 @@ export function VolunteerHomePage() {
           </Typography>
           <Stack spacing={1.5}>
             {todaySessions.map(({ assignment, deliverable }) => {
-              const params = deliverable.inputParameters || (assignment.inputParams.length > 0 ? assignment.inputParams[assignment.inputParams.length - 1] : null);
+              const params = deliverable.inputParameters || null;
               return (
                 <Stack
                   key={deliverable.id}
@@ -487,7 +487,7 @@ export function VolunteerHomePage() {
                     )}
                   </Box>
                   <Typography variant="caption" color="text.secondary">
-                    {formatTime(deliverable.inputParameters?.startTime || assignment.inputParams[assignment.inputParams.length - 1]?.startTime)}
+                    {formatTime(deliverable.inputParameters?.startTime)}
                   </Typography>
                 </Stack>
               ))}

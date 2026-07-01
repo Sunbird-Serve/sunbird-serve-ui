@@ -199,13 +199,11 @@ export function NeedSchedulePage() {
 
     for (const session of sessions) {
       if (needFilter !== 'all' && session.needName !== needFilter) continue;
-      // Fallback: plan-level inputParams (old table) — used only if deliverable doesn't have its own
-      const planParams = session.inputParams.length > 0 ? session.inputParams[session.inputParams.length - 1] : null;
 
       for (const d of session.deliverables) {
         const dateStr = d.deliverableDate?.split('T')[0] || '';
         if (dateStr >= start && dateStr <= end) {
-          // Prefer deliverable-level inputParameters (JSONB), fall back to plan-level
+          // Read from deliverable JSONB inputParameters only
           const delivParams: InputParameter | null = d.inputParameters
             ? {
                 startTime: d.inputParameters.startTime,
@@ -213,7 +211,7 @@ export function NeedSchedulePage() {
                 inputUrl: d.inputParameters.inputUrl,
                 softwarePlatform: d.inputParameters.softwarePlatform,
               }
-            : planParams;
+            : null;
           items.push({ date: dateStr, needName: session.needName, deliverable: d, params: delivParams, volunteerName: session.volunteerName || '', volunteerPhone: session.volunteerPhone || '' });
         }
       }

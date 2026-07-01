@@ -144,14 +144,20 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
 
   const commonParams: InputParameter | null = inputParams.length > 0 ? inputParams[inputParams.length - 1] : null;
 
-  // Also check if any deliverable has a session link in its own inputParameters (JSONB)
+  // Get session link from the first deliverable that has one in its JSONB inputParameters
   const effectiveLink = (() => {
-    // Check deliverables for link first (most up to date)
     for (const d of deliverables) {
       if (d.inputParameters?.inputUrl) return d.inputParameters.inputUrl;
     }
-    // Fall back to plan-level
-    return commonParams?.inputUrl || '';
+    return '';
+  })();
+
+  // Get effective time from first deliverable that has it
+  const effectiveTime = (() => {
+    for (const d of deliverables) {
+      if (d.inputParameters?.startTime) return { startTime: d.inputParameters.startTime, endTime: d.inputParameters.endTime };
+    }
+    return null;
   })();
 
   const startEdit = (d: Deliverable) => {
@@ -209,51 +215,45 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     }
   };
 
-  // Save session link — updates the plan-level input parameters
+  // Save session link — updates JSONB inputParameters on each Planned deliverable
   const handleSaveLink = async () => {
     if (!sessionLink.trim()) { setError('Please enter a valid URL.'); return; }
     setSavingLink(true);
     setError('');
     try {
-      const { getAuthHeaders, getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
       const headers = getAuthHeadersWithJson();
 
-      // Create/update input parameter for this plan
-      await fetch(`${BASE_URL}/api/v1/serve-need/deliverable-input/create`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          needPlanId: needPlanId,
-          inputUrl: sessionLink.trim(),
-          softwarePlatform: commonParams?.softwarePlatform || 'Online',
-          startTime: commonParams?.startTime || '',
-          endTime: commonParams?.endTime || '',
-        }),
-      });
+      // Update each Planned deliverable with the session link in its JSONB inputParameters
+      const plannedDeliverables = deliverables.filter((d) => d.status === 'Planned' || d.status === 'PlannedPause');
+      for (const d of plannedDeliverables) {
+        const existingParams = d.inputParameters || {};
+        await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${d.id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({
+            needPlanId: d.needPlanId || needPlanId,
+            status: d.status,
+            deliverableDate: d.deliverableDate?.split('T')[0] || '',
+            comments: d.comments || '',
+            inputParameters: {
+              ...existingParams,
+              inputUrl: sessionLink.trim(),
+            },
+          }),
+        });
+      }
 
-      // Re-fetch deliverables to get the updated inputParameters from backend
-      try {
-        const authHeaders = getAuthHeaders();
-        const delivResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/${needPlanId}`, { headers: authHeaders });
-        if (delivResp.ok) {
-          const delivData = await delivResp.json();
-          setDeliverables(delivData.needDeliverable || delivData.content || []);
-          setInputParams(delivData.inputParameters || []);
-        }
-      } catch { /* fallback: update local state manually */ }
+      // Update local state — set inputUrl on all planned deliverables
+      setDeliverables((prev) =>
+        prev.map((d) =>
+          d.status === 'Planned' || d.status === 'PlannedPause'
+            ? { ...d, inputParameters: { ...(d.inputParameters || {}), inputUrl: sessionLink.trim() } }
+            : d,
+        ),
+      );
 
-      // Also update local state as fallback
-      setInputParams((prev) => {
-        const updated = [...prev];
-        if (updated.length > 0) {
-          updated[updated.length - 1] = { ...updated[updated.length - 1], inputUrl: sessionLink.trim() };
-        } else {
-          updated.push({ inputUrl: sessionLink.trim() });
-        }
-        return updated;
-      });
-
-      setSuccess('Session link saved.');
+      setSuccess(`Session link saved for ${plannedDeliverables.length} sessions.`);
       setEditingLink(false);
       setTimeout(() => setSuccess(''), 3000);
     } catch {
@@ -266,7 +266,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
   const renderSession = (d: Deliverable, isToday: boolean) => {
     const isEditing = editingId === d.id;
     const dateStr = d.deliverableDate?.split('T')[0] || '—';
-    const params = d.inputParameters || commonParams;
+    const params = d.inputParameters || null;
 
     return (
       <Paper
@@ -435,11 +435,11 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
                 No session link set. Add one so volunteers can join.
               </Typography>
             )}
-            {commonParams?.startTime && (
+            {effectiveTime && (
               <Stack direction="row" spacing={0.5} alignItems="center">
                 <AccessTimeIcon fontSize="small" color="action" />
                 <Typography variant="body2">
-                  {formatTime(commonParams.startTime)} – {formatTime(commonParams.endTime)}
+                  {formatTime(effectiveTime.startTime)} – {formatTime(effectiveTime.endTime)}
                 </Typography>
               </Stack>
             )}
