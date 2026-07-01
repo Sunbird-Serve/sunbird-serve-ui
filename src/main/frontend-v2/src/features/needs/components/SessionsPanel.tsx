@@ -142,19 +142,41 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     .sort((a, b) => a.deliverableDate.localeCompare(b.deliverableDate))
     .slice(0, 5);
 
-  // Get session link from the first deliverable that has one in its JSONB inputParameters
+  // Get session link — prioritize Planned deliverables sorted by date (nearest upcoming first)
   const effectiveLink = (() => {
-    for (const d of deliverables) {
-      if (d.inputParameters?.inputUrl) return d.inputParameters.inputUrl;
-    }
+    // First check Planned sessions sorted by date ascending (nearest future date first)
+    const planned = deliverables
+      .filter((d) => d.status === 'Planned' && d.inputParameters?.inputUrl)
+      .sort((a, b) => (a.deliverableDate || '').localeCompare(b.deliverableDate || ''));
+    if (planned.length > 0) return planned[0].inputParameters!.inputUrl!;
+
+    // Fallback: PlannedPause sessions
+    const plannedPause = deliverables
+      .filter((d) => d.status === 'PlannedPause' && d.inputParameters?.inputUrl)
+      .sort((a, b) => (a.deliverableDate || '').localeCompare(b.deliverableDate || ''));
+    if (plannedPause.length > 0) return plannedPause[0].inputParameters!.inputUrl!;
+
+    // Last resort: any deliverable with a link (but prefer most recent date)
+    const withLink = deliverables
+      .filter((d) => d.inputParameters?.inputUrl)
+      .sort((a, b) => (b.deliverableDate || '').localeCompare(a.deliverableDate || ''));
+    if (withLink.length > 0) return withLink[0].inputParameters!.inputUrl!;
+
     return '';
   })();
 
-  // Get effective time from first deliverable that has it
+  // Get effective time — prioritize nearest Planned deliverable
   const effectiveTime = (() => {
-    for (const d of deliverables) {
-      if (d.inputParameters?.startTime) return { startTime: d.inputParameters.startTime, endTime: d.inputParameters.endTime };
-    }
+    const planned = deliverables
+      .filter((d) => d.status === 'Planned' && d.inputParameters?.startTime)
+      .sort((a, b) => (a.deliverableDate || '').localeCompare(b.deliverableDate || ''));
+    if (planned.length > 0) return { startTime: planned[0].inputParameters!.startTime!, endTime: planned[0].inputParameters?.endTime };
+
+    const withTime = deliverables
+      .filter((d) => d.inputParameters?.startTime)
+      .sort((a, b) => (b.deliverableDate || '').localeCompare(a.deliverableDate || ''));
+    if (withTime.length > 0) return { startTime: withTime[0].inputParameters!.startTime!, endTime: withTime[0].inputParameters?.endTime };
+
     return null;
   })();
 
