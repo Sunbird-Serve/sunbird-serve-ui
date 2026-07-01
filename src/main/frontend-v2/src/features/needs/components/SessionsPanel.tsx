@@ -144,6 +144,16 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
 
   const commonParams: InputParameter | null = inputParams.length > 0 ? inputParams[inputParams.length - 1] : null;
 
+  // Also check if any deliverable has a session link in its own inputParameters (JSONB)
+  const effectiveLink = (() => {
+    // Check deliverables for link first (most up to date)
+    for (const d of deliverables) {
+      if (d.inputParameters?.inputUrl) return d.inputParameters.inputUrl;
+    }
+    // Fall back to plan-level
+    return commonParams?.inputUrl || '';
+  })();
+
   const startEdit = (d: Deliverable) => {
     setEditingId(d.id);
     setEditStatus(d.status || 'Planned');
@@ -205,7 +215,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     setSavingLink(true);
     setError('');
     try {
-      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+      const { getAuthHeaders, getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
       const headers = getAuthHeadersWithJson();
 
       // Create/update input parameter for this plan
@@ -221,7 +231,18 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
         }),
       });
 
-      // Update local state
+      // Re-fetch deliverables to get the updated inputParameters from backend
+      try {
+        const authHeaders = getAuthHeaders();
+        const delivResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/${needPlanId}`, { headers: authHeaders });
+        if (delivResp.ok) {
+          const delivData = await delivResp.json();
+          setDeliverables(delivData.needDeliverable || delivData.content || []);
+          setInputParams(delivData.inputParameters || []);
+        }
+      } catch { /* fallback: update local state manually */ }
+
+      // Also update local state as fallback
       setInputParams((prev) => {
         const updated = [...prev];
         if (updated.length > 0) {
@@ -392,21 +413,21 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
           {!editingLink && (
             <Button
               size="small"
-              startIcon={commonParams?.inputUrl ? <EditIcon /> : <AddLinkIcon />}
-              onClick={() => { setEditingLink(true); setSessionLink(commonParams?.inputUrl || ''); }}
+              startIcon={effectiveLink ? <EditIcon /> : <AddLinkIcon />}
+              onClick={() => { setEditingLink(true); setSessionLink(effectiveLink || ''); }}
             >
-              {commonParams?.inputUrl ? 'Edit Link' : 'Add Session Link'}
+              {effectiveLink ? 'Edit Link' : 'Add Session Link'}
             </Button>
           )}
         </Stack>
 
         {!editingLink ? (
           <Stack direction="row" spacing={3} flexWrap="wrap">
-            {commonParams?.inputUrl ? (
+            {effectiveLink ? (
               <Stack direction="row" spacing={0.5} alignItems="center">
                 <LinkIcon fontSize="small" color="action" />
-                <Link href={commonParams.inputUrl} target="_blank" variant="body2" underline="hover">
-                  {commonParams.inputUrl.length > 50 ? commonParams.inputUrl.slice(0, 50) + '...' : commonParams.inputUrl}
+                <Link href={effectiveLink} target="_blank" variant="body2" underline="hover">
+                  {effectiveLink.length > 50 ? effectiveLink.slice(0, 50) + '...' : effectiveLink}
                 </Link>
               </Stack>
             ) : (
