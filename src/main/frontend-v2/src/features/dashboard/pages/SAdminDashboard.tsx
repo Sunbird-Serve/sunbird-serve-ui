@@ -235,6 +235,19 @@ export function SAdminDashboard() {
         const results: SessionData[] = [];
         for (const fulf of fulfs.slice(0, 80)) {
           try {
+            // Check plan status — skip inactive (backfilled) plans
+            const planCheckResp = await fetch(
+              `${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`,
+              { headers },
+            );
+            if (planCheckResp.ok) {
+              const planCheckData = await planCheckResp.json();
+              const plans = Array.isArray(planCheckData) ? planCheckData : (planCheckData.content || []);
+              const matchingPlan = plans.find((p: Record<string, unknown>) => (p?.plan as Record<string, unknown>)?.id === fulf.needPlanId || p?.id === fulf.needPlanId);
+              const status = (matchingPlan?.plan as Record<string, unknown>)?.status as string || matchingPlan?.status as string || '';
+              if (status === 'Inactive') continue;
+            }
+
             const delivResp = await fetch(
               `${BASE_URL}/api/v1/serve-need/need-deliverable/${fulf.needPlanId}`,
               { headers },
