@@ -139,13 +139,19 @@ export function NCoordinatorDashboard() {
               { headers },
             );
             let needName = '';
+            let planStatus = '';
             if (planResp.ok) {
               const planData = await planResp.json();
               const plans = Array.isArray(planData) ? planData : (planData.content || []);
               if (plans.length > 0) {
-                needName = plans[0]?.plan?.name || '';
+                const matchingPlan = plans.find((p: Record<string, unknown>) => (p?.plan as Record<string, unknown>)?.id === fulf.needPlanId || p?.id === fulf.needPlanId) || plans[0];
+                needName = (matchingPlan?.plan as Record<string, unknown>)?.name as string || '';
+                planStatus = (matchingPlan?.plan as Record<string, unknown>)?.status as string || matchingPlan?.status as string || '';
               }
             }
+
+            // Skip inactive plans (backfilled volunteers)
+            if (planStatus === 'Inactive') continue;
 
             // Get volunteer details
             let volunteerName = '';

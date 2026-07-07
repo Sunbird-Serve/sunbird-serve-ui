@@ -144,17 +144,24 @@ export function MySessionsPage() {
             // Get need plan info
             const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`, { headers });
             let needName = '', planId = fulf.needPlanId, startDate = '', endDate = '', days = '';
+            let planStatus = '';
             if (planResp.ok) {
               const planData = await planResp.json();
               const plans = Array.isArray(planData) ? planData : (planData.content || []);
               if (plans.length > 0) {
-                needName = plans[0]?.plan?.name || '';
-                planId = plans[0]?.plan?.id || fulf.needPlanId;
-                startDate = plans[0]?.occurrence?.startDate?.substring(0, 10) || '';
-                endDate = plans[0]?.occurrence?.endDate?.substring(0, 10) || '';
-                days = plans[0]?.occurrence?.days || '';
+                // Find matching plan for this fulfillment
+                const matchingPlan = plans.find((p: Record<string, unknown>) => (p?.plan as Record<string, unknown>)?.id === fulf.needPlanId || p?.id === fulf.needPlanId) || plans[0];
+                needName = (matchingPlan?.plan as Record<string, unknown>)?.name as string || '';
+                planId = (matchingPlan?.plan as Record<string, unknown>)?.id as string || fulf.needPlanId;
+                planStatus = (matchingPlan?.plan as Record<string, unknown>)?.status as string || matchingPlan?.status as string || '';
+                startDate = matchingPlan?.occurrence?.startDate?.substring(0, 10) || '';
+                endDate = matchingPlan?.occurrence?.endDate?.substring(0, 10) || '';
+                days = matchingPlan?.occurrence?.days || '';
               }
             }
+
+            // Skip inactive plans (backfilled)
+            if (planStatus === 'Inactive') continue;
 
             // Get entity name from need
             let entityName = '';

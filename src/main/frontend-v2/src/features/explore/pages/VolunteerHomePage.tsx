@@ -131,19 +131,25 @@ export function VolunteerHomePage() {
             } catch { /* skip */ }
 
             // Get need plan for schedule
+            let planStatus = '';
             try {
               const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`, { headers });
               if (planResp.ok) {
                 const planData = await planResp.json();
                 const plans = Array.isArray(planData) ? planData : (planData.content || []);
                 if (plans.length > 0) {
-                  if (!needName) needName = plans[0]?.plan?.name || '';
-                  days = plans[0]?.occurrence?.days || '';
-                  startDate = plans[0]?.occurrence?.startDate?.substring(0, 10) || '';
-                  endDate = plans[0]?.occurrence?.endDate?.substring(0, 10) || '';
+                  const matchingPlan = plans.find((p: Record<string, unknown>) => (p?.plan as Record<string, unknown>)?.id === fulf.needPlanId || p?.id === fulf.needPlanId) || plans[0];
+                  if (!needName) needName = (matchingPlan?.plan as Record<string, unknown>)?.name as string || '';
+                  planStatus = (matchingPlan?.plan as Record<string, unknown>)?.status as string || matchingPlan?.status as string || '';
+                  days = matchingPlan?.occurrence?.days || '';
+                  startDate = matchingPlan?.occurrence?.startDate?.substring(0, 10) || '';
+                  endDate = matchingPlan?.occurrence?.endDate?.substring(0, 10) || '';
                 }
               }
             } catch { /* skip */ }
+
+            // Skip inactive plans (backfilled)
+            if (planStatus === 'Inactive') continue;
 
             // Get deliverables
             const delivResp = await fetch(

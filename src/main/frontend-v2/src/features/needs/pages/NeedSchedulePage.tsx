@@ -131,14 +131,21 @@ export function NeedSchedulePage() {
             const planResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`, { headers: getAuthHeaders() });
             let needName = '';
             let planId = fulf.needPlanId;
+            let planStatus = '';
             if (planResp.ok) {
               const planData = await planResp.json();
               const plans = Array.isArray(planData) ? planData : (planData.content || []);
               if (plans.length > 0) {
-                needName = plans[0]?.plan?.name || '';
-                planId = plans[0]?.plan?.id || fulf.needPlanId;
+                // Find the plan matching this fulfillment's needPlanId
+                const matchingPlan = plans.find((p: Record<string, unknown>) => (p?.plan as Record<string, unknown>)?.id === fulf.needPlanId || p?.id === fulf.needPlanId) || plans[0];
+                needName = (matchingPlan?.plan as Record<string, unknown>)?.name as string || '';
+                planId = (matchingPlan?.plan as Record<string, unknown>)?.id as string || fulf.needPlanId;
+                planStatus = (matchingPlan?.plan as Record<string, unknown>)?.status as string || matchingPlan?.status as string || '';
               }
             }
+
+            // Skip inactive plans (backfilled)
+            if (planStatus === 'Inactive') continue;
 
             // Get volunteer details
             let volunteerName = '';
@@ -202,7 +209,7 @@ export function NeedSchedulePage() {
 
       for (const d of session.deliverables) {
         const dateStr = d.deliverableDate?.split('T')[0] || '';
-        if (dateStr >= start && dateStr <= end) {
+        if (dateStr >= start && dateStr <= end && d.status !== 'PlannedPause') {
           // Read from deliverable JSONB inputParameters only
           const delivParams: InputParameter | null = d.inputParameters
             ? {
