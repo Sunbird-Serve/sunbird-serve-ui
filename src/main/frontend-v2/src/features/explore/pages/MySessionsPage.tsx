@@ -172,6 +172,21 @@ export function MySessionsPage() {
                 const need = Array.isArray(needData) ? needData[0] : needData;
                 entityName = need?.entity?.name || '';
                 if (!needName) needName = need?.name || need?.need?.name || '';
+
+                // If entity name not embedded, fetch separately
+                if (!entityName) {
+                  const entityId = need?.entityId || need?.entity?.id || '';
+                  if (entityId) {
+                    try {
+                      const entityResp = await fetch(`${BASE_URL}/api/v1/serve-need/entity/${entityId}`, { headers });
+                      if (entityResp.ok) {
+                        const entityData = await entityResp.json();
+                        const entity = Array.isArray(entityData) ? entityData[0] : entityData;
+                        entityName = entity?.name || '';
+                      }
+                    } catch { /* skip */ }
+                  }
+                }
               }
             } catch { /* skip */ }
 
@@ -239,9 +254,19 @@ export function MySessionsPage() {
 
   const todayStr = new Date().toISOString().split('T')[0];
 
-  // For today's "Join" button — use today's deliverable inputParameters directly
-  const todayDeliv = todoDelivs.find((d) => d.deliverableDate?.startsWith(todayStr));
-  const params = todayDeliv?.inputParameters || null;
+  // Get effective params — from nearest planned deliverable that has inputParameters
+  const effectiveParams = (() => {
+    // First try today's deliverable
+    const todayDeliv = todoDelivs.find((d) => d.deliverableDate?.startsWith(todayStr) && d.inputParameters);
+    if (todayDeliv?.inputParameters) return todayDeliv.inputParameters;
+    // Then any planned deliverable with inputParameters
+    const anyPlanned = todoDelivs.find((d) => d.inputParameters?.startTime || d.inputParameters?.inputUrl);
+    if (anyPlanned?.inputParameters) return anyPlanned.inputParameters;
+    // Fallback to plan-level inputParams (old table, transitional)
+    const planParams = selectedNeed?.inputParams?.length ? selectedNeed.inputParams[selectedNeed.inputParams.length - 1] : null;
+    return planParams;
+  })();
+  const params = effectiveParams;
 
   // Actions
   const handleComplete = async () => {
