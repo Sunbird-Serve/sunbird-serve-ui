@@ -482,10 +482,15 @@ export function MySessionsPage() {
                   <Typography variant="body2">{selectedNeed.coordinator.phone}</Typography>
                 </Stack>
               )}
-              {params?.inputUrl && (
+              {params?.inputUrl ? (
                 <Stack direction="row" spacing={1} alignItems="center">
                   <LinkIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
                   <Link href={params.inputUrl} target="_blank" variant="body2" underline="hover">Session Link</Link>
+                </Stack>
+              ) : (
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <LinkIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                  <Typography variant="body2" color="text.secondary" fontStyle="italic">Contact Coordinator for your session link</Typography>
                 </Stack>
               )}
               <Stack direction="row" spacing={1} alignItems="center">
