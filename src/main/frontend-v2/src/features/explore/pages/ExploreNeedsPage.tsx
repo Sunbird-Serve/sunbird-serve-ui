@@ -93,6 +93,30 @@ export function ExploreNeedsPage() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [nominatedIds, setNominatedIds] = useState<string[]>([]);
+  const [hasPendingNomination, setHasPendingNomination] = useState(false);
+
+  // Check if volunteer already has a pending nomination
+  useEffect(() => {
+    if (!userId) return;
+    async function checkExistingNominations() {
+      try {
+        const { getAuthHeaders } = await import('@shared/utils/authHeaders');
+        const resp = await fetch(
+          `${BASE_URL}/api/v1/serve-fulfill/nomination/${userId}?page=0&size=50`,
+          { headers: getAuthHeaders() },
+        );
+        if (resp.ok) {
+          const data = await resp.json();
+          const noms = Array.isArray(data) ? data : (data.content || []);
+          const pending = noms.filter((n: { nominationStatus: string }) => n.nominationStatus === 'Nominated');
+          const alreadyNominated = noms.map((n: { needId: string }) => n.needId);
+          setHasPendingNomination(pending.length > 0);
+          setNominatedIds(alreadyNominated);
+        }
+      } catch { /* silent */ }
+    }
+    checkExistingNominations();
+  }, [userId]);
   const [search, setSearch] = useState('');
   const [selectedNeed, setSelectedNeed] = useState<AvailableNeed | null>(null);
 
@@ -118,12 +142,18 @@ export function ExploreNeedsPage() {
       setSelectedNeed(null);
       return;
     }
+    if (hasPendingNomination) {
+      setError('You already have a pending nomination. Please wait for it to be reviewed before expressing interest in another need.');
+      setSelectedNeed(null);
+      return;
+    }
     if (!needId) return;
     setError('');
     try {
       await selfNominate({ needId, userId }).unwrap();
       setSuccess(`You've expressed interest in "${need.need?.name || need.name}". The coordinator will review your nomination.`);
       setNominatedIds((prev) => [...prev, needId]);
+      setHasPendingNomination(true);
       setSelectedNeed(null);
       setTimeout(() => setSuccess(''), 5000);
     } catch {
@@ -166,6 +196,11 @@ export function ExploreNeedsPage() {
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
+      {hasPendingNomination && !success && !error && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          You have a pending nomination. Please wait for it to be reviewed before expressing interest in another need.
+        </Alert>
+      )}
 
       {filteredNeeds.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
@@ -317,9 +352,9 @@ export function ExploreNeedsPage() {
                   variant="contained"
                   startIcon={<VolunteerActivismIcon />}
                   onClick={() => handleNominate(selectedNeed)}
-                  disabled={nominating || nominatedIds.includes(selectedNeed.need?.id || selectedNeed.id)}
+                  disabled={nominating || hasPendingNomination || nominatedIds.includes(selectedNeed.need?.id || selectedNeed.id)}
                 >
-                  {nominatedIds.includes(selectedNeed.need?.id || selectedNeed.id) ? 'Interest Submitted' : "I'm Interested"}
+                  {nominatedIds.includes(selectedNeed.need?.id || selectedNeed.id) ? 'Interest Submitted' : hasPendingNomination ? 'Pending Nomination Exists' : "I'm Interested"}
                 </Button>
               ) : (
                 <Button
