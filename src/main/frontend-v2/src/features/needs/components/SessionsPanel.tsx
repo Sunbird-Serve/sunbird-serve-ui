@@ -103,8 +103,12 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
           return;
         }
 
-        // Use the first plan — planId is nested under .plan.id
-        const planObj = plans[0];
+        // Filter out Inactive plans, pick the active one
+        const activePlans = plans.filter((p: Record<string, unknown>) => {
+          const status = (p?.plan as Record<string, unknown>)?.status as string || p?.status as string || '';
+          return status !== 'Inactive';
+        });
+        const planObj = activePlans.length > 0 ? activePlans[0] : plans[0];
         const planId = planObj?.plan?.id || planObj?.id || planObj?.osid || '';
         setNeedPlanId(planId);
 
