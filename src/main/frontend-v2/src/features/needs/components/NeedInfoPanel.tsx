@@ -131,7 +131,13 @@ export function NeedInfoPanel({ need }: NeedInfoPanelProps) {
             const planData = await planResp.json();
             const plans = Array.isArray(planData) ? planData : (planData.content || []);
             if (plans.length > 0) {
-              const planId = plans[0]?.plan?.id || plans[0]?.id || '';
+              // Filter out Inactive plans, pick the active one
+              const activePlans = plans.filter((p: Record<string, unknown>) => {
+                const status = (p?.plan as Record<string, unknown>)?.status as string || p?.status as string || '';
+                return status !== 'Inactive';
+              });
+              const activePlan = activePlans.length > 0 ? activePlans[0] : plans[0];
+              const planId = activePlan?.plan?.id || activePlan?.id || '';
               if (planId) {
                 // Call reschedule API to update days and times
                 const formattedSlotsForReschedule = timeSlots.map((s) => ({
