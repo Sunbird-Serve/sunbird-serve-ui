@@ -14,6 +14,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import BusinessIcon from '@mui/icons-material/Business';
 import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import SettingsIcon from '@mui/icons-material/Settings';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
 import { SidebarItem } from '@config/roles';
 
 // Map icon string names to MUI icon components
@@ -25,6 +26,7 @@ const ICON_MAP: Record<string, React.ReactElement> = {
   Business: <BusinessIcon />,
   CorporateFare: <CorporateFareIcon />,
   Settings: <SettingsIcon />,
+  FactCheck: <FactCheckIcon />,
 };
 
 interface SidebarProps {
