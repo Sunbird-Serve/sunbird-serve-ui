@@ -50,6 +50,12 @@ const SessionsPage = lazy(() =>
 const PlaceholderPage = lazy(() =>
   import('@shared/components/PlaceholderPage').then((m) => ({ default: m.PlaceholderPage })),
 );
+const ApprovalsPage = lazy(() =>
+  import('@features/approvals/pages/ApprovalsPage').then((m) => ({ default: m.ApprovalsPage })),
+);
+const CoordinatorsPage = lazy(() =>
+  import('@features/approvals/pages/CoordinatorsPage').then((m) => ({ default: m.CoordinatorsPage })),
+);
 
 // Volunteer/Explore pages
 const MySessionsPage = lazy(() =>
@@ -132,6 +138,22 @@ export const router = createBrowserRouter([
         element: <AdminLayout />,
         children: [
           { index: true, element: <Navigate to="dashboard" replace /> },
+          {
+            path: 'approvals',
+            element: (
+              <SuspenseWrapper>
+                <ApprovalsPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: 'coordinators',
+            element: (
+              <SuspenseWrapper>
+                <CoordinatorsPage />
+              </SuspenseWrapper>
+            ),
+          },
           {
             path: 'dashboard',
             element: (

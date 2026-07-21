@@ -1,4 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Grid,
   Stack,
@@ -18,6 +19,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Button,
+  Alert,
 } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
@@ -51,6 +54,7 @@ import {
 import { WelcomeBanner } from '../components/WelcomeBanner';
 import { StatCard } from '../components/StatCard';
 import { StatusChip } from '../components/StatusChip';
+import { getAuthHeaders } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -130,8 +134,12 @@ const PIE_COLORS = ['#3B82F6', '#10B981', '#EF4444', '#F59E0B', '#8B5CF6', '#EC4
 
 // --- Component ---
 export function NAdminDashboard() {
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.user.data);
   const userId = user?.osid || '';
+
+  // Pending approval counts
+  const [pendingCounts, setPendingCounts] = useState({ coordinators: 0, entities: 0, needs: 0 });
   const userName = user?.identityDetails?.fullname || user?.identityDetails?.name || 'Admin';
   const isSAdmin = user?.role?.includes('sAdmin');
 
@@ -310,6 +318,37 @@ export function NAdminDashboard() {
     fetchSessions();
   }, [userId]);
 
+  // Fetch pending approval counts
+  useEffect(() => {
+    async function fetchPendingCounts() {
+      if (!userId) return;
+      try {
+        const headers = getAuthHeaders();
+        // Pending entities
+        const entResp = await fetch(`${BASE_URL}/api/v1/serve-need/entityDetails/${userId}?page=0&size=1000`, { headers });
+        let pendingEnts = 0;
+        if (entResp.ok) {
+          const data = await entResp.json();
+          const ents = Array.isArray(data) ? data : (data.content || []);
+          pendingEnts = ents.filter((e: { status?: string }) => e.status === 'New' || e.status === 'Verified').length;
+        }
+        // Pending coordinators
+        const usersResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/all-users`, { headers });
+        let pendingCoords = 0;
+        if (usersResp.ok) {
+          const users = await usersResp.json();
+          if (Array.isArray(users)) {
+            pendingCoords = users.filter((u: { role?: string[]; status?: string }) => u.role?.includes('nCoordinator') && u.status === 'Registered').length;
+          }
+        }
+        // Pending needs (already have from needs data)
+        const pendingNeedsCount = needs.filter((n) => n.status === 'New').length;
+        setPendingCounts({ coordinators: pendingCoords, entities: pendingEnts, needs: pendingNeedsCount });
+      } catch { /* silent */ }
+    }
+    fetchPendingCounts();
+  }, [userId, needs]);
+
   // Filter deliverables by period
   const sessionStats = useMemo(() => {
     const { start, end } = getDateRange(sessionPeriod);
@@ -387,6 +426,25 @@ export function NAdminDashboard() {
         name={userName}
         subtitle={`Managing ${entities.length} entities · AY ${selectedYear}`}
       />
+
+      {/* Action Required Banner */}
+      {(pendingCounts.coordinators + pendingCounts.entities + pendingCounts.needs) > 0 && (
+        <Alert
+          severity="warning"
+          action={
+            <Button size="small" color="inherit" onClick={() => navigate('/app/approvals')}>
+              Go to Approvals →
+            </Button>
+          }
+        >
+          <strong>Action Required:</strong>{' '}
+          {pendingCounts.coordinators > 0 && `${pendingCounts.coordinators} coordinator${pendingCounts.coordinators > 1 ? 's' : ''} pending`}
+          {pendingCounts.coordinators > 0 && (pendingCounts.entities > 0 || pendingCounts.needs > 0) && ' · '}
+          {pendingCounts.entities > 0 && `${pendingCounts.entities} entit${pendingCounts.entities > 1 ? 'ies' : 'y'} pending`}
+          {pendingCounts.entities > 0 && pendingCounts.needs > 0 && ' · '}
+          {pendingCounts.needs > 0 && `${pendingCounts.needs} need${pendingCounts.needs > 1 ? 's' : ''} pending`}
+        </Alert>
+      )}
 
       {/* Filters Row */}
       <Paper sx={{ p: 2 }}>
