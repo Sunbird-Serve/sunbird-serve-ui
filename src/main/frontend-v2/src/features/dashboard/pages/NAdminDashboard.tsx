@@ -48,7 +48,6 @@ import {
   useGetNeedsByUserIdQuery,
   useGetEntitiesByUserQuery,
   useGetAllEntitiesQuery,
-  useGetNeedsByEntitiesMutation,
   NeedItem,
 } from '../api/dashboardApi';
 import { WelcomeBanner } from '../components/WelcomeBanner';
@@ -171,21 +170,14 @@ export function NAdminDashboard() {
     return `${y}-${y + 1}`;
   });
 
-  // Needs data
+  // Needs data — fetch by status, filter by nAdmin's entities
   const { data: allNeeds = [], isLoading: needsLoading } = useGetNeedsByUserIdQuery(userId, {
     skip: !userId,
   });
-  const [fetchEntityNeeds, { data: entityNeeds, isLoading: entityNeedsLoading }] =
-    useGetNeedsByEntitiesMutation();
 
-  useEffect(() => {
-    if (selectedEntities.length > 0) {
-      fetchEntityNeeds(selectedEntities);
-    }
-  }, [selectedEntities, fetchEntityNeeds]);
-
-  const needs: NeedItem[] = entityNeeds || allNeeds;
-  const needsLoaded = !needsLoading && !entityNeedsLoading;
+  // Use allNeeds filtered by selectedEntities (no POST /need/entities needed)
+  const needs: NeedItem[] = allNeeds;
+  const needsLoaded = !needsLoading;
 
   // Filter needs by year
   const filteredNeeds = useMemo(() => {
@@ -229,84 +221,85 @@ export function NAdminDashboard() {
         const { getAuthHeaders } = await import('@shared/utils/authHeaders');
         const headers = getAuthHeaders();
 
-        // Get assigned needs, then fetch fulfillments per need
-        const needsResp = await fetch(
-          `${BASE_URL}/api/v1/serve-need/need/?status=Assigned&page=0&size=200`,
+        // Get nAdmin's entity IDs
+        const entityResp = await fetch(
+          `${BASE_URL}/api/v1/serve-need/entityDetails/${userId}?page=0&size=1000`,
           { headers },
         );
-        let assignedNeeds: { id: string }[] = [];
-        if (needsResp.ok) {
-          const needsData = await needsResp.json();
-          const content = Array.isArray(needsData) ? needsData : (needsData.content || []);
-          assignedNeeds = content.map((n: Record<string, unknown>) => ({
-            id: (n.id as string) || ((n.need as Record<string, unknown>)?.id as string) || '',
-          })).filter((n: { id: string }) => n.id);
+        let myEntityIds: string[] = [];
+        if (entityResp.ok) {
+          const entityData = await entityResp.json();
+          const ents = Array.isArray(entityData) ? entityData : (entityData.content || []);
+          myEntityIds = ents.map((e: { id: string }) => e.id);
         }
 
-        // Fetch fulfillments per need via /fulfillment/need-read/{needId}
-        let fulfs: { needId: string; needPlanId: string; assignedUserId: string }[] = [];
-        for (const need of assignedNeeds.slice(0, 30)) {
-          try {
-            const fulfResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}`,
-              { headers },
-            );
-            if (fulfResp.ok) {
-              const fulfData = await fulfResp.json();
-              const items = Array.isArray(fulfData) ? fulfData : (fulfData.content || []);
-              fulfs.push(...items);
-            }
-          } catch { /* skip */ }
+        if (myEntityIds.length === 0) {
+          setSessionsLoading(false);
+          return;
         }
 
-        // Fallback: try coordinator-read
-        if (fulfs.length === 0) {
-          try {
-            const coordResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=1000`,
-              { headers },
-            );
-            if (coordResp.ok) {
-              const coordData = await coordResp.json();
-              const items = Array.isArray(coordData) ? coordData : (coordData.content || []);
-              fulfs.push(...items);
-            }
-          } catch { /* skip */ }
-        }
-
-        const sessionResults: SessionData[] = [];
-        for (const fulf of fulfs.slice(0, 50)) {
-          try {
-            // Check plan status — skip inactive (backfilled) plans
-            const planCheckResp = await fetch(
-              `${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`,
-              { headers },
-            );
-            if (planCheckResp.ok) {
-              const planCheckData = await planCheckResp.json();
-              const plans = Array.isArray(planCheckData) ? planCheckData : (planCheckData.content || []);
-              const matchingPlan = plans.find((p: Record<string, unknown>) => (p?.plan as Record<string, unknown>)?.id === fulf.needPlanId || p?.id === fulf.needPlanId);
-              const status = (matchingPlan?.plan as Record<string, unknown>)?.status as string || matchingPlan?.status as string || '';
-              if (status === 'Inactive') continue;
-            }
-
-            const delivResp = await fetch(
-              `${BASE_URL}/api/v1/serve-need/need-deliverable/${fulf.needPlanId}`,
-              { headers },
-            );
-            if (delivResp.ok) {
-              const delivData = await delivResp.json();
-              const deliverables = delivData.needDeliverable || delivData.content || [];
-              if (deliverables.length > 0) {
-                sessionResults.push({
-                  fulfillment: fulf,
-                  deliverables: Array.isArray(deliverables) ? deliverables : [],
-                });
+        // Get assigned/fulfilled needs, filtered by entity
+        const statuses = ['Assigned', 'Fulfilled'];
+        let assignedNeeds: { id: string; name: string }[] = [];
+        const statusResults = await Promise.allSettled(
+          statuses.map((status) =>
+            fetch(`${BASE_URL}/api/v1/serve-need/need/?status=${status}&page=0&size=200`, { headers })
+              .then((r) => (r.ok ? r.json() : null)),
+          ),
+        );
+        for (const result of statusResults) {
+          if (result.status === 'fulfilled' && result.value) {
+            const content = Array.isArray(result.value) ? result.value : (result.value.content || []);
+            for (const n of content) {
+              const id = (n.id as string) || ((n.need as Record<string, unknown>)?.id as string) || '';
+              const name = (n.name as string) || ((n.need as Record<string, unknown>)?.name as string) || '';
+              const entityId = (n.entityId as string) || ((n.need as Record<string, unknown>)?.entityId as string) || '';
+              if (id && myEntityIds.includes(entityId)) {
+                assignedNeeds.push({ id, name });
               }
             }
-          } catch {
-            // skip
           }
+        }
+        // Deduplicate
+        assignedNeeds = [...new Map(assignedNeeds.map((n) => [n.id, n])).values()];
+
+        // For each need → get plans → get deliverables
+        const sessionResults: SessionData[] = [];
+        for (const need of assignedNeeds.slice(0, 50)) {
+          try {
+            const planResp = await fetch(
+              `${BASE_URL}/api/v1/serve-need/need-plan/${need.id}`,
+              { headers },
+            );
+            if (!planResp.ok) continue;
+
+            const planData = await planResp.json();
+            const plans = Array.isArray(planData) ? planData : (planData.content || []);
+
+            for (const p of plans) {
+              const planId = (p?.plan as Record<string, unknown>)?.id as string || p?.id as string || '';
+              const planStatus = (p?.plan as Record<string, unknown>)?.status as string || p?.status as string || '';
+              if (!planId || planStatus === 'Inactive') continue;
+
+              try {
+                const delivResp = await fetch(
+                  `${BASE_URL}/api/v1/serve-need/need-deliverable/${planId}`,
+                  { headers },
+                );
+                if (delivResp.ok) {
+                  const delivData = await delivResp.json();
+                  const deliverables = delivData.needDeliverable || delivData.content || [];
+                  if (Array.isArray(deliverables) && deliverables.length > 0) {
+                    sessionResults.push({
+                      fulfillment: { needId: need.id, needPlanId: planId, assignedUserId: '' },
+                      deliverables,
+                      needName: need.name,
+                    });
+                  }
+                }
+              } catch { /* skip */ }
+            }
+          } catch { /* skip */ }
         }
         setSessions(sessionResults);
       } catch {
