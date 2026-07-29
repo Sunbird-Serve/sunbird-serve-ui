@@ -34,9 +34,6 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-  PieChart,
-  Pie,
-  Legend,
 } from 'recharts';
 import { useAppSelector } from '@app/store';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
@@ -44,10 +41,18 @@ import { StatusChip } from '@features/dashboard/components/StatusChip';
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 // --- Types ---
-interface Fulfillment {
+interface NeedItem {
+  id: string;
+  name: string;
+  status: string;
+  entityId?: string;
+}
+
+interface NeedPlan {
+  id: string;
   needId: string;
-  needPlanId: string;
-  assignedUserId: string;
+  name?: string;
+  status?: string;
 }
 
 interface Deliverable {
@@ -65,23 +70,6 @@ interface Deliverable {
   };
 }
 
-interface InputParameter {
-  startTime?: string;
-  endTime?: string;
-  softwarePlatform?: string;
-  inputUrl?: string;
-}
-
-interface SessionPlan {
-  fulfillment: Fulfillment;
-  deliverables: Deliverable[];
-  inputParams: InputParameter[];
-  needName?: string;
-  volunteerName?: string;
-  volunteerPhone?: string;
-  entityName?: string;
-}
-
 interface FlatSession {
   id: string;
   date: string;
@@ -90,9 +78,6 @@ interface FlatSession {
   endTime?: string;
   sessionLink?: string;
   needName: string;
-  volunteerName: string;
-  volunteerPhone: string;
-  entityName: string;
   comments?: string;
   numberOfAttendees?: number;
   needPlanId: string;
@@ -164,8 +149,6 @@ const SESSION_COLORS: Record<string, string> = {
   Offline: '#F59E0B',
 };
 
-const PIE_COLORS = ['#3B82F6', '#10B981', '#EF4444', '#F59E0B', '#8B5CF6', '#EC4899', '#14B8A6'];
-
 const PERIOD_LABELS: Record<TimePeriod, string> = {
   today: "Today's Sessions",
   yesterday: "Yesterday's Sessions",
@@ -181,153 +164,128 @@ export function SessionsPage() {
   const userId = user?.osid || '';
 
   const [loading, setLoading] = useState(true);
-  const [sessionPlans, setSessionPlans] = useState<SessionPlan[]>([]);
-  const [period, setPeriod] = useState<TimePeriod>('today');
+  const [allSessions, setAllSessions] = useState<FlatSession[]>([]);
+  const [period, setPeriod] = useState<TimePeriod>('thisMonth');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(15);
   const [error, setError] = useState('');
 
-  // Fetch all session data
+  // Fetch sessions via need-plan → deliverables
   useEffect(() => {
     async function fetchSessions() {
       if (!userId) return;
       setLoading(true);
       setError('');
       try {
-        const { getAuthHeaders } = await import('@shared/utils/authHeaders');
+        const { getAuthHeaders, getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
         const headers = getAuthHeaders();
+        const jsonHeaders = getAuthHeadersWithJson();
 
-        // Step 1: Get all needs for this admin that are Assigned/Fulfilled (have active fulfillments)
-        const needsResp = await fetch(
-          `${BASE_URL}/api/v1/serve-need/need/?status=Assigned&page=0&size=200`,
+        // Step 1: Get nAdmin's entities
+        const entityResp = await fetch(
+          `${BASE_URL}/api/v1/serve-need/entityDetails/${userId}?page=0&size=1000`,
           { headers },
         );
-        let assignedNeeds: { id: string }[] = [];
+        let entityIds: string[] = [];
+        if (entityResp.ok) {
+          const entityData = await entityResp.json();
+          const entities = Array.isArray(entityData) ? entityData : (entityData.content || []);
+          entityIds = entities.map((e: { id: string }) => e.id);
+        }
+
+        if (entityIds.length === 0) {
+          setLoading(false);
+          return;
+        }
+
+        // Step 2: Get needs for those entities
+        const needsResp = await fetch(
+          `${BASE_URL}/api/v1/serve-need/need/entities`,
+          {
+            method: 'POST',
+            headers: jsonHeaders,
+            body: JSON.stringify({ entityIds }),
+          },
+        );
+        let needs: NeedItem[] = [];
         if (needsResp.ok) {
           const needsData = await needsResp.json();
           const content = Array.isArray(needsData) ? needsData : (needsData.content || []);
-          assignedNeeds = content.map((n: Record<string, unknown>) => ({ id: (n.id as string) || (n.need as Record<string, unknown>)?.id as string || '' })).filter((n: { id: string }) => n.id);
+          needs = content.map((n: Record<string, unknown>) => {
+            if (n.need && typeof n.need === 'object') {
+              const need = n.need as Record<string, unknown>;
+              return { id: need.id as string, name: need.name as string, status: need.status as string, entityId: need.entityId as string };
+            }
+            return { id: n.id as string, name: n.name as string, status: n.status as string, entityId: n.entityId as string };
+          }).filter((n: NeedItem) => n.id);
         }
 
-        // Also fetch Fulfilled needs
-        const fulfilledResp = await fetch(
-          `${BASE_URL}/api/v1/serve-need/need/?status=Fulfilled&page=0&size=200`,
-          { headers },
-        );
-        if (fulfilledResp.ok) {
-          const fulfilledData = await fulfilledResp.json();
-          const content = Array.isArray(fulfilledData) ? fulfilledData : (fulfilledData.content || []);
-          const more = content.map((n: Record<string, unknown>) => ({ id: (n.id as string) || (n.need as Record<string, unknown>)?.id as string || '' })).filter((n: { id: string }) => n.id);
-          assignedNeeds = [...assignedNeeds, ...more];
-        }
-
-        if (assignedNeeds.length === 0) {
+        if (needs.length === 0) {
           setLoading(false);
           return;
         }
 
-        // Step 2: For each need, get fulfillments via /fulfillment/need-read/{needId}
-        let fulfs: Fulfillment[] = [];
-        for (const need of assignedNeeds.slice(0, 50)) {
+        // Step 3: Get plans for each need
+        const sessions: FlatSession[] = [];
+        // Limit to avoid too many requests
+        const needsToProcess = needs.slice(0, 100);
+
+        for (const need of needsToProcess) {
           try {
-            const fulfResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}`,
+            const planResp = await fetch(
+              `${BASE_URL}/api/v1/serve-need/need-plan/${need.id}`,
               { headers },
             );
-            if (fulfResp.ok) {
-              const fulfData = await fulfResp.json();
-              const items = Array.isArray(fulfData) ? fulfData : (fulfData.content || []);
-              fulfs.push(...items);
-            }
-          } catch { /* skip individual failures */ }
-        }
+            if (!planResp.ok) continue;
 
-        // Fallback: also try coordinator-read in case admin is also a coordinator
-        if (fulfs.length === 0) {
-          try {
-            const coordResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=1000`,
-              { headers },
-            );
-            if (coordResp.ok) {
-              const coordData = await coordResp.json();
-              const items = Array.isArray(coordData) ? coordData : (coordData.content || []);
-              fulfs.push(...items);
-            }
-          } catch { /* skip */ }
-        }
+            const planData = await planResp.json();
+            const plans: NeedPlan[] = Array.isArray(planData) ? planData : (planData.content || []);
 
-        if (fulfs.length === 0) {
-          setLoading(false);
-          return;
-        }
-
-        const results: SessionPlan[] = [];
-        for (const fulf of fulfs.slice(0, 100)) {
-          try {
-            // Get need name and check plan status
-            let needName = '';
-            let planStatus = '';
-            try {
-              const planResp = await fetch(
-                `${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`,
-                { headers },
-              );
-              if (planResp.ok) {
-                const planData = await planResp.json();
-                const plans = Array.isArray(planData) ? planData : (planData.content || []);
-                if (plans.length > 0) {
-                  const matchingPlan = plans.find((p: Record<string, unknown>) => (p?.plan as Record<string, unknown>)?.id === fulf.needPlanId || p?.id === fulf.needPlanId) || plans[0];
-                  needName = (matchingPlan?.plan as Record<string, unknown>)?.name as string || '';
-                  planStatus = (matchingPlan?.plan as Record<string, unknown>)?.status as string || matchingPlan?.status as string || '';
-                }
+            // Normalize plan format
+            const normalizedPlans = (plans as unknown as Record<string, unknown>[]).map((p) => {
+              if (p.plan && typeof p.plan === 'object') {
+                const plan = p.plan as Record<string, unknown>;
+                return { id: plan.id as string, needId: need.id, name: plan.name as string, status: plan.status as string };
               }
-            } catch { /* skip */ }
+              return { id: p.id as string, needId: need.id, name: p.name as string, status: p.status as string };
+            }).filter((p) => p.id && p.status !== 'Inactive');
 
-            // Skip inactive plans (backfilled)
-            if (planStatus === 'Inactive') continue;
-
-            // Get volunteer details
-            let volunteerName = '';
-            let volunteerPhone = '';
-            if (fulf.assignedUserId) {
+            // Step 4: Get deliverables for each plan
+            for (const plan of normalizedPlans) {
               try {
-                const volResp = await fetch(
-                  `${BASE_URL}/api/v1/serve-volunteering/user/${fulf.assignedUserId}`,
+                const delivResp = await fetch(
+                  `${BASE_URL}/api/v1/serve-need/need-deliverable/${plan.id}`,
                   { headers },
                 );
-                if (volResp.ok) {
-                  const volData = await volResp.json();
-                  volunteerName = volData?.identityDetails?.fullname || volData?.identityDetails?.name || '';
-                  volunteerPhone = volData?.contactDetails?.mobile || '';
-                }
-              } catch { /* skip */ }
-            }
+                if (!delivResp.ok) continue;
 
-            // Get deliverables
-            const delivResp = await fetch(
-              `${BASE_URL}/api/v1/serve-need/need-deliverable/${fulf.needPlanId}`,
-              { headers },
-            );
-            if (delivResp.ok) {
-              const delivData = await delivResp.json();
-              const deliverables = delivData.needDeliverable || delivData.content || [];
-              const inputParams = delivData.inputParameters || [];
-              if (deliverables.length > 0) {
-                results.push({
-                  fulfillment: fulf,
-                  deliverables: Array.isArray(deliverables) ? deliverables : [],
-                  inputParams: Array.isArray(inputParams) ? inputParams : [],
-                  needName,
-                  volunteerName,
-                  volunteerPhone,
-                });
-              }
+                const delivData = await delivResp.json();
+                const deliverables: Deliverable[] = delivData.needDeliverable || delivData.content || (Array.isArray(delivData) ? delivData : []);
+
+                for (const d of deliverables) {
+                  const params = d.inputParameters || null;
+                  sessions.push({
+                    id: d.id,
+                    date: d.deliverableDate?.split('T')[0] || '',
+                    status: d.status,
+                    startTime: params?.startTime,
+                    endTime: params?.endTime,
+                    sessionLink: params?.inputUrl,
+                    needName: need.name || plan.name || '',
+                    comments: d.comments,
+                    numberOfAttendees: d.numberOfAttendees,
+                    needPlanId: plan.id,
+                  });
+                }
+              } catch { /* skip individual deliverable failures */ }
             }
-          } catch { /* skip individual failures */ }
+          } catch { /* skip individual plan failures */ }
         }
-        setSessionPlans(results);
+
+        // Sort by date descending
+        sessions.sort((a, b) => b.date.localeCompare(a.date));
+        setAllSessions(sessions);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load sessions');
       } finally {
@@ -336,33 +294,6 @@ export function SessionsPage() {
     }
     fetchSessions();
   }, [userId]);
-
-  // Flatten into individual session rows
-  const allSessions: FlatSession[] = useMemo(() => {
-    const flat: FlatSession[] = [];
-    for (const plan of sessionPlans) {
-      for (const d of plan.deliverables) {
-        // Read from deliverable JSONB inputParameters only
-        const delivParams = d.inputParameters || null;
-        flat.push({
-          id: d.id,
-          date: d.deliverableDate?.split('T')[0] || '',
-          status: d.status,
-          startTime: delivParams?.startTime,
-          endTime: delivParams?.endTime,
-          sessionLink: delivParams?.inputUrl,
-          needName: plan.needName || '',
-          volunteerName: plan.volunteerName || '',
-          volunteerPhone: plan.volunteerPhone || '',
-          entityName: plan.entityName || '',
-          comments: d.comments,
-          numberOfAttendees: d.numberOfAttendees,
-          needPlanId: d.needPlanId,
-        });
-      }
-    }
-    return flat.sort((a, b) => b.date.localeCompare(a.date));
-  }, [sessionPlans]);
 
   // Filter by period
   const filteredSessions = useMemo(() => {
@@ -373,8 +304,6 @@ export function SessionsPage() {
       result = result.filter(
         (s) =>
           s.needName.toLowerCase().includes(q) ||
-          s.volunteerName.toLowerCase().includes(q) ||
-          s.entityName.toLowerCase().includes(q) ||
           s.status.toLowerCase().includes(q),
       );
     }
@@ -387,9 +316,8 @@ export function SessionsPage() {
     const planned = filteredSessions.filter((s) => s.status === 'Planned').length;
     const completed = filteredSessions.filter((s) => s.status === 'Completed').length;
     const cancelled = filteredSessions.filter((s) => s.status === 'Cancelled').length;
-    const offline = filteredSessions.filter((s) => s.status === 'Offline').length;
     const completionRate = total > 0 ? ((completed / total) * 100).toFixed(1) : '0';
-    return { total, planned, completed, cancelled, offline, completionRate };
+    return { total, planned, completed, cancelled, completionRate };
   }, [filteredSessions]);
 
   // Bar chart data
@@ -397,21 +325,7 @@ export function SessionsPage() {
     { name: 'Planned', count: stats.planned, fill: SESSION_COLORS.Planned },
     { name: 'Completed', count: stats.completed, fill: SESSION_COLORS.Completed },
     { name: 'Cancelled', count: stats.cancelled, fill: SESSION_COLORS.Cancelled },
-    { name: 'Offline', count: stats.offline, fill: SESSION_COLORS.Offline },
   ], [stats]);
-
-  // Cancellation reasons
-  const cancelReasons = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const s of filteredSessions) {
-      if (s.status === 'Cancelled' && s.comments) {
-        map[s.comments] = (map[s.comments] || 0) + 1;
-      }
-    }
-    return Object.entries(map)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value);
-  }, [filteredSessions]);
 
   // Paginated rows
   const paginatedSessions = filteredSessions.slice(
@@ -421,11 +335,8 @@ export function SessionsPage() {
 
   return (
     <Box>
-      {/* Header */}
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>
-          Sessions
-        </Typography>
+        <Typography variant="h4" fontWeight={600}>Sessions</Typography>
       </Stack>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -448,15 +359,11 @@ export function SessionsPage() {
           </ToggleButtonGroup>
           <TextField
             size="small"
-            placeholder="Search by need, volunteer..."
+            placeholder="Search by need name..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(0); }}
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
+              startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
             }}
             sx={{ minWidth: 250 }}
           />
@@ -486,108 +393,59 @@ export function SessionsPage() {
             <Grid item xs={6} sm={4} md={2.4}>
               <Paper sx={{ p: 2, textAlign: 'center' }}>
                 <EventAvailableIcon sx={{ fontSize: 28, color: '#3B82F6', mb: 0.5 }} />
-                <Typography variant="h4" fontWeight={700} color="#3B82F6">
-                  {stats.total}
-                </Typography>
+                <Typography variant="h4" fontWeight={700} color="#3B82F6">{stats.total}</Typography>
                 <Typography variant="caption" color="text.secondary">Total</Typography>
               </Paper>
             </Grid>
             <Grid item xs={6} sm={4} md={2.4}>
               <Paper sx={{ p: 2, textAlign: 'center' }}>
                 <AccessTimeIcon sx={{ fontSize: 28, color: SESSION_COLORS.Planned, mb: 0.5 }} />
-                <Typography variant="h4" fontWeight={700} color={SESSION_COLORS.Planned}>
-                  {stats.planned}
-                </Typography>
+                <Typography variant="h4" fontWeight={700} color={SESSION_COLORS.Planned}>{stats.planned}</Typography>
                 <Typography variant="caption" color="text.secondary">Planned</Typography>
               </Paper>
             </Grid>
             <Grid item xs={6} sm={4} md={2.4}>
               <Paper sx={{ p: 2, textAlign: 'center' }}>
                 <CheckCircleIcon sx={{ fontSize: 28, color: SESSION_COLORS.Completed, mb: 0.5 }} />
-                <Typography variant="h4" fontWeight={700} color={SESSION_COLORS.Completed}>
-                  {stats.completed}
-                </Typography>
+                <Typography variant="h4" fontWeight={700} color={SESSION_COLORS.Completed}>{stats.completed}</Typography>
                 <Typography variant="caption" color="text.secondary">Completed</Typography>
               </Paper>
             </Grid>
             <Grid item xs={6} sm={4} md={2.4}>
               <Paper sx={{ p: 2, textAlign: 'center' }}>
                 <CancelIcon sx={{ fontSize: 28, color: SESSION_COLORS.Cancelled, mb: 0.5 }} />
-                <Typography variant="h4" fontWeight={700} color={SESSION_COLORS.Cancelled}>
-                  {stats.cancelled}
-                </Typography>
+                <Typography variant="h4" fontWeight={700} color={SESSION_COLORS.Cancelled}>{stats.cancelled}</Typography>
                 <Typography variant="caption" color="text.secondary">Cancelled</Typography>
               </Paper>
             </Grid>
             <Grid item xs={6} sm={4} md={2.4}>
               <Paper sx={{ p: 2, textAlign: 'center' }}>
                 <TrendingUpIcon sx={{ fontSize: 28, color: 'primary.main', mb: 0.5 }} />
-                <Typography variant="h4" fontWeight={700} color="primary.main">
-                  {stats.completionRate}%
-                </Typography>
+                <Typography variant="h4" fontWeight={700} color="primary.main">{stats.completionRate}%</Typography>
                 <Typography variant="caption" color="text.secondary">Completion Rate</Typography>
               </Paper>
             </Grid>
           </Grid>
 
-          {/* Charts Row */}
-          <Grid container spacing={2} sx={{ mb: 3 }}>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2, height: 280 }}>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                  Session Status Breakdown
-                </Typography>
-                <ResponsiveContainer width="100%" height="85%">
-                  <BarChart data={barData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" fontSize={12} />
-                    <YAxis fontSize={12} />
-                    <Tooltip />
-                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                      {barData.map((entry, index) => (
-                        <Cell key={index} fill={entry.fill} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Paper sx={{ p: 2, height: 280 }}>
-                <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
-                  Cancellation Reasons
-                </Typography>
-                {cancelReasons.length > 0 ? (
-                  <ResponsiveContainer width="100%" height="85%">
-                    <PieChart>
-                      <Pie
-                        data={cancelReasons}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={45}
-                        outerRadius={75}
-                        dataKey="value"
-                        label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
-                        labelLine={false}
-                      >
-                        {cancelReasons.map((_, index) => (
-                          <Cell key={index} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend verticalAlign="bottom" height={36} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                ) : (
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '80%' }}>
-                    <Typography variant="body2" color="text.secondary">
-                      No cancellations in this period
-                    </Typography>
-                  </Box>
-                )}
-              </Paper>
-            </Grid>
-          </Grid>
+          {/* Chart */}
+          <Paper sx={{ p: 2, mb: 3, height: 250 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ mb: 1 }}>
+              Sessions by Status
+            </Typography>
+            <ResponsiveContainer width="100%" height="85%">
+              <BarChart data={barData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" fontSize={12} />
+                <YAxis fontSize={12} />
+                <Tooltip />
+                <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                  {barData.map((entry, index) => (
+                    <Cell key={index} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Paper>
 
           {/* Sessions Table */}
           <Paper>
@@ -597,9 +455,9 @@ export function SessionsPage() {
                   <TableRow>
                     <TableCell sx={{ fontWeight: 600 }}>Date</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Need</TableCell>
-                    <TableCell sx={{ fontWeight: 600 }}>Volunteer</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Time</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>Attendees</TableCell>
                     <TableCell sx={{ fontWeight: 600 }}>Remarks</TableCell>
                   </TableRow>
                 </TableHead>
@@ -621,21 +479,9 @@ export function SessionsPage() {
                           </Typography>
                         </TableCell>
                         <TableCell>
-                          <Typography variant="body2" noWrap sx={{ maxWidth: 180 }}>
+                          <Typography variant="body2" noWrap sx={{ maxWidth: 200 }}>
                             {session.needName || '—'}
                           </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Stack>
-                            <Typography variant="body2" noWrap sx={{ maxWidth: 150 }}>
-                              {session.volunteerName || '—'}
-                            </Typography>
-                            {session.volunteerPhone && (
-                              <Typography variant="caption" color="text.secondary">
-                                {session.volunteerPhone}
-                              </Typography>
-                            )}
-                          </Stack>
                         </TableCell>
                         <TableCell>
                           <Typography variant="caption">
@@ -644,6 +490,11 @@ export function SessionsPage() {
                         </TableCell>
                         <TableCell>
                           <StatusChip status={session.status} />
+                        </TableCell>
+                        <TableCell>
+                          <Typography variant="body2">
+                            {session.numberOfAttendees ?? '—'}
+                          </Typography>
                         </TableCell>
                         <TableCell>
                           <Typography variant="caption" color="text.secondary" noWrap sx={{ maxWidth: 150 }}>
