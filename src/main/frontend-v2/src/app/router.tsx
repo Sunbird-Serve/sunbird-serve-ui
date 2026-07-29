@@ -13,6 +13,11 @@ import { ProtectedRoute } from '@features/auth/guards/ProtectedRoute';
 // Eager-loaded pages (small, critical path)
 import { HomePage } from '@features/home/pages/HomePage';
 
+// Onboarding (public, lazy-loaded)
+const OnboardingPage = lazy(() =>
+  import('@features/onboarding/pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage })),
+);
+
 // Lazy-loaded pages
 const RegistrationPage = lazy(() =>
   import('@features/auth/pages/RegistrationPage').then((m) => ({ default: m.RegistrationPage })),
@@ -55,6 +60,9 @@ const ApprovalsPage = lazy(() =>
 );
 const CoordinatorsPage = lazy(() =>
   import('@features/approvals/pages/CoordinatorsPage').then((m) => ({ default: m.CoordinatorsPage })),
+);
+const OnboardingRequestsPage = lazy(() =>
+  import('@features/onboarding/pages/OnboardingRequestsPage').then((m) => ({ default: m.OnboardingRequestsPage })),
 );
 
 // Volunteer/Explore pages
@@ -126,6 +134,14 @@ export const router = createBrowserRouter([
           </SuspenseWrapper>
         ),
       },
+      {
+        path: '/onboard',
+        element: (
+          <SuspenseWrapper>
+            <OnboardingPage />
+          </SuspenseWrapper>
+        ),
+      },
     ],
   },
 
@@ -143,6 +159,14 @@ export const router = createBrowserRouter([
             element: (
               <SuspenseWrapper>
                 <ApprovalsPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: 'onboarding-requests',
+            element: (
+              <SuspenseWrapper>
+                <OnboardingRequestsPage />
               </SuspenseWrapper>
             ),
           },

@@ -92,6 +92,7 @@ export const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
     layout: 'admin',
     sidebarItems: [
       { id: 'approvals', label: 'Approvals', path: '/app/approvals', icon: 'FactCheck' },
+      { id: 'onboarding-requests', label: 'Onboarding', path: '/app/onboarding-requests', icon: 'HowToReg' },
       { id: 'dashboard', label: 'Dashboard', path: '/app/dashboard', icon: 'Dashboard' },
       { id: 'needs', label: 'Needs', path: '/app/needs', icon: 'Assignment' },
       { id: 'entities', label: 'Entities', path: '/app/entities', icon: 'Business' },
@@ -138,6 +139,7 @@ export const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
     layout: 'admin',
     sidebarItems: [
       { id: 'dashboard', label: 'Dashboard', path: '/app/dashboard', icon: 'Dashboard' },
+      { id: 'onboarding-requests', label: 'Onboarding', path: '/app/onboarding-requests', icon: 'HowToReg' },
       { id: 'needs', label: 'Needs', path: '/app/needs', icon: 'Assignment' },
       { id: 'volunteers', label: 'Volunteers', path: '/app/volunteers', icon: 'People' },
       { id: 'entities', label: 'Entities', path: '/app/entities', icon: 'Business' },
