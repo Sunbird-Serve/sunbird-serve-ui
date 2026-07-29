@@ -178,9 +178,8 @@ export function SessionsPage() {
       setLoading(true);
       setError('');
       try {
-        const { getAuthHeaders, getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+        const { getAuthHeaders } = await import('@shared/utils/authHeaders');
         const headers = getAuthHeaders();
-        const jsonHeaders = getAuthHeadersWithJson();
 
         // Step 1: Get nAdmin's entities
         const entityResp = await fetch(
@@ -199,27 +198,32 @@ export function SessionsPage() {
           return;
         }
 
-        // Step 2: Get needs for those entities
-        const needsResp = await fetch(
-          `${BASE_URL}/api/v1/serve-need/need/entities`,
-          {
-            method: 'POST',
-            headers: jsonHeaders,
-            body: JSON.stringify({ entityIds }),
-          },
+        // Step 2: Get needs for those entities (using status-based fetch, same as NeedsPage)
+        const statuses = ['Assigned', 'Fulfilled', 'Approved'];
+        const needsResults = await Promise.allSettled(
+          statuses.map((status) =>
+            fetch(`${BASE_URL}/api/v1/serve-need/need/?status=${status}&page=0&size=200`, { headers })
+              .then((r) => (r.ok ? r.json() : null)),
+          ),
         );
+
         let needs: NeedItem[] = [];
-        if (needsResp.ok) {
-          const needsData = await needsResp.json();
-          const content = Array.isArray(needsData) ? needsData : (needsData.content || []);
-          needs = content.map((n: Record<string, unknown>) => {
-            if (n.need && typeof n.need === 'object') {
-              const need = n.need as Record<string, unknown>;
-              return { id: need.id as string, name: need.name as string, status: need.status as string, entityId: need.entityId as string };
-            }
-            return { id: n.id as string, name: n.name as string, status: n.status as string, entityId: n.entityId as string };
-          }).filter((n: NeedItem) => n.id);
+        for (const result of needsResults) {
+          if (result.status === 'fulfilled' && result.value) {
+            const content = Array.isArray(result.value) ? result.value : (result.value.content || []);
+            const parsed = content.map((n: Record<string, unknown>) => {
+              if (n.need && typeof n.need === 'object') {
+                const need = n.need as Record<string, unknown>;
+                return { id: need.id as string, name: need.name as string, status: need.status as string, entityId: need.entityId as string };
+              }
+              return { id: n.id as string, name: n.name as string, status: n.status as string, entityId: n.entityId as string };
+            }).filter((n: NeedItem) => n.id);
+            needs.push(...parsed);
+          }
         }
+
+        // Filter to only needs belonging to nAdmin's entities
+        needs = needs.filter((n) => entityIds.includes(n.entityId || ''));
 
         if (needs.length === 0) {
           setLoading(false);

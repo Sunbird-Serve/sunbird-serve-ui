@@ -183,9 +183,18 @@ export function NeedsPage() {
 
   // Apply filters
   const filteredNeeds = useMemo(() => {
-    let result = isAdmin ? allNeeds : allNeeds.filter((n) => n.need?.userId === userId);
+    let result = allNeeds;
 
-    // Entity filter
+    // For nAdmin (not sAdmin), scope to their mapped entities
+    if (isAdmin && !isSAdmin && entities.length > 0) {
+      const myEntityIds = entities.map((e) => e.id);
+      result = result.filter((n) => myEntityIds.includes(n.need?.entityId || ''));
+    } else if (!isAdmin) {
+      // nCoordinator sees only their own needs
+      result = result.filter((n) => n.need?.userId === userId);
+    }
+
+    // Additional entity filter (user-selected from dropdown)
     if (selectedEntities.length > 0) {
       result = result.filter((n) => selectedEntities.includes(n.need?.entityId || ''));
     }
