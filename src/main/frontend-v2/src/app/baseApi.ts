@@ -43,6 +43,6 @@ export const baseApi = createApi({
 
     return rawBaseQuery(args, api, extraOptions);
   },
-  tagTypes: ['Need', 'NeedType', 'User', 'Entity', 'Nomination', 'Agency', 'NeedPlan'],
+  tagTypes: ['Need', 'NeedType', 'User', 'Entity', 'Nomination', 'Agency', 'NeedPlan', 'OnboardingRequest'],
   endpoints: () => ({}),
 });

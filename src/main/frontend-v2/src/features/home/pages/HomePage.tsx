@@ -274,6 +274,71 @@ export function HomePage() {
         </Container>
       </Box>
 
+      {/* Onboard CTA Section */}
+      <Box
+        sx={{
+          py: { xs: 5, md: 7 },
+          bgcolor: 'background.paper',
+          borderBottom: 1,
+          borderColor: 'divider',
+        }}
+      >
+        <Container maxWidth="md">
+          <Stack spacing={3} alignItems="center" textAlign="center">
+            <SchoolIcon sx={{ fontSize: 44, color: 'primary.main' }} />
+            <Typography variant="h4" fontWeight={700}>
+              Get skilled volunteers for your school — free
+            </Typography>
+            <Typography variant="body1" color="text.secondary" maxWidth={500}>
+              2-minute form. No login needed. Activate your school on SERVE and let us match you
+              with the right volunteers.
+            </Typography>
+
+            {/* 3-step visual */}
+            <Grid container spacing={2} sx={{ maxWidth: 560, mt: 2 }}>
+              {[
+                { step: '1', label: 'Raise a need' },
+                { step: '2', label: 'Get matched' },
+                { step: '3', label: 'Sessions happen' },
+              ].map((item) => (
+                <Grid item xs={4} key={item.step}>
+                  <Stack alignItems="center" spacing={0.5}>
+                    <Box
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: '50%',
+                        bgcolor: 'primary.main',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontWeight: 700,
+                        fontSize: '0.875rem',
+                      }}
+                    >
+                      {item.step}
+                    </Box>
+                    <Typography variant="body2" fontWeight={600}>
+                      {item.label}
+                    </Typography>
+                  </Stack>
+                </Grid>
+              ))}
+            </Grid>
+
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate('/onboard')}
+              sx={{ mt: 2, px: 5, py: 1.5 }}
+            >
+              Onboard Your School
+            </Button>
+          </Stack>
+        </Container>
+      </Box>
+
       {/* Intent to Impact Section */}
       <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'background.default' }}>
         <Container maxWidth="lg">
