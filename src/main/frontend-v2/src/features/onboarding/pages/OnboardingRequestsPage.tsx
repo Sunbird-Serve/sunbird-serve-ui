@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -30,14 +30,17 @@ import PersonIcon from '@mui/icons-material/Person';
 import WifiIcon from '@mui/icons-material/Wifi';
 import ComputerIcon from '@mui/icons-material/Computer';
 import TvIcon from '@mui/icons-material/Tv';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import MeetingRoomIcon from '@mui/icons-material/VolumeUp';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import {
   useListOnboardingRequestsQuery,
   useReviewOnboardingRequestMutation,
 } from '../api/onboardingReviewApi';
+import { useBrowseEntitiesQuery } from '../api/onboardingApi';
 import type { OnboardingRequestResponse } from '../api/onboardingApi';
+import { useAppSelector } from '@app/store';
+import { getAuthHeaders } from '@shared/utils/authHeaders';
 
 type StatusFilter = '' | 'Pending' | 'Clarification' | 'Authorised' | 'Rejected';
 
@@ -58,6 +61,13 @@ function getStatusColor(status: string): 'warning' | 'info' | 'success' | 'error
   }
 }
 
+interface AdminEntity {
+  id: string;
+  name: string;
+  block?: string;
+  district?: string;
+}
+
 export function OnboardingRequestsPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('Pending');
   const [page, setPage] = useState(0);
@@ -73,27 +83,87 @@ export function OnboardingRequestsPage() {
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
-  // Fetch requests
+  // Get nAdmin's user info to derive their entity scope
+  const user = useAppSelector((state) => state.user.data);
+  const userId = user?.osid || '';
+
+  // Fetch nAdmin's mapped entities to scope onboarding requests
+  const [adminEntityIds, setAdminEntityIds] = useState<string[]>([]);
+  const [adminEntitiesLoading, setAdminEntitiesLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchAdminEntities() {
+      if (!userId) return;
+      try {
+        const headers = getAuthHeaders();
+        const baseUrl = import.meta.env.VITE_API_BASE_URL_NEED;
+        const resp = await fetch(
+          `${baseUrl}/api/v1/serve-need/entityDetails/${userId}?page=0&size=1000`,
+          { headers },
+        );
+        if (resp.ok) {
+          const data = await resp.json();
+          const entities: AdminEntity[] = Array.isArray(data) ? data : (data.content || []);
+          setAdminEntityIds(entities.map((e) => e.id));
+        }
+      } catch {
+        // If fetch fails, show all requests (no filtering)
+        setAdminEntityIds([]);
+      } finally {
+        setAdminEntitiesLoading(false);
+      }
+    }
+    fetchAdminEntities();
+  }, [userId]);
+
+  // Fetch onboarding requests
   const { data, isLoading, isFetching } = useListOnboardingRequestsQuery({
     status: statusFilter || undefined,
-    page,
-    size: 10,
+    page: 0,
+    size: 1000, // Fetch all, filter client-side
   });
+
+  // Fetch all entities to cross-reference entityId → block
+  const { data: allEntitiesData } = useBrowseEntitiesQuery({ size: 5000 });
 
   const [reviewRequest, { isLoading: reviewing }] = useReviewOnboardingRequestMutation();
 
-  const requests = data?.content ?? [];
-  const totalPages = data?.totalPages ?? 0;
+  // Build entityId → block lookup
+  const entityBlockMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (allEntitiesData?.content) {
+      for (const entity of allEntitiesData.content) {
+        if (entity.block) map.set(entity.id, entity.block);
+      }
+    }
+    return map;
+  }, [allEntitiesData]);
 
-  // Filter by search (client-side on coordinator name or entity)
+  // Filter requests: only show those where entityId is in nAdmin's mapped entities
+  const blockFilteredRequests = useMemo(() => {
+    const allRequests = data?.content ?? [];
+    // If we couldn't determine admin entities, show all (graceful fallback)
+    if (adminEntityIds.length === 0 && !adminEntitiesLoading) return allRequests;
+    if (adminEntityIds.length === 0) return [];
+
+    return allRequests.filter((req) => adminEntityIds.includes(req.entityId));
+  }, [data, adminEntityIds, adminEntitiesLoading]);
+
+  // Pagination (client-side since we fetched all)
+  const PAGE_SIZE = 10;
+  const totalFiltered = blockFilteredRequests.length;
+  const totalPages = Math.ceil(totalFiltered / PAGE_SIZE);
+  const paginatedRequests = blockFilteredRequests.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
+  // Search filter
   const filteredRequests = search.trim()
-    ? requests.filter(
+    ? paginatedRequests.filter(
         (r) =>
           r.coordinatorName.toLowerCase().includes(search.toLowerCase()) ||
           r.email.toLowerCase().includes(search.toLowerCase()) ||
           r.mobile.includes(search),
       )
-    : requests;
+    : paginatedRequests;
 
   // Actions
   const openReviewDialog = (request: OnboardingRequestResponse, action: 'Authorise' | 'Clarification' | 'Reject') => {
@@ -135,16 +205,36 @@ export function OnboardingRequestsPage() {
     setExpandedId(expandedId === id ? null : id);
   };
 
+  // Helper: get entity name from entityId
+  const getEntityName = (entityId: string) => {
+    const entity = allEntitiesData?.content?.find((e) => e.id === entityId);
+    return entity?.name || entityId;
+  };
+
+  const getEntityBlock = (entityId: string) => {
+    return entityBlockMap.get(entityId) || '—';
+  };
+
+  const isPageLoading = isLoading || adminEntitiesLoading;
+
   return (
     <Box>
       <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
         <Typography variant="h4" fontWeight={600}>
           Onboarding Requests
         </Typography>
-        {data?.totalElements !== undefined && (
-          <Chip label={`${data.totalElements} total`} size="small" variant="outlined" />
-        )}
+        <Chip
+          label={`${totalFiltered} total`}
+          size="small"
+          variant="outlined"
+        />
       </Stack>
+
+      {adminEntityIds.length > 0 && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Showing requests for your {adminEntityIds.length} mapped institution{adminEntityIds.length > 1 ? 's' : ''}.
+        </Alert>
+      )}
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
@@ -173,19 +263,19 @@ export function OnboardingRequestsPage() {
       />
 
       {/* Loading */}
-      {isLoading && (
+      {isPageLoading && (
         <Stack spacing={2}>
           {[1, 2, 3].map((i) => <Skeleton key={i} variant="rounded" height={100} />)}
         </Stack>
       )}
 
       {/* Empty state */}
-      {!isLoading && filteredRequests.length === 0 && (
+      {!isPageLoading && filteredRequests.length === 0 && (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <SchoolIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 1 }} />
           <Typography variant="h6" fontWeight={600}>No requests</Typography>
           <Typography variant="body2" color="text.secondary">
-            No {statusFilter.toLowerCase() || ''} onboarding requests found.
+            No {statusFilter.toLowerCase() || ''} onboarding requests found for your block.
           </Typography>
         </Paper>
       )}
@@ -201,7 +291,7 @@ export function OnboardingRequestsPage() {
             >
               <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={1}>
                 <Box sx={{ flex: 1 }}>
-                  <Stack direction="row" spacing={1} alignItems="center">
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                     <PersonIcon fontSize="small" color="primary" />
                     <Typography variant="subtitle2" fontWeight={600}>
                       {req.coordinatorName}
@@ -209,8 +299,11 @@ export function OnboardingRequestsPage() {
                     <Chip label={req.designation} size="small" variant="outlined" />
                     <Chip label={req.status} size="small" color={getStatusColor(req.status)} />
                   </Stack>
-                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-                    {req.email} · {req.mobile} · Submitted {new Date(req.createdAt).toLocaleDateString()}
+                  <Typography variant="body2" sx={{ mt: 0.5 }}>
+                    {getEntityName(req.entityId)}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                    {req.email} · {req.mobile} · Block: {getEntityBlock(req.entityId)} · {new Date(req.createdAt).toLocaleDateString()}
                   </Typography>
                 </Box>
 
@@ -288,8 +381,10 @@ export function OnboardingRequestsPage() {
                     <Typography variant="caption" color="text.secondary" fontWeight={600}>
                       Institution
                     </Typography>
-                    <Typography variant="body2">Entity ID: {req.entityId}</Typography>
-                    <Typography variant="body2">Agency ID: {req.agencyId}</Typography>
+                    <Typography variant="body2" fontWeight={500}>{getEntityName(req.entityId)}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Block: {getEntityBlock(req.entityId)}
+                    </Typography>
                   </Grid>
 
                   {/* Infra details */}
@@ -317,9 +412,9 @@ export function OnboardingRequestsPage() {
                         </Typography>
                       </Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <MeetingRoomIcon fontSize="small" color="primary" />
+                        <MeetingRoomIcon fontSize="small" color={req.infraDetails.hasSpeakers ? 'success' : 'disabled'} />
                         <Typography variant="caption">
-                          Rooms: {req.infraDetails.roomsAvailable}
+                          Speakers: {req.infraDetails.hasSpeakers ? 'Yes' : 'No'}
                         </Typography>
                       </Stack>
                     </Stack>
@@ -380,6 +475,9 @@ export function OnboardingRequestsPage() {
               <Paper variant="outlined" sx={{ p: 2 }}>
                 <Typography variant="subtitle2" fontWeight={600}>
                   {reviewTarget.coordinatorName}
+                </Typography>
+                <Typography variant="body2">
+                  {getEntityName(reviewTarget.entityId)}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
                   {reviewTarget.designation} · {reviewTarget.email} · {reviewTarget.mobile}

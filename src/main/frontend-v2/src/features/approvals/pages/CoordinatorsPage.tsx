@@ -114,8 +114,35 @@ export function CoordinatorsPage() {
           if (!Array.isArray(allUsers)) allUsers = [];
         }
 
+        // Get nAdmin's entity IDs for scoping
+        const myEntityIds = entities.map((e) => e.id);
+
+        // For each nCoordinator, check if they have entities overlapping with nAdmin's
+        // Fetch entity assignments for all coordinators (batch approach)
         const coords = allUsers.filter((u) => u.role?.includes('nCoordinator'));
-        setCoordinators(coords);
+
+        // Filter coordinators by checking their entity assignments
+        const filteredCoords: Coordinator[] = [];
+        for (const coord of coords) {
+          try {
+            const entResp = await fetch(
+              `${BASE_URL}/api/v1/serve-need/entityDetails/${coord.osid}?page=0&size=100`,
+              { headers },
+            );
+            if (entResp.ok) {
+              const entData = await entResp.json();
+              const coordEntities: { id: string }[] = Array.isArray(entData) ? entData : (entData.content || []);
+              const hasOverlap = coordEntities.some((ce) => myEntityIds.includes(ce.id));
+              if (hasOverlap) {
+                filteredCoords.push(coord);
+              }
+            }
+          } catch {
+            // If fetch fails for a coordinator, include them (graceful)
+            filteredCoords.push(coord);
+          }
+        }
+        setCoordinators(filteredCoords);
       } catch {
         setError('Failed to load data.');
       } finally {
