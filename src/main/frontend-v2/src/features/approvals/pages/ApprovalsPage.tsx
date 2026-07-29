@@ -19,7 +19,6 @@ import {
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import PersonIcon from '@mui/icons-material/Person';
 import BusinessIcon from '@mui/icons-material/Business';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import SearchIcon from '@mui/icons-material/Search';
@@ -30,15 +29,6 @@ import { getAuthHeaders, getAuthHeadersWithJson } from '@shared/utils/authHeader
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 // --- Types ---
-interface PendingCoordinator {
-  osid: string;
-  identityDetails?: { fullname?: string; name?: string; gender?: string };
-  contactDetails?: { email?: string; mobile?: string; address?: { city?: string; state?: string } };
-  status?: string;
-  role?: string[];
-  agencyId?: string;
-}
-
 interface PendingEntity {
   id: string;
   name: string;
@@ -66,7 +56,7 @@ interface PendingNeed {
   createdAt?: string;
 }
 
-type TabValue = 0 | 1 | 2 | 3 | 4;
+type TabValue = 0 | 1 | 2 | 3;
 
 // --- Component ---
 export function ApprovalsPage() {
@@ -74,16 +64,15 @@ export function ApprovalsPage() {
   const userId = user?.osid || '';
 
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<TabValue>(3);
+  const [tab, setTab] = useState<TabValue>(2);
   const [search, setSearch] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
   // Data
-  const [pendingCoordinators, setPendingCoordinators] = useState<PendingCoordinator[]>([]);
   const [pendingEntities, setPendingEntities] = useState<PendingEntity[]>([]);
   const [pendingNeeds, setPendingNeeds] = useState<PendingNeed[]>([]);
-  const [rejectedItems, setRejectedItems] = useState<{ type: string; item: PendingCoordinator | PendingEntity | PendingNeed }[]>([]);
+  const [rejectedItems, setRejectedItems] = useState<{ type: string; item: PendingEntity | PendingNeed }[]>([]);
 
   // Reject dialog
   const [rejectDialog, setRejectDialog] = useState(false);
@@ -91,7 +80,7 @@ export function ApprovalsPage() {
   const [rejectReason, setRejectReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch all data
+  // Fetch data
   useEffect(() => {
     async function fetchData() {
       if (!userId) return;
@@ -118,36 +107,9 @@ export function ApprovalsPage() {
         // Rejected entities
         const rejectedEnts = myEntities
           .filter((e) => e.status === 'Inactive' || e.status === 'Rejected')
-          .map((e) => ({ type: 'entity', item: e }));
+          .map((e) => ({ type: 'entity' as const, item: e }));
 
-        // 2. Get all users → filter coordinators assigned to my entities
-        const usersResp = await fetch(
-          `${BASE_URL}/api/v1/serve-volunteering/user/all-users`,
-          { headers },
-        );
-        let allUsers: PendingCoordinator[] = [];
-        if (usersResp.ok) {
-          allUsers = await usersResp.json();
-          if (!Array.isArray(allUsers)) allUsers = [];
-        }
-
-        // Filter nCoordinators — those with status Registered (pending approval)
-        // Scope to coordinators whose entities overlap with nAdmin's entities
-        // We need to check each coordinator's entity assignments
-        // Since we can't easily check all coordinators' entities in bulk,
-        // filter by city matching entity districts/blocks as a proxy,
-        // or show all pending coordinators (nAdmin can see all in their agency)
-        const pendingCoords = allUsers.filter(
-          (u) => u.role?.includes('nCoordinator') && u.status === 'Registered',
-        );
-        setPendingCoordinators(pendingCoords);
-
-        // Rejected coordinators
-        const rejectedCoords = allUsers
-          .filter((u) => u.role?.includes('nCoordinator') && (u.status === 'Rejected' || u.status === 'Inactive'))
-          .map((u) => ({ type: 'coordinator', item: u }));
-
-        // 3. Get pending needs (status = New) for my entities
+        // 2. Get pending needs (status = New) for my entities
         const needsResp = await fetch(
           `${BASE_URL}/api/v1/serve-need/need/?status=New&page=0&size=200`,
           { headers },
@@ -156,7 +118,6 @@ export function ApprovalsPage() {
         if (needsResp.ok) {
           const needsData = await needsResp.json();
           const content = Array.isArray(needsData) ? needsData : (needsData.content || []);
-          // Normalize: handle both flat and nested need format
           allNewNeeds = content.map((n: Record<string, unknown>) => {
             if (n.need && typeof n.need === 'object') {
               const need = n.need as Record<string, unknown>;
@@ -203,7 +164,7 @@ export function ApprovalsPage() {
             .map((n: PendingNeed) => ({ type: 'need', item: n }));
         }
 
-        setRejectedItems([...rejectedCoords, ...rejectedEnts, ...rejectedNeedsList]);
+        setRejectedItems([...rejectedEnts, ...rejectedNeedsList]);
       } catch {
         setError('Failed to load approvals data.');
       } finally {
@@ -214,22 +175,6 @@ export function ApprovalsPage() {
   }, [userId]);
 
   // Actions
-  const handleApproveCoordinator = async (coord: PendingCoordinator) => {
-    setActionLoading(true);
-    setError('');
-    try {
-      await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${coord.osid}`, {
-        method: 'PUT',
-        headers: getAuthHeadersWithJson(),
-        body: JSON.stringify({ status: 'Active' }),
-      });
-      setPendingCoordinators((prev) => prev.filter((c) => c.osid !== coord.osid));
-      setSuccess(`Coordinator ${coord.identityDetails?.fullname || ''} approved.`);
-      setTimeout(() => setSuccess(''), 4000);
-    } catch { setError('Failed to approve coordinator.'); }
-    finally { setActionLoading(false); }
-  };
-
   const handleActivateEntity = async (entity: PendingEntity) => {
     setActionLoading(true);
     setError('');
@@ -272,14 +217,7 @@ export function ApprovalsPage() {
     setActionLoading(true);
     setError('');
     try {
-      if (rejectTarget.type === 'coordinator') {
-        await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${rejectTarget.id}`, {
-          method: 'PUT',
-          headers: getAuthHeadersWithJson(),
-          body: JSON.stringify({ status: 'Rejected' }),
-        });
-        setPendingCoordinators((prev) => prev.filter((c) => c.osid !== rejectTarget.id));
-      } else if (rejectTarget.type === 'entity') {
+      if (rejectTarget.type === 'entity') {
         await fetch(`${BASE_URL}/api/v1/serve-need/entity/edit/${rejectTarget.id}`, {
           method: 'PUT',
           headers: getAuthHeadersWithJson(),
@@ -302,8 +240,7 @@ export function ApprovalsPage() {
 
   // Counts
   const counts = {
-    all: pendingCoordinators.length + pendingEntities.length + pendingNeeds.length,
-    coordinators: pendingCoordinators.length,
+    all: pendingEntities.length + pendingNeeds.length,
     entities: pendingEntities.length,
     needs: pendingNeeds.length,
     rejected: rejectedItems.length,
@@ -338,7 +275,7 @@ export function ApprovalsPage() {
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
 
-      {/* Tabs */}
+      {/* Tabs: All, Entities, Needs, Rejected */}
       <Tabs
         value={tab}
         onChange={(_, v) => setTab(v)}
@@ -347,7 +284,6 @@ export function ApprovalsPage() {
         sx={{ mb: 2, borderBottom: 1, borderColor: 'divider' }}
       >
         <Tab label={`All (${counts.all})`} />
-        <Tab label={`Coordinators (${counts.coordinators})`} icon={<PersonIcon />} iconPosition="start" />
         <Tab label={`Entities (${counts.entities})`} icon={<BusinessIcon />} iconPosition="start" />
         <Tab label={`Needs (${counts.needs})`} icon={<AssignmentIcon />} iconPosition="start" />
         <Tab label={`Rejected (${counts.rejected})`} />
@@ -364,7 +300,7 @@ export function ApprovalsPage() {
       />
 
       {/* Empty state */}
-      {counts.all === 0 && tab !== 4 && (
+      {counts.all === 0 && tab !== 3 && (
         <Paper sx={{ p: 4, textAlign: 'center' }}>
           <CheckCircleIcon sx={{ fontSize: 48, color: 'success.main', mb: 1 }} />
           <Typography variant="h6" fontWeight={600}>All caught up!</Typography>
@@ -372,50 +308,8 @@ export function ApprovalsPage() {
         </Paper>
       )}
 
-      {/* Pending Coordinators */}
-      {(tab === 0 || tab === 1) && pendingCoordinators.filter((c) => filterBySearch(c.identityDetails?.fullname || c.identityDetails?.name || '')).map((coord) => (
-        <Paper key={coord.osid} variant="outlined" sx={{ p: 2, mb: 1.5 }}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={1}>
-            <Box>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <PersonIcon fontSize="small" color="primary" />
-                <Typography variant="subtitle2" fontWeight={600}>
-                  {coord.identityDetails?.fullname || coord.identityDetails?.name || '—'}
-                </Typography>
-                <Chip label="nCoordinator" size="small" variant="outlined" />
-              </Stack>
-              <Typography variant="caption" color="text.secondary">
-                {coord.contactDetails?.email || ''} · {coord.contactDetails?.mobile || ''} · {coord.contactDetails?.address?.city || ''}
-              </Typography>
-            </Box>
-            <Stack direction="row" spacing={1}>
-              <Button
-                size="small"
-                variant="contained"
-                color="success"
-                startIcon={<CheckCircleIcon />}
-                onClick={() => handleApproveCoordinator(coord)}
-                disabled={actionLoading}
-              >
-                Approve
-              </Button>
-              <Button
-                size="small"
-                variant="outlined"
-                color="error"
-                startIcon={<CancelIcon />}
-                onClick={() => openRejectDialog('coordinator', coord.osid, coord.identityDetails?.fullname || '')}
-                disabled={actionLoading}
-              >
-                Reject
-              </Button>
-            </Stack>
-          </Stack>
-        </Paper>
-      ))}
-
       {/* Pending Entities */}
-      {(tab === 0 || tab === 2) && pendingEntities.filter((e) => filterBySearch(e.name)).map((entity) => (
+      {(tab === 0 || tab === 1) && pendingEntities.filter((e) => filterBySearch(e.name)).map((entity) => (
         <Paper key={entity.id} variant="outlined" sx={{ p: 2, mb: 1.5 }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={1}>
             <Box>
@@ -455,7 +349,7 @@ export function ApprovalsPage() {
       ))}
 
       {/* Pending Needs */}
-      {(tab === 0 || tab === 3) && pendingNeeds.filter((n) => filterBySearch(n.name)).map((need) => (
+      {(tab === 0 || tab === 2) && pendingNeeds.filter((n) => filterBySearch(n.name)).map((need) => (
         <Paper key={need.id} variant="outlined" sx={{ p: 2, mb: 1.5 }}>
           <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={1}>
             <Box>
@@ -495,26 +389,22 @@ export function ApprovalsPage() {
       ))}
 
       {/* Rejected Tab */}
-      {tab === 4 && (
+      {tab === 3 && (
         rejectedItems.length === 0 ? (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">No rejected items.</Typography>
           </Paper>
         ) : (
           rejectedItems.filter((r) => {
-            const name = r.type === 'coordinator'
-              ? (r.item as PendingCoordinator).identityDetails?.fullname || ''
-              : r.type === 'entity'
-                ? (r.item as PendingEntity).name
-                : (r.item as PendingNeed).name;
+            const name = r.type === 'entity'
+              ? (r.item as PendingEntity).name
+              : (r.item as PendingNeed).name;
             return filterBySearch(name);
           }).map((r, i) => {
-            const name = r.type === 'coordinator'
-              ? (r.item as PendingCoordinator).identityDetails?.fullname || (r.item as PendingCoordinator).identityDetails?.name || '—'
-              : r.type === 'entity'
-                ? (r.item as PendingEntity).name
-                : (r.item as PendingNeed).name;
-            const icon = r.type === 'coordinator' ? <PersonIcon fontSize="small" /> : r.type === 'entity' ? <BusinessIcon fontSize="small" /> : <AssignmentIcon fontSize="small" />;
+            const name = r.type === 'entity'
+              ? (r.item as PendingEntity).name
+              : (r.item as PendingNeed).name;
+            const icon = r.type === 'entity' ? <BusinessIcon fontSize="small" /> : <AssignmentIcon fontSize="small" />;
             return (
               <Paper key={i} variant="outlined" sx={{ p: 2, mb: 1, opacity: 0.7 }}>
                 <Stack direction="row" spacing={1} alignItems="center">
