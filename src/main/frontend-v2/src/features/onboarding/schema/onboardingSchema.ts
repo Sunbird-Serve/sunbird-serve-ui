@@ -36,11 +36,9 @@ export const onboardingSchema = z.object({
   hasProjector: z.enum(['true', 'false'], {
     errorMap: () => ({ message: 'Please select projector availability' }),
   }),
-  roomsAvailable: z
-    .string()
-    .min(1, 'Please enter number of rooms')
-    .regex(/^\d+$/, 'Must be a number')
-    .refine((val) => parseInt(val, 10) >= 0, 'Must be 0 or more'),
+  hasSpeakers: z.enum(['true', 'false'], {
+    errorMap: () => ({ message: 'Please select speaker availability' }),
+  }),
 }).superRefine((data, ctx) => {
   // If designation is "Other", require designationOther
   if (data.designation === 'Other') {

@@ -74,7 +74,7 @@ export function ApprovalsPage() {
   const userId = user?.osid || '';
 
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<TabValue>(0);
+  const [tab, setTab] = useState<TabValue>(3);
   const [search, setSearch] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -132,8 +132,11 @@ export function ApprovalsPage() {
         }
 
         // Filter nCoordinators — those with status Registered (pending approval)
-        // To scope to my entities: we'd need to know which coordinators are assigned to my entities
-        // For now, filter by agency (same agency) + status Registered
+        // Scope to coordinators whose entities overlap with nAdmin's entities
+        // We need to check each coordinator's entity assignments
+        // Since we can't easily check all coordinators' entities in bulk,
+        // filter by city matching entity districts/blocks as a proxy,
+        // or show all pending coordinators (nAdmin can see all in their agency)
         const pendingCoords = allUsers.filter(
           (u) => u.role?.includes('nCoordinator') && u.status === 'Registered',
         );

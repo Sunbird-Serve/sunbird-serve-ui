@@ -63,7 +63,7 @@ export function OnboardingPage() {
       hasInternet: undefined,
       hasComputer: undefined,
       hasProjector: undefined,
-      roomsAvailable: '',
+      hasSpeakers: undefined,
     },
   });
 
@@ -154,7 +154,7 @@ export function OnboardingPage() {
           hasInternet: data.hasInternet === 'true',
           hasComputer: data.hasComputer === 'true',
           hasProjector: data.hasProjector === 'true',
-          roomsAvailable: parseInt(data.roomsAvailable, 10),
+          hasSpeakers: data.hasSpeakers === 'true',
         },
       }).unwrap();
       setSubmitted(true);
@@ -530,22 +530,27 @@ export function OnboardingPage() {
                 />
               </Grid>
 
-              {/* Rooms Available */}
+              {/* Speakers */}
               <Grid item xs={12} sm={6} md={3}>
                 <Controller
-                  name="roomsAvailable"
+                  name="hasSpeakers"
                   control={control}
                   render={({ field }) => (
                     <TextField
                       {...field}
+                      select
                       fullWidth
-                      label="Rooms Available"
-                      placeholder="e.g. 2"
-                      inputProps={{ inputMode: 'numeric', min: 0 }}
-                      error={!!errors.roomsAvailable}
-                      helperText={errors.roomsAvailable?.message}
+                      label="Speakers Available"
+                      error={!!errors.hasSpeakers}
+                      helperText={errors.hasSpeakers?.message}
                       aria-required="true"
-                    />
+                    >
+                      {YES_NO_OPTIONS.map((opt) => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </MenuItem>
+                      ))}
+                    </TextField>
                   )}
                 />
               </Grid>

@@ -43,7 +43,7 @@ export interface InfraDetails {
   hasInternet: boolean;
   hasComputer: boolean;
   hasProjector: boolean;
-  roomsAvailable: number;
+  hasSpeakers: boolean;
 }
 
 export interface OnboardingRequestPayload {
