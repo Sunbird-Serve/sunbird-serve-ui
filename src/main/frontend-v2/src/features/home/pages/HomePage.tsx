@@ -100,7 +100,7 @@ export function HomePage() {
         sx={{
           background: 'linear-gradient(135deg, #0C4A6E 0%, #0E7490 50%, #155E75 100%)',
           color: 'white',
-          py: { xs: 6, md: 8 },
+          py: { xs: 4, md: 5 },
           position: 'relative',
           overflow: 'hidden',
           // Subtle pattern overlay
@@ -114,10 +114,10 @@ export function HomePage() {
         }}
       >
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Grid container spacing={6} alignItems="center">
+          <Grid container spacing={4} alignItems="center">
             {/* Left — Branding */}
-            <Grid item xs={12} md={6}>
-              <Stack spacing={2.5}>
+            <Grid item xs={12} md={7}>
+              <Stack spacing={1.5}>
                 <Stack direction="row" alignItems="center" spacing={1}>
                   <img src="/icons/serve-logo.jpeg" alt="Sunbird Serve" style={{ height: 28, width: 28, borderRadius: 4 }} />
                   <Typography
@@ -151,16 +151,90 @@ export function HomePage() {
                 </Typography>
                 <Button
                   variant="text"
-                  sx={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'underline', alignSelf: 'flex-start', px: 0 }}
+                  sx={{ color: 'rgba(255,255,255,0.7)', alignSelf: 'flex-start', px: 0, fontSize: '0.8rem' }}
                   onClick={() => navigate('/explore-needs')}
                 >
-                  Explore Available Needs →
+                  Already know what you'd like to do? Browse opportunities →
                 </Button>
+
+                {/* Quick Onboard Cards — side by side */}
+                <Stack direction="column" spacing={1.5} sx={{ mt: 1 }}>
+                  {/* Volunteer Card */}
+                  <Paper
+                    sx={{
+                      p: 2,
+                      flex: 1,
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(8px)',
+                      borderRadius: 2,
+                      border: '1px solid rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600, mb: 0.5 }}>
+                      Want to Volunteer?
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block', mb: 1, lineHeight: 1.6 }}>
+                      Start a conversation with the SERVE Assistant — Discover opportunities • Check eligibility • Get onboarded • ~5 minutes
+                    </Typography>
+                    <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
+                        href={import.meta.env.VITE_VOLUNTEER_AGENT_WEB_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Start on Web
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        sx={{ bgcolor: '#25D366', color: 'white', '&:hover': { bgcolor: '#1DA851' }, textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
+                        href={import.meta.env.VITE_VOLUNTEER_AGENT_WHATSAPP_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Start on WhatsApp
+                      </Button>
+                    </Stack>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>
+                      No sign-up required to explore.
+                    </Typography>
+                  </Paper>
+
+                  {/* School Coordinator Card */}
+                  <Paper
+                    sx={{
+                      p: 2,
+                      flex: 1,
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(8px)',
+                      borderRadius: 2,
+                      border: '1px solid rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600, mb: 0.5 }}>
+                      Need Volunteer Teachers for Your School?
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block', mb: 1.5, lineHeight: 1.6 }}>
+                      Tell us about your school. If you already have a smart classroom, TV or projector, SERVE can help connect volunteer teachers to deliver engaging online sessions.
+                    </Typography>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
+                      onClick={() => navigate('/onboard')}
+                    >
+                      Request Volunteers
+                    </Button>
+                  </Paper>
+                </Stack>
               </Stack>
             </Grid>
 
             {/* Right — Login/Signup Card */}
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12} md={5}>
               <Paper
                 elevation={0}
                 sx={{
@@ -271,71 +345,6 @@ export function HomePage() {
               </Paper>
             </Grid>
           </Grid>
-        </Container>
-      </Box>
-
-      {/* Onboard CTA Section */}
-      <Box
-        sx={{
-          py: { xs: 5, md: 7 },
-          bgcolor: 'background.paper',
-          borderBottom: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <Container maxWidth="md">
-          <Stack spacing={3} alignItems="center" textAlign="center">
-            <SchoolIcon sx={{ fontSize: 44, color: 'primary.main' }} />
-            <Typography variant="h4" fontWeight={700}>
-              Get skilled volunteers for your school — free
-            </Typography>
-            <Typography variant="body1" color="text.secondary" maxWidth={500}>
-              2-minute form. No login needed. Activate your school on SERVE and let us match you
-              with the right volunteers.
-            </Typography>
-
-            {/* 3-step visual */}
-            <Grid container spacing={2} sx={{ maxWidth: 560, mt: 2 }}>
-              {[
-                { step: '1', label: 'Raise a need' },
-                { step: '2', label: 'Get matched' },
-                { step: '3', label: 'Sessions happen' },
-              ].map((item) => (
-                <Grid item xs={4} key={item.step}>
-                  <Stack alignItems="center" spacing={0.5}>
-                    <Box
-                      sx={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: '50%',
-                        bgcolor: 'primary.main',
-                        color: 'white',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontWeight: 700,
-                        fontSize: '0.875rem',
-                      }}
-                    >
-                      {item.step}
-                    </Box>
-                    <Typography variant="body2" fontWeight={600}>
-                      {item.label}
-                    </Typography>
-                  </Stack>
-                </Grid>
-              ))}
-            </Grid>
-
-            <Button
-              variant="contained"
-              size="large"
-              onClick={() => navigate('/onboard')}
-              sx={{ mt: 2, px: 5, py: 1.5 }}
-            >
-              Onboard Your School
-            </Button>
-          </Stack>
         </Container>
       </Box>
 
