@@ -271,7 +271,7 @@ export function OnboardingPage() {
               </Typography>
             </Box>
             <Box>
-              <Typography variant="h5" fontWeight={700}>11,000+</Typography>
+              <Typography variant="h5" fontWeight={700}>15,000+</Typography>
               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>
                 Students reached
               </Typography>
