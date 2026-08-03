@@ -40,10 +40,12 @@ export interface EntityBrowseParams {
 }
 
 export interface InfraDetails {
-  hasInternet: boolean;
-  hasComputer: boolean;
-  hasProjector: boolean;
+  hasSmartTvOrProjector: boolean;
+  hasComputerOrLaptop: boolean;
   hasSpeakers: boolean;
+  hasReliableInternet: boolean;
+  hasUsedForOnlineClass: string;
+  canIndependentlyConnect: string;
 }
 
 export interface OnboardingRequestPayload {

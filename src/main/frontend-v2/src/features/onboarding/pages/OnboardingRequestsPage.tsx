@@ -394,21 +394,15 @@ export function OnboardingRequestsPage() {
                     </Typography>
                     <Stack direction="row" spacing={2} sx={{ mt: 0.5 }} flexWrap="wrap">
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <WifiIcon fontSize="small" color={req.infraDetails.hasInternet ? 'success' : 'disabled'} />
+                        <TvIcon fontSize="small" color={req.infraDetails.hasSmartTvOrProjector ? 'success' : 'disabled'} />
                         <Typography variant="caption">
-                          Internet: {req.infraDetails.hasInternet ? 'Yes' : 'No'}
+                          Smart TV/Projector: {req.infraDetails.hasSmartTvOrProjector ? 'Yes' : 'No'}
                         </Typography>
                       </Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
-                        <ComputerIcon fontSize="small" color={req.infraDetails.hasComputer ? 'success' : 'disabled'} />
+                        <ComputerIcon fontSize="small" color={req.infraDetails.hasComputerOrLaptop ? 'success' : 'disabled'} />
                         <Typography variant="caption">
-                          Computer: {req.infraDetails.hasComputer ? 'Yes' : 'No'}
-                        </Typography>
-                      </Stack>
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <TvIcon fontSize="small" color={req.infraDetails.hasProjector ? 'success' : 'disabled'} />
-                        <Typography variant="caption">
-                          Projector: {req.infraDetails.hasProjector ? 'Yes' : 'No'}
+                          Computer: {req.infraDetails.hasComputerOrLaptop ? 'Yes' : 'No'}
                         </Typography>
                       </Stack>
                       <Stack direction="row" spacing={0.5} alignItems="center">
@@ -417,7 +411,23 @@ export function OnboardingRequestsPage() {
                           Speakers: {req.infraDetails.hasSpeakers ? 'Yes' : 'No'}
                         </Typography>
                       </Stack>
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        <WifiIcon fontSize="small" color={req.infraDetails.hasReliableInternet ? 'success' : 'disabled'} />
+                        <Typography variant="caption">
+                          Internet: {req.infraDetails.hasReliableInternet ? 'Yes' : 'No'}
+                        </Typography>
+                      </Stack>
                     </Stack>
+                    {req.infraDetails.hasUsedForOnlineClass && (
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                        Online class experience: {req.infraDetails.hasUsedForOnlineClass}
+                      </Typography>
+                    )}
+                    {req.infraDetails.canIndependentlyConnect && (
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                        Can connect independently: {req.infraDetails.canIndependentlyConnect}
+                      </Typography>
+                    )}
                   </Grid>
 
                   {/* Reviewer notes (if any) */}
