@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -8,14 +8,10 @@ import {
   Stack,
   Grid,
   Paper,
-  Tab,
-  Tabs,
-  Alert,
-  Divider,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import GoogleIcon from '@mui/icons-material/Google';
-import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
-import SchoolIcon from '@mui/icons-material/School';
 import PublicIcon from '@mui/icons-material/Public';
 import GroupsIcon from '@mui/icons-material/Groups';
 import InsightsIcon from '@mui/icons-material/Insights';
@@ -56,26 +52,14 @@ export function HomePage() {
   const { authenticated, roles, keycloakLogin } = useAuth();
   const backendUser = useAppSelector((state) => state.user.data);
 
-  const [tab, setTab] = useState(0);
-  const [error, setError] = useState('');
-
-  // If already authenticated AND has roles, redirect based on role
-  // (New users without roles will be handled by App.tsx registration redirect)
-  useEffect(() => {
-    if (!authenticated) return;
-    const effectiveRoles = roles.length > 0 ? roles : (backendUser?.role || []);
-    if (effectiveRoles.length > 0) {
-      const role = effectiveRoles[0];
-      const roleConfig = getRoleConfig(role);
-      navigate(roleConfig?.defaultRoute || '/app/dashboard');
-    }
-  }, [authenticated, roles, backendUser?.role, navigate]);
-
   const handleLogin = () => {
     keycloakLogin();
   };
 
+  const [signUpAnchor, setSignUpAnchor] = useState<null | HTMLElement>(null);
+
   const handleRegister = (type: 'volunteer' | 'coordinator') => {
+    setSignUpAnchor(null);
     localStorage.setItem('pendingRegistrationType', type);
     import('@config/keycloak').then((mod) => {
       mod.default.register();
@@ -88,10 +72,16 @@ export function HomePage() {
     });
   };
 
-  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setTab(newValue);
-    setError('');
-  };
+  // If already authenticated AND has roles, redirect based on role
+  useEffect(() => {
+    if (!authenticated) return;
+    const effectiveRoles = roles.length > 0 ? roles : (backendUser?.role || []);
+    if (effectiveRoles.length > 0) {
+      const role = effectiveRoles[0];
+      const roleConfig = getRoleConfig(role);
+      navigate(roleConfig?.defaultRoute || '/app/dashboard');
+    }
+  }, [authenticated, roles, backendUser?.role, navigate]);
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -100,10 +90,8 @@ export function HomePage() {
         sx={{
           background: 'linear-gradient(135deg, #0C4A6E 0%, #0E7490 50%, #155E75 100%)',
           color: 'white',
-          py: { xs: 4, md: 5 },
           position: 'relative',
           overflow: 'hidden',
-          // Subtle pattern overlay
           '&::before': {
             content: '""',
             position: 'absolute',
@@ -113,238 +101,191 @@ export function HomePage() {
           },
         }}
       >
-        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-          <Grid container spacing={4} alignItems="center">
-            {/* Left — Branding */}
-            <Grid item xs={12} md={7}>
-              <Stack spacing={1.5}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <img src="/icons/serve-logo.jpeg" alt="Sunbird Serve" style={{ height: 28, width: 28, borderRadius: 4 }} />
-                  <Typography
-                    variant="overline"
-                    sx={{ color: 'rgba(255,255,255,0.7)', letterSpacing: 2 }}
-                  >
-                    Sunbird Serve
-                  </Typography>
-                </Stack>
-                <Typography
-                  variant="h3"
-                  fontWeight={700}
-                  sx={{
-                    fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.6rem' },
-                    lineHeight: 1.2,
-                  }}
-                >
-                  Translating Intent
-                  <br />
-                  to{' '}
-                  <Box component="span" sx={{ color: '#FCD34D' }}>
-                    Impact
-                  </Box>
-                </Typography>
-                <Typography
-                  variant="body1"
-                  sx={{ color: 'rgba(255,255,255,0.85)', maxWidth: 460, lineHeight: 1.7 }}
-                >
-                  An open-source platform that connects passionate volunteers to meaningful causes —
-                  matching every verified need with the right skills, instantly and at scale.
+        {/* Top bar with login */}
+        <Box sx={{ position: 'relative', zIndex: 1, borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
+          <Container maxWidth="lg">
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 1.5 }}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <img src="/icons/serve-logo.jpeg" alt="SERVE" style={{ height: 28, width: 28, borderRadius: 4 }} />
+                <Typography variant="subtitle1" fontWeight={700}>SERVE</Typography>
+              </Stack>
+              <Stack direction="row" alignItems="center" spacing={1.5}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', display: { xs: 'none', sm: 'block' } }}>
+                  Already using SERVE?
                 </Typography>
                 <Button
-                  variant="text"
-                  sx={{ color: 'rgba(255,255,255,0.7)', alignSelf: 'flex-start', px: 0, fontSize: '0.8rem' }}
-                  onClick={() => navigate('/explore-needs')}
+                  size="small"
+                  variant="contained"
+                  onClick={handleLogin}
+                  sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
                 >
-                  Already know what you'd like to do? Browse opportunities →
+                  Sign In
                 </Button>
-
-                {/* Quick Onboard Cards — side by side */}
-                <Stack direction="column" spacing={1.5} sx={{ mt: 1 }}>
-                  {/* Volunteer Card */}
-                  <Paper
-                    sx={{
-                      p: 2,
-                      flex: 1,
-                      bgcolor: 'rgba(255,255,255,0.1)',
-                      backdropFilter: 'blur(8px)',
-                      borderRadius: 2,
-                      border: '1px solid rgba(255,255,255,0.2)',
-                    }}
-                  >
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600, mb: 0.5 }}>
-                      Want to Volunteer?
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block', mb: 1, lineHeight: 1.6 }}>
-                      Start a conversation with the SERVE Assistant — Discover opportunities • Check eligibility • Get onboarded • ~5 minutes
-                    </Typography>
-                    <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
-                        href={import.meta.env.VITE_VOLUNTEER_AGENT_WEB_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Start on Web
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        sx={{ bgcolor: '#25D366', color: 'white', '&:hover': { bgcolor: '#1DA851' }, textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
-                        href={import.meta.env.VITE_VOLUNTEER_AGENT_WHATSAPP_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Start on WhatsApp
-                      </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  onClick={(e) => setSignUpAnchor(e.currentTarget)}
+                  sx={{ borderColor: 'rgba(255,255,255,0.5)', color: 'white', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }, textTransform: 'none' }}
+                >
+                  Sign Up
+                </Button>
+                <Menu
+                  anchorEl={signUpAnchor}
+                  open={Boolean(signUpAnchor)}
+                  onClose={() => setSignUpAnchor(null)}
+                  anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                  transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                >
+                  <MenuItem onClick={() => handleRegister('volunteer')}>
+                    <Stack>
+                      <Typography variant="body2" fontWeight={600}>Volunteer</Typography>
+                      <Typography variant="caption" color="text.secondary">Explore needs & contribute</Typography>
                     </Stack>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', fontStyle: 'italic' }}>
-                      No sign-up required to explore.
-                    </Typography>
-                  </Paper>
-
-                  {/* School Coordinator Card */}
-                  <Paper
-                    sx={{
-                      p: 2,
-                      flex: 1,
-                      bgcolor: 'rgba(255,255,255,0.1)',
-                      backdropFilter: 'blur(8px)',
-                      borderRadius: 2,
-                      border: '1px solid rgba(255,255,255,0.2)',
-                    }}
-                  >
-                    <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.95)', fontWeight: 600, mb: 0.5 }}>
-                      Need Volunteer Teachers for Your School?
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)', display: 'block', mb: 1.5, lineHeight: 1.6 }}>
-                      Tell us about your school. If you already have a smart classroom, TV or projector, SERVE can help connect volunteer teachers to deliver engaging online sessions.
-                    </Typography>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
-                      onClick={() => navigate('/onboard')}
-                    >
-                      Request Volunteers
-                    </Button>
-                  </Paper>
-                </Stack>
+                  </MenuItem>
+                  <MenuItem onClick={() => handleRegister('coordinator')}>
+                    <Stack>
+                      <Typography variant="body2" fontWeight={600}>Coordinator</Typography>
+                      <Typography variant="caption" color="text.secondary">Manage needs & volunteers</Typography>
+                    </Stack>
+                  </MenuItem>
+                </Menu>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  startIcon={<GoogleIcon />}
+                  onClick={handleGoogleLogin}
+                  sx={{ borderColor: 'rgba(255,255,255,0.5)', color: 'white', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }, textTransform: 'none', display: { xs: 'none', sm: 'inline-flex' } }}
+                >
+                  Google
+                </Button>
               </Stack>
-            </Grid>
+            </Stack>
+          </Container>
+        </Box>
 
-            {/* Right — Login/Signup Card */}
-            <Grid item xs={12} md={5}>
+        {/* Main hero content */}
+        <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, py: { xs: 4, md: 5 } }}>
+          <Stack spacing={3} alignItems="center" textAlign="center" sx={{ mb: 4 }}>
+            <Typography
+              variant="h3"
+              fontWeight={700}
+              sx={{ fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.6rem' }, lineHeight: 1.2 }}
+            >
+              Transforming Intent to{' '}
+              <Box component="span" sx={{ color: '#FCD34D' }}>Impact</Box>
+            </Typography>
+            <Typography
+              variant="body1"
+              sx={{ color: 'rgba(255,255,255,0.85)', maxWidth: 560, lineHeight: 1.7 }}
+            >
+              Whether you're ready to volunteer or looking for volunteer teachers,
+              SERVE connects people with purpose.
+            </Typography>
+          </Stack>
+
+          {/* Two cards side by side */}
+          <Grid container spacing={3} justifyContent="center">
+            {/* Volunteer Card */}
+            <Grid item xs={12} sm={6} md={5}>
               <Paper
-                elevation={0}
                 sx={{
-                  p: { xs: 3, sm: 4 },
-                  maxWidth: 420,
-                  mx: 'auto',
-                  borderRadius: 3,
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+                  p: 3,
+                  height: '100%',
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: 2,
+                  border: '1px solid rgba(255,255,255,0.2)',
                 }}
               >
-                {/* Tabs */}
-                <Tabs
-                  value={tab}
-                  onChange={handleTabChange}
-                  variant="fullWidth"
-                  sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+                <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
+                  🤝 I Want to Volunteer
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mb: 2 }}>
+                  Help students learn online.
+                </Typography>
+                <Stack spacing={0.5} sx={{ mb: 2.5 }}>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Find where you can help</Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Get matched with students</Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Start teaching online</Typography>
+                </Stack>
+                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
+                    href={import.meta.env.VITE_VOLUNTEER_AGENT_WEB_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Start on Web
+                  </Button>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    sx={{ bgcolor: '#25D366', color: 'white', '&:hover': { bgcolor: '#1DA851' }, textTransform: 'none', fontWeight: 600 }}
+                    href={import.meta.env.VITE_VOLUNTEER_AGENT_WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Start on WhatsApp
+                  </Button>
+                </Stack>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
+                  No sign-up required to explore.
+                </Typography>
+              </Paper>
+            </Grid>
+
+            {/* School Card */}
+            <Grid item xs={12} sm={6} md={5}>
+              <Paper
+                sx={{
+                  p: 3,
+                  height: '100%',
+                  bgcolor: 'rgba(255,255,255,0.1)',
+                  backdropFilter: 'blur(8px)',
+                  borderRadius: 2,
+                  border: '1px solid rgba(255,255,255,0.2)',
+                }}
+              >
+                <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
+                  🏫 I Need Volunteer Teachers
+                </Typography>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mb: 2 }}>
+                  Bring volunteer teachers to your students.
+                </Typography>
+                <Stack spacing={0.5} sx={{ mb: 2.5 }}>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Register your school/college</Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Assess digital readiness</Typography>
+                  <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Start requesting volunteer teachers</Typography>
+                </Stack>
+                <Button
+                  size="small"
+                  variant="contained"
+                  sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
+                  onClick={() => navigate('/onboard')}
                 >
-                  <Tab label="Login" />
-                  <Tab label="Sign Up" />
-                </Tabs>
-
-                {/* Error */}
-                {error && (
-                  <Alert severity="error" onClose={() => setError('')} sx={{ mb: 2 }}>
-                    {error}
-                  </Alert>
-                )}
-
-                {/* Login Tab */}
-                {tab === 0 && (
-                  <Stack spacing={2.5}>
-                    <Typography variant="body2" color="text.secondary" textAlign="center">
-                      Sign in to access your dashboard
-                    </Typography>
-
-                    <Button
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      onClick={handleLogin}
-                      sx={{ py: 1.5 }}
-                    >
-                      Sign In
-                    </Button>
-
-                    <Divider>
-                      <Typography variant="caption" color="text.secondary">
-                        OR
-                      </Typography>
-                    </Divider>
-
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      startIcon={<GoogleIcon />}
-                      onClick={handleGoogleLogin}
-                      sx={{ py: 1.2 }}
-                    >
-                      Continue with Google
-                    </Button>
-                  </Stack>
-                )}
-
-                {/* Sign Up Tab */}
-                {tab === 1 && (
-                  <Stack spacing={2.5}>
-                    <Typography variant="body2" color="text.secondary" textAlign="center">
-                      Choose how you'd like to join
-                    </Typography>
-
-                    <Button
-                      variant="contained"
-                      size="large"
-                      fullWidth
-                      startIcon={<VolunteerActivismIcon />}
-                      onClick={() => handleRegister('volunteer')}
-                      sx={{ py: 1.8, justifyContent: 'flex-start', px: 3 }}
-                    >
-                      <Stack alignItems="flex-start" sx={{ ml: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={600}>
-                          Volunteer
-                        </Typography>
-                        <Typography variant="caption" sx={{ opacity: 0.85 }}>
-                          Explore needs and contribute your skills
-                        </Typography>
-                      </Stack>
-                    </Button>
-
-                    <Button
-                      variant="outlined"
-                      size="large"
-                      fullWidth
-                      startIcon={<SchoolIcon />}
-                      onClick={() => handleRegister('coordinator')}
-                      sx={{ py: 1.8, justifyContent: 'flex-start', px: 3 }}
-                    >
-                      <Stack alignItems="flex-start" sx={{ ml: 1 }}>
-                        <Typography variant="subtitle2" fontWeight={600}>
-                          Coordinator
-                        </Typography>
-                        <Typography variant="caption" color="text.secondary">
-                          Manage needs and coordinate volunteers
-                        </Typography>
-                      </Stack>
-                    </Button>
-                  </Stack>
-                )}
+                  Get Started
+                </Button>
               </Paper>
             </Grid>
           </Grid>
+
+          {/* Trust signal */}
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center', mt: 4 }}
+          >
+            140+ schools · 250+ volunteers · 15,000+ students reached
+          </Typography>
+
+          <Typography
+            variant="body2"
+            sx={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', mt: 1.5, cursor: 'pointer' }}
+            onClick={() => navigate('/explore-needs')}
+          >
+            Already know what you'd like to do? Browse opportunities →
+          </Typography>
         </Container>
       </Box>
 
