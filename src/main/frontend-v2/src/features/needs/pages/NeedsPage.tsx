@@ -156,7 +156,7 @@ export function NeedsPage() {
       try {
         const results = await Promise.allSettled(
           statuses.map((status) =>
-            fetch(`${BASE_URL}/api/v1/serve-need/need/?status=${status}&page=0&size=200`, { headers })
+            fetch(`${BASE_URL}/api/v1/serve-need/need/?status=${status}&page=0&size=1000`, { headers })
               .then((r) => (r.ok ? r.json() : null)),
           ),
         );
