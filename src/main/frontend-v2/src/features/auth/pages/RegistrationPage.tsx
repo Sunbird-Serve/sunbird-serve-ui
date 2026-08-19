@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   Box,
@@ -17,6 +17,7 @@ import {
   MenuItem,
   Chip,
   Autocomplete,
+  CircularProgress,
 } from '@mui/material';
 import { API } from '@config/api';
 import { useAuth } from '../hooks/useAuth';
@@ -66,10 +67,12 @@ interface FormData {
 export function RegistrationPage() {
   const { agencyId } = useParams<{ agencyId: string }>();
   const navigate = useNavigate();
-  const { user: keycloakUser } = useAuth();
+  const { user: keycloakUser, authenticated, initialized } = useAuth();
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [autoSubmitting, setAutoSubmitting] = useState(false);
+  const autoSubmitDone = useRef(false);
 
   const [formData, setFormData] = useState<FormData>({
     firstName: keycloakUser?.firstName || '',
@@ -87,6 +90,120 @@ export function RegistrationPage() {
     qualification: '',
     employmentStatus: '',
   });
+
+  // On mount: if user is authenticated and we have pending form data in localStorage, auto-submit
+  useEffect(() => {
+    if (!initialized || !authenticated || autoSubmitDone.current) return;
+
+    const pendingData = localStorage.getItem('pendingRegistrationFormData');
+    if (!pendingData) return;
+
+    autoSubmitDone.current = true;
+    setAutoSubmitting(true);
+
+    const savedForm: FormData = JSON.parse(pendingData);
+    const savedAgencyId = localStorage.getItem('pendingRegistrationAgencyId') || agencyId || '';
+
+    // Auto-submit with the saved form data
+    (async () => {
+      try {
+        const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+        const headers = getAuthHeadersWithJson();
+
+        const userPayload = {
+          identityDetails: {
+            fullname: savedForm.firstName,
+            name: savedForm.lastName,
+            gender: savedForm.gender,
+            dob: savedForm.dob,
+            Nationality: savedForm.nationality,
+          },
+          contactDetails: {
+            email: savedForm.email,
+            mobile: savedForm.mobile,
+            address: {
+              city: savedForm.city,
+              state: savedForm.state,
+              country: savedForm.country,
+            },
+          },
+          agencyId: savedAgencyId || '1-74f81200-dc16-4c65-bf7a-a3ab75952432',
+          status: 'Registered',
+          role: ['Volunteer'],
+        };
+
+        const userResponse = await fetch(`${API.USER}/`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(userPayload),
+        });
+
+        if (!userResponse.ok) {
+          throw new Error('Failed to create user profile.');
+        }
+
+        const userData = await userResponse.json();
+        const userId = userData.result?.Users?.osid;
+
+        if (userId) {
+          // Create profile
+          const profilePayload = {
+            skills: [],
+            genericDetails: {
+              qualification: savedForm.qualification,
+              affiliation: '',
+              yearsOfExperience: '',
+              employmentStatus: savedForm.employmentStatus,
+            },
+            userPreference: {
+              timePreferred: [],
+              dayPreferred: [],
+              interestArea: savedForm.interests,
+              language: savedForm.languages,
+            },
+            agencyId: savedAgencyId || '',
+            userId,
+            onboardDetails: {
+              onboardStatus: [{ onboardStep: 'Discussion', status: 'completed' }],
+              refreshPeriod: '2 years',
+              profileCompletion: '50',
+            },
+            consentDetails: {
+              consentGiven: true,
+              consentDate: new Date().toISOString().split('T')[0],
+              consentDescription:
+                'Consent given for sharing preference to other volunteer agency through secure network',
+            },
+            referenceChannelId: '',
+            volunteeringHours: { totalHours: 0, hoursPerWeek: 0 },
+          };
+
+          await fetch(`${API.USER_PROFILE}`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(profilePayload),
+          });
+        }
+
+        // Clear pending data
+        localStorage.removeItem('pendingRegistrationFormData');
+        localStorage.removeItem('pendingRegistrationAgencyId');
+
+        // Force token refresh
+        try {
+          const keycloak = (await import('@config/keycloak')).default;
+          await keycloak.updateToken(-1);
+        } catch { /* will get role on next login */ }
+
+        navigate('/explore/sessions');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
+        localStorage.removeItem('pendingRegistrationFormData');
+        localStorage.removeItem('pendingRegistrationAgencyId');
+        setAutoSubmitting(false);
+      }
+    })();
+  }, [initialized, authenticated, agencyId, navigate]);
 
   const handleChange = (field: keyof FormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -122,6 +239,23 @@ export function RegistrationPage() {
     setError('');
     setLoading(true);
 
+    // If not authenticated, save form data and trigger Keycloak registration
+    if (!authenticated) {
+      localStorage.setItem('pendingRegistrationFormData', JSON.stringify(formData));
+      localStorage.setItem('pendingRegistrationAgencyId', agencyId || '');
+      try {
+        const keycloak = (await import('@config/keycloak')).default;
+        keycloak.register({
+          redirectUri: window.location.href, // Come back to the same URL
+        });
+      } catch {
+        setError('Failed to start registration. Please try again.');
+        setLoading(false);
+      }
+      return;
+    }
+
+    // If authenticated, submit directly
     const userPayload = {
       identityDetails: {
         fullname: formData.firstName,
@@ -145,7 +279,6 @@ export function RegistrationPage() {
     };
 
     try {
-      // Step 1: Create user
       const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
       const headers = getAuthHeadersWithJson();
 
@@ -166,7 +299,7 @@ export function RegistrationPage() {
         throw new Error('User created but no ID returned.');
       }
 
-      // Step 2: Create user profile
+      // Create user profile
       const profilePayload = {
         skills: [],
         genericDetails: {
@@ -198,27 +331,18 @@ export function RegistrationPage() {
         volunteeringHours: { totalHours: 0, hoursPerWeek: 0 },
       };
 
-      const profileResponse = await fetch(`${API.USER_PROFILE}`, {
+      await fetch(`${API.USER_PROFILE}`, {
         method: 'POST',
         headers,
         body: JSON.stringify(profilePayload),
       });
 
-      if (!profileResponse.ok) {
-        // Profile creation failed but user was created — still consider it a partial success
-        console.warn('Profile creation failed, but user was created.');
-      }
-
-      // Force token refresh to pick up the newly assigned Keycloak role
+      // Force token refresh
       try {
         const keycloak = (await import('@config/keycloak')).default;
-        await keycloak.updateToken(-1); // Force refresh by setting minValidity to -1
-      } catch {
-        // If token refresh fails, user will get the new role on next login
-        console.warn('Token refresh failed — role will be available on next login.');
-      }
+        await keycloak.updateToken(-1);
+      } catch { /* role will be available on next login */ }
 
-      // Navigate directly to volunteer explore page
       navigate('/explore/sessions');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
@@ -226,6 +350,20 @@ export function RegistrationPage() {
       setLoading(false);
     }
   };
+
+  // Show loading state during auto-submit after Keycloak redirect
+  if (autoSubmitting) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Stack spacing={2} alignItems="center">
+          <CircularProgress size={40} />
+          <Typography variant="body1" color="text.secondary">
+            Completing your registration...
+          </Typography>
+        </Stack>
+      </Box>
+    );
+  }
 
   return (
     <Box

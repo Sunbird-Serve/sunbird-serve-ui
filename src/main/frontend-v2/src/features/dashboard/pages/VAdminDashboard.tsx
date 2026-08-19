@@ -48,10 +48,17 @@ export function VAdminDashboard() {
 
   const [selectedAgencies, setSelectedAgencies] = useState<string[]>([]);
 
-  // All volunteers
+  const isSAdmin = user?.role?.includes('sAdmin');
+  const userAgencyId = user?.agencyId || '';
+
+  // All volunteers — scoped to vAdmin's agency (sAdmin sees all)
   const allVolunteers = useMemo(() => {
-    return allUsers.filter((u) => u.role?.includes('Volunteer'));
-  }, [allUsers]);
+    let vols = allUsers.filter((u) => u.role?.includes('Volunteer'));
+    if (!isSAdmin && userAgencyId) {
+      vols = vols.filter((v) => v.agencyId === userAgencyId);
+    }
+    return vols;
+  }, [allUsers, isSAdmin, userAgencyId]);
 
   // Filtered by selected agencies
   const volunteers = useMemo(() => {
