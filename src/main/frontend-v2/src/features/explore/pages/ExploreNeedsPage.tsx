@@ -68,7 +68,7 @@ export function ExploreNeedsPage() {
 
   useEffect(() => {
     const headers = getAuthHeaders();
-    fetch(`${BASE_URL}/api/v1/serve-need/need/?status=Approved&page=0&size=100`, {
+    fetch(`${BASE_URL}/api/v1/serve-need/need/discover?status=Approved&page=0&size=100`, {
       ...(headers.Authorization ? { headers } : {}),
     })
       .then((r) => {
