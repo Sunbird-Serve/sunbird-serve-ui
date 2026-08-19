@@ -52,7 +52,7 @@ export function AgencyScopePage() {
     async function fetchConfig() {
       try {
         const headers = getAuthHeaders();
-        const resp = await fetch(`${BASE_URL}/api/v1/serve-need/agency-visibility`, { headers });
+        const resp = await fetch(`${BASE_URL}/api/v1/serve-need/agency-scope`, { headers });
         if (resp.ok) {
           const data = await resp.json();
           setConfig({
@@ -95,7 +95,7 @@ export function AgencyScopePage() {
     setError('');
     setSuccess('');
     try {
-      const resp = await fetch(`${BASE_URL}/api/v1/serve-need/agency-visibility`, {
+      const resp = await fetch(`${BASE_URL}/api/v1/serve-need/agency-scope`, {
         method: 'POST',
         headers: getAuthHeadersWithJson(),
         body: JSON.stringify(config),
