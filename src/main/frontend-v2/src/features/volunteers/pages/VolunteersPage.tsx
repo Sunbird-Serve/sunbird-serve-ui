@@ -62,12 +62,13 @@ export function VolunteersPage() {
   // Filter to volunteers only
   const allVolunteers = useMemo(() => {
     let vols = allUsers.filter((u) => u.role?.includes('Volunteer'));
-    // vCoordinator sees only their agency's volunteers
-    if (!isAdmin && userAgencyId) {
+    // Only sAdmin sees all volunteers; vAdmin and vCoordinator see only their agency's
+    const isSAdmin = role === 'sAdmin';
+    if (!isSAdmin && userAgencyId) {
       vols = vols.filter((v) => v.agencyId === userAgencyId);
     }
     return vols;
-  }, [allUsers, isAdmin, userAgencyId]);
+  }, [allUsers, role, userAgencyId]);
 
   // Status counts
   const counts = useMemo(() => ({
