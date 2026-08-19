@@ -49,6 +49,12 @@ const EntitiesPage = lazy(() =>
 const AgenciesPage = lazy(() =>
   import('@features/entities/pages/AgenciesPage').then((m) => ({ default: m.AgenciesPage })),
 );
+const MyAgencyPage = lazy(() =>
+  import('@features/entities/pages/MyAgencyPage').then((m) => ({ default: m.MyAgencyPage })),
+);
+const AgencyScopePage = lazy(() =>
+  import('@features/entities/pages/AgencyScopePage').then((m) => ({ default: m.AgencyScopePage })),
+);
 const SessionsPage = lazy(() =>
   import('@features/sessions/pages/SessionsPage').then((m) => ({ default: m.SessionsPage })),
 );
@@ -258,6 +264,22 @@ export const router = createBrowserRouter([
             element: (
               <SuspenseWrapper>
                 <AgenciesPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: 'my-agency',
+            element: (
+              <SuspenseWrapper>
+                <MyAgencyPage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: 'agency-scope',
+            element: (
+              <SuspenseWrapper>
+                <AgencyScopePage />
               </SuspenseWrapper>
             ),
           },
