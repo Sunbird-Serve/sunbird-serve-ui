@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
   Box,
@@ -71,8 +71,23 @@ export function RegistrationPage() {
   const [activeStep, setActiveStep] = useState(0);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [autoSubmitting, setAutoSubmitting] = useState(false);
-  const autoSubmitDone = useRef(false);
+
+  // Step 1: If not authenticated, store agencyId and redirect to Keycloak registration
+  useEffect(() => {
+    if (!initialized) return;
+    if (!authenticated) {
+      // Save agencyId for after Keycloak redirect
+      if (agencyId) {
+        localStorage.setItem('pendingRegistrationAgencyId', agencyId);
+      }
+      // Trigger Keycloak registration
+      import('@config/keycloak').then((mod) => {
+        mod.default.register({
+          redirectUri: window.location.href,
+        });
+      });
+    }
+  }, [initialized, authenticated, agencyId]);
 
   const [formData, setFormData] = useState<FormData>({
     firstName: keycloakUser?.firstName || '',
@@ -81,7 +96,7 @@ export function RegistrationPage() {
     dob: '',
     nationality: '',
     mobile: '',
-    email: keycloakUser?.email || localStorage.getItem('regEmail') || '',
+    email: keycloakUser?.email || '',
     city: '',
     state: '',
     country: '',
@@ -91,119 +106,17 @@ export function RegistrationPage() {
     employmentStatus: '',
   });
 
-  // On mount: if user is authenticated and we have pending form data in localStorage, auto-submit
+  // Update form with Keycloak user info once authenticated
   useEffect(() => {
-    if (!initialized || !authenticated || autoSubmitDone.current) return;
-
-    const pendingData = localStorage.getItem('pendingRegistrationFormData');
-    if (!pendingData) return;
-
-    autoSubmitDone.current = true;
-    setAutoSubmitting(true);
-
-    const savedForm: FormData = JSON.parse(pendingData);
-    const savedAgencyId = localStorage.getItem('pendingRegistrationAgencyId') || agencyId || '';
-
-    // Auto-submit with the saved form data
-    (async () => {
-      try {
-        const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
-        const headers = getAuthHeadersWithJson();
-
-        const userPayload = {
-          identityDetails: {
-            fullname: savedForm.firstName,
-            name: savedForm.lastName,
-            gender: savedForm.gender,
-            dob: savedForm.dob,
-            Nationality: savedForm.nationality,
-          },
-          contactDetails: {
-            email: savedForm.email,
-            mobile: savedForm.mobile,
-            address: {
-              city: savedForm.city,
-              state: savedForm.state,
-              country: savedForm.country,
-            },
-          },
-          agencyId: savedAgencyId || '1-74f81200-dc16-4c65-bf7a-a3ab75952432',
-          status: 'Registered',
-          role: ['Volunteer'],
-        };
-
-        const userResponse = await fetch(`${API.USER}/`, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify(userPayload),
-        });
-
-        if (!userResponse.ok) {
-          throw new Error('Failed to create user profile.');
-        }
-
-        const userData = await userResponse.json();
-        const userId = userData.result?.Users?.osid;
-
-        if (userId) {
-          // Create profile
-          const profilePayload = {
-            skills: [],
-            genericDetails: {
-              qualification: savedForm.qualification,
-              affiliation: '',
-              yearsOfExperience: '',
-              employmentStatus: savedForm.employmentStatus,
-            },
-            userPreference: {
-              timePreferred: [],
-              dayPreferred: [],
-              interestArea: savedForm.interests,
-              language: savedForm.languages,
-            },
-            agencyId: savedAgencyId || '',
-            userId,
-            onboardDetails: {
-              onboardStatus: [{ onboardStep: 'Discussion', status: 'completed' }],
-              refreshPeriod: '2 years',
-              profileCompletion: '50',
-            },
-            consentDetails: {
-              consentGiven: true,
-              consentDate: new Date().toISOString().split('T')[0],
-              consentDescription:
-                'Consent given for sharing preference to other volunteer agency through secure network',
-            },
-            referenceChannelId: '',
-            volunteeringHours: { totalHours: 0, hoursPerWeek: 0 },
-          };
-
-          await fetch(`${API.USER_PROFILE}`, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(profilePayload),
-          });
-        }
-
-        // Clear pending data
-        localStorage.removeItem('pendingRegistrationFormData');
-        localStorage.removeItem('pendingRegistrationAgencyId');
-
-        // Force token refresh
-        try {
-          const keycloak = (await import('@config/keycloak')).default;
-          await keycloak.updateToken(-1);
-        } catch { /* will get role on next login */ }
-
-        navigate('/explore/sessions');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
-        localStorage.removeItem('pendingRegistrationFormData');
-        localStorage.removeItem('pendingRegistrationAgencyId');
-        setAutoSubmitting(false);
-      }
-    })();
-  }, [initialized, authenticated, agencyId, navigate]);
+    if (authenticated && keycloakUser) {
+      setFormData((prev) => ({
+        ...prev,
+        firstName: prev.firstName || keycloakUser.firstName || '',
+        lastName: prev.lastName || keycloakUser.lastName || '',
+        email: keycloakUser.email || prev.email,
+      }));
+    }
+  }, [authenticated, keycloakUser]);
 
   const handleChange = (field: keyof FormData) => (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -239,23 +152,9 @@ export function RegistrationPage() {
     setError('');
     setLoading(true);
 
-    // If not authenticated, save form data and trigger Keycloak registration
-    if (!authenticated) {
-      localStorage.setItem('pendingRegistrationFormData', JSON.stringify(formData));
-      localStorage.setItem('pendingRegistrationAgencyId', agencyId || '');
-      try {
-        const keycloak = (await import('@config/keycloak')).default;
-        keycloak.register({
-          redirectUri: window.location.href, // Come back to the same URL
-        });
-      } catch {
-        setError('Failed to start registration. Please try again.');
-        setLoading(false);
-      }
-      return;
-    }
+    // Resolve agencyId from URL or localStorage (saved before Keycloak redirect)
+    const effectiveAgencyId = agencyId || localStorage.getItem('pendingRegistrationAgencyId') || '1-74f81200-dc16-4c65-bf7a-a3ab75952432';
 
-    // If authenticated, submit directly
     const userPayload = {
       identityDetails: {
         fullname: formData.firstName,
@@ -273,7 +172,7 @@ export function RegistrationPage() {
           country: formData.country,
         },
       },
-      agencyId: agencyId || '1-74f81200-dc16-4c65-bf7a-a3ab75952432',
+      agencyId: effectiveAgencyId,
       status: 'Registered',
       role: ['Volunteer'],
     };
@@ -314,7 +213,7 @@ export function RegistrationPage() {
           interestArea: formData.interests,
           language: formData.languages,
         },
-        agencyId: agencyId || '',
+        agencyId: effectiveAgencyId,
         userId,
         onboardDetails: {
           onboardStatus: [{ onboardStep: 'Discussion', status: 'completed' }],
@@ -337,6 +236,9 @@ export function RegistrationPage() {
         body: JSON.stringify(profilePayload),
       });
 
+      // Clean up localStorage
+      localStorage.removeItem('pendingRegistrationAgencyId');
+
       // Force token refresh
       try {
         const keycloak = (await import('@config/keycloak')).default;
@@ -351,14 +253,14 @@ export function RegistrationPage() {
     }
   };
 
-  // Show loading state during auto-submit after Keycloak redirect
-  if (autoSubmitting) {
+  // Show loading while waiting for Keycloak init or redirecting to Keycloak
+  if (!initialized || !authenticated) {
     return (
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Stack spacing={2} alignItems="center">
           <CircularProgress size={40} />
           <Typography variant="body1" color="text.secondary">
-            Completing your registration...
+            Setting up your account...
           </Typography>
         </Stack>
       </Box>
