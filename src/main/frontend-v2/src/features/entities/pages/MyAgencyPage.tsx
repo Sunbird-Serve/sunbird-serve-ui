@@ -18,19 +18,25 @@ import LinkIcon from '@mui/icons-material/Link';
 import PeopleIcon from '@mui/icons-material/People';
 import { useAuth } from '@features/auth';
 import { useGetAgenciesQuery } from '@features/volunteers/api/volunteersApi';
+import { useAppSelector } from '@app/store';
 import { useState } from 'react';
 
 export function MyAgencyPage() {
-  const { agencyId } = useAuth();
+  const { agencyId: kcAgencyId } = useAuth();
+  const user = useAppSelector((state) => state.user.data);
+  const agencyId = kcAgencyId || user?.agencyId || '';
   const { data: agencies = [], isLoading } = useGetAgenciesQuery();
   const [copied, setCopied] = useState(false);
 
   // Find the current user's agency
   const myAgency = useMemo(() => {
     if (!agencyId || agencies.length === 0) return null;
-    // agencyId might have '1-' prefix
-    const cleanId = agencyId.startsWith('1-') ? agencyId.substring(2) : agencyId;
-    return agencies.find((a) => a.osid === agencyId || a.osid === cleanId) || null;
+    // agencyId might have '1-' prefix, osid might or might not
+    const cleanJwtId = agencyId.startsWith('1-') ? agencyId.substring(2) : agencyId;
+    return agencies.find((a) => {
+      const cleanOsid = a.osid.startsWith('1-') ? a.osid.substring(2) : a.osid;
+      return a.osid === agencyId || a.osid === cleanJwtId || cleanOsid === cleanJwtId;
+    }) || null;
   }, [agencies, agencyId]);
 
   // Build registration link
