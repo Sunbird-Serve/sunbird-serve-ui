@@ -181,15 +181,52 @@ export function OnboardingRequestsPage() {
     }
     setError('');
     try {
+      // Step 1: Update the onboarding request status (serve-need)
       await reviewRequest({
         requestId: reviewTarget.id,
         action: reviewAction,
         notes: reviewNotes.trim() || undefined,
-        userId: reviewAction === 'Authorise' ? reviewTarget.id : undefined,
+        userId: undefined, // backend handles user creation
       }).unwrap();
+
+      // Step 2: If Authorising, create the coordinator account (serve-volunteering)
+      if (reviewAction === 'Authorise') {
+        const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+        const volunteeringBase = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
+
+        const onboardResp = await fetch(
+          `${volunteeringBase}/api/v1/serve-volunteering/user/onboard`,
+          {
+            method: 'POST',
+            headers: getAuthHeadersWithJson(),
+            body: JSON.stringify({
+              role: ['nCoordinator'],
+              agencyId: reviewTarget.agencyId,
+              contactDetails: {
+                email: reviewTarget.email,
+                mobile: reviewTarget.mobile,
+              },
+              identityDetails: {
+                fullname: reviewTarget.coordinatorName,
+              },
+              status: 'Active',
+            }),
+          },
+        );
+
+        if (!onboardResp.ok) {
+          // Onboarding request was already updated — log warning but don't block
+          console.warn('Coordinator account creation failed:', onboardResp.status);
+          setSuccess(`${reviewTarget.coordinatorName} has been authorised. Note: Account setup may need manual follow-up.`);
+          setReviewDialog(false);
+          setTimeout(() => setSuccess(''), 6000);
+          return;
+        }
+      }
+
       setSuccess(
         reviewAction === 'Authorise'
-          ? `${reviewTarget.coordinatorName} has been authorised as coordinator.`
+          ? `${reviewTarget.coordinatorName} has been authorised. Login credentials sent to their mobile.`
           : reviewAction === 'Clarification'
             ? `Clarification requested from ${reviewTarget.coordinatorName}.`
             : `Request from ${reviewTarget.coordinatorName} has been rejected.`,

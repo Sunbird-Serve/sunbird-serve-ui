@@ -55,6 +55,9 @@ const MyAgencyPage = lazy(() =>
 const AgencyScopePage = lazy(() =>
   import('@features/entities/pages/AgencyScopePage').then((m) => ({ default: m.AgencyScopePage })),
 );
+const CreateUserPage = lazy(() =>
+  import('@features/entities/pages/CreateUserPage').then((m) => ({ default: m.CreateUserPage })),
+);
 const SessionsPage = lazy(() =>
   import('@features/sessions/pages/SessionsPage').then((m) => ({ default: m.SessionsPage })),
 );
@@ -280,6 +283,14 @@ export const router = createBrowserRouter([
             element: (
               <SuspenseWrapper>
                 <AgencyScopePage />
+              </SuspenseWrapper>
+            ),
+          },
+          {
+            path: 'create-user',
+            element: (
+              <SuspenseWrapper>
+                <CreateUserPage />
               </SuspenseWrapper>
             ),
           },

@@ -19,7 +19,7 @@ interface ReviewPayload {
   requestId: string;
   action: 'Authorise' | 'Clarification' | 'Reject';
   notes?: string;
-  userId?: string; // Required for Authorise
+  userId?: string;
 }
 
 // Authenticated API endpoints for nAdmin onboarding review
