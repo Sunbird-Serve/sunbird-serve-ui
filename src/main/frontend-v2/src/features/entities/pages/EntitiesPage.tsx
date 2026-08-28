@@ -96,7 +96,7 @@ export function EntitiesPage() {
   // Form state
   const [form, setForm] = useState({
     name: '', registrationId: '', website: '', mobile: '',
-    addressLine1: '', district: '', state: '', pincode: '',
+    block: '', district: '', state: '', pincode: '',
     category: 'School', status: 'New',
   });
 
@@ -174,7 +174,7 @@ export function EntitiesPage() {
   // Handlers
   const handleCreate = () => {
     setEditEntity(null);
-    setForm({ name: '', registrationId: '', website: '', mobile: '', addressLine1: '', district: '', state: '', pincode: '', category: 'School', status: 'New' });
+    setForm({ name: '', registrationId: '', website: '', mobile: '', block: '', district: '', state: '', pincode: '', category: 'School', status: 'New' });
     setDialogOpen(true);
     setError('');
   };
@@ -186,7 +186,7 @@ export function EntitiesPage() {
       registrationId: entity.registrationId || '',
       website: entity.website || '',
       mobile: entity.mobile || '',
-      addressLine1: entity.block || entity.addressLine1 || entity.address_line1 || '',
+      block: entity.block || entity.addressLine1 || entity.address_line1 || '',
       district: entity.district || '',
       state: entity.state || '',
       pincode: entity.pincode || '',
@@ -393,7 +393,7 @@ export function EntitiesPage() {
               <TextField label="Website" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} fullWidth size="small" InputLabelProps={{ shrink: true }} />
             </Grid>
             <Grid item xs={12}>
-              <TextField label="Address / Block" value={form.addressLine1} onChange={(e) => setForm({ ...form, addressLine1: e.target.value })} fullWidth size="small" InputLabelProps={{ shrink: true }} />
+              <TextField label="Block" value={form.block} onChange={(e) => setForm({ ...form, block: e.target.value })} fullWidth size="small" InputLabelProps={{ shrink: true }} />
             </Grid>
             <Grid item xs={12} sm={4}>
               <TextField label="District" value={form.district} onChange={(e) => setForm({ ...form, district: e.target.value })} fullWidth size="small" InputLabelProps={{ shrink: true }} />
