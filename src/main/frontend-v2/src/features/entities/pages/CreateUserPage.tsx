@@ -56,9 +56,14 @@ export function CreateUserPage() {
           contactDetails: {
             email,
             mobile,
+            address: { city: '', state: '', country: 'India' },
           },
           identityDetails: {
             fullname: fullName,
+            name: fullName,
+            gender: 'Others',
+            dob: '2000-01-01',
+            Nationality: 'India',
           },
           status: 'Active',
         }),

@@ -206,9 +206,14 @@ export function OnboardingRequestsPage() {
               contactDetails: {
                 email: reviewTarget.email,
                 mobile: reviewTarget.mobile,
+                address: { city: '', state: '', country: 'India' },
               },
               identityDetails: {
                 fullname: reviewTarget.coordinatorName,
+                name: reviewTarget.coordinatorName,
+                gender: 'Others',
+                dob: '2000-01-01',
+                Nationality: 'India',
               },
               status: 'Active',
             }),
