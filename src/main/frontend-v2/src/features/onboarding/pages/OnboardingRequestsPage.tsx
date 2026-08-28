@@ -186,12 +186,20 @@ export function OnboardingRequestsPage() {
         const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
         const volunteeringBase = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
 
+        // Ensure token is fresh before making the call
+        try {
+          const keycloak = (await import('@config/keycloak')).default;
+          await keycloak.updateToken(30);
+        } catch { /* proceed with existing token */ }
+
+        const headers = getAuthHeadersWithJson();
+
         // Step 1: Create coordinator account in volunteering service
         const onboardResp = await fetch(
           `${volunteeringBase}/api/v1/serve-volunteering/user/onboard`,
           {
             method: 'POST',
-            headers: getAuthHeadersWithJson(),
+            headers,
             body: JSON.stringify({
               role: ['nCoordinator'],
               agencyId: reviewTarget.agencyId,
