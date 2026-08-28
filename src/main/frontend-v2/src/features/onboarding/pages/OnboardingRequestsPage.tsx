@@ -238,11 +238,9 @@ export function OnboardingRequestsPage() {
       }).unwrap();
 
       setSuccess(
-        reviewAction === 'Authorise'
-          ? `${reviewTarget.coordinatorName} has been authorised. Login credentials sent to their mobile.`
-          : reviewAction === 'Clarification'
-            ? `Clarification requested from ${reviewTarget.coordinatorName}.`
-            : `Request from ${reviewTarget.coordinatorName} has been rejected.`,
+        reviewAction === 'Clarification'
+          ? `Clarification requested from ${reviewTarget.coordinatorName}.`
+          : `Request from ${reviewTarget.coordinatorName} has been rejected.`,
       );
       setReviewDialog(false);
       setTimeout(() => setSuccess(''), 5000);
