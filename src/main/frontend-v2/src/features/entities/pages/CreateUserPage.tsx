@@ -61,7 +61,7 @@ export function CreateUserPage() {
           identityDetails: {
             fullname: fullName,
             name: fullName,
-            gender: 'Others',
+            gender: 'Male',
             dob: '2000-01-01',
             Nationality: 'India',
           },

@@ -211,7 +211,7 @@ export function OnboardingRequestsPage() {
               identityDetails: {
                 fullname: reviewTarget.coordinatorName,
                 name: reviewTarget.coordinatorName,
-                gender: 'Others',
+                gender: 'Male',
                 dob: '2000-01-01',
                 Nationality: 'India',
               },
