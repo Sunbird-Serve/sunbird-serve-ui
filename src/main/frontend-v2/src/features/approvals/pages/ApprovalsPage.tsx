@@ -36,6 +36,7 @@ interface PendingEntity {
   mobile?: string;
   addressLine1?: string;
   address_line1?: string;
+  block?: string;
   district?: string;
   state?: string;
   category?: string;
@@ -319,7 +320,7 @@ export function ApprovalsPage() {
                 <StatusChip status={entity.status || 'New'} />
               </Stack>
               <Typography variant="caption" color="text.secondary">
-                {entity.addressLine1 || entity.address_line1 || ''} · {entity.district || ''} · {entity.category || ''}
+                {entity.block || entity.addressLine1 || entity.address_line1 || ''} · {entity.district || ''} · {entity.category || ''}
               </Typography>
             </Box>
             <Stack direction="row" spacing={1}>

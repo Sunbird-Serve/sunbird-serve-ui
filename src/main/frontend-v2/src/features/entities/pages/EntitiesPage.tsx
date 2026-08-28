@@ -47,6 +47,7 @@ interface Entity {
   mobile?: string;
   addressLine1?: string;
   address_line1?: string;
+  block?: string;
   district?: string;
   state?: string;
   pincode?: string;
@@ -161,7 +162,7 @@ export function EntitiesPage() {
       result = result.filter((e) =>
         (e.name || '').toLowerCase().includes(q) ||
         (e.district || '').toLowerCase().includes(q) ||
-        (e.addressLine1 || e.address_line1 || '').toLowerCase().includes(q) ||
+        (e.block || e.addressLine1 || e.address_line1 || '').toLowerCase().includes(q) ||
         (e.registrationId || '').toLowerCase().includes(q),
       );
     }
@@ -185,7 +186,7 @@ export function EntitiesPage() {
       registrationId: entity.registrationId || '',
       website: entity.website || '',
       mobile: entity.mobile || '',
-      addressLine1: entity.addressLine1 || entity.address_line1 || '',
+      addressLine1: entity.block || entity.addressLine1 || entity.address_line1 || '',
       district: entity.district || '',
       state: entity.state || '',
       pincode: entity.pincode || '',
@@ -331,7 +332,7 @@ export function EntitiesPage() {
                       <Typography variant="caption">{entity.mobile || '—'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="caption">{entity.addressLine1 || entity.address_line1 || '—'}</Typography>
+                      <Typography variant="caption">{entity.block || entity.addressLine1 || entity.address_line1 || '—'}</Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="caption">{entity.district || '—'}</Typography>
