@@ -181,19 +181,12 @@ export function OnboardingRequestsPage() {
     }
     setError('');
     try {
-      // Step 1: Update the onboarding request status (serve-need)
-      await reviewRequest({
-        requestId: reviewTarget.id,
-        action: reviewAction,
-        notes: reviewNotes.trim() || undefined,
-        userId: undefined, // backend handles user creation
-      }).unwrap();
-
-      // Step 2: If Authorising, create the coordinator account (serve-volunteering)
+      // For Authorise: first create coordinator account, then update request with returned userId
       if (reviewAction === 'Authorise') {
         const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
         const volunteeringBase = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
 
+        // Step 1: Create coordinator account in volunteering service
         const onboardResp = await fetch(
           `${volunteeringBase}/api/v1/serve-volunteering/user/onboard`,
           {
@@ -215,14 +208,34 @@ export function OnboardingRequestsPage() {
         );
 
         if (!onboardResp.ok) {
-          // Onboarding request was already updated — log warning but don't block
-          console.warn('Coordinator account creation failed:', onboardResp.status);
-          setSuccess(`${reviewTarget.coordinatorName} has been authorised. Note: Account setup may need manual follow-up.`);
-          setReviewDialog(false);
-          setTimeout(() => setSuccess(''), 6000);
-          return;
+          throw new Error(`Failed to create coordinator account (${onboardResp.status})`);
         }
+
+        const onboardData = await onboardResp.json();
+        // Extract the new user's osid from the response
+        const newUserId = onboardData?.result?.Users?.osid || onboardData?.osid || onboardData?.id || '';
+
+        // Step 2: Update onboarding request with the new userId
+        await reviewRequest({
+          requestId: reviewTarget.id,
+          action: 'Authorise',
+          notes: reviewNotes.trim() || undefined,
+          userId: newUserId || undefined,
+        }).unwrap();
+
+        setSuccess(`${reviewTarget.coordinatorName} has been authorised. Login credentials sent to their mobile.`);
+        setReviewDialog(false);
+        setTimeout(() => setSuccess(''), 5000);
+        return;
       }
+
+      // For Clarification/Reject: just update the request
+      await reviewRequest({
+        requestId: reviewTarget.id,
+        action: reviewAction,
+        notes: reviewNotes.trim() || undefined,
+        userId: undefined,
+      }).unwrap();
 
       setSuccess(
         reviewAction === 'Authorise'
