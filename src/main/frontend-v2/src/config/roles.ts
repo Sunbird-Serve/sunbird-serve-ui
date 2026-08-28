@@ -144,6 +144,7 @@ export const ROLE_CONFIG: Record<UserRole, RoleConfig> = {
       { id: 'dashboard', label: 'Dashboard', path: '/app/dashboard', icon: 'Dashboard' },
       { id: 'onboarding-requests', label: 'Onboarding', path: '/app/onboarding-requests', icon: 'HowToReg' },
       { id: 'create-user', label: 'Create User', path: '/app/create-user', icon: 'PersonAdd' },
+      { id: 'coordinators', label: 'Coordinators', path: '/app/coordinators', icon: 'People' },
       { id: 'needs', label: 'Needs', path: '/app/needs', icon: 'Assignment' },
       { id: 'volunteers', label: 'Volunteers', path: '/app/volunteers', icon: 'People' },
       { id: 'entities', label: 'Entities', path: '/app/entities', icon: 'Business' },

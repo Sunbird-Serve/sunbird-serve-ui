@@ -60,6 +60,7 @@ interface EntityItem {
 export function CoordinatorsPage() {
   const user = useAppSelector((state) => state.user.data);
   const userId = user?.osid || '';
+  const isSAdmin = user?.role?.includes('sAdmin');
 
   const [loading, setLoading] = useState(true);
   const [coordinators, setCoordinators] = useState<Coordinator[]>([]);
