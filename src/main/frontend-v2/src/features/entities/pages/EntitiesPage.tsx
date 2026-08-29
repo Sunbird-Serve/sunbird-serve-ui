@@ -140,7 +140,7 @@ export function EntitiesPage() {
         if (resp.ok) {
           const users = await resp.json();
           const coordinators = (Array.isArray(users) ? users : []).filter(
-            (u: NCoordinator) => u.role?.includes('nCoordinator'),
+            (u: NCoordinator) => u.role?.includes('nCoordinator') || (isSAdmin && u.role?.includes('nAdmin')),
           );
           setNCoordinators(coordinators);
         }
@@ -427,7 +427,7 @@ export function EntitiesPage() {
       {/* Assign nCoordinator Dialog */}
       <Dialog open={assignDialogOpen} onClose={() => setAssignDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Assign nCoordinator
+          Assign Coordinator
         </DialogTitle>
         <DialogContent>
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -438,7 +438,7 @@ export function EntitiesPage() {
             </Paper>
             <Divider />
             <Typography variant="body2" color="text.secondary">
-              Select an nCoordinator to assign to this entity:
+              Select a Coordinator to assign to this entity:
             </Typography>
             <Autocomplete
               options={nCoordinators}
