@@ -118,32 +118,36 @@ export function CoordinatorsPage() {
         // Get nAdmin's entity IDs for scoping
         const myEntityIds = entities.map((e) => e.id);
 
-        // For each nCoordinator, check if they have entities overlapping with nAdmin's
-        // Fetch entity assignments for all coordinators (batch approach)
-        const coords = allUsers.filter((u) => u.role?.includes('nCoordinator'));
+        // sAdmin sees all nAdmin + nCoordinator users; nAdmin sees only those scoped to their entities
+        const targetRoles = isSAdmin ? ['nAdmin', 'nCoordinator'] : ['nCoordinator'];
+        const coords = allUsers.filter((u) => targetRoles.some((r) => u.role?.includes(r)));
 
-        // Filter coordinators by checking their entity assignments
-        const filteredCoords: Coordinator[] = [];
-        for (const coord of coords) {
-          try {
-            const entResp = await fetch(
-              `${BASE_URL}/api/v1/serve-need/entityDetails/${coord.osid}?page=0&size=100`,
-              { headers },
-            );
-            if (entResp.ok) {
-              const entData = await entResp.json();
-              const coordEntities: { id: string }[] = Array.isArray(entData) ? entData : (entData.content || []);
-              const hasOverlap = coordEntities.some((ce) => myEntityIds.includes(ce.id));
-              if (hasOverlap) {
-                filteredCoords.push(coord);
+        // For sAdmin, show all matching users without entity filtering
+        if (isSAdmin) {
+          setCoordinators(coords);
+        } else {
+          // For nAdmin: filter by checking their entity assignments
+          const filteredCoords: Coordinator[] = [];
+          for (const coord of coords) {
+            try {
+              const entResp = await fetch(
+                `${BASE_URL}/api/v1/serve-need/entityDetails/${coord.osid}?page=0&size=100`,
+                { headers },
+              );
+              if (entResp.ok) {
+                const entData = await entResp.json();
+                const coordEntities: { id: string }[] = Array.isArray(entData) ? entData : (entData.content || []);
+                const hasOverlap = coordEntities.some((ce) => myEntityIds.includes(ce.id));
+                if (hasOverlap) {
+                  filteredCoords.push(coord);
+                }
               }
+            } catch {
+              filteredCoords.push(coord);
             }
-          } catch {
-            // If fetch fails for a coordinator, include them (graceful)
-            filteredCoords.push(coord);
           }
+          setCoordinators(filteredCoords);
         }
-        setCoordinators(filteredCoords);
       } catch {
         setError('Failed to load data.');
       } finally {
@@ -338,6 +342,7 @@ export function CoordinatorsPage() {
             <TableHead>
               <TableRow>
                 <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Role</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Email</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Phone</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>City</TableCell>
