@@ -60,6 +60,7 @@ interface NCoordinator {
   identityDetails?: { fullname?: string; name?: string };
   contactDetails?: { email?: string; mobile?: string };
   role?: string[];
+  agencyId?: string;
 }
 
 const STATUS_TABS = ['All', 'New', 'Verified', 'Active', 'Inactive'];
@@ -240,7 +241,21 @@ export function EntitiesPage() {
     setAssigning(true); setError('');
     try {
       const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
+
+      // Refresh token before making the call
+      try {
+        const keycloak = (await import('@config/keycloak')).default;
+        await keycloak.updateToken(30);
+      } catch { /* proceed with existing token */ }
+
       const headers = getAuthHeadersWithJson();
+
+      // Determine the coordinator's role (prefer nCoordinator, else nAdmin)
+      const coordRole = selectedCoordinator.role?.includes('nCoordinator')
+        ? 'nCoordinator'
+        : selectedCoordinator.role?.includes('nAdmin')
+          ? 'nAdmin'
+          : (selectedCoordinator.role?.[0] || 'nCoordinator');
 
       const resp = await fetch(`${BASE_URL}/api/v1/serve-need/entity/assign`, {
         method: 'POST',
@@ -248,6 +263,8 @@ export function EntitiesPage() {
         body: JSON.stringify({
           entityId: assignEntityId,
           userId: selectedCoordinator.osid,
+          agencyId: selectedCoordinator.agencyId || user?.agencyId || '',
+          userRole: coordRole,
         }),
       });
       if (resp.ok) {
