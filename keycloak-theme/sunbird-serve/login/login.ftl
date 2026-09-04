@@ -3,7 +3,6 @@
     <#if section = "header">
     <#elseif section = "form">
         <div style="text-align: center; margin-bottom: 24px;">
-            <div style="font-size: 0.75rem; font-weight: 600; color: #475569; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px;">Project SERVE — Uttar Pradesh</div>
             <div style="font-size: 1.5rem; font-weight: 700; color: #0E7490;">Welcome Back</div>
             <div style="color: #475569; font-size: 0.85rem; margin-top: 4px;">Sign in to continue</div>
         </div>

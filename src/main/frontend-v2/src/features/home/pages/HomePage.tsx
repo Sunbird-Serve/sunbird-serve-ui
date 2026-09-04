@@ -47,6 +47,9 @@ const impactItems = [
   },
 ];
 
+const VOLUNTEER_WEB_ENABLED = import.meta.env.VITE_VOLUNTEER_WEB_ENABLED === 'true';
+const VOLUNTEER_WHATSAPP_ENABLED = import.meta.env.VITE_VOLUNTEER_WHATSAPP_ENABLED === 'true';
+
 export function HomePage() {
   const navigate = useNavigate();
   const { authenticated, roles, keycloakLogin } = useAuth();
@@ -208,31 +211,48 @@ export function HomePage() {
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Get matched with students</Typography>
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Start teaching online</Typography>
                 </Stack>
-                <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                {(VOLUNTEER_WEB_ENABLED || VOLUNTEER_WHATSAPP_ENABLED) ? (
+                  <>
+                    <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                      {VOLUNTEER_WEB_ENABLED && (
+                        <Button
+                          size="small"
+                          variant="contained"
+                          sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
+                          href={import.meta.env.VITE_VOLUNTEER_AGENT_WEB_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Start on Web
+                        </Button>
+                      )}
+                      {VOLUNTEER_WHATSAPP_ENABLED && (
+                        <Button
+                          size="small"
+                          variant="contained"
+                          sx={{ bgcolor: '#25D366', color: 'white', '&:hover': { bgcolor: '#1DA851' }, textTransform: 'none', fontWeight: 600 }}
+                          href={import.meta.env.VITE_VOLUNTEER_AGENT_WHATSAPP_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          Start on WhatsApp
+                        </Button>
+                      )}
+                    </Stack>
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
+                      No sign-up required to explore.
+                    </Typography>
+                  </>
+                ) : (
                   <Button
                     size="small"
                     variant="contained"
                     sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
-                    href={import.meta.env.VITE_VOLUNTEER_AGENT_WEB_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    onClick={() => handleRegister('volunteer')}
                   >
-                    Start on Web
+                    Sign Up to Volunteer
                   </Button>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    sx={{ bgcolor: '#25D366', color: 'white', '&:hover': { bgcolor: '#1DA851' }, textTransform: 'none', fontWeight: 600 }}
-                    href={import.meta.env.VITE_VOLUNTEER_AGENT_WHATSAPP_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Start on WhatsApp
-                  </Button>
-                </Stack>
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontStyle: 'italic' }}>
-                  No sign-up required to explore.
-                </Typography>
+                )}
               </Paper>
             </Grid>
 
