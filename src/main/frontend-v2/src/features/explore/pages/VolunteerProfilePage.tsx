@@ -13,7 +13,9 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
+import PersonIcon from '@mui/icons-material/Person';
 import { useAppSelector } from '@app/store';
+import { PageHeader } from '@shared/components';
 import { useGetVolunteerProfileQuery, useUpdateVolunteerProfileMutation } from '../api/exploreApi';
 
 export function VolunteerProfilePage() {
@@ -64,20 +66,33 @@ export function VolunteerProfilePage() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h5" fontWeight={600}>
-          My Profile
-        </Typography>
-        {!editing ? (
-          <Button size="small" startIcon={<EditIcon />} onClick={() => setEditing(true)}>
+      <PageHeader
+        title="My Profile"
+        subtitle="View and update your personal details, skills, and preferences."
+        icon={<PersonIcon />}
+        actions={!editing ? (
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<EditIcon />}
+            onClick={() => setEditing(true)}
+            sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
+          >
             Edit
           </Button>
         ) : (
-          <Button size="small" variant="contained" startIcon={<SaveIcon />} onClick={handleSave} disabled={saving}>
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<SaveIcon />}
+            onClick={handleSave}
+            disabled={saving}
+            sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
+          >
             {saving ? 'Saving...' : 'Save'}
           </Button>
         )}
-      </Stack>
+      />
 
       {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}

@@ -33,7 +33,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import BlockIcon from '@mui/icons-material/Block';
 import BusinessIcon from '@mui/icons-material/Business';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import PeopleIcon from '@mui/icons-material/People';
 import { useAppSelector } from '@app/store';
+import { PageHeader } from '@shared/components';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 import { getAuthHeaders, getAuthHeadersWithJson } from '@shared/utils/authHeaders';
 
@@ -155,7 +157,7 @@ export function CoordinatorsPage() {
       }
     }
     fetchData();
-  }, [userId]);
+  }, [userId, isSAdmin]);
 
   // Fetch coordinator detail
   const handleRowClick = async (coord: Coordinator) => {
@@ -280,7 +282,11 @@ export function CoordinatorsPage() {
 
   return (
     <Box>
-      <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>Coordinators</Typography>
+      <PageHeader
+        title="Coordinators"
+        subtitle="Approve, assign, and manage coordinators for your entities."
+        icon={<PeopleIcon />}
+      />
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}

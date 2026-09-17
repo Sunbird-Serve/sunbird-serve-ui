@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Stack,
-  Typography,
   Snackbar,
   Alert,
   Paper,
@@ -26,6 +25,7 @@ import { NeedsTable } from '../components/NeedsTable';
 import { NeedDetailDialog } from '../components/NeedDetailDialog';
 import { ModifyScheduleDialog } from '../components/ModifyScheduleDialog';
 import { StatCard } from '@features/dashboard/components/StatCard';
+import { PageHeader } from '@shared/components';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
@@ -271,20 +271,21 @@ export function NeedsPage() {
   return (
     <Box>
       {/* Header */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>
-          Needs
-        </Typography>
-        {!isAdmin && (
+      <PageHeader
+        title="Needs"
+        subtitle="Track and manage volunteering needs across your entities."
+        icon={<AssignmentIcon />}
+        actions={!isAdmin ? (
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => navigate('/app/needs/raise')}
+            sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
           >
             Raise Need
           </Button>
-        )}
-      </Stack>
+        ) : undefined}
+      />
 
       {/* Admin Filters */}
       {isAdmin && (

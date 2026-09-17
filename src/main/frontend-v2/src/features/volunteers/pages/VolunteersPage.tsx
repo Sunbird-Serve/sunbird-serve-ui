@@ -25,7 +25,9 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import PeopleIcon from '@mui/icons-material/People';
 import { useAppSelector } from '@app/store';
+import { PageHeader } from '@shared/components';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 import {
   useGetAllVolunteersQuery,
@@ -112,7 +114,11 @@ export function VolunteersPage() {
 
   return (
     <Box>
-      <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>Volunteers</Typography>
+      <PageHeader
+        title="Volunteers"
+        subtitle="View and manage volunteers registered across your agency."
+        icon={<PeopleIcon />}
+      />
 
       {/* Status Cards */}
       <Grid container spacing={1.5} sx={{ mb: 3 }}>

@@ -22,7 +22,9 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import BusinessIcon from '@mui/icons-material/Business';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import SearchIcon from '@mui/icons-material/Search';
+import FactCheckIcon from '@mui/icons-material/FactCheck';
 import { useAppSelector } from '@app/store';
+import { PageHeader } from '@shared/components';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 import { getAuthHeaders, getAuthHeadersWithJson } from '@shared/utils/authHeaders';
 
@@ -256,7 +258,11 @@ export function ApprovalsPage() {
   if (loading) {
     return (
       <Box>
-        <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>Approvals</Typography>
+        <PageHeader
+          title="Approvals"
+          subtitle="Review and act on pending entity and need approvals."
+          icon={<FactCheckIcon />}
+        />
         <Stack spacing={2}>
           {[1, 2, 3, 4].map((i) => <Skeleton key={i} variant="rounded" height={80} />)}
         </Stack>
@@ -266,12 +272,14 @@ export function ApprovalsPage() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" fontWeight={600}>Approvals</Typography>
-        {counts.all > 0 && (
+      <PageHeader
+        title="Approvals"
+        subtitle="Review and act on pending entity and need approvals."
+        icon={<FactCheckIcon />}
+        actions={counts.all > 0 ? (
           <Chip label={`${counts.all} pending`} color="warning" size="small" />
-        )}
-      </Stack>
+        ) : undefined}
+      />
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}

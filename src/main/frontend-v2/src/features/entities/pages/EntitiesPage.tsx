@@ -33,7 +33,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import BusinessIcon from '@mui/icons-material/Business';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
+import { PageHeader } from '@shared/components';
 import { useAppSelector } from '@app/store';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
@@ -149,7 +151,7 @@ export function EntitiesPage() {
       finally { setLoadingCoordinators(false); }
     }
     fetchCoordinators();
-  }, [assignDialogOpen]);
+  }, [assignDialogOpen, isSAdmin]);
 
   // Filter
   const filtered = useMemo(() => {
@@ -280,14 +282,21 @@ export function EntitiesPage() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>Entities</Typography>
-        <Stack direction="row" spacing={1}>
-          <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
+      <PageHeader
+        title="Entities"
+        subtitle="Manage the schools, colleges, and organizations you work with."
+        icon={<BusinessIcon />}
+        actions={(
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+            sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
+          >
             Create Entity
           </Button>
-        </Stack>
-      </Stack>
+        )}
+      />
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
 

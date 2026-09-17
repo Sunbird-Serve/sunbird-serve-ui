@@ -20,6 +20,7 @@ import {
   Alert,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -36,6 +37,7 @@ import {
   Cell,
 } from 'recharts';
 import { useAppSelector } from '@app/store';
+import { PageHeader } from '@shared/components';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
@@ -339,9 +341,11 @@ export function SessionsPage() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>Sessions</Typography>
-      </Stack>
+      <PageHeader
+        title="Sessions"
+        subtitle="Review scheduled, completed, and cancelled sessions at a glance."
+        icon={<CalendarMonthIcon />}
+      />
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 

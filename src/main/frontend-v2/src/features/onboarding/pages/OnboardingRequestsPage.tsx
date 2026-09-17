@@ -33,6 +33,8 @@ import TvIcon from '@mui/icons-material/Tv';
 import MeetingRoomIcon from '@mui/icons-material/VolumeUp';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import HowToRegIcon from '@mui/icons-material/HowToReg';
+import { PageHeader } from '@shared/components';
 import {
   useListOnboardingRequestsQuery,
   useReviewOnboardingRequestMutation,
@@ -280,16 +282,18 @@ export function OnboardingRequestsPage() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
-        <Typography variant="h4" fontWeight={600}>
-          Onboarding Requests
-        </Typography>
-        <Chip
-          label={`${totalFiltered} total`}
-          size="small"
-          variant="outlined"
-        />
-      </Stack>
+      <PageHeader
+        title="Onboarding Requests"
+        subtitle="Review and act on coordinator onboarding requests for your institutions."
+        icon={<HowToRegIcon />}
+        actions={(
+          <Chip
+            label={`${totalFiltered} total`}
+            size="small"
+            sx={{ bgcolor: 'white', color: 'primary.main', fontWeight: 600 }}
+          />
+        )}
+      />
 
       {adminEntityIds.length > 0 && (
         <Alert severity="info" sx={{ mb: 2 }}>

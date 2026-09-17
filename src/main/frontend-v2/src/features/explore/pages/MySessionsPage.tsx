@@ -31,6 +31,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useAppSelector } from '@app/store';
 import { useAuth } from '@features/auth/hooks/useAuth';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
+import { PageHeader } from '@shared/components';
 
 // Roles permitted to call the create endpoint (two-row reschedule).
 // Volunteers can only update existing deliverables, so they reschedule in-place.
@@ -144,7 +145,7 @@ export function MySessionsPage() {
   const [error, setError] = useState('');
 
   // Action state
-  const [actionMenu, setActionMenu] = useState<{ anchor: HTMLElement; deliverable: Deliverable } | null>(null);
+  const [actionMenu, setActionMenu] = useState<{ anchor: HTMLElement; deliverable: Deliverable; allowReschedule: boolean } | null>(null);
   const [completeTarget, setCompleteTarget] = useState<Deliverable | null>(null);
   const [cancelTarget, setCancelTarget] = useState<Deliverable | null>(null);
   const [rescheduleTarget, setRescheduleTarget] = useState<Deliverable | null>(null);
@@ -487,7 +488,11 @@ export function MySessionsPage() {
   if (!selectedNeed) {
     return (
       <Box>
-        <Typography variant="h5" fontWeight={600} sx={{ mb: 3 }}>My Sessions</Typography>
+        <PageHeader
+          title="My Sessions"
+          subtitle="Track your assigned needs and manage each session."
+          icon={<CalendarTodayIcon />}
+        />
         {assignedNeeds.length === 0 ? (
           <Paper sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="body1" color="text.secondary">You don't have any assigned sessions yet.</Typography>
@@ -686,7 +691,7 @@ export function MySessionsPage() {
                     </Typography>
                   </Stack>
                   {!future && (
-                    <IconButton size="small" onClick={(e) => setActionMenu({ anchor: e.currentTarget, deliverable: d })}>
+                    <IconButton size="small" onClick={(e) => setActionMenu({ anchor: e.currentTarget, deliverable: d, allowReschedule: true })}>
                       <MoreVertIcon fontSize="small" />
                     </IconButton>
                   )}
@@ -726,22 +731,33 @@ export function MySessionsPage() {
         <Stack spacing={1}>
           {rescheduledDelivs.length === 0 ? (
             <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 3 }}>No rescheduled sessions.</Typography>
-          ) : rescheduledDelivs.map((d) => (
+          ) : rescheduledDelivs.map((d) => {
+            const future = isFutureDate(d.deliverableDate);
+            return (
             <Paper key={d.id} variant="outlined" sx={{ p: 2 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Stack direction="row" spacing={1.5} alignItems="center">
                   <StatusChip status="Rescheduled" />
                   <Typography variant="body2">{d.deliverableDate?.split('T')[0]}</Typography>
                 </Stack>
-                {d.comments && (
-                  <Stack direction="row" spacing={0.5} alignItems="center">
-                    <EventRepeatIcon sx={{ fontSize: 15, color: 'info.main' }} />
-                    <Typography variant="caption" color="text.secondary">{d.comments}</Typography>
-                  </Stack>
-                )}
+                <Stack direction="row" spacing={1} alignItems="center">
+                  {d.comments && (
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <EventRepeatIcon sx={{ fontSize: 15, color: 'info.main' }} />
+                      <Typography variant="caption" color="text.secondary">{d.comments}</Typography>
+                    </Stack>
+                  )}
+                  {/* Once the rescheduled date arrives, allow completing/cancelling it. */}
+                  {!future && (
+                    <IconButton size="small" onClick={(e) => setActionMenu({ anchor: e.currentTarget, deliverable: d, allowReschedule: false })}>
+                      <MoreVertIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </Stack>
               </Stack>
             </Paper>
-          ))}
+            );
+          })}
         </Stack>
       )}
 
@@ -769,9 +785,11 @@ export function MySessionsPage() {
         <MenuItem onClick={() => { setCompleteTarget(actionMenu!.deliverable); setActionMenu(null); }}>
           <CheckCircleIcon fontSize="small" color="success" sx={{ mr: 1 }} /> Mark as Completed
         </MenuItem>
-        <MenuItem onClick={() => { setRescheduleTarget(actionMenu!.deliverable); setActionMenu(null); }}>
-          <EventRepeatIcon fontSize="small" color="info" sx={{ mr: 1 }} /> Reschedule
-        </MenuItem>
+        {actionMenu?.allowReschedule && (
+          <MenuItem onClick={() => { setRescheduleTarget(actionMenu!.deliverable); setActionMenu(null); }}>
+            <EventRepeatIcon fontSize="small" color="info" sx={{ mr: 1 }} /> Reschedule
+          </MenuItem>
+        )}
         <MenuItem onClick={() => { setCancelTarget(actionMenu!.deliverable); setActionMenu(null); }}>
           <CancelIcon fontSize="small" color="error" sx={{ mr: 1 }} /> Cancel Session
         </MenuItem>

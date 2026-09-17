@@ -16,9 +16,11 @@ import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import { useAppSelector } from '@app/store';
 import { useGetMyNominationsQuery } from '../api/exploreApi';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
+import { PageHeader } from '@shared/components';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -134,10 +136,11 @@ export function MyNominationsPage() {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight={600} sx={{ mb: 1 }}>My Needs</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Needs you've expressed interest in.
-      </Typography>
+      <PageHeader
+        title="My Needs"
+        subtitle="Needs you've expressed interest in."
+        icon={<VolunteerActivismIcon />}
+      />
 
       {sortedNominations.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center' }}>

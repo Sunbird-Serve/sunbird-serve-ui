@@ -18,6 +18,7 @@ import {
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import SaveIcon from '@mui/icons-material/Save';
 import { useGetAgenciesQuery, Agency } from '@features/volunteers/api/volunteersApi';
+import { PageHeader } from '@shared/components';
 import { getAuthHeaders, getAuthHeadersWithJson } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
@@ -116,7 +117,11 @@ export function AgencyScopePage() {
   if (loading) {
     return (
       <Box>
-        <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>Agency Scope</Typography>
+        <PageHeader
+          title="Agency Scope"
+          subtitle="Configure cross-agency visibility for your needs and volunteers."
+          icon={<VisibilityIcon />}
+        />
         <Stack spacing={2}>
           <Skeleton variant="rounded" height={200} />
           <Skeleton variant="rounded" height={200} />
@@ -127,10 +132,11 @@ export function AgencyScopePage() {
 
   return (
     <Box>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
-        <VisibilityIcon color="primary" />
-        <Typography variant="h4" fontWeight={600}>Agency Scope</Typography>
-      </Stack>
+      <PageHeader
+        title="Agency Scope"
+        subtitle="Configure cross-agency visibility for your needs and volunteers."
+        icon={<VisibilityIcon />}
+      />
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 600 }}>
         Configure which agencies can discover your needs and which needs your volunteers can see.

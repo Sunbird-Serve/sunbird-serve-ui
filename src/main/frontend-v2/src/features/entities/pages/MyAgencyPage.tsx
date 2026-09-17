@@ -16,6 +16,8 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import BusinessIcon from '@mui/icons-material/Business';
 import LinkIcon from '@mui/icons-material/Link';
 import PeopleIcon from '@mui/icons-material/People';
+import CorporateFareIcon from '@mui/icons-material/CorporateFare';
+import { PageHeader } from '@shared/components';
 import { useAuth } from '@features/auth';
 import { useGetAgenciesQuery } from '@features/volunteers/api/volunteersApi';
 import { useAppSelector } from '@app/store';
@@ -57,7 +59,11 @@ export function MyAgencyPage() {
   if (isLoading) {
     return (
       <Box>
-        <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>My Agency</Typography>
+        <PageHeader
+          title="My Agency"
+          subtitle="View your agency details and share your registration link."
+          icon={<CorporateFareIcon />}
+        />
         <Stack spacing={2}>
           <Skeleton variant="rounded" height={120} />
           <Skeleton variant="rounded" height={80} />
@@ -69,7 +75,11 @@ export function MyAgencyPage() {
   if (!myAgency) {
     return (
       <Box>
-        <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>My Agency</Typography>
+        <PageHeader
+          title="My Agency"
+          subtitle="View your agency details and share your registration link."
+          icon={<CorporateFareIcon />}
+        />
         <Alert severity="info">
           No agency information found. Please contact the system administrator.
         </Alert>
@@ -79,7 +89,11 @@ export function MyAgencyPage() {
 
   return (
     <Box>
-      <Typography variant="h4" fontWeight={600} sx={{ mb: 3 }}>My Agency</Typography>
+      <PageHeader
+        title="My Agency"
+        subtitle="View your agency details and share your registration link."
+        icon={<CorporateFareIcon />}
+      />
 
       {/* Agency Details Card */}
       <Paper sx={{ p: 3, mb: 3 }}>

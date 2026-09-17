@@ -3,7 +3,6 @@ import {
   Box,
   Typography,
   Paper,
-  Stack,
   TextField,
   MenuItem,
   Button,
@@ -12,6 +11,7 @@ import {
 } from '@mui/material';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useGetAgenciesQuery } from '@features/volunteers/api/volunteersApi';
+import { PageHeader } from '@shared/components';
 import { getAuthHeadersWithJson } from '@shared/utils/authHeaders';
 
 const VOLUNTEERING_BASE = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
@@ -91,10 +91,11 @@ export function CreateUserPage() {
 
   return (
     <Box>
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
-        <PersonAddIcon color="primary" />
-        <Typography variant="h4" fontWeight={600}>Create User</Typography>
-      </Stack>
+      <PageHeader
+        title="Create User"
+        subtitle="Add a new user with a specific role and agency assignment."
+        icon={<PersonAddIcon />}
+      />
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 500 }}>
         Create a new user with a specific role and agency. A Keycloak account will be created

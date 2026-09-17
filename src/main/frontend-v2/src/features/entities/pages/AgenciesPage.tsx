@@ -32,7 +32,9 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import BusinessIcon from '@mui/icons-material/Business';
 import PeopleIcon from '@mui/icons-material/People';
 import AssignmentIcon from '@mui/icons-material/Assignment';
+import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import { useGetAgenciesQuery, useGetAllVolunteersQuery } from '@features/volunteers/api/volunteersApi';
+import { PageHeader } from '@shared/components';
 import { getAuthHeadersWithJson } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
@@ -190,12 +192,21 @@ export function AgenciesPage() {
 
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
-        <Typography variant="h4" fontWeight={600}>Agencies</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleCreate}>
-          Create Agency
-        </Button>
-      </Stack>
+      <PageHeader
+        title="Agencies"
+        subtitle="Manage need and volunteer agencies and their registration links."
+        icon={<CorporateFareIcon />}
+        actions={(
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleCreate}
+            sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' } }}
+          >
+            Create Agency
+          </Button>
+        )}
+      />
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && !dialog && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
