@@ -81,6 +81,18 @@ function formatDate(dateStr: string): string {
   return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
 }
 
+// Indian academic year (Apr–Mar): starting calendar year for a given ISO date.
+function academicYearOf(dateStr: string): number | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return null;
+  return d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+}
+
+function academicYearLabel(startYear: number): string {
+  return `${startYear}–${startYear + 1}`;
+}
+
 // --- Component ---
 export function VolunteerHomePage() {
   const navigate = useNavigate();
@@ -197,6 +209,35 @@ export function VolunteerHomePage() {
     const completionRate = totalSessions > 0 ? ((completed / totalSessions) * 100).toFixed(0) : '0';
     const schools = new Set(assignments.map((a) => a.entityName).filter(Boolean)).size;
     return { totalSessions, completed, planned, completionRate, schools, assignments: assignments.length };
+  }, [assignments]);
+
+  // Split assignments into current academic year (prominent) vs previous years,
+  // with previous grouped by year (newest first).
+  const { currentAssignments, previousByYear } = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+    const academicYearStart = `${currentYear}-04-01`;
+
+    const current: Assignment[] = [];
+    const previous: Assignment[] = [];
+    for (const a of assignments) {
+      const end = a.endDate || '';
+      if (end && end < academicYearStart) previous.push(a);
+      else current.push(a);
+    }
+
+    const groups = new Map<number, Assignment[]>();
+    for (const a of previous) {
+      const year = academicYearOf(a.endDate || a.startDate || '');
+      if (year == null) continue;
+      const list = groups.get(year) || [];
+      list.push(a);
+      groups.set(year, list);
+    }
+    return {
+      currentAssignments: current,
+      previousByYear: Array.from(groups.entries()).sort((x, y) => y[0] - x[0]),
+    };
   }, [assignments]);
 
   // Today's sessions
@@ -395,8 +436,8 @@ export function VolunteerHomePage() {
         </Paper>
       )}
 
-      {/* My Assignments */}
-      {assignments.length > 0 && (
+      {/* My Assignments — current academic year (prominent) */}
+      {currentAssignments.length > 0 && (
         <Box>
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
             <Typography variant="h6" fontWeight={600}>My Assignments</Typography>
@@ -405,62 +446,32 @@ export function VolunteerHomePage() {
             </Button>
           </Stack>
           <Stack spacing={2}>
-            {assignments.map((assignment) => {
-              const rate = assignment.totalSessions > 0
-                ? (assignment.completedSessions / assignment.totalSessions) * 100
-                : 0;
-              return (
-                <Paper key={assignment.planId} variant="outlined" sx={{ p: 2 }}>
-                  <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1.5}>
-                    <Box sx={{ flex: 1 }}>
-                      <Typography variant="subtitle1" fontWeight={600}>
-                        {assignment.needName}
-                      </Typography>
-                      <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
-                        {assignment.entityName && (
-                          <Typography variant="caption" color="text.secondary">
-                            🏫 {assignment.entityName}
-                          </Typography>
-                        )}
-                        {assignment.days && (
-                          <Typography variant="caption" color="text.secondary">
-                            📅 {assignment.days}
-                          </Typography>
-                        )}
-                      </Stack>
-                      {/* Progress */}
-                      <Box sx={{ mt: 1.5 }}>
-                        <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                          <Typography variant="caption" color="text.secondary">
-                            {assignment.completedSessions}/{assignment.totalSessions} sessions
-                          </Typography>
-                          <Typography variant="caption" fontWeight={600}>{rate.toFixed(0)}%</Typography>
-                        </Stack>
-                        <LinearProgress
-                          variant="determinate"
-                          value={rate}
-                          sx={{
-                            height: 6,
-                            borderRadius: 3,
-                            bgcolor: '#F1F5F9',
-                            '& .MuiLinearProgress-bar': {
-                              borderRadius: 3,
-                              bgcolor: rate > 70 ? '#10B981' : rate > 40 ? '#F59E0B' : '#3B82F6',
-                            },
-                          }}
-                        />
-                      </Box>
-                    </Box>
-                    <Stack alignItems="center" justifyContent="center" sx={{ minWidth: 70 }}>
-                      <Typography variant="h5" fontWeight={700} color="info.main">
-                        {assignment.plannedSessions}
-                      </Typography>
-                      <Typography variant="caption" color="text.secondary">remaining</Typography>
-                    </Stack>
-                  </Stack>
-                </Paper>
-              );
-            })}
+            {currentAssignments.map((assignment) => (
+              <AssignmentCard key={assignment.planId} assignment={assignment} />
+            ))}
+          </Stack>
+        </Box>
+      )}
+
+      {/* Previous academic years — grouped by year, de-emphasized */}
+      {previousByYear.length > 0 && (
+        <Box>
+          <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+            Previous Academic Years
+          </Typography>
+          <Stack spacing={2.5}>
+            {previousByYear.map(([year, list]) => (
+              <Box key={year}>
+                <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
+                  {academicYearLabel(year)}
+                </Typography>
+                <Stack spacing={2}>
+                  {list.map((assignment) => (
+                    <AssignmentCard key={assignment.planId} assignment={assignment} dimmed />
+                  ))}
+                </Stack>
+              </Box>
+            ))}
           </Stack>
         </Box>
       )}
@@ -532,5 +543,62 @@ export function VolunteerHomePage() {
         </Box>
       )}
     </Stack>
+  );
+}
+
+// Reusable assignment card with progress. `dimmed` de-emphasizes past years.
+function AssignmentCard({ assignment, dimmed = false }: { assignment: Assignment; dimmed?: boolean }) {
+  const rate = assignment.totalSessions > 0
+    ? (assignment.completedSessions / assignment.totalSessions) * 100
+    : 0;
+  return (
+    <Paper variant="outlined" sx={{ p: 2, opacity: dimmed ? 0.65 : 1, transition: 'opacity 0.2s', '&:hover': dimmed ? { opacity: 1 } : undefined }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" spacing={1.5}>
+        <Box sx={{ flex: 1 }}>
+          <Typography variant="subtitle1" fontWeight={600}>
+            {assignment.needName}
+          </Typography>
+          <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
+            {assignment.entityName && (
+              <Typography variant="caption" color="text.secondary">
+                🏫 {assignment.entityName}
+              </Typography>
+            )}
+            {assignment.days && (
+              <Typography variant="caption" color="text.secondary">
+                📅 {assignment.days}
+              </Typography>
+            )}
+          </Stack>
+          <Box sx={{ mt: 1.5 }}>
+            <Stack direction="row" justifyContent="space-between" sx={{ mb: 0.5 }}>
+              <Typography variant="caption" color="text.secondary">
+                {assignment.completedSessions}/{assignment.totalSessions} sessions
+              </Typography>
+              <Typography variant="caption" fontWeight={600}>{rate.toFixed(0)}%</Typography>
+            </Stack>
+            <LinearProgress
+              variant="determinate"
+              value={rate}
+              sx={{
+                height: 6,
+                borderRadius: 3,
+                bgcolor: '#F1F5F9',
+                '& .MuiLinearProgress-bar': {
+                  borderRadius: 3,
+                  bgcolor: rate > 70 ? '#10B981' : rate > 40 ? '#F59E0B' : '#3B82F6',
+                },
+              }}
+            />
+          </Box>
+        </Box>
+        <Stack alignItems="center" justifyContent="center" sx={{ minWidth: 70 }}>
+          <Typography variant="h5" fontWeight={700} color="info.main">
+            {assignment.plannedSessions}
+          </Typography>
+          <Typography variant="caption" color="text.secondary">remaining</Typography>
+        </Stack>
+      </Stack>
+    </Paper>
   );
 }

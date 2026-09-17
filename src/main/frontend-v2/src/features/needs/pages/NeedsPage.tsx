@@ -213,7 +213,7 @@ export function NeedsPage() {
     }
 
     return result;
-  }, [allNeeds, isAdmin, userId, selectedEntities, selectedYear]);
+  }, [allNeeds, isAdmin, isSAdmin, entities, userId, selectedEntities, selectedYear]);
 
   // Metrics
   const metrics = useMemo(() => {
@@ -418,6 +418,7 @@ export function NeedsPage() {
         needs={filteredNeeds}
         loading={loading}
         isAdmin={isAdmin}
+        groupByYear={isAdmin && selectedYear === 'all'}
         onRowClick={handleRowClick}
         onApprove={handleApprove}
         onReject={handleReject}

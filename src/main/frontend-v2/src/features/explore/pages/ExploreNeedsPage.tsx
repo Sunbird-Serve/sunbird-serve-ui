@@ -59,6 +59,31 @@ function getEndDate(need: AvailableNeed): string {
   return (schedule?.endDate as string)?.substring(0, 10) || '';
 }
 
+// Indian academic year (Apr–Mar): starting calendar year for a given ISO date.
+function academicYearOf(dateStr: string): number | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return null;
+  return d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+}
+
+function academicYearLabel(startYear: number): string {
+  return `AY ${startYear}–${startYear + 1}`;
+}
+
+function currentAcademicYear(): number {
+  const now = new Date();
+  return now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+}
+
+// Deterministic soft accent color per need, for a bit of visual variety.
+const ACCENT_COLORS = ['#0E7490', '#7C3AED', '#DB2777', '#EA580C', '#059669', '#2563EB'];
+function accentFor(key: string): string {
+  let hash = 0;
+  for (let i = 0; i < key.length; i += 1) hash = (hash * 31 + key.charCodeAt(i)) & 0xffffffff;
+  return ACCENT_COLORS[Math.abs(hash) % ACCENT_COLORS.length];
+}
+
 export function ExploreNeedsPage() {
   const user = useAppSelector((state) => state.user.data);
   const userId = user?.osid || '';
@@ -119,6 +144,8 @@ export function ExploreNeedsPage() {
   }, [userId]);
   const [search, setSearch] = useState('');
   const [selectedNeed, setSelectedNeed] = useState<AvailableNeed | null>(null);
+  // Academic-year filter: 'all' or a starting year number as string.
+  const [yearFilter, setYearFilter] = useState<string>('all');
 
   // Filter needs by search
   const filteredNeeds = useMemo(() => {
@@ -134,6 +161,47 @@ export function ExploreNeedsPage() {
       return name.includes(q) || entity.includes(q) || district.includes(q) || days.includes(q) || skills.includes(q) || timeSlots.includes(q);
     });
   }, [needs, search]);
+
+  // Group filtered needs by academic year (current year first, then desc).
+  const curAY = currentAcademicYear();
+  const groupedByYear = useMemo(() => {
+    const groups = new Map<number, AvailableNeed[]>();
+    const undated: AvailableNeed[] = [];
+    for (const need of filteredNeeds) {
+      const year = academicYearOf(getStartDate(need) || getEndDate(need));
+      if (year == null) { undated.push(need); continue; }
+      const list = groups.get(year) || [];
+      list.push(need);
+      groups.set(year, list);
+    }
+    const sorted = Array.from(groups.entries()).sort((a, b) => {
+      if (a[0] === curAY) return -1;
+      if (b[0] === curAY) return 1;
+      return b[0] - a[0];
+    });
+    return { sorted, undated };
+  }, [filteredNeeds, curAY]);
+
+  // Year options for the filter chips (years present in the data).
+  const availableYears = useMemo(() => {
+    const years = new Set<number>();
+    for (const need of needs) {
+      const y = academicYearOf(getStartDate(need) || getEndDate(need));
+      if (y != null) years.add(y);
+    }
+    return Array.from(years).sort((a, b) => {
+      if (a === curAY) return -1;
+      if (b === curAY) return 1;
+      return b - a;
+    });
+  }, [needs, curAY]);
+
+  // Apply year filter to the grouped structure.
+  const visibleGroups = useMemo(() => {
+    if (yearFilter === 'all') return groupedByYear.sorted;
+    const y = Number(yearFilter);
+    return groupedByYear.sorted.filter(([year]) => year === y);
+  }, [groupedByYear.sorted, yearFilter]);
 
   const handleNominate = async (need: AvailableNeed) => {
     const needId = need.need?.id || need.id;
@@ -175,24 +243,69 @@ export function ExploreNeedsPage() {
         </Stack>
       )}
 
-      <Typography variant="h5" fontWeight={600} sx={{ mb: 1 }}>Explore Needs</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Find opportunities that match your skills and interests.
-      </Typography>
-
-      {/* Search Bar */}
-      <TextField
-        fullWidth
-        size="small"
-        placeholder="Search by school, subject, days, time, location..."
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        InputProps={{
-          startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" /></InputAdornment>,
+      {/* Hero header */}
+      <Paper
+        sx={{
+          p: { xs: 2.5, sm: 3.5 },
+          mb: 3,
+          borderRadius: 3,
+          color: 'white',
+          background: 'linear-gradient(135deg, #0C4A6E 0%, #0E7490 55%, #155E75 100%)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background: 'radial-gradient(circle at 85% 15%, rgba(252, 211, 77, 0.18) 0%, transparent 45%)',
+          },
         }}
-        sx={{ mb: 3, maxWidth: 500 }}
-        InputLabelProps={{ shrink: true }}
-      />
+      >
+        <Box sx={{ position: 'relative', zIndex: 1 }}>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+            <VolunteerActivismIcon />
+            <Typography variant="h5" fontWeight={700}>Explore Needs</Typography>
+          </Stack>
+          <Typography variant="body2" sx={{ opacity: 0.9, mb: 2.5, maxWidth: 560 }}>
+            Find opportunities that match your skills and interests, and express your interest with a single tap.
+          </Typography>
+
+          {/* Search */}
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Search by school, subject, days, time, location..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"><SearchIcon fontSize="small" sx={{ color: 'text.secondary' }} /></InputAdornment>,
+              sx: { bgcolor: 'white', borderRadius: 2 },
+            }}
+            sx={{ maxWidth: 560 }}
+          />
+        </Box>
+      </Paper>
+
+      {/* Academic-year filter chips */}
+      {availableYears.length > 1 && (
+        <Stack direction="row" spacing={1} sx={{ mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
+          <Chip
+            label="All Years"
+            onClick={() => setYearFilter('all')}
+            color={yearFilter === 'all' ? 'primary' : 'default'}
+            variant={yearFilter === 'all' ? 'filled' : 'outlined'}
+          />
+          {availableYears.map((y) => (
+            <Chip
+              key={y}
+              label={y === curAY ? `${academicYearLabel(y)} · Current` : academicYearLabel(y)}
+              onClick={() => setYearFilter(String(y))}
+              color={yearFilter === String(y) ? 'primary' : 'default'}
+              variant={yearFilter === String(y) ? 'filled' : 'outlined'}
+            />
+          ))}
+        </Stack>
+      )}
 
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
@@ -203,7 +316,8 @@ export function ExploreNeedsPage() {
       )}
 
       {filteredNeeds.length === 0 ? (
-        <Paper sx={{ p: 4, textAlign: 'center' }}>
+        <Paper sx={{ p: 5, textAlign: 'center', borderRadius: 3 }}>
+          <VolunteerActivismIcon sx={{ fontSize: 48, color: 'primary.main', opacity: 0.5, mb: 1 }} />
           <Typography variant="body1" color="text.secondary">
             {search ? 'No needs match your search.' : userId ? 'No needs available right now. Check back later.' : 'Please login to explore available needs.'}
           </Typography>
@@ -214,57 +328,53 @@ export function ExploreNeedsPage() {
           )}
         </Paper>
       ) : (
-        <Grid container spacing={2}>
-          {filteredNeeds.map((need) => {
-            const needId = need.need?.id || need.id;
-            const needName = need.need?.name || need.name;
-            const entityName = need.entity?.name || '';
-            const district = need.entity?.district || '';
-            const days = formatDays(need);
-            const timeSlots = formatTimeSlots(need);
-            const alreadyNominated = nominatedIds.includes(needId);
-
+        <Stack spacing={3.5}>
+          {visibleGroups.map(([year, yearNeeds]) => {
+            const isCurrent = year === curAY;
             return (
-              <Grid item xs={12} sm={6} md={4} key={needId}>
-                <Paper
-                  sx={{ p: 2.5, height: '100%', display: 'flex', flexDirection: 'column', cursor: 'pointer', transition: 'box-shadow 0.2s', '&:hover': { boxShadow: '0 4px 16px rgba(0,0,0,0.1)' } }}
-                  onClick={() => setSelectedNeed(need)}
-                >
-                  <Stack spacing={1} sx={{ flexGrow: 1 }}>
-                    <Typography variant="subtitle1" fontWeight={600}>{needName}</Typography>
-                    {entityName && (
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <BusinessIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">{entityName}</Typography>
-                      </Stack>
-                    )}
-                    {district && (
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="body2" color="text.secondary">{district}</Typography>
-                      </Stack>
-                    )}
-                    {days && (
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary">{days}</Typography>
-                      </Stack>
-                    )}
-                    {timeSlots && (
-                      <Stack direction="row" spacing={0.5} alignItems="center">
-                        <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        <Typography variant="caption" color="text.secondary">{timeSlots}</Typography>
-                      </Stack>
-                    )}
-                  </Stack>
-                  {alreadyNominated && (
-                    <Chip label="Interest Submitted" size="small" color="success" variant="outlined" sx={{ mt: 1.5, alignSelf: 'flex-start' }} />
-                  )}
-                </Paper>
-              </Grid>
+              <Box key={year}>
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+                  <Typography variant={isCurrent ? 'h6' : 'subtitle1'} fontWeight={700} color={isCurrent ? 'text.primary' : 'text.secondary'}>
+                    {academicYearLabel(year)}
+                  </Typography>
+                  {isCurrent && <Chip label="Current Year" size="small" color="primary" />}
+                  <Chip label={`${yearNeeds.length} ${yearNeeds.length === 1 ? 'need' : 'needs'}`} size="small" variant="outlined" />
+                </Stack>
+                <Grid container spacing={2} sx={{ opacity: isCurrent ? 1 : 0.85 }}>
+                  {yearNeeds.map((need) => (
+                    <Grid item xs={12} sm={6} md={4} key={need.need?.id || need.id}>
+                      <NeedCard
+                        need={need}
+                        alreadyNominated={nominatedIds.includes(need.need?.id || need.id)}
+                        onOpen={() => setSelectedNeed(need)}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
             );
           })}
-        </Grid>
+
+          {/* Needs without a schedule date */}
+          {yearFilter === 'all' && groupedByYear.undated.length > 0 && (
+            <Box>
+              <Typography variant="subtitle1" fontWeight={700} color="text.secondary" sx={{ mb: 1.5 }}>
+                Other Opportunities
+              </Typography>
+              <Grid container spacing={2}>
+                {groupedByYear.undated.map((need) => (
+                  <Grid item xs={12} sm={6} md={4} key={need.need?.id || need.id}>
+                    <NeedCard
+                      need={need}
+                      alreadyNominated={nominatedIds.includes(need.need?.id || need.id)}
+                      onOpen={() => setSelectedNeed(need)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+          )}
+        </Stack>
       )}
 
       {/* Need Detail Dialog */}
@@ -369,5 +479,98 @@ export function ExploreNeedsPage() {
         )}
       </Dialog>
     </Box>
+  );
+}
+
+// Revamped need card with a colored accent, skill preview, and hover lift.
+function NeedCard({
+  need,
+  alreadyNominated,
+  onOpen,
+}: {
+  need: AvailableNeed;
+  alreadyNominated: boolean;
+  onOpen: () => void;
+}) {
+  const needId = need.need?.id || need.id;
+  const needName = need.need?.name || need.name;
+  const entityName = need.entity?.name || '';
+  const district = need.entity?.district || '';
+  const days = formatDays(need);
+  const timeSlots = formatTimeSlots(need);
+  const skills = (need.requirement?.skillDetails || '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const accent = accentFor(needId || needName || '');
+
+  return (
+    <Paper
+      onClick={onOpen}
+      sx={{
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: 'pointer',
+        borderRadius: 2.5,
+        overflow: 'hidden',
+        position: 'relative',
+        transition: 'transform 0.2s, box-shadow 0.2s',
+        borderTop: `4px solid ${accent}`,
+        '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 10px 28px rgba(0,0,0,0.12)' },
+      }}
+    >
+      <Box sx={{ p: 2.5, flexGrow: 1 }}>
+        <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1, lineHeight: 1.3 }}>
+          {needName}
+        </Typography>
+        <Stack spacing={0.75}>
+          {entityName && (
+            <Stack direction="row" spacing={0.75} alignItems="center">
+              <BusinessIcon sx={{ fontSize: 16, color: accent }} />
+              <Typography variant="body2" color="text.secondary" noWrap>{entityName}</Typography>
+            </Stack>
+          )}
+          {district && (
+            <Stack direction="row" spacing={0.75} alignItems="center">
+              <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              <Typography variant="body2" color="text.secondary">{district}</Typography>
+            </Stack>
+          )}
+          {days && (
+            <Stack direction="row" spacing={0.75} alignItems="center">
+              <CalendarTodayIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              <Typography variant="caption" color="text.secondary">{days}</Typography>
+            </Stack>
+          )}
+          {timeSlots && (
+            <Stack direction="row" spacing={0.75} alignItems="center">
+              <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+              <Typography variant="caption" color="text.secondary">{timeSlots}</Typography>
+            </Stack>
+          )}
+        </Stack>
+
+        {skills.length > 0 && (
+          <Stack direction="row" flexWrap="wrap" gap={0.5} sx={{ mt: 1.5 }}>
+            {skills.slice(0, 3).map((skill) => (
+              <Chip key={skill} label={skill} size="small" variant="outlined" sx={{ borderColor: accent, color: accent }} />
+            ))}
+            {skills.length > 3 && (
+              <Chip label={`+${skills.length - 3}`} size="small" variant="outlined" />
+            )}
+          </Stack>
+        )}
+      </Box>
+
+      <Box sx={{ px: 2.5, py: 1.5, borderTop: '1px solid', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {alreadyNominated ? (
+          <Chip label="Interest Submitted" size="small" color="success" variant="outlined" />
+        ) : (
+          <Typography variant="caption" color="text.secondary">Tap to view details</Typography>
+        )}
+        <Typography variant="caption" fontWeight={600} sx={{ color: accent }}>View →</Typography>
+      </Box>
+    </Paper>
   );
 }

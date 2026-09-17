@@ -106,6 +106,19 @@ function formatTime(timeString?: string): string {
   return timeString;
 }
 
+// Indian academic year (Apr–Mar) for a given ISO date. Returns the starting
+// calendar year, e.g. 2025 for any date between 2025-04-01 and 2026-03-31.
+function academicYearOf(dateStr: string): number | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return null;
+  return d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+}
+
+function academicYearLabel(startYear: number): string {
+  return `${startYear}–${startYear + 1}`;
+}
+
 function isFutureDate(dateStr: string): boolean {
   if (!dateStr) return false;
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -272,6 +285,19 @@ export function MySessionsPage() {
     const end = n.endDate || '';
     return end < academicYearStart;
   });
+
+  // Group previous needs by academic year (newest year first).
+  const previousNeedsByYear = (() => {
+    const groups = new Map<number, AssignedNeed[]>();
+    for (const n of previousNeeds) {
+      const year = academicYearOf(n.endDate || n.startDate || '');
+      if (year == null) continue;
+      const list = groups.get(year) || [];
+      list.push(n);
+      groups.set(year, list);
+    }
+    return Array.from(groups.entries()).sort((a, b) => b[0] - a[0]);
+  })();
   const todoDelivs = selectedNeed?.deliverables
     .filter((d) => d.status === 'Planned' || d.status === 'NotStarted')
     .sort((a, b) => a.deliverableDate.localeCompare(b.deliverableDate)) || [];
@@ -416,12 +442,14 @@ export function MySessionsPage() {
         setSuccess('Session rescheduled. The new session is now in your To-Do list.');
       } else {
         // --- In-place model (volunteers can only update) ---
-        // Move the existing deliverable to the new date, keeping it actionable.
+        // Volunteers can't create a new row, so the single deliverable is
+        // updated to Rescheduled and moved to the new date. It leaves To-Do
+        // and appears under the Rescheduled tab.
         const updateResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${rescheduleTarget.id}`, {
           method: 'PUT', headers,
           body: JSON.stringify({
             needPlanId: selectedNeed.planId,
-            status: 'Planned',
+            status: 'Rescheduled',
             comments: `Rescheduled from ${originalDate} to ${rescheduleDate}`,
             deliverableDate: rescheduleDate,
             ...(carriedParams ? { inputParameters: carriedParams } : {}),
@@ -429,16 +457,16 @@ export function MySessionsPage() {
         });
         if (!updateResp.ok) throw new Error('update failed');
 
-        // Optimistic: move the same row to the new date, still Planned.
+        // Optimistic: mark the same row Rescheduled on the new date.
         setSelectedNeed((prev) => prev ? {
           ...prev,
           deliverables: prev.deliverables.map((d) =>
             d.id === rescheduleTarget.id
-              ? { ...d, deliverableDate: rescheduleDate, status: 'Planned', comments: `Rescheduled from ${originalDate}` }
+              ? { ...d, deliverableDate: rescheduleDate, status: 'Rescheduled', comments: `Rescheduled from ${originalDate} to ${rescheduleDate}` }
               : d,
           ),
         } : null);
-        setSuccess('Session moved to the new date. It stays in your To-Do list.');
+        setSuccess('Session rescheduled. See the Rescheduled tab.');
       }
 
       setRescheduleTarget(null); setRescheduleDate('');
@@ -509,29 +537,38 @@ export function MySessionsPage() {
               </Box>
             )}
 
-            {/* Previous Academic Years */}
-            {previousNeeds.length > 0 && (
+            {/* Previous Academic Years — grouped by year, de-emphasized */}
+            {previousNeedsByYear.length > 0 && (
               <Box>
-                <Typography variant="subtitle1" fontWeight={600} color="text.secondary" sx={{ mb: 1.5 }}>
-                  Previous
+                <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  Previous Academic Years
                 </Typography>
-                <Grid container spacing={2}>
-                  {previousNeeds.map((need) => (
-                    <Grid item xs={12} sm={6} key={need.needId}>
-                      <Paper
-                        variant="outlined"
-                        sx={{ p: 2, cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}
-                        onClick={() => setSelectedNeed(need)}
-                      >
-                        <Typography variant="body1" fontWeight={500}>{need.needName}</Typography>
-                        <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
-                          {need.entityName && <Typography variant="caption" color="text.secondary">{need.entityName}</Typography>}
-                          <Typography variant="caption" color="text.secondary">{need.startDate} – {need.endDate}</Typography>
-                        </Stack>
-                      </Paper>
-                    </Grid>
+                <Stack spacing={2.5}>
+                  {previousNeedsByYear.map(([year, needs]) => (
+                    <Box key={year}>
+                      <Typography variant="subtitle2" fontWeight={600} color="text.secondary" sx={{ mb: 1 }}>
+                        {academicYearLabel(year)}
+                      </Typography>
+                      <Grid container spacing={2}>
+                        {needs.map((need) => (
+                          <Grid item xs={12} sm={6} key={need.needId}>
+                            <Paper
+                              variant="outlined"
+                              sx={{ p: 2, cursor: 'pointer', opacity: 0.6, transition: 'opacity 0.2s', '&:hover': { opacity: 1 } }}
+                              onClick={() => setSelectedNeed(need)}
+                            >
+                              <Typography variant="body1" fontWeight={500}>{need.needName}</Typography>
+                              <Stack direction="row" spacing={2} sx={{ mt: 0.5 }}>
+                                {need.entityName && <Typography variant="caption" color="text.secondary">{need.entityName}</Typography>}
+                                <Typography variant="caption" color="text.secondary">{need.startDate} – {need.endDate}</Typography>
+                              </Stack>
+                            </Paper>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </Box>
                   ))}
-                </Grid>
+                </Stack>
               </Box>
             )}
           </>
@@ -780,7 +817,7 @@ export function MySessionsPage() {
             <Typography variant="caption" color="text.secondary">
               {canCreateDeliverable
                 ? 'The original session will be marked as rescheduled and a new session created on the chosen date.'
-                : 'This session will move to the new date and stay in your To-Do list.'}
+                : 'This session will be moved to the new date and marked as rescheduled. You can find it under the Rescheduled tab.'}
             </Typography>
             <TextField label="New Date *" type="date" value={rescheduleDate} onChange={(e) => setRescheduleDate(e.target.value)} size="small" fullWidth InputLabelProps={{ shrink: true }} inputProps={{ min: todayStr }} />
             <Stack direction="row" spacing={1}>

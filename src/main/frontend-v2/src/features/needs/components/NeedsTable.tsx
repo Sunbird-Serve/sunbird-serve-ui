@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, Fragment } from 'react';
 import {
   Table,
   TableBody,
@@ -44,16 +44,32 @@ interface NeedsTableProps {
   needs: NeedListItem[];
   loading?: boolean;
   isAdmin?: boolean;
+  /** When true, rows are grouped into sections by academic year (current year
+   *  first) instead of a single paginated list. */
+  groupByYear?: boolean;
   onRowClick?: (need: NeedListItem) => void;
   onApprove?: (needId: string) => void;
   onReject?: (needId: string) => void;
   onModifySchedule?: (need: NeedListItem) => void;
 }
 
+// Indian academic year (Apr–Mar): starting calendar year for a given ISO date.
+function academicYearOf(dateStr?: string): number | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr.substring(0, 10) + 'T00:00:00');
+  if (Number.isNaN(d.getTime())) return null;
+  return d.getMonth() >= 3 ? d.getFullYear() : d.getFullYear() - 1;
+}
+
+function academicYearLabel(startYear: number): string {
+  return `AY ${startYear}–${startYear + 1}`;
+}
+
 export function NeedsTable({
   needs,
   loading = false,
   isAdmin = false,
+  groupByYear = false,
   onRowClick,
   onApprove,
   onReject,
@@ -85,11 +101,34 @@ export function NeedsTable({
     );
   }, [filteredByStatus, search]);
 
-  // Paginate
+  // Paginate (flat mode)
   const paginatedNeeds = useMemo(() => {
     const start = page * rowsPerPage;
     return filteredNeeds.slice(start, start + rowsPerPage);
   }, [filteredNeeds, page, rowsPerPage]);
+
+  // Group by academic year (grouped mode), current year first then descending.
+  const now = new Date();
+  const curAY = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  const yearGroups = useMemo(() => {
+    const groups = new Map<number, NeedListItem[]>();
+    const undated: NeedListItem[] = [];
+    if (groupByYear) {
+      for (const n of filteredNeeds) {
+        const year = academicYearOf(n.occurrence?.startDate || n.occurrence?.endDate);
+        if (year == null) { undated.push(n); continue; }
+        const list = groups.get(year) || [];
+        list.push(n);
+        groups.set(year, list);
+      }
+    }
+    const sorted = Array.from(groups.entries()).sort((a, b) => {
+      if (a[0] === curAY) return -1;
+      if (b[0] === curAY) return 1;
+      return b[0] - a[0];
+    });
+    return { sorted, undated };
+  }, [filteredNeeds, groupByYear, curAY]);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, needId: string) => {
     event.stopPropagation();
@@ -111,6 +150,150 @@ export function NeedsTable({
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const colCount = 7;
+
+  // Single desktop row (shared by flat + grouped modes)
+  const renderRow = (item: NeedListItem) => (
+    <TableRow
+      key={item.need?.id || Math.random()}
+      hover
+      sx={{ cursor: 'pointer' }}
+      onClick={() => item.need && onRowClick?.(item)}
+    >
+      <TableCell>
+        <Typography variant="body2" fontWeight={500} noWrap sx={{ maxWidth: 220 }}>
+          {item.need?.name || '—'}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <Typography variant="caption" color="text.secondary">
+          {item.needType?.name || '—'}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <Typography variant="body2" noWrap sx={{ maxWidth: 160 }}>
+          {item.entity?.name || '—'}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <Typography variant="caption" color="text.secondary">
+          {item.entity?.district || '—'}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <Typography variant="caption" color="text.secondary">
+          {formatTimeline(item.occurrence)}
+        </Typography>
+      </TableCell>
+      <TableCell>
+        <StatusChip status={item.need?.status || 'Unknown'} />
+      </TableCell>
+      {!isAdmin && (
+        <TableCell align="center">
+          <IconButton
+            size="small"
+            color="primary"
+            onClick={(e) => { e.stopPropagation(); onModifySchedule?.(item); }}
+            title="Modify Schedule"
+          >
+            <ScheduleIcon fontSize="small" />
+          </IconButton>
+        </TableCell>
+      )}
+      {isAdmin && (
+        <TableCell align="right">
+          {item.need?.status === 'New' && (
+            <IconButton size="small" onClick={(e) => handleMenuOpen(e, item.need!.id)}>
+              <MoreVertIcon fontSize="small" />
+            </IconButton>
+          )}
+        </TableCell>
+      )}
+    </TableRow>
+  );
+
+  // Year section header row (grouped mode)
+  const renderYearHeader = (label: string, count: number, isCurrent: boolean) => (
+    <TableRow key={`hdr-${label}`}>
+      <TableCell
+        colSpan={colCount}
+        sx={{
+          bgcolor: isCurrent ? 'rgba(14, 116, 144, 0.08)' : 'action.hover',
+          borderBottom: '2px solid',
+          borderColor: isCurrent ? 'primary.main' : 'divider',
+          py: 1,
+        }}
+      >
+        <Stack direction="row" spacing={1} alignItems="center">
+          <Typography variant="subtitle2" fontWeight={700} color={isCurrent ? 'primary.main' : 'text.secondary'}>
+            {label}
+          </Typography>
+          {isCurrent && (
+            <Typography variant="caption" sx={{ px: 1, py: 0.25, borderRadius: 1, bgcolor: 'primary.main', color: 'white', fontWeight: 600 }}>
+              Current
+            </Typography>
+          )}
+          <Typography variant="caption" color="text.secondary">· {count} {count === 1 ? 'need' : 'needs'}</Typography>
+        </Stack>
+      </TableCell>
+    </TableRow>
+  );
+
+  // Single mobile card (shared by flat + grouped modes)
+  const renderCard = (item: NeedListItem) => (
+    <Card key={item.need?.id || Math.random()} variant="outlined">
+      <CardActionArea onClick={() => item.need && onRowClick?.(item)}>
+        <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 0.5 }}>
+            <Typography variant="subtitle2" fontWeight={600} sx={{ flex: 1, mr: 1 }}>
+              {item.need?.name || '—'}
+            </Typography>
+            <StatusChip status={item.need?.status || 'Unknown'} />
+          </Stack>
+          <Stack spacing={0.5} sx={{ mt: 1 }}>
+            {item.entity?.name && (
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <BusinessIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                <Typography variant="caption" color="text.secondary">{item.entity.name}</Typography>
+              </Stack>
+            )}
+            {item.entity?.district && (
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <LocationOnIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                <Typography variant="caption" color="text.secondary">{item.entity.district}</Typography>
+              </Stack>
+            )}
+            {item.occurrence?.startDate && (
+              <Stack direction="row" spacing={0.5} alignItems="center">
+                <CalendarTodayIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                <Typography variant="caption" color="text.secondary">{formatTimeline(item.occurrence)}</Typography>
+              </Stack>
+            )}
+            {item.needType?.name && (
+              <Typography variant="caption" color="text.secondary">Type: {item.needType.name}</Typography>
+            )}
+          </Stack>
+          <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 1 }}>
+            {!isAdmin && (
+              <IconButton size="small" color="primary" onClick={(e) => { e.stopPropagation(); onModifySchedule?.(item); }}>
+                <ScheduleIcon fontSize="small" />
+              </IconButton>
+            )}
+            {isAdmin && item.need?.status === 'New' && (
+              <>
+                <IconButton size="small" color="success" onClick={(e) => { e.stopPropagation(); onApprove?.(item.need!.id); }}>
+                  <CheckIcon fontSize="small" />
+                </IconButton>
+                <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); onReject?.(item.need!.id); }}>
+                  <CloseIcon fontSize="small" />
+                </IconButton>
+              </>
+            )}
+          </Stack>
+        </CardContent>
+      </CardActionArea>
+    </Card>
+  );
 
   return (
     <Paper sx={{ width: '100%' }}>
@@ -158,83 +341,38 @@ export function NeedsTable({
                 <Skeleton key={i} variant="rounded" height={100} />
               ))}
             </Stack>
-          ) : paginatedNeeds.length === 0 ? (
+          ) : filteredNeeds.length === 0 ? (
             <Box sx={{ py: 6, textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">No needs found</Typography>
             </Box>
+          ) : groupByYear ? (
+            <Stack spacing={3}>
+              {yearGroups.sorted.map(([year, list]) => (
+                <Box key={year}>
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+                    <Typography variant="subtitle2" fontWeight={700} color={year === curAY ? 'primary.main' : 'text.secondary'}>
+                      {academicYearLabel(year)}
+                    </Typography>
+                    {year === curAY && (
+                      <Typography variant="caption" sx={{ px: 1, py: 0.25, borderRadius: 1, bgcolor: 'primary.main', color: 'white', fontWeight: 600 }}>Current</Typography>
+                    )}
+                    <Typography variant="caption" color="text.secondary">· {list.length}</Typography>
+                  </Stack>
+                  <Stack spacing={1.5} sx={{ opacity: year === curAY ? 1 : 0.85 }}>
+                    {list.map(renderCard)}
+                  </Stack>
+                </Box>
+              ))}
+              {yearGroups.undated.length > 0 && (
+                <Box>
+                  <Typography variant="subtitle2" fontWeight={700} color="text.secondary" sx={{ mb: 1 }}>Undated</Typography>
+                  <Stack spacing={1.5}>{yearGroups.undated.map(renderCard)}</Stack>
+                </Box>
+              )}
+            </Stack>
           ) : (
             <Stack spacing={1.5}>
-              {paginatedNeeds.map((item) => (
-                <Card key={item.need?.id || Math.random()} variant="outlined">
-                  <CardActionArea onClick={() => item.need && onRowClick?.(item)}>
-                    <CardContent sx={{ py: 1.5, px: 2, '&:last-child': { pb: 1.5 } }}>
-                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start" sx={{ mb: 0.5 }}>
-                        <Typography variant="subtitle2" fontWeight={600} sx={{ flex: 1, mr: 1 }}>
-                          {item.need?.name || '—'}
-                        </Typography>
-                        <StatusChip status={item.need?.status || 'Unknown'} />
-                      </Stack>
-                      <Stack spacing={0.5} sx={{ mt: 1 }}>
-                        {item.entity?.name && (
-                          <Stack direction="row" spacing={0.5} alignItems="center">
-                            <BusinessIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                            <Typography variant="caption" color="text.secondary">{item.entity.name}</Typography>
-                          </Stack>
-                        )}
-                        {item.entity?.district && (
-                          <Stack direction="row" spacing={0.5} alignItems="center">
-                            <LocationOnIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                            <Typography variant="caption" color="text.secondary">{item.entity.district}</Typography>
-                          </Stack>
-                        )}
-                        {item.occurrence?.startDate && (
-                          <Stack direction="row" spacing={0.5} alignItems="center">
-                            <CalendarTodayIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                            <Typography variant="caption" color="text.secondary">
-                              {formatTimeline(item.occurrence)}
-                            </Typography>
-                          </Stack>
-                        )}
-                        {item.needType?.name && (
-                          <Typography variant="caption" color="text.secondary">
-                            Type: {item.needType.name}
-                          </Typography>
-                        )}
-                      </Stack>
-                      {/* Mobile actions */}
-                      <Stack direction="row" justifyContent="flex-end" spacing={1} sx={{ mt: 1 }}>
-                        {!isAdmin && (
-                          <IconButton
-                            size="small"
-                            color="primary"
-                            onClick={(e) => { e.stopPropagation(); onModifySchedule?.(item); }}
-                          >
-                            <ScheduleIcon fontSize="small" />
-                          </IconButton>
-                        )}
-                        {isAdmin && item.need?.status === 'New' && (
-                          <>
-                            <IconButton
-                              size="small"
-                              color="success"
-                              onClick={(e) => { e.stopPropagation(); onApprove?.(item.need!.id); }}
-                            >
-                              <CheckIcon fontSize="small" />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              color="error"
-                              onClick={(e) => { e.stopPropagation(); onReject?.(item.need!.id); }}
-                            >
-                              <CloseIcon fontSize="small" />
-                            </IconButton>
-                          </>
-                        )}
-                      </Stack>
-                    </CardContent>
-                  </CardActionArea>
-                </Card>
-              ))}
+              {paginatedNeeds.map(renderCard)}
             </Stack>
           )}
         </Box>
@@ -263,95 +401,49 @@ export function NeedsTable({
                   ))}
                 </TableRow>
               ))
-            ) : paginatedNeeds.length === 0 ? (
+            ) : filteredNeeds.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isAdmin ? 7 : 7} align="center" sx={{ py: 6 }}>
+                <TableCell colSpan={colCount} align="center" sx={{ py: 6 }}>
                   <Typography variant="body2" color="text.secondary">
                     No needs found
                   </Typography>
                 </TableCell>
               </TableRow>
+            ) : groupByYear ? (
+              <>
+                {yearGroups.sorted.map(([year, list]) => (
+                  <Fragment key={year}>
+                    {renderYearHeader(academicYearLabel(year), list.length, year === curAY)}
+                    {list.map(renderRow)}
+                  </Fragment>
+                ))}
+                {yearGroups.undated.length > 0 && (
+                  <Fragment key="undated">
+                    {renderYearHeader('Undated', yearGroups.undated.length, false)}
+                    {yearGroups.undated.map(renderRow)}
+                  </Fragment>
+                )}
+              </>
             ) : (
-              paginatedNeeds.map((item) => (
-                <TableRow
-                  key={item.need?.id || Math.random()}
-                  hover
-                  sx={{ cursor: 'pointer' }}
-                  onClick={() => item.need && onRowClick?.(item)}
-                >
-                  <TableCell>
-                    <Typography variant="body2" fontWeight={500} noWrap sx={{ maxWidth: 220 }}>
-                      {item.need?.name || '—'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption" color="text.secondary">
-                      {item.needType?.name || '—'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="body2" noWrap sx={{ maxWidth: 160 }}>
-                      {item.entity?.name || '—'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption" color="text.secondary">
-                      {item.entity?.district || '—'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption" color="text.secondary">
-                      {formatTimeline(item.occurrence)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <StatusChip status={item.need?.status || 'Unknown'} />
-                  </TableCell>
-                  {!isAdmin && (
-                    <TableCell align="center">
-                      <IconButton
-                        size="small"
-                        color="primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onModifySchedule?.(item);
-                        }}
-                        title="Modify Schedule"
-                      >
-                        <ScheduleIcon fontSize="small" />
-                      </IconButton>
-                    </TableCell>
-                  )}
-                  {isAdmin && (
-                    <TableCell align="right">
-                      {item.need?.status === 'New' && (
-                        <IconButton
-                          size="small"
-                          onClick={(e) => handleMenuOpen(e, item.need!.id)}
-                        >
-                          <MoreVertIcon fontSize="small" />
-                        </IconButton>
-                      )}
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
+              paginatedNeeds.map(renderRow)
             )}
           </TableBody>
         </Table>
       </TableContainer>
       )}
 
-      {/* Pagination */}
-      <TablePagination
-        component="div"
-        count={filteredNeeds.length}
-        page={page}
-        onPageChange={(_, p) => setPage(p)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
-        rowsPerPageOptions={[10, 15, 25]}
-      />
+      {/* Pagination (flat mode only) */}
+      {!groupByYear && (
+        <TablePagination
+          component="div"
+          count={filteredNeeds.length}
+          page={page}
+          onPageChange={(_, p) => setPage(p)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); }}
+          rowsPerPageOptions={[10, 15, 25]}
+        />
+      )}
 
       {/* Admin action menu */}
       <Menu anchorEl={menuAnchor} open={Boolean(menuAnchor)} onClose={handleMenuClose}>
