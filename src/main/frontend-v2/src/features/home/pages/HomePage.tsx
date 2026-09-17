@@ -75,14 +75,28 @@ export function HomePage() {
     });
   };
 
-  // If already authenticated AND has roles, redirect based on role
+  // After authentication, route the user:
+  // 1. If they have a known app role -> role-based default route.
+  // 2. If they just completed Keycloak signup (no role yet) -> the profile
+  //    completion form matching the sign-up type they chose.
   useEffect(() => {
     if (!authenticated) return;
+
     const effectiveRoles = roles.length > 0 ? roles : (backendUser?.role || []);
     if (effectiveRoles.length > 0) {
       const role = effectiveRoles[0];
       const roleConfig = getRoleConfig(role);
       navigate(roleConfig?.defaultRoute || '/app/dashboard');
+      return;
+    }
+
+    // No role yet — this is a new user returning from Keycloak registration.
+    // Send them to the profile form for the type they signed up as.
+    const pendingType = localStorage.getItem('pendingRegistrationType');
+    if (pendingType === 'coordinator') {
+      navigate('/register/coordinator-profile');
+    } else if (pendingType === 'volunteer') {
+      navigate('/register/volunteer-profile');
     }
   }, [authenticated, roles, backendUser?.role, navigate]);
 

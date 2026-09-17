@@ -44,6 +44,11 @@ export const API = {
 
 export type ApiEndpoint = keyof typeof API;
 
+// Default agency for self-registering volunteers when the registration flow
+// is not started from an agency-specific deep link (/register/:agencyId).
+export const DEFAULT_VOLUNTEER_AGENCY_ID =
+  import.meta.env.VITE_DEFAULT_VOLUNTEER_AGENCY_ID || '';
+
 // Helper: get base URL for a given service path
 export function getServiceBaseUrl(path: string): string {
   if (path.includes('serve-need')) return NEED_BASE;

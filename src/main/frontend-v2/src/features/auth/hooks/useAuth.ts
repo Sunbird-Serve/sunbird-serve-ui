@@ -21,8 +21,16 @@ export function useAuth() {
     loginWithToken: async (_token: string) => { kc.login(); },
     logout: async () => { kc.logout(); },
     resetPassword: async (_email: string) => {
-      // Keycloak handles password reset — redirect to account page
-      window.open(`${import.meta.env.VITE_KEYCLOAK_URL}/realms/${import.meta.env.VITE_KEYCLOAK_REALM}/account`, '_blank');
+      // Route through Keycloak's dedicated UPDATE_PASSWORD flow.
+      // For authenticated users this prompts a password change directly;
+      // unauthenticated users are taken to the login screen where the
+      // "Forgot password" link is available.
+      const { default: keycloak } = await import('@config/keycloak');
+      if (kc.authenticated) {
+        keycloak.login({ action: 'UPDATE_PASSWORD' });
+      } else {
+        keycloak.login();
+      }
     },
 
     // New Keycloak-specific properties

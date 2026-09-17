@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -29,7 +29,12 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import EventRepeatIcon from '@mui/icons-material/EventRepeat';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useAppSelector } from '@app/store';
+import { useAuth } from '@features/auth/hooks/useAuth';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
+
+// Roles permitted to call the create endpoint (two-row reschedule).
+// Volunteers can only update existing deliverables, so they reschedule in-place.
+const CREATE_CAPABLE_ROLES = ['sAdmin', 'nAdmin', 'nCoordinator'];
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -40,19 +45,33 @@ interface Deliverable {
   status: string;
   comments?: string;
   numberOfAttendees?: number;
-  inputParameters?: {
-    startTime?: string;
-    endTime?: string;
-    inputUrl?: string;
-    softwarePlatform?: string;
-  };
+  inputParameters?: InputParameter;
+}
+
+interface TimeSlot {
+  day?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 interface InputParameter {
-  startTime?: string;
-  endTime?: string;
   inputUrl?: string;
   softwarePlatform?: string;
+  // New records use timeSlots[]; startTime/endTime are legacy/backfilled.
+  timeSlots?: TimeSlot[];
+  startTime?: string;
+  endTime?: string;
+}
+
+// Resolve display start/end time from either the new timeSlots[] shape
+// or the legacy top-level fields.
+function resolveTimes(p?: InputParameter | null): { startTime?: string; endTime?: string } {
+  if (!p) return {};
+  if (p.timeSlots?.length) {
+    const slot = p.timeSlots[0];
+    return { startTime: slot.startTime, endTime: slot.endTime };
+  }
+  return { startTime: p.startTime, endTime: p.endTime };
 }
 
 interface CoordinatorInfo {
@@ -102,6 +121,8 @@ const CANCEL_REASONS = [
 export function MySessionsPage() {
   const user = useAppSelector((state) => state.user.data);
   const userId = user?.osid || '';
+  const { roles } = useAuth();
+  const canCreateDeliverable = roles.some((r) => CREATE_CAPABLE_ROLES.includes(r));
 
   const [loading, setLoading] = useState(true);
   const [assignedNeeds, setAssignedNeeds] = useState<AssignedNeed[]>([]);
@@ -125,11 +146,10 @@ export function MySessionsPage() {
   // Deliverable tab
   const [delivTab, setDelivTab] = useState(0); // 0=To-Do, 1=Completed, 2=Cancelled
 
-  // Fetch assigned needs
-  useEffect(() => {
-    async function fetchData() {
+  // Fetch assigned needs (reusable so mutations can reconcile with the server)
+  const fetchData = useCallback(async (opts?: { silent?: boolean }) => {
       if (!userId) return;
-      setLoading(true);
+      if (!opts?.silent) setLoading(true);
       try {
         const { getAuthHeaders } = await import('@shared/utils/authHeaders');
         const headers = getAuthHeaders();
@@ -224,13 +244,19 @@ export function MySessionsPage() {
           } catch { /* skip */ }
         }
         setAssignedNeeds(results);
-        // Auto-select first need if only one
-        if (results.length === 1) setSelectedNeed(results[0]);
+        // Keep the currently-selected need in sync with refreshed data,
+        // or auto-select the first need if there's only one.
+        setSelectedNeed((prev) => {
+          if (prev) return results.find((n) => n.planId === prev.planId) || null;
+          return results.length === 1 ? results[0] : null;
+        });
       } catch { /* silent */ }
-      finally { setLoading(false); }
-    }
-    fetchData();
+      finally { if (!opts?.silent) setLoading(false); }
   }, [userId]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Split into current academic year vs previous
   // Indian academic year: April to March
@@ -250,7 +276,10 @@ export function MySessionsPage() {
     .filter((d) => d.status === 'Planned' || d.status === 'NotStarted')
     .sort((a, b) => a.deliverableDate.localeCompare(b.deliverableDate)) || [];
   const completedDelivs = selectedNeed?.deliverables.filter((d) => d.status === 'Completed') || [];
-  const cancelledDelivs = selectedNeed?.deliverables.filter((d) => d.status === 'Cancelled' || d.status === 'Rescheduled' || d.status === 'Offline') || [];
+  const cancelledDelivs = selectedNeed?.deliverables.filter((d) => d.status === 'Cancelled' || d.status === 'Offline') || [];
+  const rescheduledDelivs = selectedNeed?.deliverables
+    .filter((d) => d.status === 'Rescheduled')
+    .sort((a, b) => a.deliverableDate.localeCompare(b.deliverableDate)) || [];
 
   const todayStr = new Date().toISOString().split('T')[0];
 
@@ -292,9 +321,10 @@ export function MySessionsPage() {
         });
       } catch { /* best effort */ }
 
-      setSelectedNeed((prev) => prev ? { ...prev, deliverables: prev.deliverables.map((d) => d.id === completeTarget.id ? { ...d, status: 'Completed', comments: notes } : d) } : null);
+      setSelectedNeed((prev) => prev ? { ...prev, deliverables: prev.deliverables.map((d) => d.id === completeTarget.id ? { ...d, status: 'Completed', comments: notes, numberOfAttendees: parseInt(studentCount) } : d) } : null);
       setSuccess('Session marked as completed!');
       setCompleteTarget(null); setStudentCount(''); setNotes('');
+      fetchData({ silent: true });
     } catch { setError('Failed to update.'); }
     finally { setSaving(false); }
   };
@@ -312,6 +342,7 @@ export function MySessionsPage() {
       setSelectedNeed((prev) => prev ? { ...prev, deliverables: prev.deliverables.map((d) => d.id === cancelTarget.id ? { ...d, status: 'Cancelled', comments: cancelReason } : d) } : null);
       setSuccess('Session cancelled.');
       setCancelTarget(null); setCancelReason('');
+      fetchData({ silent: true });
     } catch { setError('Failed to cancel.'); }
     finally { setSaving(false); }
   };
@@ -323,17 +354,97 @@ export function MySessionsPage() {
     try {
       const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
       const headers = getAuthHeadersWithJson();
-      await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${rescheduleTarget.id}`, {
-        method: 'PUT', headers,
-        body: JSON.stringify({ needPlanId: selectedNeed.planId, status: 'Rescheduled', comments: `Rescheduled to ${rescheduleDate}`, deliverableDate: rescheduleTarget.deliverableDate?.split('T')[0] || '' }),
-      });
-      await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/create`, {
-        method: 'POST', headers,
-        body: JSON.stringify({ needPlanId: selectedNeed.planId, status: 'Planned', comments: `Rescheduled from ${rescheduleTarget.deliverableDate?.split('T')[0]}`, deliverableDate: rescheduleDate }),
-      });
-      setSelectedNeed((prev) => prev ? { ...prev, deliverables: prev.deliverables.map((d) => d.id === rescheduleTarget.id ? { ...d, status: 'Rescheduled' } : d) } : null);
-      setSuccess('Session rescheduled!');
+      const originalDate = rescheduleTarget.deliverableDate?.split('T')[0] || '';
+
+      // Carry over session details (link/time/platform) so the rescheduled
+      // session isn't left without a join link.
+      const carriedParams =
+        rescheduleTarget.inputParameters ||
+        (selectedNeed.inputParams?.length ? selectedNeed.inputParams[selectedNeed.inputParams.length - 1] : undefined);
+
+      if (canCreateDeliverable) {
+        // --- Two-row model (coordinators / admins can call create) ---
+        // 1. Mark the original deliverable as Rescheduled (keeps history).
+        const updateResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${rescheduleTarget.id}`, {
+          method: 'PUT', headers,
+          body: JSON.stringify({
+            needPlanId: selectedNeed.planId,
+            status: 'Rescheduled',
+            comments: `Rescheduled to ${rescheduleDate}`,
+            deliverableDate: originalDate,
+          }),
+        });
+        if (!updateResp.ok) throw new Error('update failed');
+
+        // 2. Create the new Planned deliverable on the chosen date.
+        const createResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/create`, {
+          method: 'POST', headers,
+          body: JSON.stringify({
+            needPlanId: selectedNeed.planId,
+            status: 'Planned',
+            comments: `Rescheduled from ${originalDate}`,
+            deliverableDate: rescheduleDate,
+            ...(carriedParams ? { inputParameters: carriedParams } : {}),
+          }),
+        });
+        if (!createResp.ok) throw new Error('create failed');
+
+        let newId = '';
+        try {
+          const created = await createResp.json();
+          newId = created?.id || created?.needDeliverable?.id || created?.result?.id || '';
+        } catch { /* refetch will fill it in */ }
+
+        // Optimistic: flip original to Rescheduled and insert the new Planned row.
+        setSelectedNeed((prev) => {
+          if (!prev) return null;
+          const deliverables = prev.deliverables.map((d) =>
+            d.id === rescheduleTarget.id
+              ? { ...d, status: 'Rescheduled', comments: `Rescheduled to ${rescheduleDate}` }
+              : d,
+          );
+          deliverables.push({
+            id: newId || `temp-${Date.now()}`,
+            needPlanId: selectedNeed.planId,
+            deliverableDate: rescheduleDate,
+            status: 'Planned',
+            comments: `Rescheduled from ${originalDate}`,
+            inputParameters: carriedParams,
+          });
+          return { ...prev, deliverables };
+        });
+        setSuccess('Session rescheduled. The new session is now in your To-Do list.');
+      } else {
+        // --- In-place model (volunteers can only update) ---
+        // Move the existing deliverable to the new date, keeping it actionable.
+        const updateResp = await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${rescheduleTarget.id}`, {
+          method: 'PUT', headers,
+          body: JSON.stringify({
+            needPlanId: selectedNeed.planId,
+            status: 'Planned',
+            comments: `Rescheduled from ${originalDate} to ${rescheduleDate}`,
+            deliverableDate: rescheduleDate,
+            ...(carriedParams ? { inputParameters: carriedParams } : {}),
+          }),
+        });
+        if (!updateResp.ok) throw new Error('update failed');
+
+        // Optimistic: move the same row to the new date, still Planned.
+        setSelectedNeed((prev) => prev ? {
+          ...prev,
+          deliverables: prev.deliverables.map((d) =>
+            d.id === rescheduleTarget.id
+              ? { ...d, deliverableDate: rescheduleDate, status: 'Planned', comments: `Rescheduled from ${originalDate}` }
+              : d,
+          ),
+        } : null);
+        setSuccess('Session moved to the new date. It stays in your To-Do list.');
+      }
+
       setRescheduleTarget(null); setRescheduleDate('');
+
+      // Reconcile with the server as the source of truth.
+      fetchData({ silent: true });
     } catch { setError('Failed to reschedule.'); }
     finally { setSaving(false); }
   };
@@ -463,7 +574,7 @@ export function MySessionsPage() {
               {selectedNeed.days && (
                 <Stack direction="row" spacing={1} alignItems="center">
                   <AccessTimeIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-                  <Typography variant="body2"><strong>Days:</strong> {selectedNeed.days} · {formatTime(params?.startTime)} – {formatTime(params?.endTime)}</Typography>
+                  <Typography variant="body2"><strong>Days:</strong> {selectedNeed.days} · {formatTime(resolveTimes(params).startTime)} – {formatTime(resolveTimes(params).endTime)}</Typography>
                 </Stack>
               )}
             </Stack>
@@ -510,9 +621,10 @@ export function MySessionsPage() {
 
       {/* Deliverables */}
       <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>Sessions</Typography>
-      <Tabs value={delivTab} onChange={(_, v) => setDelivTab(v)} sx={{ mb: 2 }}>
+      <Tabs value={delivTab} onChange={(_, v) => setDelivTab(v)} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }}>
         <Tab label={`To-Do (${todoDelivs.length})`} />
         <Tab label={`Completed (${completedDelivs.length})`} />
+        <Tab label={`Rescheduled (${rescheduledDelivs.length})`} />
         <Tab label={`Cancelled (${cancelledDelivs.length})`} />
       </Tabs>
 
@@ -572,8 +684,32 @@ export function MySessionsPage() {
         </Stack>
       )}
 
-      {/* Cancelled / Rescheduled */}
+      {/* Rescheduled */}
       {delivTab === 2 && (
+        <Stack spacing={1}>
+          {rescheduledDelivs.length === 0 ? (
+            <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 3 }}>No rescheduled sessions.</Typography>
+          ) : rescheduledDelivs.map((d) => (
+            <Paper key={d.id} variant="outlined" sx={{ p: 2 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" spacing={1.5} alignItems="center">
+                  <StatusChip status="Rescheduled" />
+                  <Typography variant="body2">{d.deliverableDate?.split('T')[0]}</Typography>
+                </Stack>
+                {d.comments && (
+                  <Stack direction="row" spacing={0.5} alignItems="center">
+                    <EventRepeatIcon sx={{ fontSize: 15, color: 'info.main' }} />
+                    <Typography variant="caption" color="text.secondary">{d.comments}</Typography>
+                  </Stack>
+                )}
+              </Stack>
+            </Paper>
+          ))}
+        </Stack>
+      )}
+
+      {/* Cancelled */}
+      {delivTab === 3 && (
         <Stack spacing={1}>
           {cancelledDelivs.length === 0 ? (
             <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 3 }}>No cancelled sessions.</Typography>
@@ -641,7 +777,12 @@ export function MySessionsPage() {
         <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0, p: 3, zIndex: 1200, boxShadow: '0 -4px 20px rgba(0,0,0,0.15)', borderRadius: '16px 16px 0 0' }}>
           <Typography variant="subtitle1" fontWeight={600} gutterBottom>Reschedule Session</Typography>
           <Stack spacing={2}>
-            <TextField label="New Date *" type="date" value={rescheduleDate} onChange={(e) => setRescheduleDate(e.target.value)} size="small" fullWidth InputLabelProps={{ shrink: true }} />
+            <Typography variant="caption" color="text.secondary">
+              {canCreateDeliverable
+                ? 'The original session will be marked as rescheduled and a new session created on the chosen date.'
+                : 'This session will move to the new date and stay in your To-Do list.'}
+            </Typography>
+            <TextField label="New Date *" type="date" value={rescheduleDate} onChange={(e) => setRescheduleDate(e.target.value)} size="small" fullWidth InputLabelProps={{ shrink: true }} inputProps={{ min: todayStr }} />
             <Stack direction="row" spacing={1}>
               <Button variant="contained" onClick={handleRescheduleSession} disabled={saving || !rescheduleDate} fullWidth>{saving ? 'Saving...' : 'Reschedule'}</Button>
               <Button variant="text" onClick={() => { setRescheduleTarget(null); setRescheduleDate(''); }} fullWidth>Back</Button>

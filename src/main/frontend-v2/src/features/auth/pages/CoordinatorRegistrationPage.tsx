@@ -78,6 +78,9 @@ export function CoordinatorRegistrationPage() {
         throw new Error('Failed to create account. Please try again.');
       }
 
+      // Clean up any pending sign-up markers
+      localStorage.removeItem('pendingRegistrationType');
+
       // Re-fetch user to update Redux state
       const encodedEmail = email.replace(/@/g, '%40');
       await dispatch(fetchUserByEmail(encodedEmail)).unwrap();

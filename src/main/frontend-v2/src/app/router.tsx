@@ -9,6 +9,7 @@ import { VolunteerLayout } from '@layouts/VolunteerLayout';
 
 // Guards
 import { ProtectedRoute } from '@features/auth/guards/ProtectedRoute';
+import { RoleGuard } from '@features/auth/guards/RoleGuard';
 
 // Eager-loaded pages (small, critical path)
 import { HomePage } from '@features/home/pages/HomePage';
@@ -158,6 +159,11 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      {
+        element: (
+          <RoleGuard allowedRoles={['nCoordinator', 'vCoordinator', 'nAdmin', 'vAdmin', 'sAdmin']} />
+        ),
+        children: [
       {
         path: '/app',
         element: <AdminLayout />,
@@ -315,6 +321,8 @@ export const router = createBrowserRouter([
           },
         ],
       },
+        ],
+      },
     ],
   },
 
@@ -322,6 +330,9 @@ export const router = createBrowserRouter([
   {
     element: <ProtectedRoute />,
     children: [
+      {
+        element: <RoleGuard allowedRoles={['Volunteer']} />,
+        children: [
       {
         path: '/explore',
         element: <VolunteerLayout />,
@@ -367,6 +378,8 @@ export const router = createBrowserRouter([
               </SuspenseWrapper>
             ),
           },
+        ],
+      },
         ],
       },
     ],

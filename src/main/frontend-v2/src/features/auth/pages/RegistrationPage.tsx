@@ -19,7 +19,8 @@ import {
   Autocomplete,
   CircularProgress,
 } from '@mui/material';
-import { API } from '@config/api';
+import { API, DEFAULT_VOLUNTEER_AGENCY_ID } from '@config/api';
+import { getRoleConfig } from '@config/roles';
 import { useAuth } from '../hooks/useAuth';
 
 const GENDER_OPTIONS = ['Male', 'Female', 'Transgender', 'Others'];
@@ -152,8 +153,18 @@ export function RegistrationPage() {
     setError('');
     setLoading(true);
 
-    // Resolve agencyId from URL or localStorage (saved before Keycloak redirect)
-    const effectiveAgencyId = agencyId || localStorage.getItem('pendingRegistrationAgencyId') || '1-74f81200-dc16-4c65-bf7a-a3ab75952432';
+    // Resolve agencyId from URL or localStorage (saved before Keycloak redirect),
+    // falling back to the deployment's default volunteer agency.
+    const effectiveAgencyId =
+      agencyId ||
+      localStorage.getItem('pendingRegistrationAgencyId') ||
+      DEFAULT_VOLUNTEER_AGENCY_ID;
+
+    if (!effectiveAgencyId) {
+      setError('No agency is configured for registration. Please contact support.');
+      setLoading(false);
+      return;
+    }
 
     const userPayload = {
       identityDetails: {
@@ -238,14 +249,28 @@ export function RegistrationPage() {
 
       // Clean up localStorage
       localStorage.removeItem('pendingRegistrationAgencyId');
+      localStorage.removeItem('pendingRegistrationType');
 
-      // Force token refresh
+      // The Volunteer role is assigned server-side, so it may not be present in
+      // the token immediately. Force-refresh the token a few times until the
+      // role appears (short backoff) before routing to the volunteer area.
       try {
         const keycloak = (await import('@config/keycloak')).default;
-        await keycloak.updateToken(-1);
+        let hasRole = false;
+        for (let attempt = 0; attempt < 3 && !hasRole; attempt += 1) {
+          await keycloak.updateToken(-1);
+          const tokenRoles =
+            (keycloak.tokenParsed?.realm_access?.roles as string[] | undefined) || [];
+          hasRole = tokenRoles.includes('Volunteer');
+          if (!hasRole) {
+            await new Promise((resolve) => setTimeout(resolve, 800));
+          }
+        }
       } catch { /* role will be available on next login */ }
 
-      navigate('/explore/sessions');
+      // Redirect to the Volunteer default route (keeps routing consistent with roles.ts)
+      const volunteerRoute = getRoleConfig('Volunteer')?.defaultRoute || '/explore/home';
+      navigate(volunteerRoute);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     } finally {
