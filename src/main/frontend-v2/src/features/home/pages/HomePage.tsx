@@ -174,7 +174,7 @@ export function HomePage() {
               </Stack>
               <Stack direction="row" alignItems="center" spacing={1} sx={{ flexShrink: 0 }}>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', display: { xs: 'none', md: 'block' } }}>
-                  Already using {adopter.brandName}?
+                  New here?
                 </Typography>
                 <Button
                   size="small"
