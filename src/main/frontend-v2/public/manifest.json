@@ -1,7 +1,7 @@
 {
-  "name": "Sunbird Serve",
-  "short_name": "Serve",
-  "description": "Volunteer and Need Management Platform - Translating Intent to Impact",
+  "name": "EVidya Nipuna",
+  "short_name": "EVidya Nipuna",
+  "description": "Digital Literacy Program for Government Junior College Students in Telangana",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

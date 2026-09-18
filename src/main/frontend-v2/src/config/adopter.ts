@@ -17,6 +17,8 @@ export interface HowItWorksStep {
 export interface AdopterConfig {
   /** Display name used in the header/brand and footer. */
   brandName: string;
+  /** Optional small label shown before the brand name in the top bar (e.g. "Serve"). */
+  brandPrefix?: string;
   /** Optional line under the brand name in the top bar (e.g. board/authority). */
   brandTagline?: string;
   /** Hero headline. Use `highlight` to color a portion of it. */
@@ -78,17 +80,18 @@ const ADOPTERS: Record<AdopterId, AdopterConfig> = {
 
   telangana: {
     ...DEFAULT_ADOPTER,
-    brandName: 'eVidya Nipuna',
+    brandName: 'EVidya Nipuna',
+    brandPrefix: 'Serve',
     brandTagline: 'Telangana Intermediate Board',
-    heroTitle: 'eVidya',
+    heroTitle: 'EVidya',
     heroHighlight: 'Nipuna',
     heroSubtitle: 'Digital Literacy Program for Government Junior College Students in Telangana',
     heroDescription:
       'Connecting students with volunteer teachers through live online sessions to build essential digital skills and confidence.',
     trustSignal: '',
-    volunteerCardTitle: '🤝 Volunteer for eVidya Nipuna',
+    volunteerCardTitle: '🤝 Volunteer for EVidya Nipuna',
     volunteerCardSubtitle: 'Teach Digital Literacy to Government Junior College students.',
-    volunteerCardCta: 'Volunteer for eVidya Nipuna',
+    volunteerCardCta: 'Volunteer for EVidya Nipuna',
     schoolCardTitle: '🏫 For Colleges',
     schoolCardSubtitle: 'Bring the Digital Literacy program to your students.',
     exploreCtaLabel: 'Explore Learning Needs',
@@ -96,7 +99,7 @@ const ADOPTERS: Record<AdopterId, AdopterConfig> = {
     aboutOverline: 'About the Program',
     aboutHeading: 'Building Digital Skills for the Future',
     aboutContent:
-      'eVidya Nipuna is a digital literacy initiative for students of Government Junior Colleges in Telangana. Through structured, volunteer-led online sessions, students learn foundational computer concepts and develop practical digital skills that support their education and future opportunities.',
+      'EVidya Nipuna is a digital literacy initiative for students of Government Junior Colleges in Telangana. Through structured, volunteer-led online sessions, students learn foundational computer concepts and develop practical digital skills that support their education and future opportunities.',
 
     highlights: [
       {
@@ -117,7 +120,7 @@ const ADOPTERS: Record<AdopterId, AdopterConfig> = {
       },
     ],
 
-    howItWorksHeading: 'How eVidya Nipuna Works',
+    howItWorksHeading: 'How EVidya Nipuna Works',
     howItWorksSteps: [
       { step: 1, text: 'Colleges identify student batches and suitable class timings.' },
       { step: 2, text: 'Digital Literacy learning needs are created and published on the platform.' },

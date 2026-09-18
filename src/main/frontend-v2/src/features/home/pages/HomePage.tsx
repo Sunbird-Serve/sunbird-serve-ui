@@ -152,7 +152,9 @@ export function HomePage() {
               <Stack direction="row" alignItems="center" spacing={1}>
                 <img src="/icons/serve-logo.jpeg" alt={adopter.brandName} style={{ height: 28, width: 28, borderRadius: 4 }} />
                 <Box>
-                  <Typography variant="subtitle1" fontWeight={700} lineHeight={1.1}>{adopter.brandName}</Typography>
+                  <Typography variant="subtitle1" fontWeight={700} lineHeight={1.1}>
+                    {adopter.brandPrefix ? `${adopter.brandPrefix} · ${adopter.brandName}` : adopter.brandName}
+                  </Typography>
                   {adopter.brandTagline && (
                     <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>{adopter.brandTagline}</Typography>
                   )}
