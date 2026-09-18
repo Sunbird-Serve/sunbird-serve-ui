@@ -150,7 +150,7 @@ export function HomePage() {
           <Container maxWidth="lg">
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 1.5 }}>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <img src="/icons/serve-logo.jpeg" alt={adopter.brandName} style={{ height: 28, width: 28, borderRadius: 4 }} />
+                <img src="/icons/serve-logo.jpeg" alt={adopter.brandName} style={{ height: 40, width: 40, borderRadius: 6 }} />
                 <Box>
                   <Typography variant="subtitle1" fontWeight={700} lineHeight={1.1}>
                     {adopter.brandPrefix ? `${adopter.brandPrefix} · ${adopter.brandName}` : adopter.brandName}
