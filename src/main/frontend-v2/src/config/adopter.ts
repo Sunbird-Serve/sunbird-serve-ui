@@ -82,7 +82,7 @@ const ADOPTERS: Record<AdopterId, AdopterConfig> = {
     ...DEFAULT_ADOPTER,
     brandName: 'EVidya Nipuna',
     brandPrefix: 'Serve',
-    brandTagline: 'Telangana Intermediate Board',
+    brandTagline: 'Telangana State Board of Intermediate Education',
     heroTitle: 'EVidya',
     heroHighlight: 'Nipuna',
     heroSubtitle: 'Digital Literacy Program for Government Junior College Students in Telangana',
