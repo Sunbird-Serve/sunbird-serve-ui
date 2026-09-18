@@ -18,6 +18,7 @@ import InsightsIcon from '@mui/icons-material/Insights';
 import VerifiedIcon from '@mui/icons-material/Verified';
 import { useAuth } from '@features/auth';
 import { getRoleConfig } from '@config/roles';
+import { getAdopterConfig } from '@config/adopter';
 import { useAppSelector } from '@app/store';
 
 const impactItems = [
@@ -49,6 +50,32 @@ const impactItems = [
 
 const VOLUNTEER_WEB_ENABLED = import.meta.env.VITE_VOLUNTEER_WEB_ENABLED === 'true';
 const VOLUNTEER_WHATSAPP_ENABLED = import.meta.env.VITE_VOLUNTEER_WHATSAPP_ENABLED === 'true';
+
+// Per-adopter (Telangana / UP / …) home page content.
+const adopter = getAdopterConfig();
+
+// Icons reused for program highlight cards (positional), keeping existing look.
+const HIGHLIGHT_ICONS = [
+  <PublicIcon sx={{ fontSize: 36 }} />,
+  <VerifiedIcon sx={{ fontSize: 36 }} />,
+  <GroupsIcon sx={{ fontSize: 36 }} />,
+  <InsightsIcon sx={{ fontSize: 36 }} />,
+];
+
+// Section cards: use adopter highlights when provided, else the generic items.
+const sectionCards = adopter.highlights
+  ? adopter.highlights.map((h, i) => ({
+      icon: HIGHLIGHT_ICONS[i % HIGHLIGHT_ICONS.length],
+      title: h.title,
+      description: h.description,
+    }))
+  : impactItems;
+
+const sectionOverline = adopter.aboutOverline || 'Why Serve';
+const sectionHeading = adopter.aboutHeading || 'Turning Intent into Impact';
+const sectionIntro =
+  adopter.aboutContent ||
+  'No community should wait while willing hands stand idle. SERVE channels untapped volunteer energy into real-world results — matching every verified need with the right skills, instantly and at scale.';
 
 export function HomePage() {
   const navigate = useNavigate();
@@ -123,12 +150,17 @@ export function HomePage() {
           <Container maxWidth="lg">
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 1.5 }}>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <img src="/icons/serve-logo.jpeg" alt="SERVE" style={{ height: 28, width: 28, borderRadius: 4 }} />
-                <Typography variant="subtitle1" fontWeight={700}>SERVE</Typography>
+                <img src="/icons/serve-logo.jpeg" alt={adopter.brandName} style={{ height: 28, width: 28, borderRadius: 4 }} />
+                <Box>
+                  <Typography variant="subtitle1" fontWeight={700} lineHeight={1.1}>{adopter.brandName}</Typography>
+                  {adopter.brandTagline && (
+                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>{adopter.brandTagline}</Typography>
+                  )}
+                </Box>
               </Stack>
               <Stack direction="row" alignItems="center" spacing={1.5}>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', display: { xs: 'none', sm: 'block' } }}>
-                  Already using SERVE?
+                  Already using {adopter.brandName}?
                 </Typography>
                 <Button
                   size="small"
@@ -188,16 +220,28 @@ export function HomePage() {
               fontWeight={700}
               sx={{ fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.6rem' }, lineHeight: 1.2 }}
             >
-              Transforming Intent to{' '}
-              <Box component="span" sx={{ color: '#FCD34D' }}>Impact</Box>
+              {adopter.heroTitle}
+              {adopter.heroHighlight && (
+                <>
+                  {' '}
+                  <Box component="span" sx={{ color: '#FCD34D' }}>{adopter.heroHighlight}</Box>
+                </>
+              )}
             </Typography>
             <Typography
               variant="body1"
-              sx={{ color: 'rgba(255,255,255,0.85)', maxWidth: 560, lineHeight: 1.7 }}
+              sx={{ color: 'rgba(255,255,255,0.9)', maxWidth: 600, lineHeight: 1.6, fontWeight: 500 }}
             >
-              Whether you're ready to volunteer or looking for volunteer teachers,
-              SERVE connects people with purpose.
+              {adopter.heroSubtitle}
             </Typography>
+            {adopter.heroDescription && (
+              <Typography
+                variant="body2"
+                sx={{ color: 'rgba(255,255,255,0.8)', maxWidth: 560, lineHeight: 1.7 }}
+              >
+                {adopter.heroDescription}
+              </Typography>
+            )}
           </Stack>
 
           {/* Two cards side by side */}
@@ -215,10 +259,10 @@ export function HomePage() {
                 }}
               >
                 <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
-                  🤝 I Want to Volunteer
+                  {adopter.volunteerCardTitle}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mb: 2 }}>
-                  Help students learn online.
+                  {adopter.volunteerCardSubtitle}
                 </Typography>
                 <Stack spacing={0.5} sx={{ mb: 2.5 }}>
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Find where you can help</Typography>
@@ -264,7 +308,7 @@ export function HomePage() {
                     sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
                     onClick={() => handleRegister('volunteer')}
                   >
-                    Sign Up to Volunteer
+                    {adopter.volunteerCardCta || 'Sign Up to Volunteer'}
                   </Button>
                 )}
               </Paper>
@@ -283,10 +327,10 @@ export function HomePage() {
                 }}
               >
                 <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 700, mb: 1 }}>
-                  🏫 I Need Volunteer Teachers
+                  {adopter.schoolCardTitle}
                 </Typography>
                 <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', mb: 2 }}>
-                  Bring volunteer teachers to your students.
+                  {adopter.schoolCardSubtitle}
                 </Typography>
                 <Stack spacing={0.5} sx={{ mb: 2.5 }}>
                   <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)' }}>✓ Register your school/college</Typography>
@@ -306,19 +350,21 @@ export function HomePage() {
           </Grid>
 
           {/* Trust signal */}
-          <Typography
-            variant="body2"
-            sx={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center', mt: 4 }}
-          >
-            140+ schools · 250+ volunteers · 15,000+ students reached
-          </Typography>
+          {adopter.trustSignal && (
+            <Typography
+              variant="body2"
+              sx={{ color: 'rgba(255,255,255,0.6)', textAlign: 'center', mt: 4 }}
+            >
+              {adopter.trustSignal}
+            </Typography>
+          )}
 
           <Typography
             variant="body2"
-            sx={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', mt: 1.5, cursor: 'pointer' }}
+            sx={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', mt: adopter.trustSignal ? 1.5 : 4, cursor: 'pointer' }}
             onClick={() => navigate('/explore-needs')}
           >
-            Already know what you'd like to do? Browse opportunities →
+            {adopter.exploreCtaLabel || "Already know what you'd like to do? Browse opportunities →"}
           </Typography>
         </Container>
       </Box>
@@ -328,10 +374,10 @@ export function HomePage() {
         <Container maxWidth="lg">
           <Stack spacing={1} textAlign="center" sx={{ mb: 6 }}>
             <Typography variant="overline" color="primary.main" fontWeight={600}>
-              Why Serve
+              {sectionOverline}
             </Typography>
             <Typography variant="h4" fontWeight={700}>
-              Turning Intent into Impact
+              {sectionHeading}
             </Typography>
             <Typography
               variant="body1"
@@ -340,14 +386,12 @@ export function HomePage() {
               mx="auto"
               sx={{ mt: 1 }}
             >
-              No community should wait while willing hands stand idle. SERVE channels untapped
-              volunteer energy into real-world results — matching every verified need with the right
-              skills, instantly and at scale.
+              {sectionIntro}
             </Typography>
           </Stack>
 
           <Grid container spacing={3}>
-            {impactItems.map((item) => (
+            {sectionCards.map((item) => (
               <Grid item xs={12} sm={6} md={3} key={item.title}>
                 <Paper
                   sx={{
@@ -375,7 +419,95 @@ export function HomePage() {
         </Container>
       </Box>
 
-      {/* Footer */}
+      {/* How It Works (adopter-provided) */}
+      {adopter.howItWorksSteps && adopter.howItWorksSteps.length > 0 && (
+        <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'background.paper' }}>
+          <Container maxWidth="lg">
+            <Stack spacing={1} textAlign="center" sx={{ mb: 6 }}>
+              <Typography variant="overline" color="primary.main" fontWeight={600}>
+                How It Works
+              </Typography>
+              <Typography variant="h4" fontWeight={700}>
+                {adopter.howItWorksHeading}
+              </Typography>
+            </Stack>
+            <Grid container spacing={3}>
+              {adopter.howItWorksSteps.map((s) => (
+                <Grid item xs={12} sm={6} md={3} key={s.step}>
+                  <Paper
+                    sx={{
+                      p: 3,
+                      height: '100%',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 8px 24px rgba(14, 116, 144, 0.12)' },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        width: 40, height: 40, borderRadius: '50%', bgcolor: 'primary.main', color: 'white',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, mb: 2,
+                      }}
+                    >
+                      {s.step}
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {s.text}
+                    </Typography>
+                  </Paper>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </Box>
+      )}
+
+      {/* Volunteer call-to-action (adopter-provided) */}
+      {adopter.volunteerSectionHeading && (
+        <Box sx={{ py: { xs: 6, md: 8 }, bgcolor: 'background.default' }}>
+          <Container maxWidth="md">
+            <Paper
+              sx={{
+                p: { xs: 3, md: 5 },
+                textAlign: 'center',
+                background: 'linear-gradient(135deg, #0C4A6E 0%, #0E7490 100%)',
+                color: 'white',
+                borderRadius: 3,
+              }}
+            >
+              <Typography variant="h5" fontWeight={700} gutterBottom>
+                {adopter.volunteerSectionHeading}
+              </Typography>
+              {adopter.volunteerSectionContent && (
+                <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.9)', maxWidth: 640, mx: 'auto', mb: 3, lineHeight: 1.7 }}>
+                  {adopter.volunteerSectionContent}
+                </Typography>
+              )}
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} justifyContent="center">
+                <Button
+                  variant="contained"
+                  size="large"
+                  sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
+                  onClick={() => handleRegister('volunteer')}
+                >
+                  {adopter.volunteerSectionCta || 'Become a Volunteer'}
+                </Button>
+                {adopter.volunteerSectionSecondaryCta && (
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    sx={{ borderColor: 'rgba(255,255,255,0.6)', color: 'white', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }, textTransform: 'none', fontWeight: 600 }}
+                    onClick={() => handleRegister('volunteer')}
+                  >
+                    {adopter.volunteerSectionSecondaryCta}
+                  </Button>
+                )}
+              </Stack>
+            </Paper>
+          </Container>
+        </Box>
+      )}
+
+      {/* Footer / platform attribution */}
       <Box
         sx={{
           py: 3,
@@ -387,10 +519,15 @@ export function HomePage() {
       >
         <Stack direction="row" alignItems="center" justifyContent="center" spacing={1}>
           <img src="/icons/serve-logo.jpeg" alt="Sunbird Serve" style={{ height: 20, width: 20, opacity: 0.7, borderRadius: 2 }} />
-          <Typography variant="caption" color="text.secondary">
-            &copy; {new Date().getFullYear()} Sunbird Serve &middot; Open Source &middot; Digital
-            Public Good
-          </Typography>
+          <Box textAlign="left">
+            <Typography variant="caption" color="text.secondary" display="block" fontWeight={600}>
+              {adopter.attributionTitle || 'Sunbird Serve'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" display="block">
+              {adopter.attributionSubtitle
+                || `\u00A9 ${new Date().getFullYear()} Sunbird Serve · Open Source · Digital Public Good`}
+            </Typography>
+          </Box>
         </Stack>
       </Box>
     </Box>
