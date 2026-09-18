@@ -148,37 +148,49 @@ export function HomePage() {
         {/* Top bar with login */}
         <Box sx={{ position: 'relative', zIndex: 1, borderBottom: '1px solid rgba(255,255,255,0.15)' }}>
           <Container maxWidth="lg">
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ py: 1.5 }}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <img src="/icons/serve-logo.jpeg" alt={adopter.brandName} style={{ height: 40, width: 40, borderRadius: 6 }} />
-                <Box>
-                  <Typography variant="subtitle1" fontWeight={700} lineHeight={1.1}>
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ py: 1.5 }}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
+                <img src="/icons/serve-logo.jpeg" alt={adopter.brandName} style={{ height: 40, width: 40, borderRadius: 6, flexShrink: 0 }} />
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    variant="subtitle1"
+                    fontWeight={700}
+                    lineHeight={1.1}
+                    noWrap
+                    sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+                  >
                     {adopter.brandPrefix ? `${adopter.brandPrefix} · ${adopter.brandName}` : adopter.brandName}
                   </Typography>
                   {adopter.brandTagline && (
-                    <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.7)' }}>{adopter.brandTagline}</Typography>
+                    <Typography
+                      variant="caption"
+                      noWrap
+                      sx={{ color: 'rgba(255,255,255,0.7)', display: { xs: 'none', sm: 'block' } }}
+                    >
+                      {adopter.brandTagline}
+                    </Typography>
                   )}
                 </Box>
               </Stack>
-              <Stack direction="row" alignItems="center" spacing={1.5}>
-                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', display: { xs: 'none', sm: 'block' } }}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ flexShrink: 0 }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)', display: { xs: 'none', md: 'block' } }}>
                   Already using {adopter.brandName}?
                 </Typography>
                 <Button
                   size="small"
                   variant="contained"
-                  onClick={handleLogin}
-                  sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
+                  onClick={(e) => setSignUpAnchor(e.currentTarget)}
+                  sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600, whiteSpace: 'nowrap' }}
                 >
-                  Sign In
+                  Sign Up
                 </Button>
                 <Button
                   size="small"
                   variant="outlined"
-                  onClick={(e) => setSignUpAnchor(e.currentTarget)}
-                  sx={{ borderColor: 'rgba(255,255,255,0.5)', color: 'white', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }, textTransform: 'none' }}
+                  onClick={handleLogin}
+                  sx={{ borderColor: 'rgba(255,255,255,0.5)', color: 'white', '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.1)' }, textTransform: 'none', whiteSpace: 'nowrap' }}
                 >
-                  Sign Up
+                  Sign In
                 </Button>
                 <Menu
                   anchorEl={signUpAnchor}
