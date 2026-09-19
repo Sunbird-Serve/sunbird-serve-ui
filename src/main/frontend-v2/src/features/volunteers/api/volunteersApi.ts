@@ -39,12 +39,15 @@ export const volunteersApi = baseApi.injectEndpoints({
       invalidatesTags: ['User'],
     }),
 
-    // Assign agency to volunteer
+    // Assign agency to volunteer.
+    // Backend maps userId as a PATH parameter: PUT .../user/agencyId/update/{userId}
+    // with body { agencyId, send }. Omitting the path segment causes Spring to
+    // return "No static resource user/agencyId/update".
     assignAgency: builder.mutation<unknown, { userId: string; agencyId: string }>({
       query: ({ userId, agencyId }) => ({
-        url: '/api/v1/serve-volunteering/user/agencyId/update',
+        url: `/api/v1/serve-volunteering/user/agencyId/update/${userId}`,
         method: 'PUT',
-        body: { userId, agencyId },
+        body: { agencyId, send: true },
       }),
       invalidatesTags: ['User'],
     }),
