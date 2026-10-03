@@ -32,12 +32,12 @@ import {
   useGetAgenciesQuery,
   useUpdateVolunteerStatusMutation,
   useAssignAgencyMutation,
+  statusOptionsForRole,
   VolunteerUser,
 } from '../api/volunteersApi';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
-const STATUS_OPTIONS = ['Registered', 'Recommended', 'OnHold', 'Active'];
 
 // --- Types ---
 interface Assignment {
@@ -69,6 +69,7 @@ export function VolunteerJourneyPage() {
   const user = useAppSelector((state) => state.user.data);
   const role = Array.isArray(user?.role) ? user?.role[0] : user?.role;
   const isAdmin = role === 'vAdmin' || role === 'sAdmin';
+  const statusOptions = statusOptionsForRole(role);
 
   const { data: allUsers = [], isLoading: usersLoading } = useGetAllVolunteersQuery();
   const { data: agencies = [] } = useGetAgenciesQuery();
@@ -342,7 +343,7 @@ export function VolunteerJourneyPage() {
               label="Status"
               InputLabelProps={{ shrink: true }}
             >
-              {STATUS_OPTIONS.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+              {statusOptions.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
             </TextField>
             <Button
               variant="contained"

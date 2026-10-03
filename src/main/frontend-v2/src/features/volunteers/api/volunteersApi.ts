@@ -15,6 +15,21 @@ export interface Agency {
   status?: string;
 }
 
+// Base volunteer statuses available to all admins/coordinators.
+export const VOLUNTEER_STATUS_OPTIONS = ['Registered', 'Recommended', 'OnHold', 'Active'];
+
+// Roles permitted to mark a volunteer Inactive.
+const INACTIVE_CAPABLE_ROLES = ['sAdmin', 'vAdmin', 'vCoordinator'];
+
+// Status options for a given role. "Inactive" is only offered to roles
+// permitted to deactivate a volunteer.
+export function statusOptionsForRole(role?: string): string[] {
+  if (role && INACTIVE_CAPABLE_ROLES.includes(role)) {
+    return [...VOLUNTEER_STATUS_OPTIONS, 'Inactive'];
+  }
+  return VOLUNTEER_STATUS_OPTIONS;
+}
+
 export const volunteersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     // Get all users

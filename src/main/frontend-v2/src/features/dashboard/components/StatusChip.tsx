@@ -14,6 +14,7 @@ const STATUS_COLORS: Record<string, { bg: string; color: string }> = {
   OnHold: { bg: '#FEE2E2', color: '#991B1B' },
   Active: { bg: '#D1FAE5', color: '#065F46' },
   OnBoarded: { bg: '#E0E7FF', color: '#3730A3' },
+  Inactive: { bg: '#F1F5F9', color: '#475569' },
   // Session deliverable statuses
   Planned: { bg: '#E0F2FE', color: '#0369A1' },
   NotStarted: { bg: '#E0F2FE', color: '#0369A1' },

@@ -20,15 +20,16 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
+import { useAppSelector } from '@app/store';
 import {
   VolunteerUser,
   Agency,
   useUpdateVolunteerStatusMutation,
   useAssignAgencyMutation,
+  statusOptionsForRole,
 } from '../api/volunteersApi';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
-const STATUS_OPTIONS = ['Registered', 'Recommended', 'OnHold', 'Active'];
 
 interface NominationInfo {
   id: string;
@@ -49,6 +50,9 @@ interface VolunteerDetailDialogProps {
 }
 
 export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }: VolunteerDetailDialogProps) {
+  const currentUser = useAppSelector((state) => state.user.data);
+  const currentRole = Array.isArray(currentUser?.role) ? currentUser?.role[0] : currentUser?.role;
+  const statusOptions = statusOptionsForRole(currentRole);
   const [updateStatus, { isLoading: statusSaving }] = useUpdateVolunteerStatusMutation();
   const [assignAgency, { isLoading: agencySaving }] = useAssignAgencyMutation();
 
@@ -282,7 +286,7 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
                   select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}
                   size="small" sx={{ minWidth: 180 }} InputLabelProps={{ shrink: true }}
                 >
-                  {STATUS_OPTIONS.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
+                  {statusOptions.map((s) => <MenuItem key={s} value={s}>{s}</MenuItem>)}
                 </TextField>
                 <Button variant="contained" size="small" onClick={handleStatusSave} disabled={statusSaving || newStatus === volunteer.status}>
                   {statusSaving ? 'Saving...' : 'Update'}
