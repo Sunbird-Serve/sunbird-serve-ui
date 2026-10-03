@@ -240,7 +240,7 @@ export function VolunteerJourneyPage() {
     if (!volunteer || !newStatus || newStatus === volunteer.status) return;
     setError('');
     try {
-      await updateStatus({ userId: volunteer.osid, status: newStatus }).unwrap();
+      await updateStatus({ user: volunteer, status: newStatus }).unwrap();
       setSuccess('Status updated.');
       setTimeout(() => setSuccess(''), 3000);
     } catch { setError('Failed to update status.'); }

@@ -29,12 +29,22 @@ export const volunteersApi = baseApi.injectEndpoints({
       providesTags: ['Agency'],
     }),
 
-    // Update user status
-    updateVolunteerStatus: builder.mutation<unknown, { userId: string; status: string }>({
-      query: ({ userId, status }) => ({
-        url: `/api/v1/serve-volunteering/user/${userId}`,
+    // Update user status.
+    // Backend PUT /user/{id} validates the FULL user object (identityDetails,
+    // contactDetails and role are required). Sending only { status } returns a
+    // 400 "Role/Contact/Identity details are required". So we send the existing
+    // user with the status replaced.
+    updateVolunteerStatus: builder.mutation<unknown, { user: VolunteerUser; status: string }>({
+      query: ({ user, status }) => ({
+        url: `/api/v1/serve-volunteering/user/${user.osid}`,
         method: 'PUT',
-        body: { status },
+        body: {
+          identityDetails: user.identityDetails,
+          contactDetails: user.contactDetails,
+          role: user.role,
+          agencyId: user.agencyId,
+          status,
+        },
       }),
       invalidatesTags: ['User'],
     }),
