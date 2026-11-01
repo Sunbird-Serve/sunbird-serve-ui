@@ -2,7 +2,7 @@
 // Set VITE_ADOPTER in the environment (e.g. .env / .env.production) to switch
 // which adopter's content is shown. Add a new adopter by adding an entry here.
 
-export type AdopterId = 'telangana' | 'up' | 'default';
+export type AdopterId = 'telangana' | 'up' | 'samudaya' | 'default';
 
 export interface ProgramHighlight {
   title: string;
@@ -77,6 +77,30 @@ const DEFAULT_ADOPTER: AdopterConfig = {
 
 const ADOPTERS: Record<AdopterId, AdopterConfig> = {
   default: DEFAULT_ADOPTER,
+
+  // SERVE Samudaya — hosted Community Edition. Uses a dedicated, structurally
+  // different home page (SamudayaHomePage) rather than the generic template,
+  // so most copy for Samudaya lives in that component. The entries below keep
+  // the shared brand/attribution fields consistent across the app.
+  samudaya: {
+    ...DEFAULT_ADOPTER,
+    brandName: 'SERVE Samudaya',
+    brandPrefix: 'SERVE',
+    brandTagline: 'Community Edition',
+    heroTitle: 'Many organisations.',
+    heroHighlight: 'Countless ways to contribute.',
+    heroSubtitle:
+      'SERVE Samudaya brings people, organisations and volunteering opportunities together.',
+    trustSignal: '',
+    volunteerCardTitle: '🤝 I want to volunteer',
+    volunteerCardSubtitle: 'Discover opportunities that connect with your interests and skills.',
+    volunteerCardCta: 'Explore opportunities',
+    schoolCardTitle: '🏢 We have volunteering needs',
+    schoolCardSubtitle: 'Bring forward the support your programme or community needs.',
+    exploreCtaLabel: 'Explore opportunities →',
+    attributionTitle: 'SERVE Samudaya · Community Edition',
+    attributionSubtitle: 'Hosted by eVidyaloka · Powered by Sunbird SERVE',
+  },
 
   telangana: {
     ...DEFAULT_ADOPTER,

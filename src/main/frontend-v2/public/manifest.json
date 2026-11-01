@@ -1,7 +1,7 @@
 {
-  "name": "EVidya Nipuna",
-  "short_name": "EVidya Nipuna",
-  "description": "Digital Literacy Program for Government Junior College Students in Telangana",
+  "name": "SERVE Samudaya",
+  "short_name": "SERVE Samudaya",
+  "description": "Shared digital infrastructure for volunteering. Community Edition hosted by eVidyaloka, powered by Sunbird SERVE.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
@@ -33,7 +33,7 @@
       "url": "/app/dashboard"
     },
     {
-      "name": "Explore Needs",
+      "name": "Explore Opportunities",
       "short_name": "Explore",
       "url": "/explore-needs"
     }

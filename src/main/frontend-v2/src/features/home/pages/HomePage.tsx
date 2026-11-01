@@ -291,7 +291,7 @@ export function HomePage() {
                           size="small"
                           variant="contained"
                           sx={{ bgcolor: 'white', color: 'primary.main', '&:hover': { bgcolor: 'grey.100' }, textTransform: 'none', fontWeight: 600 }}
-                          href={import.meta.env.VITE_VOLUNTEER_AGENT_WEB_URL}
+                          href={import.meta.env.VITE_VOLUNTEER_AGENT_WEB_URL || '#'}
                           target="_blank"
                           rel="noopener noreferrer"
                         >
@@ -303,7 +303,7 @@ export function HomePage() {
                           size="small"
                           variant="contained"
                           sx={{ bgcolor: '#25D366', color: 'white', '&:hover': { bgcolor: '#1DA851' }, textTransform: 'none', fontWeight: 600 }}
-                          href={import.meta.env.VITE_VOLUNTEER_AGENT_WHATSAPP_URL}
+                          href={import.meta.env.VITE_VOLUNTEER_AGENT_WHATSAPP_URL || '#'}
                           target="_blank"
                           rel="noopener noreferrer"
                         >

@@ -13,10 +13,24 @@ import { RoleGuard } from '@features/auth/guards/RoleGuard';
 
 // Eager-loaded pages (small, critical path)
 import { HomePage } from '@features/home/pages/HomePage';
+import { SamudayaHomePage } from '@features/home/pages/SamudayaHomePage';
+
+// Adopter-specific landing page. SERVE Samudaya (Community Edition) uses a
+// dedicated, structurally different home page; all other adopters use the
+// shared template-driven HomePage.
+const LandingPage =
+  (import.meta.env.VITE_ADOPTER as string | undefined)?.toLowerCase() === 'samudaya'
+    ? SamudayaHomePage
+    : HomePage;
 
 // Onboarding (public, lazy-loaded)
 const OnboardingPage = lazy(() =>
   import('@features/onboarding/pages/OnboardingPage').then((m) => ({ default: m.OnboardingPage })),
+);
+const OrganisationInterestPage = lazy(() =>
+  import('@features/onboarding/pages/OrganisationInterestPage').then((m) => ({
+    default: m.OrganisationInterestPage,
+  })),
 );
 
 // Lazy-loaded pages
@@ -110,8 +124,8 @@ export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
     children: [
-      { path: '/', element: <HomePage /> },
-      { path: '/login', element: <HomePage /> },
+      { path: '/', element: <LandingPage /> },
+      { path: '/login', element: <LandingPage /> },
       {
         path: '/register/:agencyId',
         element: (
@@ -149,6 +163,14 @@ export const router = createBrowserRouter([
         element: (
           <SuspenseWrapper>
             <OnboardingPage />
+          </SuspenseWrapper>
+        ),
+      },
+      {
+        path: '/organisation-interest',
+        element: (
+          <SuspenseWrapper>
+            <OrganisationInterestPage />
           </SuspenseWrapper>
         ),
       },
