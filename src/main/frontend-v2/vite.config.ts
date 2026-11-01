@@ -12,10 +12,30 @@ export default defineConfig({
       manifest: false, // Using public/manifest.json directly
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        // Home-page photography / screenshots live under /images and can be
+        // large. They don't need to be precached into the service worker
+        // (they load fine over the network and are runtime-cached below), so
+        // exclude them from the precache manifest to keep the SW small and
+        // avoid build failures on large files.
+        globIgnores: ['**/images/**'],
+        // Safety net: allow precaching files up to 3 MiB (default is 2 MiB).
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         navigateFallback: '/index.html',
         navigateFallbackDenylist: [/^\/api/, /^\/silent-check-sso/],
         offlineGoogleAnalytics: false,
         runtimeCaching: [
+          {
+            // Cache home-page images at runtime after first request.
+            urlPattern: ({ url }) => url.pathname.startsWith('/images/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'samudaya-images',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+            },
+          },
           {
             urlPattern: /^https:\/\/serve-v1\.evean\.net\/api\/.*/i,
             handler: 'NetworkFirst',
