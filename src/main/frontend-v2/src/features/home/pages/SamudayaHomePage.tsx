@@ -16,12 +16,8 @@ import {
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
-import CampaignIcon from '@mui/icons-material/Campaign';
 import Diversity3Icon from '@mui/icons-material/Diversity3';
 import SchoolIcon from '@mui/icons-material/School';
-import PsychologyIcon from '@mui/icons-material/Psychology';
-import LaptopMacIcon from '@mui/icons-material/LaptopMac';
-import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import { useAuth } from '@features/auth';
 import { getRoleConfig } from '@config/roles';
 import { useAppSelector } from '@app/store';
@@ -38,23 +34,24 @@ const HERO_IMAGES = [
   { src: '/images/samudaya/hero-2.jpg', alt: 'A mentor and mentee in conversation' },
   { src: '/images/samudaya/hero-3.png', alt: 'Community members collaborating together' },
 ];
-//   Product screenshots (real SERVE UI):
+//   Product screens (Samudaya's tools). Shown with object-fit: contain so no
+//   interface content is cropped.
 const PRODUCT_SHOTS = [
   {
     src: '/images/samudaya/product-discover.png',
-    alt: 'SERVE screen showing volunteers discovering opportunities',
+    alt: 'Samudaya tool for discovering volunteering opportunities',
     title: 'Discover opportunities',
-    caption: 'Volunteers browse and find needs that fit their skills and time.',
+    caption: 'Find and browse education opportunities that fit your skills and time.',
   },
   {
     src: '/images/samudaya/product-coordinate.png',
-    alt: 'SERVE screen showing coordination of participation',
+    alt: 'Samudaya tool for coordinating participation',
     title: 'Coordinate participation',
-    caption: 'Organisations review interest and confirm who takes part.',
+    caption: 'Review interest and confirm who takes part in an activity.',
   },
   {
     src: '/images/samudaya/product-contributions.png',
-    alt: 'SERVE screen showing recorded contributions',
+    alt: 'Samudaya tool for following contributions',
     title: 'View contributions',
     caption: 'Follow delivery and completed contributions over time.',
   },
@@ -70,7 +67,7 @@ const SUNBIRD_SERVE_URL = (import.meta.env.VITE_SUNBIRD_SERVE_URL || '').trim();
 const NAV_LINKS = [
   { label: 'How it works', target: 'how-it-works' },
   { label: 'For organisations', target: 'for-organisations' },
-  { label: 'The product', target: 'product' },
+  { label: 'What you can do', target: 'product' },
   { label: 'Why shared infrastructure', target: 'why-dpi' },
 ];
 
@@ -153,17 +150,17 @@ export function SamudayaHomePage() {
             <Stack direction="row" alignItems="center" spacing={1.25} sx={{ flexShrink: 0 }}>
               <img
                 src="/icons/serve-logo.jpeg"
-                alt="SERVE Samudaya"
+                alt="Samudaya"
                 width={40}
                 height={40}
                 style={{ borderRadius: 8, flexShrink: 0 }}
               />
               <Box>
                 <Typography variant="subtitle1" fontWeight={700} lineHeight={1.1} sx={{ whiteSpace: 'nowrap' }}>
-                  SERVE Samudaya
+                  Samudaya
                 </Typography>
                 <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
-                  Community Edition
+                  by the Servean Community
                 </Typography>
               </Box>
             </Stack>
@@ -361,9 +358,10 @@ export function SamudayaHomePage() {
                   fontSize: { xs: '1rem', md: '1.15rem' },
                 }}
               >
-                SERVE Samudaya brings people, organisations and volunteering opportunities together.
-                Contribute your time and skills, bring forward a need, or run your organisation&rsquo;s
-                volunteering programme on shared infrastructure.
+                Samudaya brings people and organisations together on shared volunteering rails,
+                beginning with education. Find opportunities to teach, mentor and support learning,
+                or coordinate your organisation&rsquo;s education volunteering programme using common
+                digital tools.
               </Typography>
 
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 4 }}>
@@ -400,7 +398,8 @@ export function SamudayaHomePage() {
               </Stack>
 
               <Typography variant="body2" sx={{ mt: 3, color: 'rgba(255,255,255,0.75)' }}>
-                For individuals, NGOs, institutions, companies and community groups.
+                Beginning with education, connecting learning needs with people willing to share
+                their time and skills.
               </Typography>
             </Grid>
 
@@ -479,19 +478,19 @@ export function SamudayaHomePage() {
         </Container>
       </Box>
 
-      {/* ================ A PLACE FOR EVERYONE TO PARTICIPATE ============ */}
+      {/* ==================== FIND YOUR PLACE ON SAMUDAYA ============== */}
       <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
         <Container maxWidth="lg">
           <Stack spacing={1} alignItems="center" sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="overline" color="primary.main" fontWeight={700}>
-              A place for everyone to participate
+              Participate
             </Typography>
             <Typography variant="h4" fontWeight={800}>
-              Three ways in
+              Find your place on Samudaya
             </Typography>
             <Typography variant="body1" color="text.secondary" maxWidth={680} mx="auto" sx={{ mt: 1, textAlign: 'center' }}>
-              Whether you are ready to help, or bringing people together around a need, there is a
-              way in for you.
+              Whether you want to volunteer, find support for learners or coordinate a programme,
+              Samudaya gives you a shared foundation to get started.
             </Typography>
           </Stack>
 
@@ -499,23 +498,26 @@ export function SamudayaHomePage() {
             {[
               {
                 icon: <VolunteerActivismIcon sx={{ fontSize: 34 }} />,
-                title: 'I want to volunteer',
-                body: 'Discover opportunities that connect with your interests, skills and availability. Join an activity or contribute to an ongoing programme.',
+                title: 'Put your skills to work',
+                audience: 'Volunteers',
+                body: 'Find education opportunities that fit your interests, skills and availability. Express interest, coordinate your participation and follow your contributions.',
                 cta: 'Explore opportunities',
                 onClick: exploreOpportunities,
               },
               {
-                icon: <CampaignIcon sx={{ fontSize: 34 }} />,
-                title: 'We have volunteering needs',
-                body: 'Bring forward the support your programme or community needs. Connect with interested volunteers, confirm participation and coordinate delivery.',
-                cta: 'Bring a need',
+                icon: <SchoolIcon sx={{ fontSize: 34 }} />,
+                title: 'Connect learning needs with willing support',
+                audience: 'Schools, colleges and learning communities',
+                body: "Bring forward your learners' needs, connect with interested volunteers and coordinate learning activities through your participating organisation.",
+                cta: 'Bring a learning need',
                 onClick: expressInterest,
               },
               {
                 icon: <Diversity3Icon sx={{ fontSize: 34 }} />,
-                title: 'We mobilise volunteers',
-                body: 'Help your volunteer community find opportunities to contribute. Coordinate participation and follow contributions across activities.',
-                cta: 'Bring your volunteer community',
+                title: 'Coordinate your programme on shared rails',
+                audience: 'NGOs, institutions and volunteer networks',
+                body: 'Bring your needs, volunteers or both. Use common tools to coordinate participation and delivery while your team leads its own programme.',
+                cta: 'Join as an organisation',
                 onClick: expressInterest,
               },
             ].map((card) => (
@@ -536,6 +538,9 @@ export function SamudayaHomePage() {
                   }}
                 >
                   <Box sx={{ color: 'primary.main', mb: 1 }}>{card.icon}</Box>
+                  <Typography variant="overline" color="primary.main" fontWeight={700} sx={{ lineHeight: 1.3 }}>
+                    {card.audience}
+                  </Typography>
                   <Typography variant="subtitle1" fontWeight={700} gutterBottom>
                     {card.title}
                   </Typography>
@@ -554,81 +559,27 @@ export function SamudayaHomePage() {
             ))}
           </Grid>
 
-          <Typography variant="caption" color="text.secondary" display="block" textAlign="center" sx={{ mt: 3 }}>
-            Organisations can bring needs, mobilise volunteers or both — joining as a Need Agency,
-            a Volunteer Agency, or both.
+          <Typography variant="body2" color="text.secondary" maxWidth={760} mx="auto" sx={{ mt: 3, textAlign: 'center', lineHeight: 1.7 }}>
+            Organisations participate as agencies — bringing learning needs, mobilising volunteers,
+            or doing both. Need agencies bring forward learning needs; volunteer agencies mobilise
+            and support volunteers.
           </Typography>
         </Container>
       </Box>
 
-      {/* ==================== MANY WAYS TO CONTRIBUTE ==================== */}
-      <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={{ xs: 3, md: 5 }} alignItems="center">
-            <Grid item xs={12} md={5}>
-              <Typography variant="overline" color="primary.main" fontWeight={700}>
-                Many ways to contribute
-              </Typography>
-              <Typography variant="h4" fontWeight={800} sx={{ mt: 1, mb: 2 }}>
-                Different contributions, a shared purpose
-              </Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.7 }}>
-                A regular learning session. A career conversation. A few hours of professional
-                expertise. The coordination that helps an activity happen.
-              </Typography>
-              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2, fontStyle: 'italic' }}>
-                Illustrative examples — opportunities you can actually discover are listed on the
-                Explore opportunities page.
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={7}>
-              <Grid container spacing={2}>
-                {[
-                  { icon: <SchoolIcon sx={{ fontSize: 28 }} />, label: 'Teaching and learning support' },
-                  { icon: <PsychologyIcon sx={{ fontSize: 28 }} />, label: 'Mentoring and career guidance' },
-                  { icon: <LaptopMacIcon sx={{ fontSize: 28 }} />, label: 'Digital skills and professional expertise' },
-                  { icon: <EventAvailableIcon sx={{ fontSize: 28 }} />, label: 'Programme coordination and community activities' },
-                ].map((item) => (
-                  <Grid item xs={12} sm={6} key={item.label}>
-                    <Stack
-                      direction="row"
-                      spacing={2}
-                      alignItems="center"
-                      sx={{
-                        p: 2,
-                        height: '100%',
-                        borderRadius: 3,
-                        border: '1px solid',
-                        borderColor: 'divider',
-                        bgcolor: 'background.default',
-                      }}
-                    >
-                      <Box sx={{ color: 'primary.main', display: 'flex' }}>{item.icon}</Box>
-                      <Typography variant="body2" fontWeight={600}>
-                        {item.label}
-                      </Typography>
-                    </Stack>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-
-      {/* ======================= SEE THE PRODUCT ======================= */}
-      <Box id="product" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
+      {/* ================ WHAT YOU CAN DO ON SAMUDAYA ================== */}
+      <Box id="product" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
         <Container maxWidth="lg">
           <Stack spacing={1} alignItems="center" sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="overline" color="primary.main" fontWeight={700}>
-              See the product
+              Samudaya in action
             </Typography>
             <Typography variant="h4" fontWeight={800}>
-              What coordinating on Samudaya looks like
+              What you can do on Samudaya
             </Typography>
             <Typography variant="body1" color="text.secondary" maxWidth={680} mx="auto" sx={{ mt: 1, lineHeight: 1.7, textAlign: 'center' }}>
-              The same shared capabilities, shown in the actual SERVE interface — from discovering
-              opportunities to recording what gets delivered.
+              Discover education opportunities, coordinate participation and follow contributions —
+              all on shared volunteering rails.
             </Typography>
           </Stack>
 
@@ -641,6 +592,8 @@ export function SamudayaHomePage() {
                     alt={shot.alt}
                     ratio="16 / 10"
                     radius={8}
+                    fit="contain"
+                    sx={{ bgcolor: 'background.default', border: '1px solid', borderColor: 'divider' }}
                     fallback={<HeroImageFallback label="Screenshot coming soon" />}
                   />
                   <Box sx={{ px: 1, pt: 1.5, pb: 0.5 }}>
@@ -659,7 +612,7 @@ export function SamudayaHomePage() {
       </Box>
 
       {/* ===================== THE VOLUNTEERING RAILS ==================== */}
-      <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
+      <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
         <Container maxWidth="lg">
           <Stack spacing={1} alignItems="center" sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="overline" color="primary.main" fontWeight={700}>
@@ -668,10 +621,10 @@ export function SamudayaHomePage() {
             <Typography variant="h4" fontWeight={800}>
               Shared rails. Programmes shaped by you.
             </Typography>
-            <Typography variant="body1" color="text.secondary" maxWidth={720} mx="auto" sx={{ mt: 1, lineHeight: 1.7, textAlign: 'center' }}>
-              You bring your purpose, relationships and local knowledge. Samudaya provides the common
-              stages below, so coordination follows a clear path from a need to a recorded
-              contribution.
+            <Typography variant="body1" color="text.secondary" maxWidth={740} mx="auto" sx={{ mt: 1, lineHeight: 1.7, textAlign: 'center' }}>
+              Samudaya provides common tools for discovering needs, coordinating participation and
+              following delivery. Each participating agency brings its own purpose, relationships and
+              programme responsibilities.
             </Typography>
           </Stack>
 
@@ -682,7 +635,7 @@ export function SamudayaHomePage() {
       </Box>
 
       {/* =============== WHY DIGITAL PUBLIC INFRASTRUCTURE ============== */}
-      <Box id="why-dpi" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
+      <Box id="why-dpi" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
         <Container maxWidth="lg">
           <Stack spacing={1} alignItems="center" sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="overline" color="primary.main" fontWeight={700}>
@@ -747,7 +700,7 @@ export function SamudayaHomePage() {
       </Box>
 
       {/* ==================== HOW PARTICIPATION WORKS =================== */}
-      <Box id="how-it-works" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
+      <Box id="how-it-works" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
         <Container maxWidth="lg">
           <Stack spacing={1} alignItems="center" sx={{ mb: 4, textAlign: 'center' }}>
             <Typography variant="overline" color="primary.main" fontWeight={700}>
@@ -837,7 +790,7 @@ export function SamudayaHomePage() {
       </Box>
 
       {/* ====================== FOR ORGANISATIONS ====================== */}
-      <Box id="for-organisations" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
+      <Box id="for-organisations" component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
         <Container maxWidth="lg">
           <Grid container spacing={{ xs: 3, md: 5 }} alignItems="center">
             <Grid item xs={12} md={6}>
@@ -876,7 +829,7 @@ export function SamudayaHomePage() {
                     sx={{
                       p: 2,
                       borderRadius: 3,
-                      bgcolor: 'background.paper',
+                      bgcolor: 'background.default',
                       border: '1px solid',
                       borderColor: 'divider',
                     }}
@@ -896,7 +849,7 @@ export function SamudayaHomePage() {
       </Box>
 
       {/* ==================== TRUST AND RESPONSIBILITY ================= */}
-      <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
+      <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
         <Container maxWidth="md">
           <Stack spacing={2} alignItems="center" sx={{ textAlign: 'center' }}>
             <Typography variant="overline" color="primary.main" fontWeight={700}>
@@ -934,7 +887,7 @@ export function SamudayaHomePage() {
       </Box>
 
       {/* ========================== FINAL CTA ========================= */}
-      <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default' }}>
+      <Box component="section" sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper' }}>
         <Container maxWidth="md">
           <Paper
             sx={{
@@ -994,7 +947,7 @@ export function SamudayaHomePage() {
         <Box
           id="contact"
           component="section"
-          sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.paper', scrollMarginTop: 80 }}
+          sx={{ py: { xs: 5, md: 7 }, bgcolor: 'background.default', scrollMarginTop: 80 }}
         >
           <Container maxWidth="md">
             <Paper sx={{ p: { xs: 3, md: 4 }, borderRadius: 3, textAlign: 'center' }}>
@@ -1037,20 +990,22 @@ export function SamudayaHomePage() {
               <Stack direction="row" alignItems="center" spacing={1.5}>
                 <img
                   src="/icons/serve-logo.jpeg"
-                  alt="SERVE Samudaya"
+                  alt="Samudaya"
                   width={32}
                   height={32}
                   style={{ borderRadius: 6 }}
                 />
                 <Box>
                   <Typography variant="subtitle1" fontWeight={700} color="white">
-                    SERVE Samudaya
+                    Samudaya
                   </Typography>
-                  <Typography variant="body2">A shared space for volunteering.</Typography>
+                  <Typography variant="body2">
+                    by the Servean Community · A shared space for education volunteering.
+                  </Typography>
                 </Box>
               </Stack>
               <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'rgba(255,255,255,0.65)' }}>
-                Hosted by eVidyaloka · Powered by Sunbird SERVE
+                Hosted by eVidyaloka · Powered by Sunbird SERVE · Community Edition
               </Typography>
             </Grid>
             <Grid item xs={12} md={5}>

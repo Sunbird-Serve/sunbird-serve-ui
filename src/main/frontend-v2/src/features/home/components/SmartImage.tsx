@@ -9,6 +9,9 @@ interface SmartImageProps {
   /** Eager-load above-the-fold images; lazy-load the rest (default). */
   eager?: boolean;
   radius?: number;
+  /** How the image fills its box. 'cover' (default) for photos, 'contain' for
+   *  screenshots where no interface content should be cropped. */
+  fit?: 'cover' | 'contain';
   sx?: SxProps<Theme>;
   /** Optional element shown while the real image is unavailable/missing. */
   fallback?: React.ReactNode;
@@ -25,6 +28,7 @@ export function SmartImage({
   ratio = '4 / 3',
   eager = false,
   radius = 12,
+  fit = 'cover',
   sx,
   fallback,
 }: SmartImageProps) {
@@ -57,7 +61,7 @@ export function SmartImage({
               inset: 0,
               width: '100%',
               height: '100%',
-              objectFit: 'cover',
+              objectFit: fit,
               display: 'block',
             }}
           />

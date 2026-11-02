@@ -50,7 +50,7 @@ function resolveOrganisationType(data: OrganisationInterestFormData): string {
 
 function buildMailto(data: OrganisationInterestFormData): string {
   const orgType = resolveOrganisationType(data);
-  const subject = `SERVE Samudaya — interest from ${data.organisationName}`;
+  const subject = `Samudaya — interest from ${data.organisationName}`;
   const bodyLines = [
     `Organisation: ${data.organisationName}`,
     `Type: ${orgType}`,
@@ -121,7 +121,7 @@ export function OrganisationInterestPage() {
             source: 'serve-samudaya-home',
             // Formspree-recognised field: sets the notification email subject.
             // Harmless to endpoints that ignore it.
-            _subject: `SERVE Samudaya interest — ${data.organisationName}`,
+            _subject: `Samudaya interest — ${data.organisationName}`,
           }),
         });
         if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
@@ -183,13 +183,13 @@ export function OrganisationInterestPage() {
       >
         <Stack spacing={3}>
           <Stack direction="row" alignItems="center" spacing={1.5}>
-            <img src="/icons/serve-logo.jpeg" alt="SERVE Samudaya" width={36} height={36} style={{ borderRadius: 6 }} />
+            <img src="/icons/serve-logo.jpeg" alt="Samudaya" width={36} height={36} style={{ borderRadius: 6 }} />
             <Box>
               <Typography variant="h6" fontWeight={700} lineHeight={1.1}>
-                SERVE Samudaya
+                Samudaya
               </Typography>
               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.75)' }}>
-                Community Edition
+                by the Servean Community
               </Typography>
             </Box>
           </Stack>

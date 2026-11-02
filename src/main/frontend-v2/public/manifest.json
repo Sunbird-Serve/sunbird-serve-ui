@@ -1,7 +1,7 @@
 {
-  "name": "SERVE Samudaya",
-  "short_name": "SERVE Samudaya",
-  "description": "Shared digital infrastructure for volunteering. Community Edition hosted by eVidyaloka, powered by Sunbird SERVE.",
+  "name": "Samudaya",
+  "short_name": "Samudaya",
+  "description": "Shared digital infrastructure for volunteering, beginning with education. By the Servean Community; hosted by eVidyaloka; powered by Sunbird SERVE.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

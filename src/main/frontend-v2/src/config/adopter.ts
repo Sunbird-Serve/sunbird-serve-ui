@@ -84,9 +84,9 @@ const ADOPTERS: Record<AdopterId, AdopterConfig> = {
   // the shared brand/attribution fields consistent across the app.
   samudaya: {
     ...DEFAULT_ADOPTER,
-    brandName: 'SERVE Samudaya',
-    brandPrefix: 'SERVE',
-    brandTagline: 'Community Edition',
+    brandName: 'Samudaya',
+    brandPrefix: '',
+    brandTagline: 'by the Servean Community',
     heroTitle: 'Many organisations.',
     heroHighlight: 'Countless ways to contribute.',
     heroSubtitle:
@@ -98,7 +98,7 @@ const ADOPTERS: Record<AdopterId, AdopterConfig> = {
     schoolCardTitle: '🏢 We have volunteering needs',
     schoolCardSubtitle: 'Bring forward the support your programme or community needs.',
     exploreCtaLabel: 'Explore opportunities →',
-    attributionTitle: 'SERVE Samudaya · Community Edition',
+    attributionTitle: 'Samudaya · by the Servean Community',
     attributionSubtitle: 'Hosted by eVidyaloka · Powered by Sunbird SERVE',
   },
 
