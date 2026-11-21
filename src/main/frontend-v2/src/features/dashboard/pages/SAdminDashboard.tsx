@@ -52,6 +52,7 @@ import { WelcomeBanner } from '../components/WelcomeBanner';
 import { StatCard } from '../components/StatCard';
 import { StatusChip } from '../components/StatusChip';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
+import { apiUrl } from '@shared/utils/apiUrls';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -206,7 +207,7 @@ export function SAdminDashboard() {
         for (const need of assignedNeeds.slice(0, 50)) {
           try {
             const fulfResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/need-read/${need.id}`,
+              apiUrl(`/api/v1/serve-fulfill/fulfillment/need-read/${need.id}`),
               { headers },
             );
             if (fulfResp.ok) {
@@ -221,7 +222,7 @@ export function SAdminDashboard() {
         if (fulfs.length === 0) {
           try {
             const coordResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=1000`,
+              apiUrl(`/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=1000`),
               { headers },
             );
             if (coordResp.ok) {

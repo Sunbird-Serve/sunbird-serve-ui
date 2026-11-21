@@ -54,6 +54,7 @@ import { WelcomeBanner } from '../components/WelcomeBanner';
 import { StatCard } from '../components/StatCard';
 import { StatusChip } from '../components/StatusChip';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
+import { apiUrl } from '@shared/utils/apiUrls';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -326,7 +327,7 @@ export function NAdminDashboard() {
           pendingEnts = ents.filter((e: { status?: string }) => e.status === 'New' || e.status === 'Verified').length;
         }
         // Pending coordinators
-        const usersResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/all-users`, { headers });
+        const usersResp = await fetch(apiUrl(`/api/v1/serve-volunteering/user/all-users`), { headers });
         let pendingCoords = 0;
         if (usersResp.ok) {
           const users = await usersResp.json();

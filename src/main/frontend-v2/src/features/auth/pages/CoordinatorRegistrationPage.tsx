@@ -15,8 +15,9 @@ import {
 import { useAuth } from '../hooks/useAuth';
 import { useAppDispatch } from '@app/store';
 import { fetchUserByEmail } from '../state/userSlice';
+import { apiUrl } from '@shared/utils/apiUrls';
+import { readErrorMessage, normalizeEmail } from '@shared/utils/apiError';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 const GENDER_OPTIONS = ['Male', 'Female', 'Transgender', 'Others'];
 
 export function CoordinatorRegistrationPage() {
@@ -45,6 +46,7 @@ export function CoordinatorRegistrationPage() {
       return;
     }
 
+    if (loading) return;
     setLoading(true);
     try {
       const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
@@ -59,7 +61,7 @@ export function CoordinatorRegistrationPage() {
           Nationality: 'India',
         },
         contactDetails: {
-          email,
+          email: normalizeEmail(email),
           mobile,
           address: { city: '', state: '', country: 'India' },
         },
@@ -68,14 +70,15 @@ export function CoordinatorRegistrationPage() {
         role: [role],
       };
 
-      const resp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/`, {
+      const resp = await fetch(apiUrl(`/api/v1/serve-volunteering/user/`), {
         method: 'POST',
         headers,
         body: JSON.stringify(payload),
       });
 
       if (!resp.ok) {
-        throw new Error('Failed to create account. Please try again.');
+        // 409 = a user with this email already exists, 503 = try again shortly
+        throw new Error(await readErrorMessage(resp, 'Failed to create account. Please try again.'));
       }
 
       // Clean up any pending sign-up markers

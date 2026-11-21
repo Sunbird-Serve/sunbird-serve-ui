@@ -18,6 +18,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useAuth } from '@features/auth';
 import { useAppSelector } from '@app/store';
 import { getRoleConfig } from '@config/roles';
+import { COMMUNITY_URL, COMMUNITY_LABEL } from '@config/community';
 import { Sidebar } from '@shared/components/Sidebar';
 
 const DRAWER_WIDTH = 260;
@@ -142,6 +143,17 @@ export function AdminLayout() {
               <MenuItem disabled>
                 <Typography variant="body2">{firebaseUser?.email}</Typography>
               </MenuItem>
+              {COMMUNITY_URL && (
+                <MenuItem
+                  component="a"
+                  href={COMMUNITY_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleProfileMenuClose}
+                >
+                  {COMMUNITY_LABEL}
+                </MenuItem>
+              )}
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Toolbar>

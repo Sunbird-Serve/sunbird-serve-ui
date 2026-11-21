@@ -27,6 +27,7 @@ import { ModifyScheduleDialog } from '../components/ModifyScheduleDialog';
 import { StatCard } from '@features/dashboard/components/StatCard';
 import { PageHeader } from '@shared/components';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
+import { apiUrl } from '@shared/utils/apiUrls';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -135,7 +136,7 @@ export function NeedsPage() {
     async function fetchAgencies() {
       try {
         const headers = getAuthHeaders();
-        const resp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/agency/list`, { headers });
+        const resp = await fetch(apiUrl(`/api/v1/serve-volunteering/agency/list`), { headers });
         if (resp.ok) {
           const data = await resp.json();
           const list = Array.isArray(data) ? data : (data.content || []);

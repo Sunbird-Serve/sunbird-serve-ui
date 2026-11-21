@@ -22,29 +22,15 @@ import {
 import { API, DEFAULT_VOLUNTEER_AGENCY_ID } from '@config/api';
 import { getRoleConfig } from '@config/roles';
 import { useAuth } from '../hooks/useAuth';
+import { readErrorMessage, normalizeEmail } from '@shared/utils/apiError';
 
-const GENDER_OPTIONS = ['Male', 'Female', 'Transgender', 'Others'];
-
-const LANGUAGES = [
-  'English', 'Hindi', 'Bengali', 'Telugu', 'Marathi', 'Tamil', 'Gujarati',
-  'Kannada', 'Malayalam', 'Punjabi', 'Urdu', 'Spanish', 'French', 'German',
-  'Mandarin Chinese', 'Japanese', 'Korean', 'Arabic', 'Portuguese', 'Russian',
-];
-
-const INTERESTS = [
-  'Teaching', 'Mentoring', 'Guest Lecture', 'Content Writing', 'Data Science',
-  'Software Development', 'Graphic Design', 'Public Speaking', 'Social Work',
-  'Healthcare', 'Environmental Science', 'Digital Marketing', 'Music Production',
-  'Career Guidance', 'Financial Planning', 'Project Management', 'UX/UI Design',
-];
-
-const QUALIFICATIONS = [
-  'High School', 'Pre University', 'Graduate', 'Post Graduate', 'Professional Degree',
-];
-
-const EMPLOYMENT_STATUS = [
-  'Full Time', 'Part Time', 'Self-Employed', 'Homemaker', 'Student', 'Retired', 'Not Employed',
-];
+import {
+  GENDER_OPTIONS,
+  LANGUAGES,
+  INTERESTS,
+  QUALIFICATIONS,
+  EMPLOYMENT_STATUS,
+} from '@shared/constants/profileOptions';
 
 const steps = ['Personal Details', 'Contact Info', 'Preferences'];
 
@@ -150,6 +136,7 @@ export function RegistrationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return; // ignore double clicks while a request is running
     setError('');
     setLoading(true);
 
@@ -175,7 +162,7 @@ export function RegistrationPage() {
         Nationality: formData.nationality,
       },
       contactDetails: {
-        email: formData.email,
+        email: normalizeEmail(formData.email),
         mobile: formData.mobile,
         address: {
           city: formData.city,
@@ -199,7 +186,8 @@ export function RegistrationPage() {
       });
 
       if (!userResponse.ok) {
-        throw new Error('Failed to create user profile.');
+        // 409 = a user with this email already exists, 503 = try again shortly
+        throw new Error(await readErrorMessage(userResponse, 'Failed to create user profile.'));
       }
 
       const userData = await userResponse.json();
@@ -241,6 +229,8 @@ export function RegistrationPage() {
         volunteeringHours: { totalHours: 0, hoursPerWeek: 0 },
       };
 
+      // A 409 means this user already has a profile, which is fine. Any other failure is not
+      // blocking: the volunteer can create the profile later from the Profile page.
       await fetch(`${API.USER_PROFILE}`, {
         method: 'POST',
         headers,

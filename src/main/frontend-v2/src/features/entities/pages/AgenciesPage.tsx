@@ -36,8 +36,8 @@ import CorporateFareIcon from '@mui/icons-material/CorporateFare';
 import { useGetAgenciesQuery, useGetAllVolunteersQuery } from '@features/volunteers/api/volunteersApi';
 import { PageHeader } from '@shared/components';
 import { getAuthHeadersWithJson } from '@shared/utils/authHeaders';
+import { apiUrl } from '@shared/utils/apiUrls';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
 
 interface AgencyFormData {
   name: string;
@@ -144,7 +144,7 @@ export function AgenciesPage() {
       const headers = getAuthHeadersWithJson();
       if (editingId) {
         // Update
-        await fetch(`${BASE_URL}/api/v1/serve-volunteering/agency/${editingId}`, {
+        await fetch(apiUrl(`/api/v1/serve-volunteering/agency/${editingId}`), {
           method: 'PUT',
           headers,
           body: JSON.stringify({
@@ -158,7 +158,7 @@ export function AgenciesPage() {
         setSuccess(`Agency "${form.name}" updated.`);
       } else {
         // Create
-        await fetch(`${BASE_URL}/api/v1/serve-volunteering/agency/create`, {
+        await fetch(apiUrl(`/api/v1/serve-volunteering/agency/create`), {
           method: 'POST',
           headers,
           body: JSON.stringify({

@@ -32,6 +32,27 @@ export function statusOptionsForRole(role?: string): string[] {
 
 export const volunteersApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    // Delete a user and all of their profiles (super admin only).
+    // DELETE /api/v1/serve-volunteering/user/{userId}
+    // 204 deleted, 404 not found, 409 has volunteering hours (set Inactive instead).
+    deleteUser: builder.mutation<unknown, { userId: string }>({
+      query: ({ userId }) => ({
+        url: `/api/v1/serve-volunteering/user/${encodeURIComponent(userId)}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['User', 'Profile'],
+    }),
+
+    // Delete one volunteer profile (super admin only). profileId is the profile's own osid.
+    // DELETE /api/v1/serve-volunteering/user/user-profile/{profileId}
+    deleteUserProfile: builder.mutation<unknown, { profileId: string }>({
+      query: ({ profileId }) => ({
+        url: `/api/v1/serve-volunteering/user/user-profile/${encodeURIComponent(profileId)}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Profile'],
+    }),
+
     // Get all users
     getAllVolunteers: builder.query<VolunteerUser[], void>({
       query: () => '/api/v1/serve-volunteering/user/all-users',
@@ -80,6 +101,8 @@ export const volunteersApi = baseApi.injectEndpoints({
 });
 
 export const {
+  useDeleteUserMutation,
+  useDeleteUserProfileMutation,
   useGetAllVolunteersQuery,
   useGetAgenciesQuery,
   useUpdateVolunteerStatusMutation,

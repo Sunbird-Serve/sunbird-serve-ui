@@ -20,6 +20,7 @@ import {
   Alert,
   Skeleton,
   Chip,
+  CircularProgress,
 } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -27,6 +28,8 @@ import { StatusChip } from '@features/dashboard/components/StatusChip';
 import {
   useGetNominationsQuery,
   useConfirmNominationMutation,
+  useDropVolunteerMutation,
+  getApiErrorMessage,
   NominationItem,
 } from '../api/needsApi';
 import { useGetAllUsersQuery } from '@features/dashboard/api/dashboardApi';
@@ -41,10 +44,13 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
   const [rejectTarget, setRejectTarget] = useState<NominationItem | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [dialogError, setDialogError] = useState('');
 
   const { data: nominations = [], isLoading, refetch } = useGetNominationsQuery(needId);
   const { data: allUsers = [] } = useGetAllUsersQuery();
   const [confirmNomination, { isLoading: confirming }] = useConfirmNominationMutation();
+  const [dropVolunteer, { isLoading: dropping }] = useDropVolunteerMutation();
+  const submitting = confirming || dropping;
 
   // Enrich nominations with user info
   const enrichedNominations = useMemo(() => {
@@ -81,98 +87,14 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
   }, [enrichedNominations, tab]);
 
   const handleAccept = async (nom: NominationItem) => {
-    const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
-
     try {
-      // Step 1: Check for existing backfilled volunteers for this need
-      const backfilledNoms = enrichedNominations.filter(
-        (n) => n.needId === nom.needId && n.nominationStatus === 'Backfill',
-      );
-
-      if (backfilledNoms.length > 0) {
-        const { getAuthHeaders, getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
-        const authHeaders = getAuthHeaders();
-        const authJsonHeaders = getAuthHeadersWithJson();
-        // Step 2: For each backfilled volunteer, pause their deliverables and inactivate plan
-        for (const bNom of backfilledNoms) {
-          try {
-            // Get fulfillments for the backfilled volunteer
-            const fulfResp = await fetch(
-              `${BASE_URL}/api/v1/serve-fulfill/fulfillment/volunteer-read/${bNom.nominatedUserId}?page=0&size=100`,
-              { headers: authHeaders },
-            );
-            if (fulfResp.ok) {
-              const fulfData = await fulfResp.json();
-              const fulfillments = Array.isArray(fulfData) ? fulfData : (fulfData.content || []);
-              const relevantFulfillments = fulfillments.filter(
-                (f: { needId: string }) => f.needId === nom.needId,
-              );
-
-              for (const fulfillment of relevantFulfillments) {
-                const planId = fulfillment.needPlanId;
-
-                // Get deliverables for this plan
-                const delivResp = await fetch(
-                  `${BASE_URL}/api/v1/serve-need/need-deliverable/${planId}`,
-                  { headers: authHeaders },
-                );
-                if (delivResp.ok) {
-                  const delivData = await delivResp.json();
-                  const deliverables = delivData.needDeliverable || [];
-
-                  // Update all "Planned" deliverables to "PlannedPause"
-                  for (const deliverable of deliverables) {
-                    if (deliverable.status === 'Planned') {
-                      await fetch(
-                        `${BASE_URL}/api/v1/serve-need/need-deliverable/update/${deliverable.id}`,
-                        {
-                          method: 'PUT',
-                          headers: authJsonHeaders,
-                          body: JSON.stringify({
-                            needPlanId: planId,
-                            status: 'PlannedPause',
-                            deliverableDate: deliverable.deliverableDate,
-                            comments: deliverable.comments || '',
-                          }),
-                        },
-                      );
-                    }
-                  }
-                }
-
-                // Inactivate the need plan (may fail if role lacks permission — non-critical)
-                try {
-                  await fetch(
-                    `${BASE_URL}/api/v1/serve-need/need-plan/status/${planId}?status=Inactive`,
-                    { method: 'PUT', headers: authHeaders },
-                  );
-                } catch { /* non-critical — plan inactivation is best-effort */ }
-              }
-            }
-          } catch {
-            // Continue even if one backfill processing fails
-          }
-
-          // Mark the backfilled nomination status (re-confirm as Backfill)
-          await confirmNomination({
-            needId: nom.needId,
-            userId: bNom.nominatedUserId,
-            nominationId: bNom.id,
-            status: 'Backfill',
-          }).unwrap();
-        }
-      }
-
-      // Step 3: Approve the new volunteer
       await confirmNomination({
         needId: nom.needId,
         userId: nom.nominatedUserId,
         nominationId: nom.id,
         status: 'Approved',
       }).unwrap();
-
       setSuccessMsg('Nomination accepted successfully.');
-      refetch();
     } catch {
       setSuccessMsg('Failed to process acceptance. Please try again.');
     }
@@ -181,29 +103,37 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
   const handleRejectClick = (nom: NominationItem) => {
     setRejectTarget(nom);
     setRejectReason('');
+    setDialogError('');
     setRejectDialog(true);
   };
 
   const handleRejectConfirm = async () => {
-    if (!rejectTarget) return;
-    if (!rejectReason.trim()) return; // Reason is mandatory
-    const status = tab === 1 ? 'Backfill' : 'Rejected';
+    if (!rejectTarget || submitting) return;
+    const comments = rejectReason.trim();
+    if (!comments) return; // Reason is mandatory
+    setDialogError('');
     try {
-      await confirmNomination({
-        needId: rejectTarget.needId,
-        userId: rejectTarget.nominatedUserId,
-        nominationId: rejectTarget.id,
-        status,
-        comments: rejectReason.trim(),
-      }).unwrap();
-      setSuccessMsg(tab === 1 ? 'Volunteer dropped.' : 'Nomination rejected.');
+      if (tab === 1) {
+        await dropVolunteer({ nominationId: rejectTarget.id, comments }).unwrap();
+        setSuccessMsg('Volunteer dropped.');
+      } else {
+        await confirmNomination({
+          needId: rejectTarget.needId,
+          userId: rejectTarget.nominatedUserId,
+          nominationId: rejectTarget.id,
+          status: 'Rejected',
+          comments,
+        }).unwrap();
+        setSuccessMsg('Nomination rejected.');
+      }
       setRejectDialog(false);
-      refetch();
-    } catch {
-      setSuccessMsg('');
+    } catch (err) {
+      const { status, message } = getApiErrorMessage(err);
+      setDialogError(message);
+      // Stale data: reload so the list matches the server
+      if (status === 404 || status === 409) refetch();
     }
   };
-
   // Clear success message after 3s
   useEffect(() => {
     if (successMsg) {
@@ -213,9 +143,8 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
   }, [successMsg]);
 
   const nominatedCount = enrichedNominations.filter((n) => n.nominationStatus === 'Nominated').length;
-  const acceptedCount = enrichedNominations.filter(
-    (n) => n.nominationStatus === 'Approved' || n.nominationStatus === 'Backfill',
-  ).length;
+  // Dropped volunteers stay in the list but are not counted as accepted
+  const acceptedCount = enrichedNominations.filter((n) => n.nominationStatus === 'Approved').length;
   const rejectedCount = enrichedNominations.filter((n) => n.nominationStatus === 'Rejected').length;
 
   return (
@@ -304,7 +233,7 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
                         </Button>
                       </Stack>
                     )}
-                    {tab === 1 && nom.nominationStatus !== 'Backfill' && (
+                    {tab === 1 && (
                       <Button
                         size="small"
                         variant="outlined"
@@ -323,14 +252,19 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
       )}
 
       {/* Reject/Drop Dialog */}
-      <Dialog open={rejectDialog} onClose={() => setRejectDialog(false)} maxWidth="sm" fullWidth>
+      <Dialog open={rejectDialog} onClose={() => !submitting && setRejectDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{tab === 1 ? 'Drop Volunteer' : 'Reject Nomination'}</DialogTitle>
         <DialogContent>
+          {dialogError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {dialogError}
+            </Alert>
+          )}
           <Typography variant="body2" sx={{ mb: 2 }}>
             {rejectTarget?.userInfo?.identityDetails?.fullname || 'Volunteer'}
           </Typography>
           <TextField
-            label="Reason *"
+            label="Reason"
             multiline
             rows={3}
             value={rejectReason}
@@ -344,8 +278,14 @@ export function NominationsPanel({ needId }: NominationsPanelProps) {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setRejectDialog(false)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={handleRejectConfirm} disabled={confirming || !rejectReason.trim()}>
+          <Button onClick={() => setRejectDialog(false)} disabled={submitting}>Cancel</Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={handleRejectConfirm}
+            disabled={submitting || !rejectReason.trim()}
+            startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : undefined}
+          >
             Confirm
           </Button>
         </DialogActions>

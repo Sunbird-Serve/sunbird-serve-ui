@@ -21,6 +21,7 @@ import PendingIcon from '@mui/icons-material/Pending';
 import { useAppSelector } from '@app/store';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
+import { apiUrl } from '@shared/utils/apiUrls';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -114,7 +115,7 @@ export function NeedSchedulePage() {
       try {
         // Get fulfillments for this coordinator
         const fulfResp = await fetch(
-          `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=50`,
+          apiUrl(`/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=50`),
           { headers: getAuthHeaders() },
         );
         if (!fulfResp.ok) { setLoading(false); return; }
@@ -152,7 +153,7 @@ export function NeedSchedulePage() {
             let volunteerPhone = '';
             if (fulf.assignedUserId) {
               try {
-                const volResp = await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${fulf.assignedUserId}`, { headers: getAuthHeaders() });
+                const volResp = await fetch(apiUrl(`/api/v1/serve-volunteering/user/${fulf.assignedUserId}`), { headers: getAuthHeaders() });
                 if (volResp.ok) {
                   const volData = await volResp.json();
                   volunteerName = volData?.identityDetails?.fullname || volData?.identityDetails?.name || '';

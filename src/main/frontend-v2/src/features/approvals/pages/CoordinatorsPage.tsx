@@ -38,6 +38,8 @@ import { useAppSelector } from '@app/store';
 import { PageHeader } from '@shared/components';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
 import { getAuthHeaders, getAuthHeadersWithJson } from '@shared/utils/authHeaders';
+import { apiUrl } from '@shared/utils/apiUrls';
+import { readErrorMessage } from '@shared/utils/apiError';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -108,7 +110,7 @@ export function CoordinatorsPage() {
 
         // Get all users → filter nCoordinators
         const usersResp = await fetch(
-          `${BASE_URL}/api/v1/serve-volunteering/user/all-users`,
+          apiUrl(`/api/v1/serve-volunteering/user/all-users`),
           { headers },
         );
         let allUsers: Coordinator[] = [];
@@ -230,34 +232,50 @@ export function CoordinatorsPage() {
   const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   // Actions
+  // The backend validates the FULL user on PUT /user/{id} (identityDetails, contactDetails and
+  // role are required), so a status change sends the existing record with the new status.
+  const changeStatus = async (coord: Coordinator, status: 'Active' | 'Inactive') => {
+    const resp = await fetch(apiUrl(`/api/v1/serve-volunteering/user/${coord.osid}`), {
+      method: 'PUT',
+      headers: getAuthHeadersWithJson(),
+      body: JSON.stringify({
+        identityDetails: coord.identityDetails,
+        contactDetails: coord.contactDetails,
+        role: coord.role,
+        agencyId: coord.agencyId,
+        status,
+      }),
+    });
+    if (!resp.ok) {
+      throw new Error(await readErrorMessage(resp, `Failed to set the coordinator to ${status}.`));
+    }
+    setCoordinators((prev) => prev.map((c) => c.osid === coord.osid ? { ...c, status } : c));
+  };
+
   const handleApprove = async (coord: Coordinator) => {
+    if (actionLoading) return;
     setActionLoading(true);
+    setError('');
     try {
-      await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${coord.osid}`, {
-        method: 'PUT',
-        headers: getAuthHeadersWithJson(),
-        body: JSON.stringify({ status: 'Active' }),
-      });
-      setCoordinators((prev) => prev.map((c) => c.osid === coord.osid ? { ...c, status: 'Active' } : c));
+      await changeStatus(coord, 'Active');
       setSuccess(`${coord.identityDetails?.fullname || ''} approved.`);
       setTimeout(() => setSuccess(''), 4000);
-    } catch { setError('Failed to approve.'); }
-    finally { setActionLoading(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to approve.');
+    } finally { setActionLoading(false); }
   };
 
   const handleDeactivate = async (coord: Coordinator) => {
+    if (actionLoading) return;
     setActionLoading(true);
+    setError('');
     try {
-      await fetch(`${BASE_URL}/api/v1/serve-volunteering/user/${coord.osid}`, {
-        method: 'PUT',
-        headers: getAuthHeadersWithJson(),
-        body: JSON.stringify({ status: 'Inactive' }),
-      });
-      setCoordinators((prev) => prev.map((c) => c.osid === coord.osid ? { ...c, status: 'Inactive' } : c));
-      setSuccess(`Coordinator deactivated.`);
+      await changeStatus(coord, 'Inactive');
+      setSuccess('Coordinator deactivated.');
       setTimeout(() => setSuccess(''), 4000);
-    } catch { setError('Failed to deactivate.'); }
-    finally { setActionLoading(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to deactivate.');
+    } finally { setActionLoading(false); }
   };
 
   const handleAssignEntity = async () => {

@@ -17,6 +17,9 @@ interface ImportMetaEnv {
   readonly VITE_SAMUDAYA_PRIVACY_URL?: string;
   readonly VITE_SAMUDAYA_TERMS_URL?: string;
   readonly VITE_SUNBIRD_SERVE_URL?: string;
+  readonly VITE_VOLUNTEER_CONTENT_URL?: string;
+  readonly VITE_COMMUNITY_URL?: string;
+  readonly VITE_COMMUNITY_LABEL?: string;
 }
 
 interface ImportMeta {

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -24,9 +25,13 @@ import BusinessIcon from '@mui/icons-material/Business';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import CloseIcon from '@mui/icons-material/Close';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ScheduleIcon from '@mui/icons-material/Schedule';
 import { useAppSelector } from '@app/store';
-import { useSelfNominateMutation, AvailableNeed } from '../api/exploreApi';
+import { useSelfNominateMutation, useGetVolunteerProfileQuery, AvailableNeed } from '../api/exploreApi';
+import { availabilityOf, hasAvailability, type Availability } from '../utils/availability';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
+import { apiUrl } from '@shared/utils/apiUrls';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -59,6 +64,67 @@ function getEndDate(need: AvailableNeed): string {
   return (schedule?.endDate as string)?.substring(0, 10) || '';
 }
 
+const WEEK_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+// Days (Mon..Sun) a need runs on, read from its days text such as "Monday,Wednesday".
+function needDays(need: AvailableNeed): string[] {
+  const text = formatDays(need).toLowerCase();
+  return WEEK_DAYS.filter((d) => text.includes(d.toLowerCase()));
+}
+
+function firstSlotMinutes(need: AvailableNeed): { start: number; end: number | null } | null {
+  const schedule = need.requirement?.schedule || need.occurrence;
+  const slot = (schedule?.timeSlots || need.timeSlots)?.[0];
+  const s = slot?.startTime?.match(/(\d{2}):(\d{2})/);
+  if (!s) return null;
+  const e = slot?.endTime?.match(/(\d{2}):(\d{2})/);
+  return {
+    start: parseInt(s[1]) * 60 + parseInt(s[2]),
+    end: e ? parseInt(e[1]) * 60 + parseInt(e[2]) : null,
+  };
+}
+
+type TimeOfDay = 'morning' | 'afternoon' | 'evening';
+function timeOfDay(startMinutes: number): TimeOfDay {
+  if (startMinutes < 12 * 60) return 'morning';
+  if (startMinutes < 16 * 60) return 'afternoon';
+  return 'evening';
+}
+
+// True when the need fits the volunteer's saved availability: every day the need runs is a day
+// they can volunteer, and the session time falls in a time of day they chose. Needs with no
+// day or time information to compare are not marked as matching.
+function matchesAvailability(need: AvailableNeed, a: Availability): boolean {
+  if (!hasAvailability(a)) return false;
+  const nd = needDays(need);
+  const slot = firstSlotMinutes(need);
+  const compareDays = a.days.length > 0 && nd.length > 0;
+  const compareTime = a.times.length > 0 && slot !== null;
+  if (!compareDays && !compareTime) return false;
+  const dayOk = !compareDays || nd.every((d) => a.days.includes(d));
+  const timeOk = !compareTime || a.times.includes(timeOfDay(slot!.start));
+  return dayOk && timeOk;
+}
+
+// e.g. "2 days/week · 1 hr per session · till 28 Feb 2026"
+function commitmentLine(need: AvailableNeed): string {
+  const parts: string[] = [];
+  const days = needDays(need).length;
+  if (days > 0) parts.push(`${days} day${days > 1 ? 's' : ''}/week`);
+  const slot = firstSlotMinutes(need);
+  if (slot?.end != null && slot.end > slot.start) {
+    const mins = slot.end - slot.start;
+    parts.push(mins < 60 ? `${mins} min per session` : `${mins / 60} hr${mins / 60 === 1 ? '' : 's'} per session`);
+  }
+  const end = getEndDate(need);
+  if (end) {
+    const d = new Date(end + 'T00:00:00');
+    if (!Number.isNaN(d.getTime())) {
+      parts.push(`till ${d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}`);
+    }
+  }
+  return parts.join(' · ');
+}
 // Indian academic year (Apr–Mar): starting calendar year for a given ISO date.
 function academicYearOf(dateStr: string): number | null {
   if (!dateStr) return null;
@@ -85,8 +151,14 @@ function accentFor(key: string): string {
 }
 
 export function ExploreNeedsPage() {
+  const navigate = useNavigate();
   const user = useAppSelector((state) => state.user.data);
   const userId = user?.osid || '';
+
+  // The volunteer's saved availability, used to highlight matching needs
+  const { data: volunteerProfile } = useGetVolunteerProfileQuery(userId, { skip: !userId });
+  const availability = useMemo(() => availabilityOf(volunteerProfile), [volunteerProfile]);
+  const hasAvail = hasAvailability(availability);
 
   const [needs, setNeeds] = useState<AvailableNeed[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -119,6 +191,7 @@ export function ExploreNeedsPage() {
   const [error, setError] = useState('');
   const [nominatedIds, setNominatedIds] = useState<string[]>([]);
   const [hasPendingNomination, setHasPendingNomination] = useState(false);
+  const [pendingNeedIds, setPendingNeedIds] = useState<string[]>([]);
 
   // Check if volunteer already has a pending nomination
   useEffect(() => {
@@ -127,7 +200,7 @@ export function ExploreNeedsPage() {
       try {
         const { getAuthHeaders } = await import('@shared/utils/authHeaders');
         const resp = await fetch(
-          `${BASE_URL}/api/v1/serve-fulfill/nomination/${userId}?page=0&size=50`,
+          apiUrl(`/api/v1/serve-fulfill/nomination/${userId}?page=0&size=50`),
           { headers: getAuthHeaders() },
         );
         if (resp.ok) {
@@ -136,6 +209,7 @@ export function ExploreNeedsPage() {
           const pending = noms.filter((n: { nominationStatus: string }) => n.nominationStatus === 'Nominated');
           const alreadyNominated = noms.map((n: { needId: string }) => n.needId);
           setHasPendingNomination(pending.length > 0);
+          setPendingNeedIds(pending.map((n: { needId: string }) => n.needId));
           setNominatedIds(alreadyNominated);
         }
       } catch { /* silent */ }
@@ -147,21 +221,44 @@ export function ExploreNeedsPage() {
   // Academic-year filter: 'all' or a starting year number as string.
   const [yearFilter, setYearFilter] = useState<string>('all');
 
-  // Filter needs by search
-  const filteredNeeds = useMemo(() => {
-    if (!search.trim()) return needs;
-    const q = search.toLowerCase();
-    return needs.filter((need) => {
-      const name = (need.need?.name || need.name || '').toLowerCase();
-      const entity = (need.entity?.name || '').toLowerCase();
-      const district = (need.entity?.district || '').toLowerCase();
-      const days = formatDays(need).toLowerCase();
-      const skills = (need.requirement?.skillDetails || '').toLowerCase();
-      const timeSlots = formatTimeSlots(need).toLowerCase();
-      return name.includes(q) || entity.includes(q) || district.includes(q) || days.includes(q) || skills.includes(q) || timeSlots.includes(q);
-    });
-  }, [needs, search]);
+  // Availability filters: days the volunteer is free, and time of day
+  const [dayFilter, setDayFilter] = useState<string[]>([]);
+  const [timeFilter, setTimeFilter] = useState<'any' | TimeOfDay>('any');
+  const [matchOnly, setMatchOnly] = useState(false);
+  const filtersActive = dayFilter.length > 0 || timeFilter !== 'any' || matchOnly;
 
+  // Filter needs by search, free days and time of day
+  const filteredNeeds = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return needs.filter((need) => {
+      if (q) {
+        const name = (need.need?.name || need.name || '').toLowerCase();
+        const entity = (need.entity?.name || '').toLowerCase();
+        const district = (need.entity?.district || '').toLowerCase();
+        const days = formatDays(need).toLowerCase();
+        const skills = (need.requirement?.skillDetails || '').toLowerCase();
+        const timeSlots = formatTimeSlots(need).toLowerCase();
+        const match = name.includes(q) || entity.includes(q) || district.includes(q) || days.includes(q) || skills.includes(q) || timeSlots.includes(q);
+        if (!match) return false;
+      }
+      if (dayFilter.length > 0) {
+        // Show needs that run on at least one of the selected days
+        const nd = needDays(need);
+        if (nd.length > 0 && !nd.some((d) => dayFilter.includes(d))) return false;
+      }
+      if (timeFilter !== 'any') {
+        const slot = firstSlotMinutes(need);
+        if (!slot || timeOfDay(slot.start) !== timeFilter) return false;
+      }
+      if (matchOnly && !matchesAvailability(need, availability)) return false;
+      return true;
+    });
+  }, [needs, search, dayFilter, timeFilter, matchOnly, availability]);
+
+  const pendingNeedName = useMemo(() => {
+    const n = needs.find((x) => pendingNeedIds.includes(x.need?.id || x.id));
+    return n ? n.need?.name || n.name : '';
+  }, [needs, pendingNeedIds]);
   // Group filtered needs by academic year (current year first, then desc).
   const curAY = currentAcademicYear();
   const groupedByYear = useMemo(() => {
@@ -211,7 +308,7 @@ export function ExploreNeedsPage() {
       return;
     }
     if (hasPendingNomination) {
-      setError('You already have a pending nomination. Please wait for it to be reviewed before expressing interest in another need.');
+      setError('You can have one pending nomination at a time. Once your coordinator reviews it, you can express interest in another need.');
       setSelectedNeed(null);
       return;
     }
@@ -286,6 +383,67 @@ export function ExploreNeedsPage() {
         </Box>
       </Paper>
 
+      {/* Availability filters */}
+      <Paper variant="outlined" sx={{ p: 2, mb: 2.5, borderRadius: 2 }}>
+        <Stack spacing={1.5}>
+          {userId && (
+            <Box>
+              {hasAvail ? (
+                <Chip
+                  icon={<CheckCircleIcon />}
+                  label="Matches my availability"
+                  onClick={() => setMatchOnly((v) => !v)}
+                  color={matchOnly ? 'success' : 'default'}
+                  variant={matchOnly ? 'filled' : 'outlined'}
+                />
+              ) : (
+                <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Typography variant="caption" color="text.secondary">
+                    Set your available days and times to see needs that match.
+                  </Typography>
+                  <Button size="small" onClick={() => navigate('/explore/profile')}>Set my availability</Button>
+                </Stack>
+              )}
+            </Box>
+          )}
+          <Box>
+            <Typography variant="caption" color="text.secondary" fontWeight={600}>NEEDS RUNNING ON ANY OF THESE DAYS</Typography>
+            <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 0.5 }}>
+              {WEEK_DAYS.map((d) => (
+                <Chip
+                  key={d}
+                  label={d}
+                  size="small"
+                  onClick={() => setDayFilter((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d]))}
+                  color={dayFilter.includes(d) ? 'primary' : 'default'}
+                  variant={dayFilter.includes(d) ? 'filled' : 'outlined'}
+                />
+              ))}
+            </Stack>
+          </Box>
+          <Box>
+            <Typography variant="caption" color="text.secondary" fontWeight={600}>TIME OF DAY</Typography>
+            <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 0.5 }}>
+              {([['any', 'Any time'], ['morning', 'Morning'], ['afternoon', 'Afternoon'], ['evening', 'Evening']] as const).map(([value, label]) => (
+                <Chip
+                  key={value}
+                  label={label}
+                  size="small"
+                  onClick={() => setTimeFilter(value)}
+                  color={timeFilter === value ? 'primary' : 'default'}
+                  variant={timeFilter === value ? 'filled' : 'outlined'}
+                />
+              ))}
+              {filtersActive && (
+                <Button size="small" onClick={() => { setDayFilter([]); setTimeFilter('any'); setMatchOnly(false); }}>
+                  Clear filters
+                </Button>
+              )}
+            </Stack>
+          </Box>
+        </Stack>
+      </Paper>
+
       {/* Academic-year filter chips */}
       {availableYears.length > 1 && (
         <Stack direction="row" spacing={1} sx={{ mb: 2.5, flexWrap: 'wrap', gap: 1 }}>
@@ -310,8 +468,12 @@ export function ExploreNeedsPage() {
       {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
       {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
       {hasPendingNomination && !success && !error && (
-        <Alert severity="info" sx={{ mb: 2 }}>
-          You have a pending nomination. Please wait for it to be reviewed before expressing interest in another need.
+        <Alert
+          severity="info"
+          sx={{ mb: 2 }}
+          action={<Button color="inherit" size="small" onClick={() => navigate('/explore/nominations')}>View</Button>}
+        >
+          You can have one pending nomination at a time{pendingNeedName ? ` (${pendingNeedName})` : ''}. Once your coordinator reviews it, you can express interest in another need.
         </Alert>
       )}
 
@@ -319,7 +481,7 @@ export function ExploreNeedsPage() {
         <Paper sx={{ p: 5, textAlign: 'center', borderRadius: 3 }}>
           <VolunteerActivismIcon sx={{ fontSize: 48, color: 'primary.main', opacity: 0.5, mb: 1 }} />
           <Typography variant="body1" color="text.secondary">
-            {search ? 'No needs match your search.' : userId ? 'No needs available right now. Check back later.' : 'Please login to explore available needs.'}
+            {search || filtersActive ? 'No needs match your search or filters.' : userId ? 'No needs available right now. Check back later.' : 'Please login to explore available needs.'}
           </Typography>
           {!userId && (
             <Button variant="contained" href="/login" sx={{ mt: 2 }}>
@@ -346,6 +508,7 @@ export function ExploreNeedsPage() {
                       <NeedCard
                         need={need}
                         alreadyNominated={nominatedIds.includes(need.need?.id || need.id)}
+                        matches={matchesAvailability(need, availability)}
                         onOpen={() => setSelectedNeed(need)}
                       />
                     </Grid>
@@ -367,6 +530,7 @@ export function ExploreNeedsPage() {
                     <NeedCard
                       need={need}
                       alreadyNominated={nominatedIds.includes(need.need?.id || need.id)}
+                      matches={matchesAvailability(need, availability)}
                       onOpen={() => setSelectedNeed(need)}
                     />
                   </Grid>
@@ -424,6 +588,12 @@ export function ExploreNeedsPage() {
                         <Typography variant="body2">{formatTimeSlots(selectedNeed)}</Typography>
                       </Stack>
                     )}
+                    {commitmentLine(selectedNeed) && (
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <ScheduleIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                        <Typography variant="body2" fontWeight={500}>{commitmentLine(selectedNeed)}</Typography>
+                      </Stack>
+                    )}
                     {getStartDate(selectedNeed) && (
                       <Typography variant="caption" color="text.secondary">
                         Period: {getStartDate(selectedNeed)} to {getEndDate(selectedNeed)}
@@ -464,7 +634,7 @@ export function ExploreNeedsPage() {
                   onClick={() => handleNominate(selectedNeed)}
                   disabled={nominating || hasPendingNomination || nominatedIds.includes(selectedNeed.need?.id || selectedNeed.id)}
                 >
-                  {nominatedIds.includes(selectedNeed.need?.id || selectedNeed.id) ? 'Interest Submitted' : hasPendingNomination ? 'Pending Nomination Exists' : "I'm Interested"}
+                  {nominatedIds.includes(selectedNeed.need?.id || selectedNeed.id) ? 'Interest Submitted' : hasPendingNomination ? 'Another Nomination Pending' : "I'm Interested"}
                 </Button>
               ) : (
                 <Button
@@ -486,10 +656,12 @@ export function ExploreNeedsPage() {
 function NeedCard({
   need,
   alreadyNominated,
+  matches,
   onOpen,
 }: {
   need: AvailableNeed;
   alreadyNominated: boolean;
+  matches: boolean;
   onOpen: () => void;
 }) {
   const needId = need.need?.id || need.id;
@@ -498,6 +670,7 @@ function NeedCard({
   const district = need.entity?.district || '';
   const days = formatDays(need);
   const timeSlots = formatTimeSlots(need);
+  const commitment = commitmentLine(need);
   const skills = (need.requirement?.skillDetails || '')
     .split(',')
     .map((s) => s.trim())
@@ -521,6 +694,16 @@ function NeedCard({
       }}
     >
       <Box sx={{ p: 2.5, flexGrow: 1 }}>
+        {matches && (
+          <Chip
+            icon={<CheckCircleIcon />}
+            label="Matches your availability"
+            size="small"
+            color="success"
+            variant="outlined"
+            sx={{ mb: 1 }}
+          />
+        )}
         <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 1, lineHeight: 1.3 }}>
           {needName}
         </Typography>
@@ -547,6 +730,12 @@ function NeedCard({
             <Stack direction="row" spacing={0.75} alignItems="center">
               <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
               <Typography variant="caption" color="text.secondary">{timeSlots}</Typography>
+            </Stack>
+          )}
+          {commitment && (
+            <Stack direction="row" spacing={0.75} alignItems="center">
+              <ScheduleIcon sx={{ fontSize: 16, color: accent }} />
+              <Typography variant="caption" fontWeight={600}>{commitment}</Typography>
             </Stack>
           )}
         </Stack>

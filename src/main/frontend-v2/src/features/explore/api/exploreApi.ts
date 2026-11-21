@@ -29,6 +29,7 @@ export interface VolunteerNomination {
 }
 
 export interface VolunteerProfile {
+  osid?: string; // the profile record's own id
   skills?: { skillName: string; skillLevel: string }[];
   genericDetails?: {
     qualification?: string;
@@ -43,6 +44,12 @@ export interface VolunteerProfile {
     language?: string[];
   };
   userId?: string;
+  agencyId?: string;
+  // Kept as returned by the server and sent back unchanged on update
+  onboardDetails?: unknown;
+  consentDetails?: unknown;
+  referenceChannelId?: string;
+  volunteeringHours?: unknown;
 }
 
 export const exploreApi = baseApi.injectEndpoints({
@@ -80,19 +87,47 @@ export const exploreApi = baseApi.injectEndpoints({
     }),
 
     // Get volunteer profile
-    // GET /api/v1/serve-volunteering/user/user-profile/{userId}
+    // GET /api/v1/serve-volunteering/user/user-profile/userId/{userId}
+    // Looks the profile up by the volunteer's user id. (The plain /user-profile/{id} form
+    // expects the profile record's own id and answers 404 for a user id.)
     getVolunteerProfile: builder.query<VolunteerProfile, string>({
-      query: (userId) => `/api/v1/serve-volunteering/user/user-profile/${userId}`,
+      query: (userId) => `/api/v1/serve-volunteering/user/user-profile/userId/${userId}`,
+      providesTags: ['Profile'],
     }),
 
     // Update volunteer profile
-    // PUT /api/v1/serve-volunteering/user/user-profile/{userId}
-    updateVolunteerProfile: builder.mutation<unknown, { userId: string; body: Partial<VolunteerProfile> }>({
-      query: ({ userId, body }) => ({
-        url: `/api/v1/serve-volunteering/user/user-profile/${userId}`,
+    // PUT /api/v1/serve-volunteering/user/user-profile/{profileId}
+    // profileId is the profile record's own id (osid), not the user id.
+    updateVolunteerProfile: builder.mutation<unknown, { profileId: string; body: Partial<VolunteerProfile> }>({
+      query: ({ profileId, body }) => ({
+        url: `/api/v1/serve-volunteering/user/user-profile/${profileId}`,
         method: 'PUT',
         body,
       }),
+      invalidatesTags: ['Profile'],
+    }),
+
+    // Create a volunteer profile (for volunteers who do not have one yet)
+    // POST /api/v1/serve-volunteering/user/user-profile
+    createVolunteerProfile: builder.mutation<unknown, Partial<VolunteerProfile>>({
+      query: (body) => ({
+        url: '/api/v1/serve-volunteering/user/user-profile',
+        method: 'POST',
+        body,
+      }),
+      invalidatesTags: ['Profile'],
+    }),
+
+    // Update the volunteer's own personal and contact details.
+    // PUT /api/v1/serve-volunteering/user/{osid}
+    // The backend validates the FULL user (identityDetails, contactDetails, role), so send all of it.
+    updateVolunteerUser: builder.mutation<unknown, { osid: string; body: Record<string, unknown> }>({
+      query: ({ osid, body }) => ({
+        url: `/api/v1/serve-volunteering/user/${osid}`,
+        method: 'PUT',
+        body,
+      }),
+      invalidatesTags: ['User'],
     }),
   }),
 });
@@ -103,4 +138,6 @@ export const {
   useGetMyNominationsQuery,
   useGetVolunteerProfileQuery,
   useUpdateVolunteerProfileMutation,
+  useCreateVolunteerProfileMutation,
+  useUpdateVolunteerUserMutation,
 } = exploreApi;

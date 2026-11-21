@@ -13,6 +13,7 @@ import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { useGetAgenciesQuery } from '@features/volunteers/api/volunteersApi';
 import { PageHeader } from '@shared/components';
 import { getAuthHeadersWithJson } from '@shared/utils/authHeaders';
+import { readErrorMessage, normalizeEmail } from '@shared/utils/apiError';
 
 const VOLUNTEERING_BASE = import.meta.env.VITE_API_BASE_URL_VOLUNTEERING;
 
@@ -45,6 +46,7 @@ export function CreateUserPage() {
       return;
     }
 
+    if (saving) return;
     setSaving(true);
     try {
       const resp = await fetch(`${VOLUNTEERING_BASE}/api/v1/serve-volunteering/user/onboard`, {
@@ -54,7 +56,7 @@ export function CreateUserPage() {
           role: [role],
           agencyId,
           contactDetails: {
-            email,
+            email: normalizeEmail(email),
             mobile,
             address: { city: '', state: '', country: 'India' },
           },
@@ -70,8 +72,8 @@ export function CreateUserPage() {
       });
 
       if (!resp.ok) {
-        const data = await resp.json().catch(() => null);
-        throw new Error(data?.message || `Failed to create user (${resp.status})`);
+        // 409 = a user with this email already exists, 503 = try again shortly
+        throw new Error(await readErrorMessage(resp, `Failed to create user (${resp.status})`));
       }
 
       setSuccess(`User "${fullName}" created successfully with role ${role}. Login credentials sent to their mobile.`);

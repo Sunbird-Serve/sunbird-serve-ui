@@ -19,6 +19,7 @@ export interface User {
   };
   role: string[];
   agencyId?: string;
+  status?: string;
 }
 
 export interface Need {

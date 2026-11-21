@@ -43,6 +43,7 @@ import { useBrowseEntitiesQuery } from '../api/onboardingApi';
 import type { OnboardingRequestResponse } from '../api/onboardingApi';
 import { useAppSelector } from '@app/store';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
+import { readErrorMessage, normalizeEmail } from '@shared/utils/apiError';
 
 type StatusFilter = '' | 'Pending' | 'Clarification' | 'Authorised' | 'Rejected';
 
@@ -128,7 +129,11 @@ export function OnboardingRequestsPage() {
   // Fetch all entities to cross-reference entityId → block
   const { data: allEntitiesData } = useBrowseEntitiesQuery({ size: 5000 });
 
-  const [reviewRequest, { isLoading: reviewing }] = useReviewOnboardingRequestMutation();
+  const [reviewRequest, { isLoading: reviewingRequest }] = useReviewOnboardingRequestMutation();
+  // Also covers the account-creation call that runs before the review is saved,
+  // so a double click cannot create the account twice
+  const [submitting, setSubmitting] = useState(false);
+  const reviewing = reviewingRequest || submitting;
 
   // Build entityId → block lookup
   const entityBlockMap = useMemo(() => {
@@ -181,6 +186,8 @@ export function OnboardingRequestsPage() {
       setError('Notes are required for this action.');
       return;
     }
+    if (submitting) return;
+    setSubmitting(true);
     setError('');
     try {
       // For Authorise: first create coordinator account, then update request with returned userId
@@ -206,7 +213,7 @@ export function OnboardingRequestsPage() {
               role: ['nCoordinator'],
               agencyId: reviewTarget.agencyId,
               contactDetails: {
-                email: reviewTarget.email,
+                email: normalizeEmail(reviewTarget.email),
                 mobile: reviewTarget.mobile,
                 address: { city: '', state: '', country: 'India' },
               },
@@ -223,7 +230,10 @@ export function OnboardingRequestsPage() {
         );
 
         if (!onboardResp.ok) {
-          throw new Error(`Failed to create coordinator account (${onboardResp.status})`);
+          // 409 = a user with this email already exists, 503 = try again shortly
+          throw new Error(
+            await readErrorMessage(onboardResp, `Failed to create coordinator account (${onboardResp.status})`),
+          );
         }
 
         const onboardData = await onboardResp.json();
@@ -259,8 +269,10 @@ export function OnboardingRequestsPage() {
       );
       setReviewDialog(false);
       setTimeout(() => setSuccess(''), 5000);
-    } catch {
-      setError('Failed to process review. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to process review. Please try again.');
+    } finally {
+      setSubmitting(false);
     }
   };
 

@@ -28,6 +28,7 @@ import {
   useAssignAgencyMutation,
   statusOptionsForRole,
 } from '../api/volunteersApi';
+import { apiUrl } from '@shared/utils/apiUrls';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -86,7 +87,7 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
         const headers = getAuthHeaders();
 
         // Fetch nominations
-        const nomResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/nomination/${volunteer.osid}?page=0&size=50`, { headers });
+        const nomResp = await fetch(apiUrl(`/api/v1/serve-fulfill/nomination/${volunteer.osid}?page=0&size=50`), { headers });
         let noms: { id: string; needId: string; nominationStatus: string }[] = [];
         if (nomResp.ok) {
           const nomData = await nomResp.json();
@@ -94,7 +95,7 @@ export function VolunteerDetailDialog({ volunteer, agencies, isAdmin, onClose }:
         }
 
         // Also fetch fulfillments (assigned needs)
-        const fulfResp = await fetch(`${BASE_URL}/api/v1/serve-fulfill/fulfillment/volunteer-read/${volunteer.osid}?page=0&size=50`, { headers });
+        const fulfResp = await fetch(apiUrl(`/api/v1/serve-fulfill/fulfillment/volunteer-read/${volunteer.osid}?page=0&size=50`), { headers });
         let fulfs: { needId: string }[] = [];
         if (fulfResp.ok) {
           const fulfData = await fulfResp.json();

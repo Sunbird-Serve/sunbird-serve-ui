@@ -19,7 +19,17 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import AddLinkIcon from '@mui/icons-material/AddLink';
+import AddIcon from '@mui/icons-material/Add';
 import { StatusChip } from '@features/dashboard/components/StatusChip';
+import { useAuth } from '@features/auth/hooks/useAuth';
+import {
+  SESSION_CREATE_ROLES,
+  addSession,
+  fetchPlanDeliverables,
+  pickDefaultParams,
+  saveSessionUpdate,
+  todayLocalISO,
+} from '../utils/sessionActions';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
@@ -77,6 +87,14 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
   const [editStudents, setEditStudents] = useState('');
   const [editDate, setEditDate] = useState('');
   const [saving, setSaving] = useState(false);
+
+  // Add session state
+  const [addOpen, setAddOpen] = useState(false);
+  const [addDate, setAddDate] = useState('');
+  const [adding, setAdding] = useState(false);
+
+  const { roles } = useAuth();
+  const canCreate = roles.some((r) => SESSION_CREATE_ROLES.includes(r));
 
   // Session link state
   const [editingLink, setEditingLink] = useState(false);
@@ -189,11 +207,21 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     setEditStatus(d.status || 'Planned');
     setEditComments(d.comments || '');
     setEditStudents(d.numberOfAttendees?.toString() || '');
-    setEditDate(d.deliverableDate?.split('T')[0] || '');
+    setEditDate(''); // reschedule date: empty = do not reschedule
   };
 
   const cancelEdit = () => {
     setEditingId(null);
+  };
+
+  const reloadDeliverables = async (planId: string) => {
+    try {
+      const data = await fetchPlanDeliverables(planId);
+      setDeliverables(data.deliverables);
+      setInputParams(data.inputParams);
+    } catch {
+      // Keep the current list if the refresh fails
+    }
   };
 
   const saveEdit = async (d: Deliverable) => {
@@ -201,44 +229,58 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     if (!editStudents) { setError('Student count is required.'); return; }
     if (editStatus !== 'Planned' && !editComments) { setError('Remarks are required.'); return; }
 
+    const isCancel = editStatus === 'Cancelled' || editStatus === 'Offline';
+    const originalDate = d.deliverableDate?.split('T')[0] || '';
+    const rescheduleTo = isCancel && canCreate && editDate && editDate !== originalDate ? editDate : undefined;
+    if (rescheduleTo && rescheduleTo <= todayLocalISO()) {
+      setError('Please select a future date to reschedule.');
+      return;
+    }
+
+    const planId = d.needPlanId || needPlanId;
     setSaving(true);
     setError('');
     try {
-      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
-      await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${d.id}`, {
-        method: 'PUT',
-        headers: getAuthHeadersWithJson(),
-        body: JSON.stringify({
-          needPlanId: d.needPlanId || needPlanId,
-          status: editStatus,
-          comments: editComments,
-          deliverableDate: editDate || d.deliverableDate?.split('T')[0] || '',
-          outputParameters: {
-            numberOfAttendees: parseInt(editStudents) || 0,
-            submittedUrl: '',
-            remarks: editComments,
-          },
-        }),
+      await saveSessionUpdate({
+        planId,
+        deliverable: d,
+        status: editStatus,
+        comments: editComments,
+        students: parseInt(editStudents) || 0,
+        rescheduleTo,
+        params: rescheduleTo ? d.inputParameters || pickDefaultParams(deliverables) : undefined,
       });
-
-      // Update local state
-      setDeliverables((prev) =>
-        prev.map((item) =>
-          item.id === d.id
-            ? { ...item, status: editStatus, comments: editComments, deliverableDate: editDate ? `${editDate}T00:00:00.000Z` : item.deliverableDate }
-            : item,
-        ),
-      );
-      setSuccess('Session updated successfully.');
+      setSuccess(rescheduleTo ? `Session updated and rescheduled to ${rescheduleTo}.` : 'Session updated successfully.');
       cancelEdit();
       setTimeout(() => setSuccess(''), 3000);
-    } catch {
-      setError('Failed to update session.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update session.');
     } finally {
+      await reloadDeliverables(planId);
       setSaving(false);
     }
   };
 
+  const defaultParams = pickDefaultParams(deliverables);
+
+  const handleAddSession = async () => {
+    if (!addDate) { setError('Please select a date.'); return; }
+    if (addDate < todayLocalISO()) { setError('Please select today or a future date.'); return; }
+    setAdding(true);
+    setError('');
+    try {
+      await addSession({ needPlanId, date: addDate, params: defaultParams });
+      setSuccess(`Session added for ${addDate}.`);
+      setAddOpen(false);
+      setAddDate('');
+      setTimeout(() => setSuccess(''), 3000);
+      await reloadDeliverables(needPlanId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not add the session.');
+    } finally {
+      setAdding(false);
+    }
+  };
   // Save session link — updates JSONB inputParameters on each Planned deliverable
   const handleSaveLink = async () => {
     if (!sessionLink.trim()) { setError('Please enter a valid URL.'); return; }
@@ -375,9 +417,10 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
                   <MenuItem value="Volunteer Not Available">Volunteer Not Available</MenuItem>
                   <MenuItem value="Infra Related Issues">Infra Related Issues</MenuItem>
                 </TextField>
+                {canCreate && (
                 <Paper variant="outlined" sx={{ p: 2, bgcolor: 'rgba(14, 116, 144, 0.03)' }}>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                    Would you like to reschedule this session to another day?
+                    A new Planned session will be created on this date with the same time and link.
                   </Typography>
                   <TextField
                     label="Reschedule to" type="date" value={editDate}
@@ -386,6 +429,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
                     helperText="Leave empty if not rescheduling"
                   />
                 </Paper>
+                )}
               </>
             )}
             {editStatus === 'Planned' && (
@@ -417,7 +461,7 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
     );
   }
 
-  if (deliverables.length === 0) {
+  if (deliverables.length === 0 && !needPlanId) {
     return (
       <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 4 }}>
         No sessions found for this need.
@@ -496,6 +540,41 @@ export function SessionsPanel({ needId }: SessionsPanelProps) {
           </Stack>
         )}
       </Paper>
+
+      {/* Add Session */}
+      {canCreate && needPlanId && (
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+          {!addOpen ? (
+            <Button size="small" startIcon={<AddIcon />} onClick={() => { setAddOpen(true); setAddDate(''); }}>
+              Add Session
+            </Button>
+          ) : (
+            <Stack spacing={1.5}>
+              <Typography variant="subtitle2" fontWeight={600}>Add Session</Typography>
+              <TextField
+                label="Date *" type="date" value={addDate}
+                onChange={(e) => setAddDate(e.target.value)}
+                size="small" sx={{ maxWidth: 200 }} InputLabelProps={{ shrink: true }}
+                inputProps={{ min: todayLocalISO() }}
+              />
+              <Typography variant="caption" color="text.secondary">
+                {defaultParams?.startTime
+                  ? `Time ${formatTime(defaultParams.startTime)} – ${formatTime(defaultParams.endTime)}`
+                  : 'No previous session time found'}
+                {defaultParams?.inputUrl ? ' and the same session link will be used.' : '.'}
+              </Typography>
+              <Stack direction="row" spacing={1}>
+                <Button size="small" variant="contained" onClick={handleAddSession} disabled={adding || !addDate}>
+                  {adding ? 'Adding...' : 'Add'}
+                </Button>
+                <Button size="small" variant="text" onClick={() => setAddOpen(false)} disabled={adding}>
+                  Cancel
+                </Button>
+              </Stack>
+            </Stack>
+          )}
+        </Paper>
+      )}
 
       {/* Today's sessions */}
       {todaySessions.length > 0 && (

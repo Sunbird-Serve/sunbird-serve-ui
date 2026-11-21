@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useAuth } from '@features/auth';
+import { COMMUNITY_URL, COMMUNITY_LABEL } from '@config/community';
 import TodayIcon from '@mui/icons-material/Today';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import ExploreIcon from '@mui/icons-material/Explore';
@@ -94,6 +95,17 @@ export function VolunteerLayout() {
             <MenuItem disabled>
               <Typography variant="body2">{firebaseUser?.email}</Typography>
             </MenuItem>
+            {COMMUNITY_URL && (
+              <MenuItem
+                component="a"
+                href={COMMUNITY_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleProfileMenuClose}
+              >
+                {COMMUNITY_LABEL}
+              </MenuItem>
+            )}
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Toolbar>

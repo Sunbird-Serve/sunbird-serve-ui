@@ -13,6 +13,12 @@ import {
   Divider,
   TextField,
   MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -24,8 +30,14 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import { useAppSelector } from '@app/store';
 import { WelcomeBanner } from '../components/WelcomeBanner';
 import { StatusChip } from '../components/StatusChip';
+import {
+  fetchPlanDeliverables,
+  pickDefaultParams,
+  saveSessionUpdate,
+  todayLocalISO,
+} from '@features/needs/utils/sessionActions';
+import { apiUrl } from '@shared/utils/apiUrls';
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL_NEED;
 
 interface Fulfillment {
   needId: string;
@@ -108,10 +120,11 @@ export function NCoordinatorDashboard() {
 
         // Get fulfillments for this coordinator
         const fulfResp = await fetch(
-          `${BASE_URL}/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=10`,
+          apiUrl(`/api/v1/serve-fulfill/fulfillment/coordinator-read/${userId}?page=0&size=100`),
           { headers },
         );
         if (!fulfResp.ok) {
+          setError('Could not load your sessions. Please refresh the page.');
           setLoading(false);
           return;
         }
@@ -129,15 +142,18 @@ export function NCoordinatorDashboard() {
           return;
         }
 
-        // For each fulfillment, get deliverables (some may 500 for old/stale plans — skip those)
-        const sessionResults: SessionData[] = [];
-        for (const fulf of fulfs) {
+        // Load every fulfillment in parallel (some may 500 for old/stale plans, skip those)
+        const loadSession = async (fulf: Fulfillment): Promise<SessionData | null> => {
           try {
-            // Get need plan info (for the need name)
-            const planResp = await fetch(
-              `${BASE_URL}/api/v1/serve-need/need-plan/${fulf.needId}`,
-              { headers },
-            );
+            const [planResp, volResp, delivResp] = await Promise.all([
+              fetch(apiUrl(`/api/v1/serve-need/need-plan/${fulf.needId}`), { headers }),
+              fulf.assignedUserId
+                ? fetch(apiUrl(`/api/v1/serve-volunteering/user/${fulf.assignedUserId}`), { headers }).catch(() => null)
+                : Promise.resolve(null),
+              fetch(apiUrl(`/api/v1/serve-need/need-deliverable/${fulf.needPlanId}`), { headers }),
+            ]);
+
+            // Need name and plan status
             let needName = '';
             let planStatus = '';
             if (planResp.ok) {
@@ -151,54 +167,41 @@ export function NCoordinatorDashboard() {
             }
 
             // Skip inactive plans (backfilled volunteers)
-            if (planStatus === 'Inactive') continue;
+            if (planStatus === 'Inactive') return null;
 
-            // Get volunteer details
+            // Volunteer details
             let volunteerName = '';
             let volunteerPhone = '';
-            if (fulf.assignedUserId) {
+            if (volResp && volResp.ok) {
               try {
-                const volResp = await fetch(
-                  `${BASE_URL}/api/v1/serve-volunteering/user/${fulf.assignedUserId}`,
-                  { headers },
-                );
-                if (volResp.ok) {
-                  const volData = await volResp.json();
-                  volunteerName = volData?.identityDetails?.fullname || volData?.identityDetails?.name || '';
-                  volunteerPhone = volData?.contactDetails?.mobile || '';
-                }
+                const volData = await volResp.json();
+                volunteerName = volData?.identityDetails?.fullname || volData?.identityDetails?.name || '';
+                volunteerPhone = volData?.contactDetails?.mobile || '';
               } catch {
-                // Skip if volunteer fetch fails
+                // Skip if volunteer data is unreadable
               }
             }
 
-            // Get deliverables
-            const delivResp = await fetch(
-              `${BASE_URL}/api/v1/serve-need/need-deliverable/${fulf.needPlanId}`,
-              { headers },
-            );
-            if (delivResp.ok) {
-              const delivData = await delivResp.json();
-              const deliverables = delivData.needDeliverable || delivData.content || [];
-              const inputParams = delivData.inputParameters || [];
-              if (deliverables.length > 0 || inputParams.length > 0) {
-                sessionResults.push({
-                  fulfillment: fulf,
-                  deliverables: Array.isArray(deliverables) ? deliverables : [],
-                  inputParams: Array.isArray(inputParams) ? inputParams : [],
-                  needName,
-                  volunteerName,
-                  volunteerPhone,
-                });
-              }
-            } else {
-              // Skip failed plans (stale/deleted)
-            }
+            // Deliverables (skip failed plans, stale or deleted)
+            if (!delivResp.ok) return null;
+            const delivData = await delivResp.json();
+            const deliverables = delivData.needDeliverable || delivData.content || [];
+            const inputParams = delivData.inputParameters || [];
+            if (deliverables.length === 0 && inputParams.length === 0) return null;
+            return {
+              fulfillment: fulf,
+              deliverables: Array.isArray(deliverables) ? deliverables : [],
+              inputParams: Array.isArray(inputParams) ? inputParams : [],
+              needName,
+              volunteerName,
+              volunteerPhone,
+            };
           } catch {
-            // Skip failed individual fetches
+            return null;
           }
-        }
-        setSessions(sessionResults);
+        };
+        const loaded = await Promise.all(fulfs.map(loadSession));
+        const sessionResults = loaded.filter((s): s is SessionData => s !== null);        setSessions(sessionResults);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load sessions');
       } finally {
@@ -236,6 +239,22 @@ export function NCoordinatorDashboard() {
   upcomingDeliverables.sort((a, b) => a.deliverable.deliverableDate.localeCompare(b.deliverable.deliverableDate));
   const upcomingSlice = upcomingDeliverables.slice(0, 10);
 
+  // Session counts per need (the grade is part of the need name, e.g. "English Grade 7 ...")
+  const summaryMap = new Map<string, { completed: number; cancelled: number; planned: number }>();
+  for (const session of sessions) {
+    const key = session.needName || 'Unnamed need';
+    const row = summaryMap.get(key) || { completed: 0, cancelled: 0, planned: 0 };
+    for (const d of session.deliverables) {
+      if (d.status === 'Completed') row.completed++;
+      else if (d.status === 'Cancelled') row.cancelled++;
+      else if (d.status === 'Planned') row.planned++;
+    }
+    summaryMap.set(key, row);
+  }
+  const sessionSummary = Array.from(summaryMap.entries())
+    .map(([name, counts]) => ({ name, ...counts }))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
   // Total session count for debug info
   const totalDeliverables = sessions.reduce((sum, s) => sum + s.deliverables.length, 0);
 
@@ -245,7 +264,7 @@ export function NCoordinatorDashboard() {
     setEditStatus(d.status || 'Planned');
     setEditComments(d.comments || '');
     setEditStudents(d.numberOfAttendees?.toString() || '');
-    setEditDate(d.deliverableDate?.split('T')[0] || '');
+    setEditDate(''); // reschedule date: empty = do not reschedule
   };
 
   const cancelEdit = () => {
@@ -257,49 +276,49 @@ export function NCoordinatorDashboard() {
     if (!editComments && editStatus !== 'Planned') { setError('Remarks are required.'); return; }
     if (!editStudents) { setError('Student count is required.'); return; }
 
+    const isCancel = editStatus === 'Cancelled' || editStatus === 'Offline';
+    const originalDate = d.deliverableDate?.split('T')[0] || '';
+    const rescheduleTo = isCancel && editDate && editDate !== originalDate ? editDate : undefined;
+    if (rescheduleTo && rescheduleTo <= todayLocalISO()) {
+      setError('Please select a future date to reschedule.');
+      return;
+    }
+
     setSaving(true);
     setError('');
     try {
-      const { getAuthHeadersWithJson } = await import('@shared/utils/authHeaders');
-      const headers = getAuthHeadersWithJson();
-
-      await fetch(`${BASE_URL}/api/v1/serve-need/need-deliverable/update/${d.id}`, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({
-          needPlanId: planId,
-          comments: editComments,
-          status: editStatus,
-          deliverableDate: editDate ? `${editDate}` : d.deliverableDate?.split('T')[0] || '',
-          outputParameters: {
-            numberOfAttendees: parseInt(editStudents) || 0,
-            submittedUrl: '',
-            remarks: editComments,
-          },
-        }),
+      const session = sessions.find((s) => s.fulfillment.needPlanId === planId);
+      await saveSessionUpdate({
+        planId,
+        deliverable: d,
+        status: editStatus,
+        comments: editComments,
+        students: parseInt(editStudents) || 0,
+        rescheduleTo,
+        params: rescheduleTo ? d.inputParameters || pickDefaultParams(session?.deliverables || []) : undefined,
       });
-
-      // Update local state
-      setSessions((prev) =>
-        prev.map((s) => ({
-          ...s,
-          deliverables: s.deliverables.map((item) =>
-            item.id === d.id
-              ? { ...item, status: editStatus, comments: editComments, deliverableDate: editDate ? `${editDate}T00:00:00.000Z` : item.deliverableDate }
-              : item,
-          ),
-        })),
-      );
-      setSuccess('Session updated!');
+      setSuccess(rescheduleTo ? `Session updated and rescheduled to ${rescheduleTo}.` : 'Session updated!');
       cancelEdit();
       setTimeout(() => setSuccess(''), 3000);
-    } catch {
-      setError('Failed to update.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update.');
     } finally {
+      // Reload this plan's sessions so the new Planned session shows up
+      try {
+        const fresh = await fetchPlanDeliverables(planId);
+        setSessions((prev) =>
+          prev.map((s) =>
+            s.fulfillment.needPlanId === planId
+              ? { ...s, deliverables: fresh.deliverables as Deliverable[], inputParams: fresh.inputParams }
+              : s,
+          ),
+        );
+      } catch {
+        // Keep the current list if the refresh fails
+      }
       setSaving(false);
     }
   };
-
   const renderDeliverable = (
     d: Deliverable,
     params: InputParameter | null,
@@ -428,7 +447,7 @@ export function NCoordinatorDashboard() {
             {(editStatus === 'Cancelled' || editStatus === 'Offline') && (
               <Paper variant="outlined" sx={{ p: 2, bgcolor: 'rgba(14, 116, 144, 0.03)' }}>
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                  Would you like to reschedule this session to another day?
+                  A new Planned session will be created on this date with the same time and link.
                 </Typography>
                 <TextField
                   label="Reschedule to"
@@ -474,6 +493,37 @@ export function NCoordinatorDashboard() {
         </Stack>
       ) : (
         <>
+          {/* Session summary per grade / need */}
+          {sessionSummary.length > 0 && (
+            <Box>
+              <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>
+                Session Summary
+              </Typography>
+              <TableContainer component={Paper} variant="outlined">
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 600 }}>Grade / Need</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }} align="right">Completed</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }} align="right">Cancelled</TableCell>
+                      <TableCell sx={{ fontWeight: 600 }} align="right">Planned</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {sessionSummary.map((row) => (
+                      <TableRow key={row.name}>
+                        <TableCell>{row.name}</TableCell>
+                        <TableCell align="right">{row.completed}</TableCell>
+                        <TableCell align="right">{row.cancelled}</TableCell>
+                        <TableCell align="right">{row.planned}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Box>
+          )}
+
           {/* Today's Sessions — Primary focus */}
           <Box>
             <Typography variant="h6" fontWeight={600} sx={{ mb: 1.5 }}>

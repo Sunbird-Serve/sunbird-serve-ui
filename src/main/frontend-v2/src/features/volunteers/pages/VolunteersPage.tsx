@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -19,7 +19,11 @@ import {
   Skeleton,
   Button,
   Grid,
+  Alert,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import SearchIcon from '@mui/icons-material/Search';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -35,6 +39,8 @@ import {
   VolunteerUser,
 } from '../api/volunteersApi';
 import { VolunteerDetailDialog } from '../components/VolunteerDetailDialog';
+import { DeleteUserDialog } from '../components/DeleteDialogs';
+import { useAuth } from '@features/auth/hooks/useAuth';
 
 const STATUS_CARDS = [
   { key: 'all', label: 'All', icon: null, color: 'primary.main' },
@@ -50,6 +56,16 @@ export function VolunteersPage() {
   const role = Array.isArray(user?.role) ? user?.role[0] : user?.role;
   const isAdmin = role === 'vAdmin' || role === 'sAdmin';
   const userAgencyId = user?.agencyId;
+  // Only super admins may delete users
+  const { roles: authRoles } = useAuth();
+  const isSuperAdmin = authRoles.includes('sAdmin');
+  const columnCount = 5 + (isAdmin ? 1 : 0) + (isSuperAdmin ? 1 : 0);
+  const [deleteTarget, setDeleteTarget] = useState<VolunteerUser | null>(null);
+  // A message passed from the detail page after it deleted a user
+  const location = useLocation();
+  const [notice, setNotice] = useState(
+    (location.state as { notice?: string } | null)?.notice || '',
+  );
 
   const { data: allUsers = [], isLoading } = useGetAllVolunteersQuery();
   const { data: agencies = [] } = useGetAgenciesQuery();
@@ -120,6 +136,8 @@ export function VolunteersPage() {
         icon={<PeopleIcon />}
       />
 
+      {notice && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setNotice('')}>{notice}</Alert>}
+
       {/* Status Cards */}
       <Grid container spacing={1.5} sx={{ mb: 3 }}>
         {STATUS_CARDS.map((card) => (
@@ -185,20 +203,21 @@ export function VolunteersPage() {
                 <TableCell sx={{ fontWeight: 600 }}>City</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
                 {isAdmin && <TableCell sx={{ fontWeight: 600 }}>Agency</TableCell>}
+                {isSuperAdmin && <TableCell sx={{ fontWeight: 600 }} align="right">Actions</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
               {isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i}>
-                    {Array.from({ length: isAdmin ? 6 : 5 }).map((_, j) => (
+                    {Array.from({ length: columnCount }).map((_, j) => (
                       <TableCell key={j}><Skeleton /></TableCell>
                     ))}
                   </TableRow>
                 ))
               ) : paginatedVolunteers.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={isAdmin ? 6 : 5} align="center" sx={{ py: 6 }}>
+                  <TableCell colSpan={columnCount} align="center" sx={{ py: 6 }}>
                     <Typography variant="body2" color="text.secondary">No volunteers found</Typography>
                   </TableCell>
                 </TableRow>
@@ -240,6 +259,20 @@ export function VolunteersPage() {
                           )}
                         </TableCell>
                       )}
+                      {isSuperAdmin && (
+                        <TableCell align="right">
+                          <Tooltip title="Delete user">
+                            <IconButton
+                              size="small"
+                              color="error"
+                              aria-label="Delete user"
+                              onClick={(e) => { e.stopPropagation(); setDeleteTarget(vol); }}
+                            >
+                              <DeleteOutlineIcon fontSize="small" />
+                            </IconButton>
+                          </Tooltip>
+                        </TableCell>
+                      )}
                     </TableRow>
                   );
                 })
@@ -257,6 +290,12 @@ export function VolunteersPage() {
           rowsPerPageOptions={[10, 15, 25]}
         />
       </Paper>
+
+      <DeleteUserDialog
+        user={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onDone={(message) => { setDeleteTarget(null); setNotice(message); setPage(0); }}
+      />
 
       {/* Detail Dialog (kept for quick view) */}
       <VolunteerDetailDialog

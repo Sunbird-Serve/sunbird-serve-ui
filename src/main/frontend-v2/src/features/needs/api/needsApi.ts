@@ -124,6 +124,28 @@ export interface NominationItem {
   };
 }
 
+export interface DropVolunteerResponse {
+  nominationId: string;
+  status: string;
+  sessionsPaused: number;
+}
+
+// Error body returned by the backend: { status, error, message, details?: { comments?: string } }
+export function getApiErrorMessage(err: unknown): { status?: number; message: string } {
+  const e = err as { status?: number | string; data?: { message?: string; details?: { comments?: string } } };
+  const status = typeof e?.status === 'number' ? e.status : undefined;
+  if (status === 503) {
+    return { status, message: 'Please try again in a few seconds.' };
+  }
+  if (status === 400 && e.data?.details?.comments) {
+    return { status, message: e.data.details.comments };
+  }
+  if (status !== undefined && status !== 500 && e.data?.message) {
+    return { status, message: e.data.message };
+  }
+  return { status, message: 'Something went wrong. Please try again.' };
+}
+
 // Normalize API response — handles both old nested format and new flat format
 function normalizeNeedItem(item: Record<string, unknown>): NeedListItem | null {
   if (!item) return null;
@@ -317,6 +339,21 @@ export const needsApi = baseApi.injectEndpoints({
       invalidatesTags: ['Nomination', 'Need'],
     }),
 
+    // Drop an approved volunteer. The server marks the nomination Backfill, pauses the
+    // volunteer's sessions and resets the need status. Safe to retry.
+    // POST /api/v1/serve-fulfill/nomination/{nominationId}/drop-volunteer
+    dropVolunteer: builder.mutation<
+      DropVolunteerResponse,
+      { nominationId: string; comments: string }
+    >({
+      query: ({ nominationId, comments }) => ({
+        url: `/api/v1/serve-fulfill/nomination/${nominationId}/drop-volunteer`,
+        method: 'POST',
+        body: { comments: comments.trim() },
+      }),
+      invalidatesTags: ['Nomination', 'Need', 'NeedPlan'],
+    }),
+
     // Fetch deliverables by need plan
     // GET /api/v1/serve-need/need-deliverable/{needPlanId}
     getDeliverables: builder.query<
@@ -387,6 +424,7 @@ export const {
   useUpdateNeedMutation,
   useGetNominationsQuery,
   useConfirmNominationMutation,
+  useDropVolunteerMutation,
   useGetDeliverablesQuery,
   useUpdateDeliverableMutation,
   useCreateDeliverableMutation,
