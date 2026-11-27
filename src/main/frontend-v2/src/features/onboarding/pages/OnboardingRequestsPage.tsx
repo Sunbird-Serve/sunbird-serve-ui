@@ -42,6 +42,7 @@ import {
 import { useBrowseEntitiesQuery } from '../api/onboardingApi';
 import type { OnboardingRequestResponse } from '../api/onboardingApi';
 import { useAppSelector } from '@app/store';
+import { useAuth } from '@features/auth/hooks/useAuth';
 import { getAuthHeaders } from '@shared/utils/authHeaders';
 import { readErrorMessage, normalizeEmail } from '@shared/utils/apiError';
 
@@ -89,6 +90,9 @@ export function OnboardingRequestsPage() {
   // Get nAdmin's user info to derive their entity scope
   const user = useAppSelector((state) => state.user.data);
   const userId = user?.osid || '';
+  // sAdmin sees all onboarding requests, whatever institutions are mapped to them
+  const { roles: authRoles } = useAuth();
+  const isSuperAdmin = authRoles.includes('sAdmin');
 
   // Fetch nAdmin's mapped entities to scope onboarding requests
   const [adminEntityIds, setAdminEntityIds] = useState<string[]>([]);
@@ -96,6 +100,12 @@ export function OnboardingRequestsPage() {
 
   useEffect(() => {
     async function fetchAdminEntities() {
+      // Super admins see every request, so there is no institution list to load
+      if (isSuperAdmin) {
+        setAdminEntityIds([]);
+        setAdminEntitiesLoading(false);
+        return;
+      }
       if (!userId) return;
       try {
         const headers = getAuthHeaders();
@@ -117,7 +127,7 @@ export function OnboardingRequestsPage() {
       }
     }
     fetchAdminEntities();
-  }, [userId]);
+  }, [userId, isSuperAdmin]);
 
   // Fetch onboarding requests
   const { data, isLoading, isFetching } = useListOnboardingRequestsQuery({
@@ -149,12 +159,13 @@ export function OnboardingRequestsPage() {
   // Filter requests: only show those where entityId is in nAdmin's mapped entities
   const blockFilteredRequests = useMemo(() => {
     const allRequests = data?.content ?? [];
+    if (isSuperAdmin) return allRequests;
     // If we couldn't determine admin entities, show all (graceful fallback)
     if (adminEntityIds.length === 0 && !adminEntitiesLoading) return allRequests;
     if (adminEntityIds.length === 0) return [];
 
     return allRequests.filter((req) => adminEntityIds.includes(req.entityId));
-  }, [data, adminEntityIds, adminEntitiesLoading]);
+  }, [data, adminEntityIds, adminEntitiesLoading, isSuperAdmin]);
 
   // Pagination (client-side since we fetched all)
   const PAGE_SIZE = 10;
@@ -307,7 +318,12 @@ export function OnboardingRequestsPage() {
         )}
       />
 
-      {adminEntityIds.length > 0 && (
+      {isSuperAdmin && (
+        <Alert severity="info" sx={{ mb: 2 }}>
+          Showing requests from all institutions.
+        </Alert>
+      )}
+      {!isSuperAdmin && adminEntityIds.length > 0 && (
         <Alert severity="info" sx={{ mb: 2 }}>
           Showing requests for your {adminEntityIds.length} mapped institution{adminEntityIds.length > 1 ? 's' : ''}.
         </Alert>
@@ -352,7 +368,7 @@ export function OnboardingRequestsPage() {
           <SchoolIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 1 }} />
           <Typography variant="h6" fontWeight={600}>No requests</Typography>
           <Typography variant="body2" color="text.secondary">
-            No {statusFilter.toLowerCase() || ''} onboarding requests found for your block.
+            No {statusFilter.toLowerCase() || ''} onboarding requests found{isSuperAdmin ? '.' : ' for your block.'}
           </Typography>
         </Paper>
       )}
